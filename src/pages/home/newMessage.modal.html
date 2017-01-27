@@ -1,0 +1,26 @@
+<ion-header>
+	<ion-toolbar [color]="'primaryDarker'">
+		<ion-title>
+			Select Contacts
+		</ion-title>
+		<ion-buttons start>
+			<button ion-button (click)="dismiss()">
+				<span ion-text color="light" showWhen="ios">Cancel</span>
+				<ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+			</button>
+		</ion-buttons>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content>
+	<ion-searchbar animated [(ngModel)]="searchTerm" (ionInput)="getUsers()"></ion-searchbar>
+	<ion-list>
+		<ion-item *ngFor="let friend of friends;">
+			<ion-avatar item-left>
+				<img src="{{friend.picture.medium}}">
+			</ion-avatar>
+			<ion-label>{{friend.name.first}} {{friend.name.last}}</ion-label>
+			<ion-checkbox checked="false" clear item-right></ion-checkbox>
+		</ion-item>
+	</ion-list>
+</ion-content>

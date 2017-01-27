@@ -2,29 +2,55 @@ page-home {
 
 }
 
-.topic__user {
+.topic {
 	.label p {
-		height: 2em;
+		// let's hope this works everywhere...
+		display: -webkit-box;
+		white-space: normal;
+		text-overflow: ellipsis;
+
+		min-height: 2.5em;
+
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
 	}
 
-	&.topic__user--new-message {
-		.label p {
-			height: 3em;
+	.note {
+		align-self: flex-start;
+		line-height: 1em;
+		font-size: 0.9em;
+		.icon {
+			font-size: 1em;
+			line-height: 1em;
 		}
 	}
 
-	&.topic__user--online {
+	&.topic--new {
+		.label p {
+			min-height: 3.5em;
+			-webkit-line-clamp: 3;
+		}
+	}
+
+	&.topic--online {
 		.user__image {
 			background: map-get($colors, primary);
 		}
 	}
 }
 
+.topic--new--last {
+	border-bottom: 20px solid map-get($colors, primary) !important;
+	.item-inner {
+		border: none;
+	}
+}
+
 .user__image {
 	position: relative;
 
-	height: calc(3em) !important;
-	width: calc(3em - 5px) !important;
+	width: calc(4em - 5px) !important;
+	height: 4em !important;
 
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 
@@ -35,8 +61,8 @@ page-home {
 	position: absolute;
 	top: 2px; left: 2px;
 
-	height: calc(3em - 4px) !important;
-	width: calc(3em - 5px - 4px) !important;
+	height: calc(100% - 4px) !important;
+	width: calc(100% - 4px) !important;
 
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 	border-radius: 0 !important;

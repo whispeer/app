@@ -1,24 +1,35 @@
 <ion-header>
-	<ion-navbar>
+	<ion-navbar [color]="'primaryDarker'" no-border>
 		<ion-title>Chats</ion-title>
 	</ion-navbar>
 </ion-header>
 
 <ion-content class="list-avatar-page">
-	<ion-searchbar [showCancelButton]="true" animated></ion-searchbar>
+	<ion-searchbar [showCancelButton]="true" animated [(ngModel)]="searchTerm" (ionInput)="getUsers()"></ion-searchbar>
 	<ion-list>
 		<!-- <ion-list-header>Yesterday</ion-list-header> -->
 		<!-- User is online when its lastname is longer than 4. Hehe. -->
-		<ion-item *ngFor="let user of users" class="topic__user" [ngClass]="{'topic__user--online': user.name.last.length > 5}">
+		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--online': topic.user.online, 'topic--new': topic.topic.newMessage, 'topic--new--last': topic.lastNew}">
 			<ion-avatar item-left class="user__image">
-				<img src="{{user.picture.thumbnail}}" class="user__image__image">
+				<img src="{{topic.user.picture.medium}}" class="user__image__image">
 			</ion-avatar>
-			<h2>{{user.name.first}} {{user.name.last}}</h2>
-			<p>Lorem Ipsum!</p>
-			<ion-note item-right>11:11 pm</ion-note>
+			<h2>{{topic.user.name.first}} {{topic.user.name.last}}</h2>
+			<p>{{topic.topic.lastMessage}}</p>
+			<ion-note item-right>{{topic.topic.date | date: "EEEE"}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 		</ion-item>
 	</ion-list>
-	<ion-fab class="fab--hexagon" center bottom>
-		<button class="fab--hexagon__button" ion-fab color="light"><ion-icon name="add"></ion-icon></button>
+	<ion-fab center bottom #fab>
+		<div class="fab--hexagon">
+			<button (press)="showOptions(fab)" (click)="handleClick(fab)" class="fab--hexagon__button" ion-fab color="light"><ion-icon name="add"></ion-icon></button>
+		</div>
+		<ion-fab-list side="top">
+			<button ion-fab color="primary"><ion-icon name="logo-vimeo"></ion-icon></button>
+		</ion-fab-list>
+		<ion-fab-list side="left">
+			<button ion-fab color="light"><ion-icon name="logo-googleplus"></ion-icon></button>
+		</ion-fab-list>
+		<ion-fab-list side="right">
+			<button ion-fab color="dark"><ion-icon name="logo-twitter"></ion-icon></button>
+		</ion-fab-list>
 	</ion-fab>
 </ion-content>
