@@ -1,17 +1,24 @@
 <ion-header>
 	<ion-navbar>
-		<ion-title>Home</ion-title>
+		<ion-title>Chats</ion-title>
 	</ion-navbar>
 </ion-header>
 
-<ion-content padding>
-	<h2>Welcome to Ionic!</h2>
-	<p>
-		This starter project comes with simple tabs-based layout for apps
-		that are going to primarily use a Tabbed UI.
-	</p>
-	<p>
-		Take a look at the <code>src/pages/</code> directory to add or change tabs,
-		update any existing page or create new pages.
-	</p>
+<ion-content class="list-avatar-page">
+	<ion-searchbar [showCancelButton]="true" animated></ion-searchbar>
+	<ion-list>
+		<!-- <ion-list-header>Yesterday</ion-list-header> -->
+		<!-- User is online when its lastname is longer than 4. Hehe. -->
+		<ion-item *ngFor="let user of users" class="topic__user" [ngClass]="{'topic__user--online': user.name.last.length > 5}">
+			<ion-avatar item-left class="user__image">
+				<img src="{{user.picture.thumbnail}}" class="user__image__image">
+			</ion-avatar>
+			<h2>{{user.name.first}} {{user.name.last}}</h2>
+			<p>Lorem Ipsum!</p>
+			<ion-note item-right>11:11 pm</ion-note>
+		</ion-item>
+	</ion-list>
+	<ion-fab class="fab--hexagon" center bottom>
+		<button class="fab--hexagon__button" ion-fab color="light"><ion-icon name="add"></ion-icon></button>
+	</ion-fab>
 </ion-content>

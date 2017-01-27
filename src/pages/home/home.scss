@@ -1,3 +1,43 @@
 page-home {
 
 }
+
+.topic__user {
+	.label p {
+		height: 2em;
+	}
+
+	&.topic__user--new-message {
+		.label p {
+			height: 3em;
+		}
+	}
+
+	&.topic__user--online {
+		.user__image {
+			background: map-get($colors, primary);
+		}
+	}
+}
+
+.user__image {
+	position: relative;
+
+	height: calc(3em) !important;
+	width: calc(3em - 5px) !important;
+
+	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+
+	background: map-get($colors, grey);
+}
+
+.user__image__image {
+	position: absolute;
+	top: 2px; left: 2px;
+
+	height: calc(3em - 4px) !important;
+	width: calc(3em - 5px - 4px) !important;
+
+	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+	border-radius: 0 !important;
+}
