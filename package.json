@@ -37,10 +37,13 @@
 		"cordova-plugin-console",
 		"cordova-plugin-statusbar",
 		"cordova-plugin-device",
-		"cordova-plugin-splashscreen"
+		"cordova-plugin-splashscreen",
+		{
+			"locator": "https://github.com/driftyco/cordova-plugin-wkwebview-engine.git",
+			"id": "cordova-plugin-wkwebview-engine"
+		}
 	],
 	"cordovaPlatforms": [
-		"ios",
 		{
 			"platform": "ios",
 			"version": "",
