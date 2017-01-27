@@ -1,0 +1,13 @@
+<ion-header>
+	<ion-navbar [color]="'primaryDarker'" no-border>
+		<ion-title>Ulrich Benz</ion-title>
+	</ion-navbar>
+</ion-header>
+
+<ion-content no-scroll>
+	<ion-list no-lines inset [virtualScroll]="messages" approxItemHeight="45px">
+		<ion-item class="message" [ngClass]="{'message--me': message.user.isMe}" *virtualItem="let message">
+			{{ message.text }}
+		</ion-item>
+	</ion-list>
+</ion-content>

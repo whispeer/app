@@ -1,0 +1,12 @@
+.message {
+	background: map-get($colors, light_grey);
+	margin: 1em 0;
+
+	white-space: normal;
+	border-radius: 3px;
+}
+
+.message--me {
+	background: map-get($colors, primary);
+	color: #fff;
+}

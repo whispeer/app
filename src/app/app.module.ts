@@ -4,6 +4,8 @@ import { MyApp } from './app.component';
 import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
+import { MessagesPage } from "../pages/messages/messages";
+
 import { NewMessageModal } from "../pages/home/newMessage.modal";
 
 import { UserService } from "../assets/services/user.service";
@@ -14,6 +16,7 @@ import { UserService } from "../assets/services/user.service";
 		AboutPage,
 		ContactPage,
 		HomePage,
+		MessagesPage,
 		NewMessageModal
 	],
 	imports: [
@@ -25,6 +28,7 @@ import { UserService } from "../assets/services/user.service";
 		AboutPage,
 		ContactPage,
 		HomePage,
+		MessagesPage,
 		NewMessageModal
 	],
 	providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, UserService]

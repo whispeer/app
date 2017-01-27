@@ -3,6 +3,7 @@ import { Component } from "@angular/core";
 import { ModalController, NavController, FabContainer } from "ionic-angular";
 
 import { NewMessageModal } from "./newMessage.modal";
+import { MessagesPage } from "../messages/messages";
 
 import { UserService } from "../../assets/services/user.service";
 
@@ -25,6 +26,7 @@ export class HomePage {
 				user.online = user.name.last.length > 5;
 
 				let item = {
+					id: index,
 					topic: {
 						title: "",
 						lastMessage: "Lorem Ipsum dolor sit amet.",
@@ -66,6 +68,10 @@ export class HomePage {
 
 		let modal = this.modalCtrl.create(NewMessageModal);
 		modal.present();
+	}
+
+	openChat = () => {
+		this.navCtrl.push(MessagesPage);
 	}
 
 }
