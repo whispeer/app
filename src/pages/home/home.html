@@ -25,16 +25,16 @@
 	</ion-list>
 	<ion-fab center bottom #fab>
 		<div class="fab--hexagon">
-			<button (press)="showOptions(fab)" (click)="handleClick(fab)" class="fab--hexagon__button" ion-fab color="light"><ion-icon name="add"></ion-icon></button>
+			<button (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="fab--hexagon__button" ion-fab color="light"><ion-icon name="add"></ion-icon></button>
 		</div>
 		<ion-fab-list side="top">
-			<button ion-fab color="primary"><ion-icon name="logo-vimeo"></ion-icon></button>
+			<button ion-fab color="primary" (click)="test($event, fab)"><ion-icon name="logo-vimeo"></ion-icon></button>
 		</ion-fab-list>
 		<ion-fab-list side="left">
-			<button ion-fab color="light"><ion-icon name="logo-googleplus"></ion-icon></button>
+			<button ion-fab color="light" (click)="test($event, fab)"><ion-icon name="logo-googleplus"></ion-icon></button>
 		</ion-fab-list>
 		<ion-fab-list side="right">
-			<button ion-fab color="dark"><ion-icon name="logo-twitter"></ion-icon></button>
+			<button ion-fab color="dark" (click)="test($event, fab)"><ion-icon name="logo-twitter"></ion-icon></button>
 		</ion-fab-list>
 	</ion-fab>
 </ion-content>

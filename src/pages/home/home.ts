@@ -55,19 +55,24 @@ export class HomePage {
 		});
 	}
 
-	showOptions = (fab?: FabContainer) => {
-		if(fab) {
+	handleClick = ($event: any, fab: FabContainer) => {
+		if($event.type === "press") {
+			console.log("press");
 			fab.toggleList();
+		} else {
+			console.log("click");
+			if(fab._listsActive) {
+				fab.close();
+			} else {
+				let modal = this.modalCtrl.create(NewMessageModal);
+				modal.present();
+			}
 		}
 	}
 
-	handleClick = (fab?: FabContainer) => {
-		if(fab) {
-			fab.close();
-		}
-
-		let modal = this.modalCtrl.create(NewMessageModal);
-		modal.present();
+	test = ($event: any, fab: FabContainer) => {
+		console.log("Test!!!");
+		fab.close();
 	}
 
 	openChat = () => {
