@@ -53,8 +53,8 @@ page-home {
 .user__image {
 	position: relative;
 
-	width: calc(4em - 5px) !important;
-	height: 4em !important;
+	width: 54px !important;
+	height: 62px !important;
 
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 
@@ -67,6 +67,9 @@ page-home {
 
 	height: calc(100% - 4px) !important;
 	width: calc(100% - 4px) !important;
+
+	background-sizing: cover;
+	background-position: center center;
 
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 	border-radius: 0 !important;

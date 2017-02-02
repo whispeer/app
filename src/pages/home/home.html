@@ -16,7 +16,7 @@
 		<!-- User is online when its lastname is longer than 4. Hehe. -->
 		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--online': topic.user.online, 'topic--new': topic.topic.newMessage, 'topic--new--last': topic.lastNew}" (click)="openChat(topic.id)">
 			<ion-avatar item-left class="user__image">
-				<img src="{{topic.user.picture.medium}}" class="user__image__image">
+				<div class="user__image__image" [style.background-image]="topic.user.image"></div>
 			</ion-avatar>
 			<h2>{{topic.user.name.first}} {{topic.user.name.last}}</h2>
 			<p>{{topic.topic.lastMessage}}</p>
