@@ -36,3 +36,5 @@ UserInterfaceState.xcuserstate
 # compiled resources
 resources/android
 resources/ios
+
+.io-config.json
