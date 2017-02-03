@@ -15,7 +15,7 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
-.fab--hexagon {
+.hexagon {
 	display: inline-block;
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 
@@ -23,7 +23,7 @@
 	padding: 2px;
 }
 
-.fab--hexagon__button {
+.hexagon__button {
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 	border-radius: 0 !important;
 
@@ -31,6 +31,18 @@
 	height: 60px !important;
 
 	.fab-close-icon {
-		line-height: 62px !important;
+		line-height: 60px !important;
+	}
+}
+
+.hexagon--fab {
+	padding: 4px;
+	.hexagon__button {
+		width: 50px !important;
+		height: 58px !important;
+	}
+
+	.fab-close-icon {
+		line-height: 58px;
 	}
 }
