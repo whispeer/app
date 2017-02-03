@@ -21,17 +21,17 @@
 				Create a new account or simply login...
 			</p>
 			<ion-item class="login__input-wrap">
-				<ion-input class="login__input" type="text" placeholder="e.g. whispeerHQ" value=""></ion-input>
+				<ion-input class="login__input" type="text" placeholder="e.g. whispeerHQ" [disabled]="register" [(ngModel)]="username"></ion-input>
 			</ion-item>
 			<ion-item class="login__input-wrap">
-				<ion-input class="login__input" type="password" placeholder="e.g. l0ng!_p455w0rd" value=""></ion-input>
+				<ion-input class="login__input" type="password" placeholder="e.g. l0ng!_p455w0rd" [(ngModel)]="password"></ion-input>
 			</ion-item>
 			<p class="login__paragraph login__paragraph--detail">
 				By signing up, you agree to our <strong>Terms of Service</strong> and our very strict <strong>Privacy Policy</strong>
 			</p>
 			<div text-center padding>
 				<div class="fab--hexagon">
-					<button ion-button icon-only color="light" class="fab--hexagon__button">
+					<button ion-button icon-only color="light" class="fab--hexagon__button" (click)="nextStep()">
 						<ion-icon name="arrow-forward"></ion-icon>
 					</button>
 				</div>
@@ -39,5 +39,3 @@
 		</div>
 	</div>
 </ion-content>
-			<!-- <input class="login__input" placeholder="e.g. whispeerHQ" type="text">
-			<input class="login__input" placeholder="e.g. l0ng!_p455w0rd" type="password"> -->

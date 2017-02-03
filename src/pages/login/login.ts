@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
+import { HomePage } from "../home/home";
+
 /*
 	Generated class for the Login page.
 
@@ -12,11 +14,33 @@ import { NavController, NavParams } from 'ionic-angular';
 	templateUrl: 'login.html'
 })
 export class LoginPage {
+	username: string = "";
+	password: string = "";
+	register: boolean = false;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams) {
+		this.username = localStorage.getItem("username");
+		this.password = localStorage.getItem("password");
 
-	ionViewDidLoad() {
-		console.log('ionViewDidLoad LoginPage');
+		if(this.username && this.password) {
+			this.nextStep();
+		}
 	}
 
+	ionViewDidLoad() {
+		console.log("ionViewDidLoad LoginPage");
+	}
+
+	nextStep = () => {
+		if(this.username === "test" && this.password === "1234") {
+			localStorage.setItem("username", this.username);
+			localStorage.setItem("password", this.password);
+
+			this.navCtrl.setRoot(HomePage);
+		}
+
+		if(!this.register) {
+			this.register = true;
+		}
+	}
 }
