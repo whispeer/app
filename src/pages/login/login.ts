@@ -26,7 +26,7 @@ export class LoginPage {
 		this.password = localStorage.getItem("password");
 
 		if(this.username && this.password) {
-			this.nextStep();
+			this.nextStep(true);
 		}
 	}
 
@@ -34,11 +34,13 @@ export class LoginPage {
 		console.log("ionViewDidLoad LoginPage");
 	}
 
-	nextStep = () => {
+	nextStep = (noRegister?: boolean) => {
+		noRegister = noRegister || false;
+
 		if(this.username && this.password) {
 			if(this.username === "test" && this.password === "1234") {
 				this.doLogin();
-			} else if(!this.register) {
+			} else if(!this.register && !noRegister) {
 				this.register = true;
 			} else if(this.password === this.passwordRepeat) {
 				this.doRegister();
