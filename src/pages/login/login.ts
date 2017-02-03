@@ -16,7 +16,10 @@ import { HomePage } from "../home/home";
 export class LoginPage {
 	username: string = "";
 	password: string = "";
+	passwordRepeat: string = "";
+
 	register: boolean = false;
+	usernameUsed: boolean = false;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {
 		this.username = localStorage.getItem("username");
@@ -32,15 +35,26 @@ export class LoginPage {
 	}
 
 	nextStep = () => {
-		if(this.username === "test" && this.password === "1234") {
-			localStorage.setItem("username", this.username);
-			localStorage.setItem("password", this.password);
-
-			this.navCtrl.setRoot(HomePage);
+		if(this.username && this.password) {
+			if(this.username === "test" && this.password === "1234") {
+				this.doLogin();
+			} else if(!this.register) {
+				this.register = true;
+			} else if(this.password === this.passwordRepeat) {
+				this.doRegister();
+			}
 		}
+	}
 
-		if(!this.register) {
-			this.register = true;
-		}
+	doRegister = () => {
+		// register and then login...
+		this.doLogin();
+	}
+
+	doLogin = () => {
+		localStorage.setItem("username", this.username);
+		localStorage.setItem("password", this.password);
+
+		this.navCtrl.setRoot(HomePage);
 	}
 }

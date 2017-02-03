@@ -22,9 +22,13 @@
 			</p>
 			<ion-item class="login__input-wrap">
 				<ion-input class="login__input" type="text" placeholder="e.g. whispeerHQ" [disabled]="register" [(ngModel)]="username"></ion-input>
+				<ion-label [hidden]="!register || usernameUsed" class="login__icon-label" fixed><ion-icon name="checkmark"></ion-icon></ion-label>
 			</ion-item>
-			<ion-item class="login__input-wrap">
+			<ion-item *ngIf="!register" class="login__input-wrap">
 				<ion-input class="login__input" type="password" placeholder="e.g. l0ng!_p455w0rd" [(ngModel)]="password"></ion-input>
+			</ion-item>
+			<ion-item *ngIf="register" class="login__input-wrap">
+				<ion-input class="login__input" type="password" placeholder="please repeat your password" [(ngModel)]="passwordRepeat"></ion-input>
 			</ion-item>
 			<p class="login__paragraph login__paragraph--detail">
 				By signing up, you agree to our <strong>Terms of Service</strong> and our very strict <strong>Privacy Policy</strong>

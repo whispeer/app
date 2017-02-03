@@ -50,9 +50,12 @@ page-login {
 	padding: 0 2em;
 }
 
-.login__input-wrap .item-inner {
-	box-shadow: none !important;
-	border: none !important;
+.login__input-wrap {
+	margin-bottom: 1em;
+	.item-inner {
+		box-shadow: none !important;
+		border: none !important;
+	}
 }
 
 .login__input {
@@ -60,7 +63,6 @@ page-login {
 	width: 100%;
 
 	padding: 0;
-	margin-bottom: 1em;
 
 	background-color: #e9eaeb;
 	color: #b6bbbd;
@@ -71,4 +73,22 @@ page-login {
 	input {
 		margin: 1em;
 	}
+
+	&[disabled="true"], &[ng-reflect-disabled="true"] {
+		background-color: #f5f6f6;
+	}
+}
+
+.login__icon-label {
+	position: absolute;
+	top: 50%;
+	right: 0;
+
+	width: 1em !important;
+	height: 1em;
+
+	min-width: 0 !important;
+	margin-top: -0.5em;
+
+	font-size: 1.3em;
 }
