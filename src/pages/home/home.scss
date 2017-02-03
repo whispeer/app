@@ -31,12 +31,6 @@ page-home {
 			-webkit-line-clamp: 3;
 		}
 	}
-
-	&.topic--online {
-		.user__image {
-			background: map-get($colors, primary);
-		}
-	}
 }
 
 .topic--new--last {
@@ -50,27 +44,31 @@ page-home {
 	}
 }
 
-.user__image {
+.user-name--online {
+	color: map-get($colors, primary);
+}
+
+.user__image-wrap {
 	position: relative;
 
 	width: 54px !important;
-	height: 62px !important;
-
-	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-
-	background: map-get($colors, grey);
+    height: 62px !important;
 }
 
-.user__image__image {
+.hexagon__image--medium:nth-child(1) {
 	position: absolute;
-	top: 2px; left: 2px;
-
-	height: calc(100% - 4px) !important;
-	width: calc(100% - 4px) !important;
-
-	background-sizing: cover;
-	background-position: center center;
-
-	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-	border-radius: 0 !important;
+	margin-top: 15px;
+	z-index: 1;
+}
+.hexagon__image--medium:nth-child(2) {
+	position: absolute;
+	top: -7px;
+	left: 12px;
+	z-index: 2;
+}
+.hexagon__image--medium:nth-child(3) {
+	position: absolute;
+	margin-top: 15px;
+	margin-left: 25px;
+	z-index: 1;
 }

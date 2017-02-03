@@ -23,6 +23,11 @@ export class UserService {
 						// info: we have to set the url here, trustedURL is not enought
 						// since we cannot add the url in markup.
 						user.image = this._sanitizer.bypassSecurityTrustStyle("url(" + user.picture.medium + ")");
+						user.basic = {
+							firstname: user.name.first,
+							lastname: user.name.last,
+							shortname: user.name.first
+						};
 						user.name = user.name.first + " " + user.name.last;
 					});
 

@@ -57,6 +57,10 @@
 .hexagon__image {
 	position: relative;
 
+	// reset ionic defaults
+	min-width: 0 !important;
+	min-height: 0 !important;
+
 	width: 54px !important;
 	height: 62px !important;
 
@@ -77,6 +81,15 @@
 
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 	border-radius: 0 !important;
+}
+
+.hexagon__image--active {
+	background: map-get($colors, primary);
+}
+
+.hexagon__image--medium {
+	width: 27px !important;
+	height: 31px !important;
 }
 
 .hexagon__image--small {

@@ -42,7 +42,7 @@ export class HomePage {
 						newMessage: index === 0 || index === 1,
 						date: new Date(user.dob.split(" ")[0])
 					},
-					user: user
+					partners: user.online ? [user, user, user] : [user]
 				};
 
 				this.topics.push(item);
