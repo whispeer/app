@@ -28,6 +28,10 @@ page-messages {
 	}
 }
 
+.md .messages__header-image {
+	order: -4; // first element in header row
+}
+
 .messages__message {
 	position: relative;
 	padding: 5px 20px;

@@ -18,7 +18,7 @@
 			<ion-avatar item-left class="user__image">
 				<div class="user__image__image" [style.background-image]="topic.user.image"></div>
 			</ion-avatar>
-			<h2>{{topic.user.name.first}} {{topic.user.name.last}}</h2>
+			<h2>{{topic.user.name}}</h2>
 			<p>{{topic.topic.lastMessage}}</p>
 			<ion-note item-right>{{topic.topic.date | date: "EEEE"}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 		</ion-item>

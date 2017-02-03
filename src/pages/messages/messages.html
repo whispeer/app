@@ -1,6 +1,11 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
-		<ion-title>Ulrich Benz</ion-title>
+		<ion-title>
+			{{ user.name }}
+		</ion-title>
+		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small">
+			<div class="hexagon__image__image" [style.background-image]="user.image"></div>
+		</ion-avatar>
 	</ion-navbar>
 </ion-header>
 

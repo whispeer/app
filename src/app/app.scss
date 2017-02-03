@@ -53,3 +53,45 @@
 		border: none !important;
 	}
 }
+
+.hexagon__image {
+	position: relative;
+
+	width: 54px !important;
+	height: 62px !important;
+
+	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+
+	background: map-get($colors, grey);
+}
+
+.hexagon__image__image {
+	position: absolute;
+	top: 2px; left: 2px;
+
+	height: calc(100% - 4px) !important;
+	width: calc(100% - 4px) !important;
+
+	background-size: cover;
+	background-position: center center;
+
+	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+	border-radius: 0 !important;
+}
+
+.hexagon__image--small {
+    width: 24px !important;
+    height: 26px !important;
+
+    .hexagon__image__image {
+		top: 1px; left: 1px;
+
+		height: calc(100% - 2px) !important;
+		width: calc(100% - 2px) !important;
+    }
+}
+
+.toolbar-content {
+	display: flex;
+	align-items: center;
+}

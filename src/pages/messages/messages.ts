@@ -2,16 +2,23 @@ import { Component, ViewChild } from "@angular/core";
 
 import { NavController, Content } from "ionic-angular";
 
+import { UserService } from "../../assets/services/user.service";
+
 @Component({
 	selector: 'page-messages',
 	templateUrl: 'messages.html'
 })
 export class MessagesPage {
+	user: any = {};
 	@ViewChild(Content) content: Content;
 
 	i: number = 20;
 	messages: any[];
-	constructor(public navCtrl: NavController) {}
+	constructor(public navCtrl: NavController, private userService: UserService) {
+		this.userService.getUsers().then((users: any) => {
+			this.user = users[0];
+		});
+	}
 
 	ngOnInit() {
 		this.messages = [];

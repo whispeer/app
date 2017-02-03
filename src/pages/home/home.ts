@@ -23,7 +23,7 @@ export class HomePage {
 		this.topics = [];
 		this.userService.getUsers(this.searchTerm).then((users: any[]) => {
 			users.forEach((user: any, index: number) => {
-				user.online = user.name.last.length > 5;
+				user.online = user.name.length > 10;
 
 				let item = {
 					id: index,
