@@ -1,13 +1,28 @@
 <ion-header>
-	<ion-navbar [color]="'primaryDarker'" no-border>
+	<ion-navbar [color]="'primary'" no-border>
 		<ion-title>Ulrich Benz</ion-title>
 	</ion-navbar>
 </ion-header>
 
-<ion-content no-scroll>
-	<ion-list no-lines inset [virtualScroll]="messages" approxItemHeight="45px">
-		<ion-item class="message" [ngClass]="{'message--me': message.user.isMe}" *virtualItem="let message">
-			{{ message.text }}
+<ion-content fullscreen>
+	<ion-list no-lines>
+		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
+			<div *ngFor="let message of burst.messages" attr.data-messageid="{{message.id}}" class="messages__message">
+				{{ message.text }}
+				<!-- {{message.images}} -->
+				<span>{{ message.timestamp }}</span>
+			</div>
 		</ion-item>
 	</ion-list>
+	<div class="messages__form" ion-fixed>
+		<button ion-button icon-only clear color="grey" class="messages__add-assets">
+			<ion-icon name="add-circle"></ion-icon>
+		</button>
+		<ion-item class="clean-input-wrap messages__input-wrap">
+			<ion-textarea rows="1" type="text" class="messages__message-input"></ion-textarea>
+		</ion-item>
+		<button ion-button icon-only clear class="messages__send-message">
+			<ion-icon name="arrow-dropup-circle"></ion-icon>
+		</button>
+	</div>
 </ion-content>

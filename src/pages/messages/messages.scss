@@ -1,12 +1,156 @@
-.message {
-	background: map-get($colors, light_grey);
-	margin: 1em 0;
+page-messages {
+	.content {
+		display: flex;
+		flex-direction: column;
+	}
 
-	white-space: normal;
-	border-radius: 3px;
+	.scroll-content {
+		position: relative;
+		display: flex;
+		width: 100%;
+		height: 100%;
+		order: 1;
+	}
+
+	.fixed-content {
+		position: relative;
+		display: flex;
+		width: 100%;
+		background: map-get($colors, light);
+
+		align-self: flex-end;
+
+		order: 2;
+
+		margin-top: 0 !important;
+
+		flex-shrink: 0 !important;
+	}
 }
 
-.message--me {
+.messages__message {
+	position: relative;
+	padding: 5px 20px;
+	border-radius: 20px;
+
+	box-sizing: border-box;
+
+	max-width: 75%;
+	word-wrap: break-word;
+	white-space: normal;
+	line-height: 24px;
+}
+
+.messages__burst .messages__message {
+	margin-bottom: 1px;
+}
+
+.burst--me .messages__message {
 	background: map-get($colors, primary);
 	color: #fff;
+
+	float: right;
+	margin-right: 5px;
+
+	&:last-child {
+		&:before {
+			content:"";
+			position:absolute;
+			z-index:-1;
+			bottom:-2px;
+			right:-7px;
+			height:20px;
+			border-right:20px solid map-get($colors, primary);
+			border-bottom-left-radius: 16px 14px;
+			-webkit-transform:translate(0, -2px);
+		}
+
+		&:after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			bottom: -2px;
+			right: -56px;
+			width: 26px;
+			height: 20px;
+			background: white;
+			border-bottom-left-radius: 10px;
+			transform: translate(-30px, -2px);
+		}
+	}
+}
+
+.burst--other .messages__message {
+	background: map-get($colors, other_grey);
+	color: black;
+
+	float: left;
+
+	margin-left: 5px;
+
+	&:last-child {
+		&:before {
+			content:"";
+			position: absolute;
+			z-index: 2;
+			bottom: -2px;
+			left: -7px;
+			height: 20px;
+			border-left: 20px solid map-get($colors, other_grey);
+			border-bottom-right-radius: 16px 14px;
+			transform: translate(0, -2px);
+		}
+
+		&:after {
+			content: "";
+			position: absolute;
+			z-index: 3;
+			bottom: -2px;
+			left: 4px;
+			width: 26px;
+			height: 20px;
+			background: white;
+			border-bottom-right-radius: 10px;
+			transform:translate(-30px, -2px);
+		}
+	}
+}
+
+.messages__form {
+	position: relative;
+
+	width: 100%;
+
+	display: flex;
+
+	align-items: center;
+
+	padding: 5px 0;
+}
+
+.messages__input-wrap {
+	height: auto;
+	min-height: 30px !important;
+}
+
+.messages__message-input {
+	textarea {
+		border: 1px solid map-get($colors, other_grey);
+		border-radius: 20px;
+		padding: 4px 10px;
+
+		margin: 0 !important;
+	}
+}
+
+.messages__add-assets {
+	margin: 0;
+}
+
+.messages__send-message {
+	position: absolute;
+	right: 7px;
+	bottom: 4px;
+
+	margin: 0 !important;
 }
