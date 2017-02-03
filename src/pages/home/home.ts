@@ -4,6 +4,7 @@ import { ModalController, NavController, FabContainer } from "ionic-angular";
 
 import { NewMessageModal } from "./newMessage.modal";
 import { MessagesPage } from "../messages/messages";
+import { FriendsPage } from "../friends/friends";
 
 import { UserService } from "../../assets/services/user.service";
 
@@ -70,8 +71,21 @@ export class HomePage {
 		}
 	}
 
-	test = ($event: any, fab: FabContainer) => {
-		console.log("Test!!!");
+	fabSideClick = ($event: any, fab: FabContainer, what: string) => {
+		switch (what) {
+			case "friends":
+				this.navCtrl.push(FriendsPage);
+				break;
+			case "profile":
+				// code...
+				break;
+			case "settings":
+				// code...
+				break;
+			default:
+				// code...
+				break;
+		}
 		fab.close();
 	}
 

@@ -5,6 +5,7 @@ import { MyApp } from './app.component';
 import { LoginPage } from "../pages/login/login"
 import { HomePage } from "../pages/home/home";
 import { MessagesPage } from "../pages/messages/messages";
+import { FriendsPage } from "../pages/friends/friends";
 
 import { NewMessageModal } from "../pages/home/newMessage.modal";
 
@@ -16,6 +17,7 @@ import { UserService } from "../assets/services/user.service";
 		HomePage,
 		MessagesPage,
 		LoginPage,
+		FriendsPage,
 		NewMessageModal
 	],
 	imports: [
@@ -27,6 +29,7 @@ import { UserService } from "../assets/services/user.service";
 		HomePage,
 		MessagesPage,
 		LoginPage,
+		FriendsPage,
 		NewMessageModal
 	],
 	providers: [
