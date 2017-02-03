@@ -1,6 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 
-import { ModalController, NavController, FabContainer } from "ionic-angular";
+import { ModalController, NavController, FabContainer, Content } from "ionic-angular";
 
 import { NewMessageModal } from "./newMessage.modal";
 import { MessagesPage } from "../messages/messages";
@@ -13,12 +13,20 @@ import { UserService } from "../../assets/services/user.service";
 	templateUrl: 'home.html'
 })
 export class HomePage {
+	@ViewChild(Content) content: Content;
+
 	topics: any[];
 	searchTerm: string = "";
 
 	constructor(public navCtrl: NavController, private userService: UserService, private modalCtrl: ModalController) {}
 
 	ngOnInit() { this.getUsers(); }
+
+	ionViewDidEnter = () => {
+		// this should hide the search bar
+		// but it runs too early. (works in messages...)
+		this.content.scrollTo(0, 44, 0);
+	}
 
 	getUsers = () => {
 		this.topics = [];
