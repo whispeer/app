@@ -1,9 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 
-import { NavController, Content, Platform } from "ionic-angular";
-
-import { Keyboard } from "ionic-native";
-import { Subscription } from 'rxjs/rx';
+import { NavController, Content } from "ionic-angular";
 
 @Component({
 	selector: 'page-messages',
@@ -12,17 +9,9 @@ import { Subscription } from 'rxjs/rx';
 export class MessagesPage {
 	@ViewChild(Content) content: Content;
 
-	private onShowSubscription: Subscription;
-
 	i: number = 20;
 	messages: any[];
-	constructor(public navCtrl: NavController, private platform: Platform) {
-		if (this.platform.is('cordova') && this.platform.is('ios')) {
-			this.onShowSubscription = Keyboard.onKeyboardShow().subscribe((e) => {
-				debugger;
-			});
-		}
-	}
+	constructor(public navCtrl: NavController) {}
 
 	ngOnInit() {
 		this.messages = [];
