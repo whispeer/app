@@ -16,18 +16,19 @@
 // automatically applied to the <body> element in the app.
 
 .fab--hexagon {
+	display: inline-block;
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 
 	background: map-get($colors, primary);
-	padding: 4px;
+	padding: 2px;
 }
 
 .fab--hexagon__button {
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 	border-radius: 0 !important;
 
-	width: 54px !important;
-	height: 62px !important;
+	width: 52px !important;
+	height: 60px !important;
 
 	.fab-close-icon {
 		line-height: 62px !important;
