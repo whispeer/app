@@ -1,0 +1,48 @@
+page-profile {
+
+}
+
+.item-block {
+	border-top: none !important;
+}
+
+.item-block:first-child:not(:last-child),
+.item-block:last-child:not(:first-child) {
+	border: none !important;
+}
+
+.profile__info {
+	color: map-get($colors, dark) !important;
+}
+
+.profile__image {
+	margin: auto;
+}
+
+.profile__info-list {
+	margin-top: 3em;
+	margin-bottom: 60px;
+}
+
+.profile__qr {
+	display: block;
+	text-align: center;
+}
+
+.profile__fingerprint-list {
+	margin: 2em auto 1em;
+}
+
+.profile__key-label {
+	min-width: 70px !important;
+	flex: 0 0 70px !important;
+}
+
+.profile__key-part-wrap {
+	margin: auto;
+}
+
+.profile__key-part {
+	white-space: nowrap;
+	font-size: 12px !important;
+}

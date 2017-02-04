@@ -12,8 +12,6 @@ $font-path: "../assets/fonts";
 // To view all the possible Ionic variables, see:
 // http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
 
-$list-border-color: #bbc0c2;
-
 
 // Named Color Variables
 // --------------------------------------------------
@@ -25,15 +23,16 @@ $list-border-color: #bbc0c2;
 
 $colors: (
 	primary:		#5ab70d,
-	primaryDarker:	#4e8c24,
+	primaryDarker:	#3a8100,
 	secondary:		#013c4c,
 	danger:			#f53d3d,
 	light:			#fff,
 	dark:			#545b5e,
 	grey:			#788286,
 	light_grey:		#f9f9f9,
-	other_grey:		#e7e7e7,
-	blue_grey:		#d8dfe2
+	other_grey:		#e5e5e5,
+	blue_grey:		#d8dfe2,
+	more_grey:		#efeff4
 );
 
 // $primary: #3a8100;
@@ -49,6 +48,8 @@ $colors: (
 
 // $light_grey: #f9f9f9;
 // $blue_grey: #d8dfe2;
+
+$list-border-color: map-get($colors, other_grey);
 
 // App iOS Variables
 // --------------------------------------------------

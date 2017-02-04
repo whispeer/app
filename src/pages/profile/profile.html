@@ -1,0 +1,68 @@
+<!--
+	Generated template for the Profile page.
+
+	See http://ionicframework.com/docs/v2/components/#navigation for more info on
+	Ionic pages and navigation.
+-->
+<ion-header>
+
+	<ion-navbar [color]="'primary'">
+		<ion-title>Profile</ion-title>
+	</ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+	<div padding-bottom>
+		<ion-segment [(ngModel)]="view" color="dark">
+			<ion-segment-button value="profile">
+				Profile
+			</ion-segment-button>
+			<ion-segment-button value="qr">
+				QR-Code
+			</ion-segment-button>
+		</ion-segment>
+	</div>
+	<div [ngSwitch]="view">
+		<div *ngSwitchCase="'profile'">
+			<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
+				<div class="hexagon__image__image" [style.background-image]="user.image"></div>
+			</ion-avatar>
+			<ion-list class="profile__info-list">
+				<ion-item>
+					<ion-label fixed color="primaryDarker" text-right>Account</ion-label>
+					<p item-content padding-horizontal class="profile__info">{{user.basic.nickname}}</p>
+				</ion-item>
+				<ion-item>
+					<ion-label fixed color="primaryDarker" text-right>Name</ion-label>
+					<p item-content padding-horizontal class="profile__info">{{user.basic.firstname}}</p>
+				</ion-item>
+				<ion-item>
+					<ion-label fixed color="primaryDarker" text-right>Surname</ion-label>
+					<p item-content padding-horizontal class="profile__info">{{user.basic.lastname}}</p>
+				</ion-item>
+			</ion-list>
+		</div>
+		<div *ngSwitchCase="'qr'">
+			<qr-code [data]="user.fingerprint" [size]="150" class="profile__qr"></qr-code>
+			<ion-list class="profile__fingerprint-list">
+				<ion-item>
+					<ion-label class="profile__key-label" fixed color="primaryDarker" text-right>Your ID</ion-label>
+					<div item-content class="profile__key-part-wrap">
+						<p *ngFor="let part of fingerprint; let l = last" class="profile__key-part">{{part}}{{l ? '' : ' - '}}</p>
+					</div>
+				</ion-item>
+			</ion-list>
+
+			<p class="text-grey" padding-horizontal>This is your personal and unique ID for whispeer.<br>You need this <span class="text-primary">to verify with friends</span> on whispeer - for extra security.</p>
+		</div>
+	</div>
+	<ion-fab center bottom #fab>
+		<div class="hexagon hexagon--fab">
+			<button (tap)="goBack()" class="hexagon__button" ion-fab color="light">
+				<ion-icon name="close"></ion-icon>
+			</button>
+		</div>
+	</ion-fab>
+</ion-content>

@@ -1,0 +1,57 @@
+<!--
+	Generated template for the Settings page.
+
+	See http://ionicframework.com/docs/v2/components/#navigation for more info on
+	Ionic pages and navigation.
+-->
+<ion-header>
+
+	<ion-navbar [color]="'primary'">
+		<ion-title>Settings</ion-title>
+	</ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+	<ion-list>
+		<ion-list-header padding-top>
+			Notifications
+		</ion-list-header>
+		<ion-item>
+			<ion-label>Receive push notifiations</ion-label>
+			<ion-toggle checked="true"></ion-toggle>
+		</ion-item>
+	</ion-list>
+	<ion-list>
+		<ion-list-header>
+			Information about whispeer
+		</ion-list-header>
+		<ion-item detail-push>
+			Terms of Service
+		</ion-item>
+		<ion-item detail-push>
+			Privacy policy
+		</ion-item>
+		<ion-item detail-push>
+			Contact us
+		</ion-item>
+	</ion-list>
+
+	<button ion-button full color="danger">Logout</button>
+
+	<div text-center>
+		<p class="text-grey" padding-vertical>
+			whispeer by <em>mindpost</em> GmbH<br>
+			Made with <ion-icon name="md-heart"></ion-icon> for human rights in Germany
+		</p>
+	</div>
+
+	<ion-fab center bottom #fab>
+		<div class="hexagon hexagon--fab">
+			<button (tap)="goBack()" class="hexagon__button" ion-fab color="light">
+				<ion-icon name="close"></ion-icon>
+			</button>
+		</div>
+	</ion-fab>
+</ion-content>

@@ -22,12 +22,14 @@ export class UserService {
 						// this might be an xss hole.
 						// info: we have to set the url here, trustedURL is not enought
 						// since we cannot add the url in markup.
-						user.image = this._sanitizer.bypassSecurityTrustStyle("url(" + user.picture.medium + ")");
+						user.image = this._sanitizer.bypassSecurityTrustStyle("url(" + user.picture.large + ")");
 						user.basic = {
 							firstname: user.name.first,
 							lastname: user.name.last,
-							shortname: user.name.first
+							shortname: user.name.first,
+							nickname: user.login.username
 						};
+						user.fingerprint = "UB763EN7GFADGUB763EN7GFADGUB763EN7GFADGUB763EN7GFADG";
 						user.name = user.name.first + " " + user.name.last;
 					});
 

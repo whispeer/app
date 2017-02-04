@@ -5,6 +5,8 @@ import { ModalController, NavController, FabContainer, Content } from "ionic-ang
 import { NewMessageModal } from "./newMessage.modal";
 import { MessagesPage } from "../messages/messages";
 import { FriendsPage } from "../friends/friends";
+import { ProfilePage } from "../profile/profile";
+import { SettingsPage } from "../settings/settings";
 
 import { UserService } from "../../assets/services/user.service";
 
@@ -24,8 +26,10 @@ export class HomePage {
 
 	ionViewDidEnter = () => {
 		// this should hide the search bar
-		// but it runs too early. (works in messages...)
-		this.content.scrollTo(0, 44, 0);
+		// but it runs too early when redirected from login. (works in messages...)
+		// another problem is that the search bars have different heights.
+
+		//this.content.scrollTo(0, 58, 0);
 	}
 
 	getUsers = () => {
@@ -85,10 +89,10 @@ export class HomePage {
 				this.navCtrl.push(FriendsPage);
 				break;
 			case "profile":
-				// code...
+				this.navCtrl.push(ProfilePage);
 				break;
 			case "settings":
-				// code...
+				this.navCtrl.push(SettingsPage);
 				break;
 			default:
 				// code...

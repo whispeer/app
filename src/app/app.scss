@@ -91,6 +91,18 @@
 	background: map-get($colors, primary);
 }
 
+.hexagon__image--large {
+	width: 152px !important;
+	height: 175px !important;
+
+	.hexagon__image__image {
+		top: 3px; left: 3px;
+
+		height: calc(100% - 6px) !important;
+		width: calc(100% - 6px) !important;
+	}
+}
+
 .hexagon__image--medium {
 	width: 27px !important;
 	height: 31px !important;
@@ -111,4 +123,12 @@
 .toolbar-content {
 	display: flex;
 	align-items: center;
+}
+
+.text-primary {
+	color: map-get($colors, primary);
+}
+
+.text-grey {
+	color: map-get($colors, grey);
 }
