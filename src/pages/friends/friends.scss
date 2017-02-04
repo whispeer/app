@@ -1,3 +1,11 @@
 page-friends {
 
 }
+
+.friends__divider {
+	margin-top: -1px;
+}
+
+ion-item:last-of-type .item-inner {
+	border: none !important;
+}

@@ -15,15 +15,12 @@
 	<div *ngIf="friendsLoading" padding text-center>
 		<ion-spinner></ion-spinner>
 	</div>
-	<ion-list [virtualScroll]="friends" [headerFn]="friendDividers">
-		<ion-item-divider *virtualHeader="let header">
+	<ion-list [virtualScroll]="friends" [headerFn]="friendDividers" class="friends__list">
+		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
 		</ion-item-divider>
 
 		<ion-item *virtualItem="let friend">
-			<ion-avatar item-left class="user__image">
-				<div class="user__image__image" [style.background-image]="friend.image"></div>
-			</ion-avatar>
 			<h2>{{friend.name}}</h2>
 		</ion-item>
 	</ion-list>
