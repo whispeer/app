@@ -24,12 +24,15 @@ page-home {
 			line-height: 1em;
 		}
 	}
+}
 
-	&.topic--new {
-		.label p {
-			min-height: 3.5em;
-			-webkit-line-clamp: 3;
-		}
+.topic--new {
+	.label p {
+		min-height: 3.5em;
+		-webkit-line-clamp: 3;
+	}
+	.user__name {
+		color: map-get($colors, primary);
 	}
 }
 
@@ -44,10 +47,6 @@ page-home {
 	}
 }
 
-.user-name--online {
-	color: map-get($colors, primary);
-}
-
 .user__image-wrap {
 	position: relative;
 
@@ -55,20 +54,37 @@ page-home {
     height: 62px !important;
 }
 
+.topic__remainingUsers {
+	background-color: map-get($colors, light);
+
+	font-size: 0.65em;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	padding: 2px;
+	box-sizing: border-box;
+
+	overflow: hidden;
+
+	color: map-get($colors, dark);
+}
+
 .hexagon__image--medium:nth-child(1) {
 	position: absolute;
-	margin-top: 15px;
-	z-index: 1;
+	margin-top: 25px;
+	z-index: 2;
 }
 .hexagon__image--medium:nth-child(2) {
 	position: absolute;
-	top: -7px;
+	top: 3px;
 	left: 12px;
-	z-index: 2;
+	z-index: 3;
 }
 .hexagon__image--medium:nth-child(3) {
 	position: absolute;
-	margin-top: 15px;
+	margin-top: 25px;
 	margin-left: 25px;
 	z-index: 1;
 }
