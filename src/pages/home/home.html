@@ -7,7 +7,7 @@
 <ion-content class="list-avatar-page">
 	<ion-searchbar [showCancelButton]="true" animated [(ngModel)]="searchTerm" (ionInput)="getUsers()"></ion-searchbar>
 
-	<ion-list>
+	<ion-list class="space-for-fab">
 		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.topic.newMessage, 'topic--new--last': topic.lastNew}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar class="hexagon__image" [ngClass]="{'hexagon__image--active': partner.online && pIndex < 2, 'hexagon__image--medium': topic.partners.length > 1}" *ngFor="let partner of topic.partners; let pIndex = index">
