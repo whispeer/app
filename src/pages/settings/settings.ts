@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { Component } from "@angular/core";
+import { NavController, NavParams } from "ionic-angular";
+
+import { LoginPage } from "../login/login";
 
 /*
 	Generated class for the Settings page.
@@ -21,6 +23,11 @@ export class SettingsPage {
 
 	goBack() {
 		this.navCtrl.pop();
+	}
+
+	logout() {
+		localStorage.clear();
+		this.navCtrl.setRoot(LoginPage);
 	}
 
 }
