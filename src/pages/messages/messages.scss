@@ -29,7 +29,13 @@ page-messages {
 }
 
 .md .messages__header-image {
-	order: -4; // first element in header row
+	order: 1; // first element in header row
+}
+
+.ios .messages__header-image {
+	order: 4; // last element in header row
+	align-self: flex-end;
+	margin: auto 0 auto auto;
 }
 
 .messages__message {
