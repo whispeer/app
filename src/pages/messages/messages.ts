@@ -4,6 +4,8 @@ import { NavController, Content } from "ionic-angular";
 
 import { UserService } from "../../assets/services/user.service";
 
+import { ProfilePage } from "../profile/profile";
+
 @Component({
 	selector: 'page-messages',
 	templateUrl: 'messages.html'
@@ -51,5 +53,9 @@ export class MessagesPage {
 
 	messageBursts = () => {
 		return this.messages;
+	}
+
+	goToProfile() {
+		this.navCtrl.push(ProfilePage);
 	}
 }
