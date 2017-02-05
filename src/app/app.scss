@@ -30,6 +30,8 @@
 	width: 52px !important;
 	height: 60px !important;
 
+	color: map-get($colors, grey);
+
 	.fab-close-icon {
 		line-height: 60px !important;
 	}
