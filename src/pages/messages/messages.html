@@ -12,7 +12,7 @@
 <ion-content fullscreen>
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-			<div *ngFor="let message of burst.messages" attr.data-messageid="{{message.id}}" class="messages__message">
+			<div *ngFor="let message of burst.messages" attr.data-messageid="{{message.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.emojiOnly}">
 				{{ message.text }}
 				<!-- {{message.images}} -->
 				<span>{{ message.timestamp }}</span>

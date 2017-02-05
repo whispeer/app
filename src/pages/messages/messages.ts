@@ -37,7 +37,12 @@ export class MessagesPage {
 				sender: () => {
 
 				},
-				messages: [{
+				messages: i % 3 ? [{
+					text: "😂🤓",
+					emojiOnly: true
+				}, {
+					text: "I am the latest one."
+				}] : [{
 					text: "Hi! I am the default message."
 				}, {
 					text: "I am the latest one."
