@@ -3,26 +3,24 @@ import { NavController, NavParams } from 'ionic-angular';
 
 import { UserService } from "../../assets/services/user.service";
 
-import { FriendRequestsPage } from "../friend-requests/friend-requests";
-
+import { ProfilePage } from "../profile/profile";
 /*
-	Generated class for the Friends page.
+	Generated class for the FriendRequests page.
 
 	See http://ionicframework.com/docs/v2/components/#navigation for more info on
 	Ionic pages and navigation.
 */
 @Component({
-	selector: 'page-friends',
-	templateUrl: 'friends.html'
+	selector: 'page-friend-requests',
+	templateUrl: 'friend-requests.html'
 })
-export class FriendsPage {
-	friends: any[] = [];
+export class FriendRequestsPage {
 	requests: any[] = [];
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {}
 
 	ionViewDidLoad() {
-		console.log('ionViewDidLoad FriendsPage');
+		console.log('ionViewDidLoad FriendRequestsPage');
 		this.userService.getUsers().then((friends: any[]) => {
 			friends.sort((a: any, b: any) => {
 				const nameA: string = a.name.toLowerCase();
@@ -39,8 +37,7 @@ export class FriendsPage {
 				return 0;
 			});
 
-			this.friends = friends;
-			this.requests = [friends[0], friends[4]];
+			this.requests = [friends[1], friends[2]];
 		});
 	}
 
@@ -58,8 +55,9 @@ export class FriendsPage {
 		return null;
 	}
 
-	goToRequests() {
-		this.navCtrl.push(FriendRequestsPage);
+	checkRequest(userId) {
+		this.navCtrl.push(ProfilePage, {
+			userId: userId
+		})
 	}
-
 }

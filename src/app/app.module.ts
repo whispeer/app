@@ -8,6 +8,7 @@ import { MessagesPage } from "../pages/messages/messages";
 import { FriendsPage } from "../pages/friends/friends";
 import { ProfilePage } from "../pages/profile/profile";
 import { SettingsPage } from "../pages/settings/settings";
+import { FriendRequestsPage } from "../pages/friend-requests/friend-requests";
 
 import { NewMessageModal } from "../pages/home/newMessage.modal";
 
@@ -24,6 +25,7 @@ import { QRCodeModule } from 'angular2-qrcode';
 		FriendsPage,
 		ProfilePage,
 		SettingsPage,
+		FriendRequestsPage,
 		NewMessageModal
 	],
 	imports: [
@@ -33,6 +35,7 @@ import { QRCodeModule } from 'angular2-qrcode';
 				{ component: HomePage, name: "Home", segment: "home" },
 				{ component: MessagesPage, name: "Messages", segment: "messages/:messageId" },
 				{ component: FriendsPage, name: "Friends", segment: "friends" },
+				{ component: FriendRequestsPage, name: "Requests", segment: "requests" },
 				{ component: ProfilePage, name: "Profile", segment: "profile/:userId" },
 				{ component: SettingsPage, name: "Settings", segment: "settings" }
 			]
@@ -48,6 +51,7 @@ import { QRCodeModule } from 'angular2-qrcode';
 		FriendsPage,
 		ProfilePage,
 		SettingsPage,
+		FriendRequestsPage,
 		NewMessageModal
 	],
 	providers: [

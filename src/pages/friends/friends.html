@@ -16,7 +16,7 @@
 		<ion-spinner></ion-spinner>
 	</div>
 	<ion-list no-lines no-margin *ngIf="requests.length > 0">
-		<ion-item class="friends__request" padding>
+		<ion-item class="friends__request" padding (click)="goToRequests()">
 			<ion-badge item-left>{{requests.length}}</ion-badge>
 			<h2>New contact requests</h2>
 			<ion-note item-right><span>Details&nbsp;</span><ion-icon name="arrow-forward"></ion-icon></ion-note>

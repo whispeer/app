@@ -18,10 +18,12 @@ export class UserService {
 						return res.json();
 					}
 				).map((users: any) => {
+					let i: number = 0;
 					users.results.forEach((user: any) => {
 						// this might be an xss hole.
 						// info: we have to set the url here, trustedURL is not enought
 						// since we cannot add the url in markup.
+						user.id = i; i++;
 						user.image = this._sanitizer.bypassSecurityTrustStyle("url(" + user.picture.large + ")");
 						user.basic = {
 							firstname: user.name.first,

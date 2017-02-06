@@ -15,6 +15,34 @@ page-profile {
 	color: map-get($colors, dark) !important;
 }
 
+.profile__avatar-row {
+	display: flex;
+}
+
+.profile__request-hex {
+	margin: auto;
+	//height: 64px !important;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.profile__request-button {
+	font-size: 1.5em;
+}
+
+#request__decline {
+	background-color: map-get($colors, highlight);
+}
+
+#request__decline__button {
+	background-color: map-get($colors, highlight);
+	color: map-get($colors, grey);
+}
+
+#request__accept__button {
+	color: map-get($colors, light);
+}
+
 .profile__image {
 	margin: auto;
 }

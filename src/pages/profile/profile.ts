@@ -17,12 +17,22 @@ export class ProfilePage {
 	user: any = {
 		basic: {}
 	};
+	// this should be my own id by default @Nilos!
+	userId: number;
+
+	isRequest: boolean;
+	isOwn: boolean;
 
 	fingerprint: string[];
 
 	view: string = "profile";
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {
+		this.userId = this.navParams.get("userId") || 0;
+
+		this.isRequest = this.userId === 3 || this.userId === 17;
+		this.isOwn = this.userId === 0;
+	}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad ProfilePage');
@@ -30,14 +40,20 @@ export class ProfilePage {
 
 	ngOnInit() {
 		this.userService.getUsers().then((users: any[]) => {
-			this.user = users[0];
+			this.user = users[this.userId];
 
-			const fp = this.user.fingerprint;
-			this.fingerprint = [[fp.substr(0,13), fp.substr(13,13)].join(" - "), [fp.substr(26,13), fp.substr(39,13)].join(" - ")];
+			if(this.isOwn) {
+				const fp = this.user.fingerprint;
+				this.fingerprint = [[fp.substr(0,13), fp.substr(13,13)].join(" - "), [fp.substr(26,13), fp.substr(39,13)].join(" - ")];
+			}
 		});
 	}
 
 	goBack() {
 		this.navCtrl.pop();
 	}
+
+	acceptRequest() {}
+
+	declineRequest() {}
 }
