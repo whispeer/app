@@ -15,6 +15,8 @@ import { UserService } from "../../assets/services/user.service";
 })
 export class FriendsPage {
 	friends: any[] = [];
+	requests: any[] = [];
+
 	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {}
 
 	ionViewDidLoad() {
@@ -36,6 +38,7 @@ export class FriendsPage {
 			});
 
 			this.friends = friends;
+			this.requests = [friends[0], friends[4]];
 		});
 	}
 

@@ -9,3 +9,19 @@ page-friends {
 ion-item:last-of-type .item-inner {
 	border: none !important;
 }
+
+.friends__request {
+	background-color: map-get($colors, highlight);
+	color: map-get($colors, dark);
+
+	ion-note {
+		display: flex;
+		align-content: center;
+		justify-content: center;
+		color: map-get($colors, grey);
+
+		ion-icon {
+			margin-top: 2px;
+		}
+	}
+}

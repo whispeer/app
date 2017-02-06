@@ -15,6 +15,13 @@
 	<div *ngIf="friendsLoading" padding text-center>
 		<ion-spinner></ion-spinner>
 	</div>
+	<ion-list no-lines no-margin *ngIf="requests.length > 0">
+		<ion-item class="friends__request" padding>
+			<ion-badge item-left>{{requests.length}}</ion-badge>
+			<h2>New contact requests</h2>
+			<ion-note item-right><span>Details&nbsp;</span><ion-icon name="arrow-forward"></ion-icon></ion-note>
+		</ion-item>
+	</ion-list>
 	<ion-list [virtualScroll]="friends" [headerFn]="friendDividers" class="friends__list">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
