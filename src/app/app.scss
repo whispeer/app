@@ -27,13 +27,13 @@
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 	border-radius: 0 !important;
 
-	width: 52px !important;
-	height: 60px !important;
+	width: 70px !important;
+	height: 80px !important;
 
 	color: map-get($colors, grey);
 
 	.fab-close-icon {
-		line-height: 60px !important;
+		line-height: 80px !important;
 	}
 
 	.button-effect {
@@ -44,12 +44,12 @@
 .hexagon--fab {
 	padding: 4px;
 	.hexagon__button {
-		width: 50px !important;
-		height: 58px !important;
+		width: 66px !important;
+		height: 77px !important;
 	}
 
 	.fab-close-icon {
-		line-height: 58px;
+		line-height: 77px !important;
 	}
 }
 
@@ -140,5 +140,5 @@
 }
 
 .space-for-fab {
-	margin-bottom: 76px;
+	margin-bottom: 95px;
 }
