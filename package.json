@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "npm run ionic:serve",
-    "build": "npm run ionic:build --dev",
+    "build": "npm run ionic:build -- --dev",
     "clean": "npm run ionic:clean",
     "ionic:clean": "ionic-app-scripts clean",
     "ionic:build": "ionic-app-scripts build",
