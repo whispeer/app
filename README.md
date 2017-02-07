@@ -33,7 +33,7 @@ To run the messanger locally, execute
     $ npm start
 
 This wraps `npm run ionic:serve`. All of the npm scripts wrap
-[`ionic-app-scripts`][ionic-scripts], which this project is depending
+[`app-scripts`][app-scripts], which this project is depending
 upon. These are the ionic tasks available to you directly:
 
     npm run ionic:clean   # removes the build files
@@ -43,4 +43,4 @@ upon. These are the ionic tasks available to you directly:
 
 [ionic2]: https://github.com/driftyco/ionic
 [shrinkwrap-help]: https://github.com/thewoolleyman/npm-shrinkwrap-helper
-[ionic-scripts]: https://github.com/driftyco/ionic-app-scripts
+[app-scripts]: https://ionicframework.com/docs/v2/resources/app-scripts
