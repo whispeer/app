@@ -564,8 +564,8 @@ Topic.loadTopic = function (topic) {
 
 	var promise = Bluebird.promisify(topic.loadAllData.bind(topic))().thenReturn(topic);
 
-	promise.then(function (id) {
-		topicDebug("Topic loaded (" + id + "):" + (new Date().getTime() - startup));
+	promise.then(function (topic) {
+		topicDebug("Topic loaded (" + topic.getID() + "):" + (new Date().getTime() - startup));
 	});
 
 	return promise;

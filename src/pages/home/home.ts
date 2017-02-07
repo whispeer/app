@@ -26,7 +26,9 @@ export class HomePage {
 
 	constructor(public navCtrl: NavController, private userService: UserService) {}
 
-	ngOnInit() { this.getUsers(); }
+	ngOnInit() {
+
+	}
 
 	ionViewDidEnter = () => {
 		// this should hide the search bar
@@ -34,6 +36,15 @@ export class HomePage {
 		// another problem is that the search bars have different heights.
 
 		//this.content.scrollTo(0, 58, 0);
+		this.getTopics();
+	}
+
+	getTopics = () => {
+		this.topics = messageService.data.latestTopics.data;
+
+		messageService.loadMoreLatest(() => {}).then(() => {
+			this.topicsLoading = false;
+		});
 	}
 
 	getUsers = () => {

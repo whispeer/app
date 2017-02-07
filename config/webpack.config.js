@@ -15,7 +15,7 @@ module.exports = {
     filename: '[name].js',
     devtoolModuleFilenameTemplate: ionicWebpackFactory.getSourceMapperFunction(),
   },
-  devtool: process.env.IONIC_SOURCE_MAP_TYPE,
+  devtool: "cheap-inline-source-map", //process.env.IONIC_SOURCE_MAP_TYPE,
 
   resolve: {
     extensions: ['.ts', '.js', '.json'],

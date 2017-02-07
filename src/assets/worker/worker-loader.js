@@ -6,7 +6,7 @@ define([], function () {
 		this._busy = true;
 
 		if (!workerScriptOverride) {
-			this._worker = new Worker("./assets/js/build/worker.bundle.js");
+			this._worker = new Worker("./build/worker.bundle.js");
 		} else {
 			this._worker = new Worker(workerScriptOverride);
 		}

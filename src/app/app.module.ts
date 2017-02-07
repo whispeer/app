@@ -1,5 +1,6 @@
 require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
+require("services/trust.service");
 
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
@@ -16,6 +17,10 @@ import { NewMessagePage } from "../pages/new-message/new-message";
 import { UserService } from "../assets/services/user.service";
 
 import { QRCodeModule } from 'angular2-qrcode';
+
+import sessionService from '../assets/services/session.service';
+
+(<any>window).startup = new Date().getTime();
 
 @NgModule({
 	declarations: [
@@ -58,4 +63,8 @@ import { QRCodeModule } from 'angular2-qrcode';
 		UserService
 	]
 })
-export class AppModule {}
+export class AppModule {
+	constructor() {
+		sessionService.loadLogin()
+	}
+}
