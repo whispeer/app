@@ -7,24 +7,24 @@
 <ion-header>
 
 	<ion-navbar [color]="'primary'">
-		<ion-title><span *ngIf="!isOwn">{{user.basic.firstname}}'s</span> Profile</ion-title>
+		<ion-title><span *ngIf="!isOwn">{{user.name}}'s</span> Profile</ion-title>
 	</ion-navbar>
 
 </ion-header>
 
-<ion-content padding *ngIf="!isOwn">
+<ion-content padding *ngIf="isRequest">
 	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<h4 class="text-primary text-medium" text-center padding>Add this person as a contact?</h4>
 	<div class="profile__avatar-row">
-		<div class="hexagon profile__request-hex" id="request__decline" (click)="acceptRequest()">
+		<div class="hexagon profile__request-hex" id="request__decline" (click)="declineRequest()">
 			<button ion-button icon-only class="hexagon__button hexagon__button--medium profile__request-button" id="request__decline__button">
 				<ion-icon name="close"></ion-icon>
 			</button>
 		</div>
 		<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
-			<div class="hexagon__image__image" [style.background-image]="user.image"></div>
+			<div class="hexagon__image__image" [style.background-image]="user.basic.image | safeUrl"></div>
 		</ion-avatar>
-		<div class="hexagon profile__request-hex" (click)="declineRequest()">
+		<div class="hexagon profile__request-hex" (click)="acceptRequest()">
 			<button ion-button icon-only class="hexagon__button hexagon__button--medium profile__request-button" id="request__accept__button">
 				<ion-icon name="checkmark"></ion-icon>
 			</button>
@@ -33,15 +33,15 @@
 	<ion-list class="profile__info-list space-for-fab">
 		<ion-item>
 			<ion-label fixed color="primaryDarker" text-right>Account</ion-label>
-			<p item-content padding-horizontal class="profile__info">{{user.basic.nickname}}</p>
+			<p item-content padding-horizontal class="profile__info">{{user.names.nickname}}</p>
 		</ion-item>
 		<ion-item>
 			<ion-label fixed color="primaryDarker" text-right>Name</ion-label>
-			<p item-content padding-horizontal class="profile__info">{{user.basic.firstname}}</p>
+			<p item-content padding-horizontal class="profile__info">{{user.names.firstname}}</p>
 		</ion-item>
 		<ion-item>
 			<ion-label fixed color="primaryDarker" text-right>Surname</ion-label>
-			<p item-content padding-horizontal class="profile__info">{{user.basic.lastname}}</p>
+			<p item-content padding-horizontal class="profile__info">{{user.names.lastname}}</p>
 		</ion-item>
 	</ion-list>
 	<ion-fab center bottom #fab>
@@ -53,7 +53,7 @@
 	</ion-fab>
 </ion-content>
 
-<ion-content padding *ngIf="isOwn">
+<ion-content padding *ngIf="!isRequest">
 	<div padding-bottom>
 		<ion-segment [(ngModel)]="view" color="dark">
 			<ion-segment-button value="profile">
@@ -68,20 +68,20 @@
 	<div [ngSwitch]="view">
 		<div *ngSwitchCase="'profile'">
 			<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
-				<div class="hexagon__image__image" [style.background-image]="user.image"></div>
+				<div class="hexagon__image__image" [style.background-image]="user.basic.image | safeUrl"></div>
 			</ion-avatar>
 			<ion-list class="profile__info-list space-for-fab">
 				<ion-item>
 					<ion-label fixed color="primaryDarker" text-right>Account</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.basic.nickname}}</p>
+					<p item-content padding-horizontal class="profile__info">{{user.names.nickname}}</p>
 				</ion-item>
 				<ion-item>
 					<ion-label fixed color="primaryDarker" text-right>Name</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.basic.firstname}}</p>
+					<p item-content padding-horizontal class="profile__info">{{user.names.firstname}}</p>
 				</ion-item>
 				<ion-item>
 					<ion-label fixed color="primaryDarker" text-right>Surname</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.basic.lastname}}</p>
+					<p item-content padding-horizontal class="profile__info">{{user.names.lastname}}</p>
 				</ion-item>
 			</ion-list>
 		</div>

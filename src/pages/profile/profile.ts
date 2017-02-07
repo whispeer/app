@@ -1,22 +1,22 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
+import sessionService from '../../assets/services/session.service';
+import * as Bluebird from 'bluebird';
 
-import { UserService } from "../../assets/services/user.service";
+const userService = require("user/userService");
+const friendsService = require("../../assets/services/friendsService");
 
-/*
-	Generated class for the Profile page.
-
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
 @Component({
 	selector: 'page-profile',
 	templateUrl: 'profile.html'
 })
 export class ProfilePage {
 	user: any = {
-		basic: {}
+		basic: {},
+		names: {}
 	};
+
+	userObject: any;
 	// this should be my own id by default @Nilos!
 	userId: number;
 
@@ -29,25 +29,37 @@ export class ProfilePage {
 
 	profileLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {
-		this.userId = parseFloat(this.navParams.get("userId")) || 0;
-
-		this.isRequest = this.userId === 3 || this.userId === 17;
-		this.isOwn = this.userId === 0;
-	}
-
-	ionViewDidLoad() {
-		console.log('ionViewDidLoad ProfilePage');
-	}
+	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
 	ngOnInit() {
-		this.userService.getUsers().then((users: any[]) => {
-			this.user = users[this.userId];
+		this.userId = parseFloat(this.navParams.get("userId"));
+		this.isOwn = true;
 
-			if(this.isOwn) {
-				const fp = this.user.fingerprint;
-				this.fingerprint = [[fp.substr(0,13), fp.substr(13,13)].join(" - "), [fp.substr(26,13), fp.substr(39,13)].join(" - ")];
+		const awaitFriendsService = friendsService.awaitLoading().then(() => {
+			var requests = friendsService.getRequests();
+
+			this.isRequest = requests.indexOf(this.userId) > -1
+		});
+
+		Bluebird.all([
+			userService.get(this.userId),
+			awaitFriendsService
+		]).then(([user]) => {
+			if (user.isNotExistingUser()) {
+				this.user = user.data;
+				this.profileLoading = false;
+				return;
 			}
+
+			this.isOwn = this.userId === parseFloat(sessionService.userid);
+
+			var fp = user.getFingerPrint();
+			this.fingerprint = [fp.substr(0,13), fp.substr(13,13), fp.substr(26,13), fp.substr(39,13)];
+
+			return user.loadFullData().thenReturn(user);
+		}).then((user) => {
+			this.userObject = user;
+			this.user = this.userObject.data;
 
 			this.profileLoading = false;
 		});
@@ -57,7 +69,21 @@ export class ProfilePage {
 		this.navCtrl.pop();
 	}
 
-	acceptRequest() {}
+	acceptRequest() {
+		this.profileLoading = true;
 
-	declineRequest() {}
+		friendsService.acceptFriendShip(this.userId).then(() => {
+			this.profileLoading = false;
+			this.isRequest = false;
+		});
+	}
+
+	declineRequest() {
+		this.profileLoading = true;
+
+		friendsService.ignoreFriendShip(this.userId).then(() => {
+			this.profileLoading = false;
+			this.isRequest = false;
+		});
+	}
 }

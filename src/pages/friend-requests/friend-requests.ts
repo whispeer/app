@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
-import { UserService } from "../../assets/services/user.service";
-
 import { ProfilePage } from "../profile/profile";
-/*
-	Generated class for the FriendRequests page.
 
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
+const friendsService = require("../../assets/services/friendsService");
+const userService = require("../../assets/user/userService");
+
+import * as Bluebird from 'bluebird';
+
 @Component({
 	selector: 'page-friend-requests',
 	templateUrl: 'friend-requests.html'
@@ -18,27 +16,25 @@ export class FriendRequestsPage {
 	requests: any[] = [];
 	requestsLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams) {}
+
+	loadRequestsUsers = () => {
+		return Bluebird.try(() => {
+			var requests = friendsService.getRequests();
+
+			return userService.getMultipleFormatted(requests);
+		}).then((result) => {
+			this.requests = result;
+		});
+	}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad FriendRequestsPage');
-		this.userService.getUsers().then((friends: any[]) => {
-			friends.sort((a: any, b: any) => {
-				const nameA: string = a.name.toLowerCase();
-				const nameB: string = b.name.toLowerCase();
 
-				if (nameA < nameB) {
-					return -1;
-				}
+		friendsService.awaitLoading().then(() => {
+			friendsService.listen(this.loadRequestsUsers);
+			this.loadRequestsUsers();
 
-				if (nameA > nameB) {
-					return 1;
-				}
-
-				return 0;
-			});
-
-			this.requests = [friends[1], friends[2]];
 			this.requestsLoading = false;
 		});
 	}

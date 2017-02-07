@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
-import { UserService } from "../../assets/services/user.service";
-
 import { FriendRequestsPage } from "../friend-requests/friend-requests";
+import { ProfilePage } from "../profile/profile";
 
-/*
-	Generated class for the Friends page.
+const friendsService = require("../../assets/services/friendsService");
+const userService = require("../../assets/user/userService");
 
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
+import * as Bluebird from 'bluebird';
+
 @Component({
 	selector: 'page-friends',
 	templateUrl: 'friends.html'
@@ -20,31 +18,27 @@ export class FriendsPage {
 	friendsLoading: boolean = true;
 	requests: any[] = [];
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
-	ionViewDidLoad() {
-		console.log('ionViewDidLoad FriendsPage');
-		this.userService.getUsers().then((friends: any[]) => {
-			friends.sort((a: any, b: any) => {
-				const nameA: string = a.name.toLowerCase();
-				const nameB: string = b.name.toLowerCase();
+	loadFriendsUsers = () => {
+		this.requests = friendsService.getRequests();
 
-				if (nameA < nameB) {
-					return -1;
-				}
-
-				if (nameA > nameB) {
-					return 1;
-				}
-
-				return 0;
-			});
-
-			this.friends = friends;
-			this.requests = [friends[0], friends[4]];
-
+		return Bluebird.try(() => {
+			var friends = friendsService.getFriends();
+			return userService.getMultipleFormatted(friends);
+		}).then((result) => {
+			this.friends = result;
 			this.friendsLoading = false;
 		});
+	}
+
+	ionViewDidLoad() {
+		friendsService.awaitLoading().then(() => {
+			friendsService.listen(this.loadFriendsUsers);
+			this.loadFriendsUsers();
+		});
+
+		console.log('ionViewDidLoad FriendsPage');
 	}
 
 	friendDividers = (record, recordIndex, records) => {
@@ -59,6 +53,12 @@ export class FriendsPage {
 		}
 
 		return null;
+	}
+
+	goToUser(userId) {
+		this.navCtrl.push(ProfilePage, {
+			userId: userId
+		})
 	}
 
 	goToRequests() {

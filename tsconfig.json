@@ -10,6 +10,7 @@
 		],
 		"module": "es2015",
 		"moduleResolution": "node",
+		"types" : ["node", "webpack", "jquery"],
 		"sourceMap": true,
 		"target": "es5"
 	},

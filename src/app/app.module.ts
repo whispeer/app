@@ -1,8 +1,13 @@
-import { NgModule, ErrorHandler } from '@angular/core';
+require("interceptors/addKeysInterceptor");
+require("interceptors/sessionServiceInterceptor");
+require("services/trust.service");
+
+import { SafeUrl } from "../assets/pipes/safeStyle";
+
+import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { LoginPage } from "../pages/login/login"
 import { HomePage } from "../pages/home/home";
 import { MessagesPage } from "../pages/messages/messages";
 import { FriendsPage } from "../pages/friends/friends";
@@ -16,22 +21,26 @@ import { UserService } from "../assets/services/user.service";
 // aot compilation which is required for production builds. this works however if we use the whole path.
 import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
 
+import sessionService from '../assets/services/session.service';
+import * as Bluebird from 'bluebird';
+
+(<any>window).startup = new Date().getTime();
+
 @NgModule({
 	declarations: [
 		MyApp,
 		HomePage,
 		MessagesPage,
-		LoginPage,
 		FriendsPage,
 		ProfilePage,
 		SettingsPage,
 		FriendRequestsPage,
-		NewMessagePage
+		NewMessagePage,
+		SafeUrl
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
 			links: [
-				{ component: LoginPage, name: "Login", segment: "login" },
 				{ component: HomePage, name: "Home", segment: "home" },
 				{ component: MessagesPage, name: "Messages", segment: "messages/:messageId" },
 				{ component: FriendsPage, name: "Friends", segment: "friends" },
@@ -48,7 +57,6 @@ import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode
 		MyApp,
 		HomePage,
 		MessagesPage,
-		LoginPage,
 		FriendsPage,
 		ProfilePage,
 		SettingsPage,
@@ -60,4 +68,13 @@ import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode
 		UserService
 	]
 })
-export class AppModule {}
+export class AppModule {
+	constructor(private zone: NgZone) {
+		sessionService.loadLogin();
+		Bluebird.setScheduler((fn) => {
+			setTimeout(() => {
+				this.zone.run(fn);
+			}, 0)
+		});
+	}
+}
