@@ -45,7 +45,8 @@
     "typescript": "2.0.9"
   },
   "config": {
-     "ionic_webpack": "./config/webpack.config.js"
+     "ionic_webpack": "./config/webpack.config.js",
+     "ionic_copy": "./config/copy.config.js"
   },
   "cordovaPlugins": [
     "ionic-plugin-keyboard",

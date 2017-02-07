@@ -5,6 +5,8 @@ import { HomePage } from "../home/home";
 
 import loginService from "../../assets/services/login.service";
 
+import jQuery from "jquery";
+
 /*
 	Generated class for the Login page.
 
@@ -25,7 +27,11 @@ export class LoginPage {
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {
 		loginService.loadedStorage.then(() => {
-			console.log("loaded storage");
+			if (loginService.identifier) {
+				jQuery("#password input").focus();
+			} else {
+				jQuery("#mail input").focus();
+			}
 		});
 
 		this.username = localStorage.getItem("username");

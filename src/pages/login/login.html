@@ -21,11 +21,11 @@
 				Create a new account or simply login...
 			</p>
 			<ion-item class="clean-input-wrap login__input-wrap">
-				<ion-input class="login__input" type="text" placeholder="e.g. whispeerHQ" [disabled]="register" [(ngModel)]="username"></ion-input>
+				<ion-input id="mail" class="login__input" type="text" placeholder="e.g. whispeerHQ" [disabled]="register" [(ngModel)]="username"></ion-input>
 				<ion-label [hidden]="!register || usernameUsed" class="login__icon-label" fixed><ion-icon name="checkmark"></ion-icon></ion-label>
 			</ion-item>
 			<ion-item *ngIf="!register" class="clean-input-wrap login__input-wrap">
-				<ion-input class="login__input" type="password" placeholder="e.g. l0ng!_p455w0rd" [(ngModel)]="password"></ion-input>
+				<ion-input id="password" class="login__input" type="password" placeholder="e.g. l0ng!_p455w0rd" [(ngModel)]="password"></ion-input>
 			</ion-item>
 			<ion-item *ngIf="register" class="clean-input-wrap login__input-wrap">
 				<ion-input class="login__input" type="password" placeholder="please repeat your password" [(ngModel)]="passwordRepeat"></ion-input>

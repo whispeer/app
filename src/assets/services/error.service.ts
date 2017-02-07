@@ -40,14 +40,6 @@ class ErrorService {
 				}),
 				body: JSON.stringify({ error: e.toString() })
 			}).catch(() => {});
-
-			const windowLocal : any = window;
-
-			windowLocal.globalErrors.push({
-				e: e,
-				str: e.toString(),
-				stack: e.stack
-			});
 		}
 	};
 
