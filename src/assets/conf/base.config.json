@@ -1,0 +1,12 @@
+{
+	"hashVersion": 3,
+
+	"socket": {
+		"autoConnect": true,
+		"autoReconnect": true
+	},
+
+	"serviceWorker": {
+		"enabled": false
+	}
+}
