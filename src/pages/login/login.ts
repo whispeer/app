@@ -3,6 +3,8 @@ import { NavController, NavParams } from 'ionic-angular';
 
 import { HomePage } from "../home/home";
 
+import loginService from "../../assets/services/login.service";
+
 /*
 	Generated class for the Login page.
 
@@ -22,6 +24,10 @@ export class LoginPage {
 	usernameUsed: boolean = false;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {
+		loginService.loadedStorage.then(() => {
+			console.log("loaded storage");
+		});
+
 		this.username = localStorage.getItem("username");
 		this.password = localStorage.getItem("password");
 
