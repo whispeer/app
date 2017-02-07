@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
-import { UserService } from "../../assets/services/user.service";
-
 import { ProfilePage } from "../profile/profile";
 
 const friendsService = require("../../assets/services/friendsService");
