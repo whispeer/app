@@ -49,18 +49,27 @@ upon. These are the ionic tasks available to you directly:
 
 ## Deploying to Hardware
 
-### Installation
-
 To install ionic and all other dependencies for running the application
 on actual hardware, run
 
-    $ npm install -g cordova ionic
-    [...]
-    $ npm install
-    [...]
+    $ npm install -g cordova ionic && npm install
 
+### Deploying to iOS
 
+There's a [comprehensive documentation][ios-deployment] on the
+deployment pipeline in cordova. To get up and running quickly, run these
+commands:
+
+    $ xcode-select --install
+    $ npm install -g ios-deploy ios-sim
+
+Make sure there is an Apple ID in the accounts tab of your Xcode
+preferences. Once that is done, run a production build of the messenger
+application:
+
+    $ ionic build ios --prod
 
 [ionic2]: https://github.com/driftyco/ionic
 [shrinkwrap-help]: https://github.com/thewoolleyman/npm-shrinkwrap-helper
 [app-scripts]: https://ionicframework.com/docs/v2/resources/app-scripts
+[ios-deployment]: https://cordova.apache.org/docs/en/latest/guide/platforms/ios/
