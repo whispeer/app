@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
+import sessionService from '../../assets/services/session.service';
 
-import { UserService } from "../../assets/services/user.service";
+var userService = require("user/userService");
 
 /*
 	Generated class for the Profile page.
@@ -17,6 +18,8 @@ export class ProfilePage {
 	user: any = {
 		basic: {}
 	};
+
+	userObject: any;
 	// this should be my own id by default @Nilos!
 	userId: number;
 
@@ -29,25 +32,33 @@ export class ProfilePage {
 
 	profileLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {
-		this.userId = parseFloat(this.navParams.get("userId")) || 0;
-
-		this.isRequest = this.userId === 3 || this.userId === 17;
-		this.isOwn = this.userId === 0;
-	}
+	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad ProfilePage');
 	}
 
 	ngOnInit() {
-		this.userService.getUsers().then((users: any[]) => {
-			this.user = users[this.userId];
+		this.userId = parseFloat(this.navParams.get("userId"));
 
-			if(this.isOwn) {
-				const fp = this.user.fingerprint;
-				this.fingerprint = [[fp.substr(0,13), fp.substr(13,13)].join(" - "), [fp.substr(26,13), fp.substr(39,13)].join(" - ")];
+		this.isOwn = this.userId === sessionService.userid;
+		this.isRequest = false;
+
+		userService.get(this.userId).then((user) => {
+			if (user.isNotExistingUser()) {
+				this.user = user.data;
+				this.profileLoading = false;
+				return;
 			}
+
+			this.userObject = user;
+
+			var fp = user.getFingerPrint();
+			this.fingerprint = [fp.substr(0,13), fp.substr(13,13), fp.substr(26,13), fp.substr(39,13)];
+
+			return user.loadFullData();
+		}).then(() => {
+			this.user = this.userObject.data;
 
 			this.profileLoading = false;
 		});

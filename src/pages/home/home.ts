@@ -12,6 +12,8 @@ import { UserService } from "../../assets/services/user.service";
 
 const messageService = require("messages/messageService");
 
+import sessionService from '../../assets/services/session.service';
+
 @Component({
 	selector: 'page-home',
 	templateUrl: 'home.html'
@@ -26,9 +28,7 @@ export class HomePage {
 
 	constructor(public navCtrl: NavController, private userService: UserService) {}
 
-	ngOnInit() {
-
-	}
+	ngOnInit() {}
 
 	ionViewDidEnter = () => {
 		// this should hide the search bar
@@ -47,50 +47,10 @@ export class HomePage {
 		});
 	}
 
-	getUsers = () => {
-		this.topics = [];
-		this.userService.getUsers(this.searchTerm).then((users: any[]) => {
-			users.forEach((user: any, index: number) => {
-				user.online = user.name.length > 10;
-
-				let item = {
-					id: index,
-					topic: {
-						title: "",
-						lastMessage: "Lorem Ipsum dolor sit amet.",
-						newMessage: index === 0 || index === 1,
-						date: new Date(user.dob.split(" ")[0])
-					},
-					partners: user.online ? [user, user, user] : [user]
-				};
-
-				this.topics.push(item);
-			});
-
-			// sorting: UNREAD (sorted by day) - READ (sorted by day)
-			this.topics = this.topics.sort((a: any, b: any): any => {
-				return b.topic.newMessage - a.topic.newMessage || b.topic.date - a.topic.date;
-			});
-
-			// this is not good code. but i need this attribute.
-			// hacky demo data. you're gonna do the real implementation better ;-)
-			this.topics.forEach((elem: any, index: number, arr: any[]) => {
-				// set property if this is the last topic with a new message.
-				if(elem.topic.newMessage && arr[index + 1] && !arr[index + 1].topic.newMessage) {
-					elem.lastNew = true;
-				}
-			});
-
-			this.topicsLoading = false;
-		});
-	}
-
 	handleClick = ($event: any, fab: FabContainer) => {
 		if($event.type === "press") {
-			console.log("press");
 			fab.toggleList();
 		} else {
-			console.log("click");
 			if(fab._listsActive) {
 				fab.close();
 			} else {
@@ -108,7 +68,7 @@ export class HomePage {
 				break;
 			case "profile":
 				this.navCtrl.push(ProfilePage, {
-					userId: 0
+					userId: sessionService.userid
 				});
 				break;
 			case "settings":
@@ -121,8 +81,8 @@ export class HomePage {
 		fab.close();
 	}
 
-	openChat = () => {
-		this.navCtrl.push(MessagesPage);
+	openChat = (messageId: number) => {
+		this.navCtrl.push(MessagesPage, { messageId: messageId });
 	}
 
 }

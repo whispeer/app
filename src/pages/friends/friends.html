@@ -25,7 +25,7 @@
 			{{ header }}
 		</ion-item-divider>
 
-		<ion-item *virtualItem="let friend">
+		<ion-item *virtualItem="let friend" (click)="goToUser(friend.id)">
 			<h2>{{friend.name}}</h2>
 		</ion-item>
 	</ion-list>
