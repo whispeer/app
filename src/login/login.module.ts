@@ -6,7 +6,7 @@ import { LoginPage } from "../pages/login/login"
 
 import { UserService } from "../assets/services/user.service";
 
-import { QRCodeModule } from 'angular2-qrcode';
+import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
 
 @NgModule({
 	declarations: [
