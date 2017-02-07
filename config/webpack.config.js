@@ -21,7 +21,10 @@ module.exports = {
     extensions: ['.ts', '.js', '.json'],
     modules: [path.resolve('src/assets/'), path.resolve('node_modules')],
     alias: {
-        whispeerHelper: "helper/helper"
+        whispeerHelper: "helper/helper",
+		workerQueue: "worker/worker-queue",
+		PromiseWorker: "worker/worker-loader",
+		imageLib: "blueimp-load-image/js/load-image",
     }
   },
 

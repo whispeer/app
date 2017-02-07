@@ -26,8 +26,11 @@
     "@types/socket.io-client": "^1.4.29",
     "@types/webpack": "^2.0.0",
     "@types/whatwg-fetch": "0.0.33",
+    "amanda": "~0.4.7",
     "angular2-qrcode": "^1.0.5",
     "bluebird": "^3.4.7",
+    "blueimp-load-image": "^2.10.0",
+    "deepmerge": "^1.3.0",
     "dexie": "~1.4.2",
     "ionic-angular": "2.0.0",
     "ionic-native": "2.4.1",
@@ -45,8 +48,8 @@
     "typescript": "2.0.9"
   },
   "config": {
-     "ionic_webpack": "./config/webpack.config.js",
-     "ionic_copy": "./config/copy.config.js"
+    "ionic_webpack": "./config/webpack.config.js",
+    "ionic_copy": "./config/copy.config.js"
   },
   "cordovaPlugins": [
     "ionic-plugin-keyboard",

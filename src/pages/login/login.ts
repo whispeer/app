@@ -5,12 +5,6 @@ import loginService from "../../assets/services/login.service";
 
 import jQuery from "jquery";
 
-/*
-	Generated class for the Login page.
-
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
 @Component({
 	selector: 'page-login',
 	templateUrl: 'login.html'
@@ -21,7 +15,7 @@ export class LoginPage {
 	passwordRepeat: string = "";
 
 	register: boolean = false;
-	usernameUsed: boolean = false;
+	usernameUsed: boolean = true;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {
 		this.login = loginService;
@@ -39,7 +33,16 @@ export class LoginPage {
 		console.log("ionViewDidLoad LoginPage");
 	}
 
+	checkUserNameExistance = () => {
+
+	}
+
 	loginOrRegister = () => {
-		loginService.login();
+		if (this.usernameUsed) {
+			loginService.login();
+			return;
+		}
+
+		this.register = true;
 	}
 }

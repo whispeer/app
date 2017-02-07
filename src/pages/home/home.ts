@@ -10,6 +10,8 @@ import { NewMessagePage } from "../new-message/new-message";
 
 import { UserService } from "../../assets/services/user.service";
 
+const messageService = require("messages/messageService");
+
 @Component({
 	selector: 'page-home',
 	templateUrl: 'home.html'
