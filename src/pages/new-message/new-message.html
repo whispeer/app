@@ -1,15 +1,14 @@
 <ion-header>
-	<ion-toolbar [color]="'primary'">
+	<ion-navbar [color]="'primary'">
 		<ion-title>
 			Select Contacts
 		</ion-title>
-		<ion-buttons start>
-			<button ion-button (click)="dismiss()">
-				<span ion-text color="light" showWhen="ios">Cancel</span>
-				<ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+		<ion-buttons end>
+			<button ion-button (click)="create()">
+				<ion-icon name="md-person-add"></ion-icon>
 			</button>
 		</ion-buttons>
-	</ion-toolbar>
+	</ion-navbar>
 </ion-header>
 
 <ion-content>

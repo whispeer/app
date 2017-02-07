@@ -1,12 +1,12 @@
 import { Component, ViewChild } from "@angular/core";
 
-import { ModalController, NavController, FabContainer, Content } from "ionic-angular";
+import { NavController, FabContainer, Content } from "ionic-angular";
 
-import { NewMessageModal } from "./newMessage.modal";
 import { MessagesPage } from "../messages/messages";
 import { FriendsPage } from "../friends/friends";
 import { ProfilePage } from "../profile/profile";
 import { SettingsPage } from "../settings/settings";
+import { NewMessagePage } from "../new-message/new-message";
 
 import { UserService } from "../../assets/services/user.service";
 
@@ -22,7 +22,7 @@ export class HomePage {
 
 	topicsLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, private userService: UserService, private modalCtrl: ModalController) {}
+	constructor(public navCtrl: NavController, private userService: UserService) {}
 
 	ngOnInit() { this.getUsers(); }
 
@@ -81,8 +81,9 @@ export class HomePage {
 			if(fab._listsActive) {
 				fab.close();
 			} else {
-				let modal = this.modalCtrl.create(NewMessageModal);
-				modal.present();
+				this.navCtrl.push(NewMessagePage, {}, {
+					animation: "md-transition"
+				});
 			}
 		}
 	}

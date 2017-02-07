@@ -9,8 +9,7 @@ import { FriendsPage } from "../pages/friends/friends";
 import { ProfilePage } from "../pages/profile/profile";
 import { SettingsPage } from "../pages/settings/settings";
 import { FriendRequestsPage } from "../pages/friend-requests/friend-requests";
-
-import { NewMessageModal } from "../pages/home/newMessage.modal";
+import { NewMessagePage } from "../pages/new-message/new-message";
 
 import { UserService } from "../assets/services/user.service";
 
@@ -26,7 +25,7 @@ import { QRCodeModule } from 'angular2-qrcode';
 		ProfilePage,
 		SettingsPage,
 		FriendRequestsPage,
-		NewMessageModal
+		NewMessagePage
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
@@ -37,7 +36,8 @@ import { QRCodeModule } from 'angular2-qrcode';
 				{ component: FriendsPage, name: "Friends", segment: "friends" },
 				{ component: FriendRequestsPage, name: "Requests", segment: "requests" },
 				{ component: ProfilePage, name: "Profile", segment: "profile/:userId" },
-				{ component: SettingsPage, name: "Settings", segment: "settings" }
+				{ component: SettingsPage, name: "Settings", segment: "settings" },
+				{ component: NewMessagePage, name: "New Message", segment: "newMessage" }
 			]
 		}),
 		QRCodeModule
@@ -52,7 +52,7 @@ import { QRCodeModule } from 'angular2-qrcode';
 		ProfilePage,
 		SettingsPage,
 		FriendRequestsPage,
-		NewMessageModal
+		NewMessagePage
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},
