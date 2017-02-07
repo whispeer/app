@@ -12,8 +12,9 @@ import { FriendRequestsPage } from "../pages/friend-requests/friend-requests";
 import { NewMessagePage } from "../pages/new-message/new-message";
 
 import { UserService } from "../assets/services/user.service";
-
-import { QRCodeModule } from 'angular2-qrcode';
+// yep that looks wrong, but this module does not have necessary files for
+// aot compilation which is required for production builds. this works however if we use the whole path.
+import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
 
 @NgModule({
 	declarations: [

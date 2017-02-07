@@ -5,10 +5,10 @@
   "private": true,
   "scripts": {
     "start": "npm run ionic:serve",
-    "build": "npm run ionic:build",
+    "build": "npm run ionic:build --dev",
     "clean": "npm run ionic:clean",
     "ionic:clean": "ionic-app-scripts clean",
-    "ionic:build": "ionic-app-scripts build --dev",
+    "ionic:build": "ionic-app-scripts build",
     "ionic:serve": "ionic-app-scripts serve --dev"
   },
   "dependencies": {
