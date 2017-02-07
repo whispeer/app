@@ -185,7 +185,6 @@ function loadData() {
 }
 
 var loadingPromise = sessionService.listenPromise("ssn.login").then(function () {
-	console.log("load data");
 	return loadData();
 });
 

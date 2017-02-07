@@ -2,7 +2,9 @@ require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
-import { NgModule, ErrorHandler } from '@angular/core';
+import { SafeUrl } from "../assets/pipes/safeStyle";
+
+import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
@@ -19,6 +21,7 @@ import { UserService } from "../assets/services/user.service";
 import { QRCodeModule } from 'angular2-qrcode';
 
 import sessionService from '../assets/services/session.service';
+import * as Bluebird from 'bluebird';
 
 (<any>window).startup = new Date().getTime();
 
@@ -31,7 +34,8 @@ import sessionService from '../assets/services/session.service';
 		ProfilePage,
 		SettingsPage,
 		FriendRequestsPage,
-		NewMessagePage
+		NewMessagePage,
+		SafeUrl
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
@@ -64,7 +68,12 @@ import sessionService from '../assets/services/session.service';
 	]
 })
 export class AppModule {
-	constructor() {
-		sessionService.loadLogin()
+	constructor(private zone: NgZone) {
+		sessionService.loadLogin();
+		Bluebird.setScheduler((fn) => {
+			setTimeout(() => {
+				this.zone.run(fn);
+			}, 0)
+		});
 	}
 }

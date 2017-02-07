@@ -95,6 +95,10 @@ var Topic = function (data) {
 
 		newMessage: "",
 
+		latestMessage: {
+			data: {}
+		},
+
 		id: data.topicid,
 		type: (receiver.length <= 2 ? "peerChat" : "groupChat"),
 		obj: this
