@@ -74,7 +74,21 @@ export class ProfilePage {
 		this.navCtrl.pop();
 	}
 
-	acceptRequest() {}
+	acceptRequest() {
+		this.profileLoading = true;
 
-	declineRequest() {}
+		friendsService.acceptFriendShip(this.userId).then(() => {
+			this.profileLoading = false;
+			this.isRequest = false;
+		});
+	}
+
+	declineRequest() {
+		this.profileLoading = true;
+
+		friendsService.ignoreFriendShip(this.userId).then(() => {
+			this.profileLoading = false;
+			this.isRequest = false;
+		});
+	}
 }
