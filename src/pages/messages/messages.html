@@ -20,7 +20,7 @@
 		</ion-item>
 	</ion-list>
 	<div class="messages__form" ion-fixed>
-		<button ion-button icon-only clear color="grey" class="messages__add-assets">
+		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
 			<ion-icon name="add-circle"></ion-icon>
 		</button>
 		<ion-item class="clean-input-wrap messages__input-wrap">

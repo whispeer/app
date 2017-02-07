@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 
-import { NavController, Content } from "ionic-angular";
+import { NavController, ActionSheetController, Content } from "ionic-angular";
 
 import { UserService } from "../../assets/services/user.service";
 
@@ -16,7 +16,7 @@ export class MessagesPage {
 
 	i: number = 20;
 	messages: any[];
-	constructor(public navCtrl: NavController, private userService: UserService) {
+	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController, private userService: UserService) {
 		this.userService.getUsers().then((users: any) => {
 			this.user = users[0];
 		});
@@ -58,6 +58,31 @@ export class MessagesPage {
 
 	messageBursts = () => {
 		return this.messages;
+	}
+
+	presentActionSheet = () => {
+		let actionSheet = this.actionSheetCtrl.create({
+			title: "What do you want to send?", // todo: translate!
+			buttons: [{
+				text: "Select from Gallery",
+				handler: () => {
+					console.log("Select smth from Gallery!");
+				}
+			}, {
+				text: "Take Photo",
+				handler: () => {
+					console.log("Take new photo!");
+				}
+			}, {
+				text: "Cancel",
+				role: "cancel",
+				handler: () => {
+					console.log("Cancel clicked.");
+				}
+			}]
+		});
+
+		actionSheet.present();
 	}
 
 	goToProfile() {
