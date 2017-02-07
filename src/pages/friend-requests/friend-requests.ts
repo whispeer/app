@@ -39,7 +39,7 @@ export class FriendRequestsPage {
 			});
 
 			this.requests = [friends[1], friends[2]];
-			this.requestsLoading = true;
+			this.requestsLoading = false;
 		});
 	}
 
