@@ -6,8 +6,6 @@ import socketService from "../services/socket.service";
 
 import { mainPage, loginPage, isLoginPage } from "../services/location.manager";
 
-console.log("Login service");
-
 const chelper = require("crypto/helper");
 const errors = require("asset/errors");
 
