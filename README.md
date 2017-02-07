@@ -54,6 +54,23 @@ on actual hardware, run
 
     $ npm install -g cordova ionic && npm install
 
+
+### Updating Resources
+
+There is a `resources` folder with an `icon.png` as well as a
+`splash.png`. Those images can be transformed to their respectively
+resized counterparts in the `resources/ios` and `resources/android`
+folders with the following two commands:
+
+    $ ionic resources --icon
+    $ ionic resources --splash
+
+Make sure to review the results before commiting. Please also note that
+this _uploads_ the images to a web service and therefore needs internet
+access to be performed, and also note that this will not warn you about
+changing the `config.xml` of the project, replacing all previous icon
+and splash screen configuration.
+
 ### Deploying to iOS
 
 There's a [comprehensive documentation][ios-deployment] on the
