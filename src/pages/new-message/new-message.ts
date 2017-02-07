@@ -3,6 +3,8 @@ import { NavController, NavParams } from 'ionic-angular';
 
 import { UserService } from "../../assets/services/user.service";
 
+import { MessagesPage } from "../messages/messages";
+
 /*
 	Generated class for the NewMessage page.
 
@@ -33,4 +35,7 @@ export class NewMessagePage {
 		});
 	}
 
+	create = () => {
+		this.navCtrl.push(MessagesPage);
+	}
 }
