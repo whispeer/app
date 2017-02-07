@@ -6,12 +6,6 @@ import * as Bluebird from 'bluebird';
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
 
-/*
-	Generated class for the Profile page.
-
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
 @Component({
 	selector: 'page-profile',
 	templateUrl: 'profile.html'
@@ -39,8 +33,7 @@ export class ProfilePage {
 
 	ngOnInit() {
 		this.userId = parseFloat(this.navParams.get("userId"));
-
-		this.isOwn = this.userId === sessionService.userid;
+		this.isOwn = true;
 
 		const awaitFriendsService = friendsService.awaitLoading().then(() => {
 			var requests = friendsService.getRequests();
@@ -57,6 +50,8 @@ export class ProfilePage {
 				this.profileLoading = false;
 				return;
 			}
+
+			this.isOwn = this.userId === parseFloat(sessionService.userid);
 
 			var fp = user.getFingerPrint();
 			this.fingerprint = [fp.substr(0,13), fp.substr(13,13), fp.substr(26,13), fp.substr(39,13)];
