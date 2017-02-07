@@ -4,7 +4,14 @@ This is the whispeer mobile messenger based on [Ionic 2][ionic2]. The
 instructions below were written for macOS, but should apply to other
 systems as well.
 
-# Prerequisites
+The _Quick Start_ guide will get you up and running on a development
+machine with a browser. This can be sufficient for some development
+work. If running the application on simulators or actual hardware is
+desired, consult the second part _Deploying to Hardware_.
+
+## Quick Start
+
+### Prerequisites
 
 Make sure node and npm are installed and corresponding to the version
 specified in `.nvmrc`:
@@ -13,7 +20,7 @@ specified in `.nvmrc`:
     v7.5.0
     4.1.2
 
-# Installation
+### Installation
 
 To install ionic and all other dependencies, run
 
@@ -26,7 +33,7 @@ is neccessary when updating existing and installing new dependencies.
 There is existing [documentation][shrinkwrap-help] on how to work with
 shrinkwraps.
 
-# Running the application
+### Running the Application
 
 To run the messanger locally, execute
 
@@ -39,6 +46,19 @@ upon. These are the ionic tasks available to you directly:
     npm run ionic:clean   # removes the build files
     npm run ionic:build   # builds anew
     npm run ionic:serve   # runs the dev environment
+
+## Deploying to Hardware
+
+### Installation
+
+To install ionic and all other dependencies for running the application
+on actual hardware, run
+
+    $ npm install -g cordova ionic
+    [...]
+    $ npm install
+    [...]
+
 
 
 [ionic2]: https://github.com/driftyco/ionic
