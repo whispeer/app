@@ -13,6 +13,7 @@
 </ion-header>
 
 <ion-content padding *ngIf="!isOwn">
+	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<h4 class="text-primary text-medium" text-center padding>Add this person as a contact?</h4>
 	<div class="profile__avatar-row">
 		<div class="hexagon profile__request-hex" id="request__decline" (click)="acceptRequest()">
@@ -63,6 +64,7 @@
 			</ion-segment-button>
 		</ion-segment>
 	</div>
+	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<div [ngSwitch]="view">
 		<div *ngSwitchCase="'profile'">
 			<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">

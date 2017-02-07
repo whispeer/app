@@ -20,6 +20,8 @@ export class HomePage {
 	topics: any[];
 	searchTerm: string = "";
 
+	topicsLoading: boolean = true;
+
 	constructor(public navCtrl: NavController, private userService: UserService, private modalCtrl: ModalController) {}
 
 	ngOnInit() { this.getUsers(); }
@@ -65,6 +67,8 @@ export class HomePage {
 					elem.lastNew = true;
 				}
 			});
+
+			this.topicsLoading = false;
 		});
 	}
 
@@ -89,7 +93,9 @@ export class HomePage {
 				this.navCtrl.push(FriendsPage);
 				break;
 			case "profile":
-				this.navCtrl.push(ProfilePage);
+				this.navCtrl.push(ProfilePage, {
+					userId: 0
+				});
 				break;
 			case "settings":
 				this.navCtrl.push(SettingsPage);

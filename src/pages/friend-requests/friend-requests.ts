@@ -16,6 +16,7 @@ import { ProfilePage } from "../profile/profile";
 })
 export class FriendRequestsPage {
 	requests: any[] = [];
+	requestsLoading: boolean = true;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {}
 
@@ -38,6 +39,7 @@ export class FriendRequestsPage {
 			});
 
 			this.requests = [friends[1], friends[2]];
+			this.requestsLoading = true;
 		});
 	}
 

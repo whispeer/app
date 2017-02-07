@@ -27,8 +27,10 @@ export class ProfilePage {
 
 	view: string = "profile";
 
+	profileLoading: boolean = true;
+
 	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {
-		this.userId = this.navParams.get("userId") || 0;
+		this.userId = parseFloat(this.navParams.get("userId")) || 0;
 
 		this.isRequest = this.userId === 3 || this.userId === 17;
 		this.isOwn = this.userId === 0;
@@ -46,6 +48,8 @@ export class ProfilePage {
 				const fp = this.user.fingerprint;
 				this.fingerprint = [[fp.substr(0,13), fp.substr(13,13)].join(" - "), [fp.substr(26,13), fp.substr(39,13)].join(" - ")];
 			}
+
+			this.profileLoading = false;
 		});
 	}
 

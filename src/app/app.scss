@@ -147,3 +147,11 @@
 .space-for-fab {
 	margin-bottom: 95px;
 }
+
+.spinner--full {
+	width: 100%;
+}
+
+.md .spinner--full circle {
+	stroke: map-get($colors, primary);
+}

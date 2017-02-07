@@ -12,9 +12,7 @@
 
 
 <ion-content>
-	<div *ngIf="friendsLoading" padding text-center>
-		<ion-spinner></ion-spinner>
-	</div>
+	<ion-spinner *ngIf="friendsLoading" text-center margin class="spinner--full"></ion-spinner>
 	<ion-list no-lines no-margin *ngIf="requests.length > 0">
 		<ion-item class="friends__request" padding (click)="goToRequests()">
 			<ion-badge item-left>{{requests.length}}</ion-badge>

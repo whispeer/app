@@ -12,6 +12,8 @@ import { ProfilePage } from "../profile/profile";
 })
 export class MessagesPage {
 	user: any = {};
+	messagesLoading: boolean = true;
+
 	@ViewChild(Content) content: Content;
 
 	i: number = 20;
@@ -24,6 +26,7 @@ export class MessagesPage {
 
 	ngOnInit() {
 		this.messages = [];
+
 		for(let i = 0; i < 10; i++) {
 			const b = i % 2;
 			this.messages.push({
@@ -50,6 +53,8 @@ export class MessagesPage {
 				date: new Date()
 			});
 		}
+
+		this.messagesLoading = false;
 	}
 
 	ionViewDidEnter = () => {
