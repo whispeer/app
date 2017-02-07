@@ -2,7 +2,6 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { LoginPage } from "../pages/login/login"
 import { HomePage } from "../pages/home/home";
 import { MessagesPage } from "../pages/messages/messages";
 import { FriendsPage } from "../pages/friends/friends";
@@ -20,7 +19,6 @@ import { QRCodeModule } from 'angular2-qrcode';
 		MyApp,
 		HomePage,
 		MessagesPage,
-		LoginPage,
 		FriendsPage,
 		ProfilePage,
 		SettingsPage,
@@ -30,7 +28,6 @@ import { QRCodeModule } from 'angular2-qrcode';
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
 			links: [
-				{ component: LoginPage, name: "Login", segment: "login" },
 				{ component: HomePage, name: "Home", segment: "home" },
 				{ component: MessagesPage, name: "Messages", segment: "messages/:messageId" },
 				{ component: FriendsPage, name: "Friends", segment: "friends" },
@@ -47,7 +44,6 @@ import { QRCodeModule } from 'angular2-qrcode';
 		MyApp,
 		HomePage,
 		MessagesPage,
-		LoginPage,
 		FriendsPage,
 		ProfilePage,
 		SettingsPage,

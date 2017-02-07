@@ -5,7 +5,10 @@ var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "development";
 
 module.exports = {
-  entry: process.env.IONIC_APP_ENTRY_POINT,
+  entry: {
+    main: process.env.IONIC_APP_ENTRY_POINT,
+    login: path.resolve(process.env.IONIC_APP_ENTRY_POINT, "../../login/login.ts")
+  },
   output: {
     path: '{{BUILD}}',
     publicPath: 'build/',
