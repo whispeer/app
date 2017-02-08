@@ -14,6 +14,10 @@ module.exports = {
     src: ['{{ROOT}}/node_modules/ionicons/dist/fonts/**/*', '{{ROOT}}/node_modules/ionic-angular/fonts/**/*'],
     dest: '{{WWW}}/assets/fonts'
   },
+  copyWorker: {
+    src: ['{{ROOT}}/build/**/*'],
+    dest: '{{BUILD}}'
+  },
   copyPolyfills: {
     src: ['{{ROOT}}/node_modules/ionic-angular/polyfills/polyfills.js'],
     dest: '{{BUILD}}'
