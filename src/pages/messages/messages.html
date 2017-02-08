@@ -1,7 +1,7 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
 		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small">
-			<div class="hexagon__image__image" [style.background-image]="user.image"></div>
+			<div class="hexagon__image__image" [style.background-image]="user.basic.image | safeUrl"></div>
 		</ion-avatar>
 		<ion-title>
 			<span (click)="goToProfile(user.id)">{{ user.name }}</span>

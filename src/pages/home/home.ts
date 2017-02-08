@@ -81,8 +81,8 @@ export class HomePage {
 		fab.close();
 	}
 
-	openChat = (messageId: number) => {
-		this.navCtrl.push(MessagesPage, { messageId: messageId });
+	openChat = (topicId: number) => {
+		this.navCtrl.push(MessagesPage, { topicId: topicId });
 	}
 
 }

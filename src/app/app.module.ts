@@ -42,7 +42,7 @@ import * as Bluebird from 'bluebird';
 		IonicModule.forRoot(MyApp, {}, {
 			links: [
 				{ component: HomePage, name: "Home", segment: "home" },
-				{ component: MessagesPage, name: "Messages", segment: "messages/:messageId" },
+				{ component: MessagesPage, name: "Messages", segment: "messages/:topicId" },
 				{ component: FriendsPage, name: "Friends", segment: "friends" },
 				{ component: FriendRequestsPage, name: "Requests", segment: "requests" },
 				{ component: ProfilePage, name: "Profile", segment: "profile/:userId" },
