@@ -2,7 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
-process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "development";
+process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
 
 module.exports = {
   entry: {
