@@ -193,9 +193,9 @@ export class MessagesPage {
 		actionSheet.present();
 	}
 
-	goToProfile(profileId: number) {
+	goToProfile(userId: number) {
 		this.navCtrl.push(ProfilePage, {
-			profileId
+			userId
 		});
 	}
 }

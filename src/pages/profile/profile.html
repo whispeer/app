@@ -54,7 +54,7 @@
 </ion-content>
 
 <ion-content padding *ngIf="!isRequest">
-	<div padding-bottom>
+	<div padding-bottom *ngIf="isMe">
 		<ion-segment [(ngModel)]="view" color="dark">
 			<ion-segment-button value="profile">
 				Profile
