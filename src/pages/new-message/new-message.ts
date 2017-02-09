@@ -7,6 +7,7 @@ import { MessagesPage } from "../messages/messages";
 
 const friendsService = require("../../assets/services/friendsService");
 const userService = require("../../assets/user/userService");
+const messageService = require("../../assets/messages/messageService");
 
 import * as Bluebird from 'bluebird';
 
@@ -91,7 +92,32 @@ export class NewMessagePage {
 		});
 	}
 
+	private sendToUserTopic(users) {
+		if (users.length > 1) {
+			return Bluebird.resolve();
+		}
+
+		return messageService.getUserTopic(users[0].id);
+
+	}
+
+	private getSelectedUsers() {
+		return this.friends.filter((friend) => {
+			return this.selectedUsers[friend.id];
+		})
+	}
+
 	create = () => {
-		this.navCtrl.push(MessagesPage);
+		const users = this.getSelectedUsers();
+
+		console.warn(users);
+
+		this.sendToUserTopic(users).then((topicId) => {
+			if (topicId) {
+				this.navCtrl.push(MessagesPage, { topicId: topicId });
+			}
+
+			console.warn("No topic for users: ", users);
+		});
 	}
 }
