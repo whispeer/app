@@ -9,9 +9,18 @@
 	<ion-list class="space-for-fab">
 		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.topic, 'topic--new--last': topic.lastNew}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>
-				<ion-avatar class="hexagon__image" [ngClass]="{'hexagon__image--active': partner.online && pIndex < 2, 'hexagon__image--medium': topic.partners.length > 1}" *ngFor="let partner of topic.partners; let pIndex = index">
+				<ion-avatar
+					*ngFor="let partner of topic.partnersDisplay; let pIndex = index"
+					class="hexagon__image"
+					[ngClass]="{'hexagon__image--active': partner.online, 'hexagon__image--medium': topic.partners.length > 1}"
+				>
 					<div *ngIf="pIndex < 2" class="hexagon__image__image" [style.background-image]="partner.basic.image | safeUrl"></div>
-					<div *ngIf="pIndex === 2" class="hexagon__image__image topic__remainingUsers">
+				</ion-avatar>
+				<ion-avatar
+					*ngIf="topic.partners.length > 2"
+					class="hexagon__image hexagon__image--medium"
+				>
+					<div class="hexagon__image__image topic__remainingUsers">
 						+{{topic.partners.length - 2}}
 					</div>
 				</ion-avatar>
