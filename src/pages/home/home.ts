@@ -47,6 +47,12 @@ export class HomePage {
 		});
 	}
 
+	loadMoreTopics = (infiniteScroll) => {
+		messageService.loadMoreLatest().then(() => {
+			infiniteScroll.complete();
+		})
+	}
+
 	handleClick = ($event: any, fab: FabContainer) => {
 		if($event.type === "press") {
 			fab.toggleList();

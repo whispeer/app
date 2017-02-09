@@ -35,6 +35,10 @@
 		</ion-item>
 	</ion-list>
 
+	<ion-infinite-scroll (ionInfinite)="loadMoreTopics($event)">
+		<ion-infinite-scroll-content></ion-infinite-scroll-content>
+	</ion-infinite-scroll>
+
 	<ion-fab center bottom #fab>
 		<div class="hexagon hexagon--fab">
 			<button (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light"><ion-icon name="add"></ion-icon></button>
