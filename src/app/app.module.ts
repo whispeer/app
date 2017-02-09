@@ -24,6 +24,8 @@ import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode
 import sessionService from '../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
+import { loginPage } from "../assets/services/location.manager";
+
 (<any>window).startup = new Date().getTime();
 
 @NgModule({
@@ -70,11 +72,16 @@ import * as Bluebird from 'bluebird';
 })
 export class AppModule {
 	constructor(private zone: NgZone) {
-		sessionService.loadLogin();
 		Bluebird.setScheduler((fn) => {
 			setTimeout(() => {
 				this.zone.run(fn);
 			}, 0)
+		});
+
+		sessionService.loadLogin().then((loggedin) => {
+			if (!loggedin) {
+				loginPage();
+			}
 		});
 	}
 }
