@@ -20,7 +20,7 @@ export class FriendsPage {
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
-	loadFriendsUsers = () => {
+	private loadFriendsUsers = () => {
 		this.requests = friendsService.getRequests();
 
 		return Bluebird.try(() => {

@@ -5,6 +5,11 @@ import { UserService } from "../../assets/services/user.service";
 
 import { MessagesPage } from "../messages/messages";
 
+const friendsService = require("../../assets/services/friendsService");
+const userService = require("../../assets/user/userService");
+
+import * as Bluebird from 'bluebird';
+
 /*
 	Generated class for the NewMessage page.
 
@@ -19,19 +24,36 @@ export class NewMessagePage {
 	friends: any[];
 	searchTerm: string = "";
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private userService: UserService) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad NewMessagePage');
 	}
 
 	ngOnInit() {
-		this.getUsers();
+		friendsService.awaitLoading().then(() => {
+			friendsService.listen(this.loadFriendsUsers);
+			this.loadFriendsUsers();
+		});
 	}
 
-	getUsers = () => {
-		this.userService.getUsers(this.searchTerm).then((users: any[]) => {
-			this.friends = users;
+	private loadFriendsUsers = () => {
+		return Bluebird.try(() => {
+			var friends = friendsService.getFriends().slice(0, 20);
+			return userService.getMultipleFormatted(friends);
+		}).then((result) => {
+			console.warn("Done loading friends");
+			this.friends = result;
+		});
+	}
+
+	getFilteredFriends = () => {
+		if (!this.searchTerm) {
+			return this.friends;
+		}
+
+		return this.friends.filter((friend) => {
+			return friend.name.indexOf(this.searchTerm) > -1
 		});
 	}
 

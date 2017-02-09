@@ -19,9 +19,10 @@
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 			<span *ngIf="burst.isMessageBurst()">
-
+				<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
 				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
 					{{ message.data.text }}
+					<!--<gallery *ngIf="message.data.images.length > 0" data-images="message.images"></gallery>-->
 					<!-- {{message.data.images}} -->
 					<!-- <span>{{ message.data.timestamp }}</span> -->
 				</div>
@@ -34,9 +35,7 @@
 			</div>
 		</ion-item>
 	</ion-list>
-</ion-content>
 
-<ion-footer>
 	<div class="messages__form" ion-fixed>
 		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
 			<ion-icon name="add-circle"></ion-icon>
@@ -48,4 +47,4 @@
 			<ion-icon name="arrow-dropup-circle"></ion-icon>
 		</button>
 	</div>
-</ion-footer>
+</ion-content>

@@ -12,9 +12,9 @@
 </ion-header>
 
 <ion-content>
-	<ion-searchbar animated [(ngModel)]="searchTerm" (ionInput)="getUsers()"></ion-searchbar>
+	<ion-searchbar animated [(ngModel)]="searchTerm"></ion-searchbar>
 	<ion-list>
-		<ion-item *ngFor="let friend of friends;">
+		<ion-item *ngFor="let friend of getFilteredFriends();">
 			<ion-label>{{friend.name}}</ion-label>
 			<ion-checkbox checked="false" clear item-right></ion-checkbox>
 		</ion-item>
