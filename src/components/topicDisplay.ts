@@ -78,6 +78,24 @@ export class TopicComponent {
 		return bursts;
 	}
 
+	change() {
+		const fontSize = 16;
+		const maxSize = fontSize*7;
+
+		const element   = document.getElementById('sendMessageBox');
+		const textarea  = element.getElementsByTagName('textarea')[0];
+
+		textarea.style.minHeight  = '0';
+		textarea.style.height     = '0';
+
+		const scroll_height = Math.min(textarea.scrollHeight, maxSize);
+
+		// apply new style
+		element.style.height      = scroll_height + "px";
+		textarea.style.minHeight  = scroll_height + "px";
+		textarea.style.height     = scroll_height + "px";
+	}
+
 	goToProfile(userId: number) {
 		this.navCtrl.push(ProfilePage, {
 			userId
