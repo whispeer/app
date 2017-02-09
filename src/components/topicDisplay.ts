@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core";
 
 import { NavController, NavParams, ActionSheetController, Content } from "ionic-angular";
 
@@ -9,6 +9,8 @@ const messageService = require("../assets/messages/messageService");
 const TopicUpdate = require("../assets/models/topicUpdate");
 const Burst = require("../assets/messages/burst");
 import errorService from "../assets/services/error.service";
+
+import * as Bluebird from 'bluebird';
 
 @Component({
 	selector: 'topicWithBursts',
@@ -22,6 +24,8 @@ export class TopicComponent {
 
 	@Output() sendMessage = new EventEmitter();
 
+	@ViewChild(Content) content: Content;
+
 	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController,) {}
 
 	sendMessageToTopic = () => {
@@ -30,7 +34,7 @@ export class TopicComponent {
 
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({
-			title: "What do you want to send?", // todo: translate!
+			title: "What do you want to send?",
 			buttons: [{
 				text: "Select from Gallery",
 				handler: () => {
@@ -51,6 +55,27 @@ export class TopicComponent {
 		});
 
 		actionSheet.present();
+	}
+
+	awaitRendering = () => {
+		return Bluebird.delay(100);
+	}
+
+	messageBursts = () => {
+		const { changed, bursts } = this.messageBurstsFunction();
+
+		if (changed) {
+			const dimension = this.content.getContentDimensions();
+			const scrollFromBottom = dimension.scrollHeight - dimension.scrollTop;
+
+			this.awaitRendering().then(() => {
+				const newDimension = this.content.getContentDimensions();
+
+				this.content.scrollTo(dimension.scrollLeft, newDimension.scrollHeight - scrollFromBottom, 0);
+			})
+		}
+
+		return bursts;
 	}
 
 	goToProfile(userId: number) {

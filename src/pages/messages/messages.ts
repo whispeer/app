@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component } from "@angular/core";
 
 import { NavController, NavParams, ActionSheetController, Content } from "ionic-angular";
 
@@ -24,8 +24,6 @@ export class MessagesPage {
 
 	burstTopic: number = 0;
 	bursts: any[] = [];
-
-	@ViewChild(Content) content: Content;
 
 	messages: any[];
 	constructor(public navParams: NavParams) {
@@ -130,7 +128,7 @@ export class MessagesPage {
 
 	private getBursts = () => {
 		if (!this.topic || this.topic.messagesAndUpdates.length === 0) {
-			return [];
+			return { changed: false, bursts: [] };
 		}
 
 		var messagesAndUpdates = this.topic.messagesAndUpdates;
@@ -139,12 +137,12 @@ export class MessagesPage {
 			this.bursts = this.calculateBursts(messagesAndUpdates);
 			this.burstTopic = this.topic.id;
 
-			return this.bursts;
+			return { changed: true, bursts: this.bursts };
 		}
 
 		var newElements = this.getNewElements(messagesAndUpdates, this.bursts);
 		if (newElements.length === 0) {
-			return this.bursts;
+			return { changed: false, bursts: this.bursts };
 		}
 
 		this.bursts.forEach((burst) => {
@@ -157,17 +155,17 @@ export class MessagesPage {
 			this.bursts = newBursts;
 		}
 
-		return this.bursts;
+		return { changed: true, bursts: this.bursts };
 	}
 
 	messageBursts = () => {
-		var bursts = this.getBursts();
+		var burstInfo = this.getBursts();
 
-		bursts.sort((b1, b2) => {
+		burstInfo.bursts.sort((b1, b2) => {
 			return b1.firstItem().getTime() - b2.firstItem().getTime();
 		});
 
-		return bursts;
+		return burstInfo;
 	}
 
 	markRead = () => {

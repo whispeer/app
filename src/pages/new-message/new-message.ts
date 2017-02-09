@@ -30,7 +30,7 @@ export class NewMessagePage {
 	}
 
 	messageBursts = () => {
-		return [];
+		return { changed: false, bursts: [] };
 	}
 
 	sendMessage = () => {
