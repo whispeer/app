@@ -19,17 +19,18 @@
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 			<span *ngIf="burst.isMessageBurst()">
+
 				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
 					{{ message.data.text }}
 					<!-- {{message.data.images}} -->
-					<span>{{ message.data.timestamp }}</span>
+					<!-- <span>{{ message.data.timestamp }}</span> -->
 				</div>
 			</span>
 			<div class="messages_message" *ngIf="burst.isTopicUpdate()">
-				<span class="burst-date-text">
+				<!--<span class="burst-date-text">
 					{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}" -
 					{{burst.firstItem().state.timestamp}}
-				</span>
+				</span>-->
 			</div>
 		</ion-item>
 	</ion-list>

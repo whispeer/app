@@ -200,6 +200,10 @@ export class MessagesPage {
 	}
 
 	sendMessage = () => {
+		if (this.topic.newMessage.length === 0) {
+			return;
+		}
+
 		messageService.sendMessage(this.topic.id, this.topic.newMessage, []).then(() => {
 			this.topic.newMessage = "";
 			this.markRead();
