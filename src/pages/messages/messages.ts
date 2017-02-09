@@ -128,7 +128,7 @@ export class MessagesPage {
 		}, true);
 	}
 
-	getBursts = () => {
+	private getBursts = () => {
 		if (!this.topic || this.topic.messagesAndUpdates.length === 0) {
 			return [];
 		}
@@ -193,6 +193,17 @@ export class MessagesPage {
 		});
 
 		actionSheet.present();
+	}
+
+	markRead = () => {
+		this.topicObject.markRead(errorService.criticalError)
+	}
+
+	sendMessage = () => {
+		messageService.sendMessage(this.topic.id, this.topic.newMessage, []).then(() => {
+			this.topic.newMessage = "";
+			this.markRead();
+		});
 	}
 
 	goToProfile(userId: number) {

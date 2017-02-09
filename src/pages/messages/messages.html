@@ -7,7 +7,9 @@
 			<span (click)="goToProfile(partners[0].id)">{{ partners[0].name }}</span>
 		</ion-title>
 		<ion-title *ngIf="partners.length != 1">
-			<span *ngFor="let partner of partners" (click)="goToProfile(partner.id)">{{ partner.name }}</span>
+			<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
+				{{ partner.basic.shortname }}{{ l ? "":", " }}
+			</span>
 		</ion-title>
 	</ion-navbar>
 </ion-header>
@@ -16,10 +18,18 @@
 	<ion-spinner *ngIf="messagesLoading" text-center margin class="spinner--full"></ion-spinner>
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-			<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
-				{{ message.data.text }}
-				<!-- {{message.data.images}} -->
-				<span>{{ message.data.timestamp }}</span>
+			<span *ngIf="burst.isMessageBurst()">
+				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
+					{{ message.data.text }}
+					<!-- {{message.data.images}} -->
+					<span>{{ message.data.timestamp }}</span>
+				</div>
+			</span>
+			<div class="messages_message" *ngIf="burst.isTopicUpdate()">
+				<span class="burst-date-text">
+					{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}" -
+					{{burst.firstItem().state.timestamp}}
+				</span>
 			</div>
 		</ion-item>
 	</ion-list>
@@ -31,9 +41,9 @@
 			<ion-icon name="add-circle"></ion-icon>
 		</button>
 		<ion-item class="clean-input-wrap messages__input-wrap">
-			<ion-textarea rows="1" type="text" class="messages__message-input"></ion-textarea>
+			<ion-textarea rows="1" type="text" class="messages__message-input" [(ngModel)]="topic && topic.newMessage"></ion-textarea>
 		</ion-item>
-		<button ion-button icon-only clear class="messages__send-message">
+		<button ion-button icon-only clear class="messages__send-message" (click)="sendMessage()">
 			<ion-icon name="arrow-dropup-circle"></ion-icon>
 		</button>
 	</div>
