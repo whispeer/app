@@ -94,7 +94,7 @@ function runCacheCallbacks(initRequests) {
 			return !request.options.cache;
 		}
 
-		return request.options.cacheCallback(request.cache).thenReturn(true);
+		return request.options.cacheCallback(request.cache, blockageToken).thenReturn(true);
 	});
 }
 
