@@ -10,11 +10,11 @@ const TopicUpdate = require("../assets/models/topicUpdate");
 const Burst = require("../assets/messages/burst");
 import errorService from "../assets/services/error.service";
 
-import * as Bluebird from 'bluebird';
+import * as Bluebird from "bluebird";
 
 @Component({
-	selector: 'topicWithBursts',
-	templateUrl: 'topic.html'
+	selector: "topicWithBursts",
+	templateUrl: "topic.html"
 })
 export class TopicComponent {
 	@Input() partners;
@@ -82,11 +82,11 @@ export class TopicComponent {
 		const fontSize = 16;
 		const maxSize = fontSize*7;
 
-		const element   = document.getElementById('sendMessageBox');
-		const textarea  = element.getElementsByTagName('textarea')[0];
+		const element   = document.getElementById("sendMessageBox");
+		const textarea  = element.getElementsByTagName("textarea")[0];
 
-		textarea.style.minHeight  = '0';
-		textarea.style.height     = '0';
+		textarea.style.minHeight  = "0";
+		textarea.style.height     = "0";
 
 		const scroll_height = Math.min(textarea.scrollHeight, maxSize);
 
