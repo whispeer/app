@@ -1,6 +1,6 @@
 import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core";
 
-import { NavController, NavParams, ActionSheetController, Content } from "ionic-angular";
+import { NavController, NavParams, ActionSheetController, Content, Footer } from "ionic-angular";
 
 import { UserService } from "../assets/services/user.service";
 import { ProfilePage } from "../pages/profile/profile";
@@ -25,8 +25,12 @@ export class TopicComponent {
 	@Output() sendMessage = new EventEmitter();
 
 	@ViewChild(Content) content: Content;
+	@ViewChild(Footer) footer: Footer;
 
 	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController,) {}
+
+	contentHeight = 0;
+	footerHeight = 0;
 
 	sendMessageToTopic = () => {
 		this.sendMessage.emit();
@@ -82,11 +86,22 @@ export class TopicComponent {
 		const fontSize = 16;
 		const maxSize = fontSize*7;
 
+		const contentElement = this.content.getScrollElement();
+		const footerElement = this.footer.getNativeElement();
+
+		if (!this.footerHeight) {
+			this.footerHeight = footerElement.offsetHeight;
+		}
+
 		const element   = document.getElementById("sendMessageBox");
 		const textarea  = element.getElementsByTagName("textarea")[0];
 
 		textarea.style.minHeight  = "0";
 		textarea.style.height     = "0";
+		contentElement.style.height = "";
+
+		const contentHeight = contentElement.offsetHeight;
+
 
 		const scroll_height = Math.min(textarea.scrollHeight, maxSize);
 
@@ -94,6 +109,8 @@ export class TopicComponent {
 		element.style.height      = scroll_height + "px";
 		textarea.style.minHeight  = scroll_height + "px";
 		textarea.style.height     = scroll_height + "px";
+
+		contentElement.style.height = contentHeight - (footerElement.offsetHeight - this.footerHeight) + "px";
 	}
 
 	goToProfile(userId: number) {
