@@ -1,10 +1,10 @@
 <ion-header>
-	<ion-navbar [color]="'primary'" no-border>
+	<ion-navbar [color]="'primary'" no-border *ngIf="partners.length == 1">
 		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small">
-			<div class="hexagon__image__image" [style.background-image]="user.basic.image | safeUrl"></div>
+			<div class="hexagon__image__image" [style.background-image]="partners[0].basic.image | safeUrl"></div>
 		</ion-avatar>
 		<ion-title>
-			<span (click)="goToProfile(user.id)">{{ user.name }}</span>
+			<span (click)="goToProfile(partners[0].id)">{{ partners[0].name }}</span>
 		</ion-title>
 	</ion-navbar>
 </ion-header>
@@ -13,10 +13,10 @@
 	<ion-spinner *ngIf="messagesLoading" text-center margin class="spinner--full"></ion-spinner>
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-			<div *ngFor="let message of burst.messages" attr.data-messageid="{{message.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.emojiOnly}">
-				{{ message.text }}
-				<!-- {{message.images}} -->
-				<span>{{ message.timestamp }}</span>
+			<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
+				{{ message.data.text }}
+				<!-- {{message.data.images}} -->
+				<span>{{ message.data.timestamp }}</span>
 			</div>
 		</ion-item>
 	</ion-list>

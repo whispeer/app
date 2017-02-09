@@ -6,6 +6,9 @@ import { UserService } from "../../assets/services/user.service";
 import { ProfilePage } from "../profile/profile";
 
 const messageService = require("../../assets/messages/messageService");
+const TopicUpdate = require("../../assets/models/topicUpdate");
+const Burst = require("../../assets/messages/burst");
+import errorService from "../../assets/services/error.service";
 
 @Component({
 	selector: 'page-messages',
@@ -13,12 +16,17 @@ const messageService = require("../../assets/messages/messageService");
 })
 export class MessagesPage {
 	topicId: number;
-	user: any = { basic: {} };
+	topic: any;
+	topicObject: any;
+
+	partners: any[] = [];
 	messagesLoading: boolean = true;
+
+	burstTopic: number = 0;
+	bursts: any[] = [];
 
 	@ViewChild(Content) content: Content;
 
-	i: number = 20;
 	messages: any[];
 	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private userService: UserService) {
 	}
@@ -27,47 +35,137 @@ export class MessagesPage {
 		this.topicId = parseFloat(this.navParams.get("topicId"));
 
 		messageService.getTopic(this.topicId).then((topic) => {
-			this.user = topic.data.partners[0];
+			this.topic = topic.data;
+			this.topicObject = topic;
+			this.partners = topic.data.partners;
+
+			this.messagesLoading = false;
 		})
-
-		this.messages = [];
-
-		for(let i = 0; i < 10; i++) {
-			const b = i % 2;
-			this.messages.push({
-				id: i,
-				isMe: () => {
-					return b;
-				},
-				isOther: () => {
-					return !b;
-				},
-				sender: () => {
-
-				},
-				messages: i % 3 ? [{
-					text: "😂🤓",
-					emojiOnly: true
-				}, {
-					text: "I am the latest one."
-				}] : [{
-					text: "Hi! I am the default message."
-				}, {
-					text: "I am the latest one."
-				}],
-				date: new Date()
-			});
-		}
-
-		this.messagesLoading = false;
 	}
 
 	ionViewDidEnter = () => {
 		this.content.scrollToBottom(0);
 	}
 
+	private getNewElements(messagesAndUpdates, bursts) {
+		return messagesAndUpdates.filter((message) => {
+			return bursts.reduce((prev, current) => {
+				return prev && !current.hasItem(message);
+			}, true);
+		});
+	}
+
+	private calculateBursts(messages) {
+		var bursts = [new Burst(TopicUpdate)];
+		var currentBurst = bursts[0];
+
+		messages.sort((m1, m2) => {
+			return m2.getTime() - m1.getTime();
+		});
+
+		messages.forEach((messageOrUpdate) => {
+			if(!currentBurst.fitsItem(messageOrUpdate)) {
+				currentBurst = new Burst(TopicUpdate);
+				bursts.push(currentBurst);
+			}
+
+			currentBurst.addItem(messageOrUpdate);
+		});
+
+		return bursts;
+	}
+
+	private hasMatchingMessage(oldBurst, newBurst) {
+		var matchingMessages = newBurst.getItems().filter((message) => {
+			return oldBurst.hasItem(message);
+		});
+
+		return matchingMessages.length > 0;
+	}
+
+	private addBurst(bursts, burst) {
+		bursts.push(burst);
+
+		return true;
+	}
+
+	private mergeBurst(oldBurst, newBurst) {
+		var newMessages = newBurst.getItems().filter((message) => {
+			return !oldBurst.hasItem(message);
+		});
+
+		newMessages.forEach((message) => {
+			oldBurst.addItem(message);
+		});
+
+		return true;
+	}
+
+	private addBurstOrMerge(bursts, burst) {
+		var possibleMatches = bursts.filter((oldBurst) => {
+			return this.hasMatchingMessage(oldBurst, burst);
+		});
+
+		if (possibleMatches.length === 0) {
+			return this.addBurst(bursts, burst);
+		}
+
+		if (possibleMatches.length === 1) {
+			return this.mergeBurst(possibleMatches[0], burst);
+		}
+
+		if (possibleMatches.length > 1) {
+			errorService.criticalError(new Error("Burst merging possible matches > 1 wtf..."));
+			return false;
+		}
+	}
+
+	private mergeBursts(bursts, newBursts) {
+		return newBursts.reduce((prev, burst) => {
+			return prev && this.addBurstOrMerge(bursts, burst);
+		}, true);
+	}
+
+	getBursts = () => {
+		if (!this.topic || this.topic.messagesAndUpdates.length === 0) {
+			return [];
+		}
+
+		var messagesAndUpdates = this.topic.messagesAndUpdates;
+
+		if (this.burstTopic !== this.topic.id) {
+			this.bursts = this.calculateBursts(messagesAndUpdates);
+			this.burstTopic = this.topic.id;
+
+			return this.bursts;
+		}
+
+		var newElements = this.getNewElements(messagesAndUpdates, this.bursts);
+		if (newElements.length === 0) {
+			return this.bursts;
+		}
+
+		this.bursts.forEach((burst) => {
+			burst.removeAllExceptLast();
+		});
+
+		var newBursts = this.calculateBursts(messagesAndUpdates);
+		if (!this.mergeBursts(this.bursts, newBursts)) {
+			console.warn("Rerender all bursts!");
+			this.bursts = newBursts;
+		}
+
+		return this.bursts;
+	}
+
 	messageBursts = () => {
-		return this.messages;
+		var bursts = this.getBursts();
+
+		bursts.sort((b1, b2) => {
+			return b1.firstItem().getTime() - b2.firstItem().getTime();
+		});
+
+		return bursts;
 	}
 
 	presentActionSheet = () => {
@@ -95,7 +193,9 @@ export class MessagesPage {
 		actionSheet.present();
 	}
 
-	goToProfile() {
-		this.navCtrl.push(ProfilePage);
+	goToProfile(profileId: number) {
+		this.navCtrl.push(ProfilePage, {
+			profileId
+		});
 	}
 }
