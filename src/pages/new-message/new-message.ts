@@ -23,6 +23,7 @@ import * as Bluebird from 'bluebird';
 export class NewMessagePage {
 	friends: any[];
 	searchTerm: string = "";
+	selectedUsers: any = {};
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
@@ -39,15 +40,48 @@ export class NewMessagePage {
 
 	private loadFriendsUsers = () => {
 		return Bluebird.try(() => {
-			var friends = friendsService.getFriends().slice(0, 20);
+			var friends = friendsService.getFriends().slice(0, 10);
 			return userService.getMultipleFormatted(friends);
 		}).then((result) => {
-			console.warn("Done loading friends");
+			console.warn("Friends loaded");
 			this.friends = result;
 		});
 	}
 
+	getFriendsResults = () => {
+		const friends = this.getFilteredFriends();
+
+		friends.sort((a: any, b: any) => {
+			if (this.selectedUsers[a.id] && !this.selectedUsers[b.id]) {
+				return -1;
+			}
+
+			if (this.selectedUsers[b.id] && !this.selectedUsers[a.id]) {
+				return 1;
+			}
+
+			const nameA = a.name.toUpperCase();
+			const nameB = b.name.toUpperCase();
+			if (nameA < nameB) {
+				return -1;
+			}
+
+			if (nameA > nameB) {
+				return 1;
+			}
+
+			// names must be equal
+			return 0;
+		});
+
+		return friends;
+	}
+
 	getFilteredFriends = () => {
+		if (!this.friends) {
+			return [];
+		}
+
 		if (!this.searchTerm) {
 			return this.friends;
 		}
