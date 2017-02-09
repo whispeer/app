@@ -26,6 +26,9 @@ import * as Bluebird from 'bluebird';
 
 import { loginPage } from "../assets/services/location.manager";
 
+import { TopicComponent } from "../components/topicDisplay";
+import { chooseFriends } from "../components/chooseFriends";
+
 (<any>window).startup = new Date().getTime();
 
 @NgModule({
@@ -38,6 +41,8 @@ import { loginPage } from "../assets/services/location.manager";
 		SettingsPage,
 		FriendRequestsPage,
 		NewMessagePage,
+		TopicComponent,
+		chooseFriends,
 		SafeUrl
 	],
 	imports: [
@@ -63,7 +68,9 @@ import { loginPage } from "../assets/services/location.manager";
 		ProfilePage,
 		SettingsPage,
 		FriendRequestsPage,
-		NewMessagePage
+		NewMessagePage,
+		TopicComponent,
+		chooseFriends
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},

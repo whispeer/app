@@ -5,119 +5,37 @@ import { UserService } from "../../assets/services/user.service";
 
 import { MessagesPage } from "../messages/messages";
 
-const friendsService = require("../../assets/services/friendsService");
-const userService = require("../../assets/user/userService");
 const messageService = require("../../assets/messages/messageService");
 
 import * as Bluebird from 'bluebird';
 
-/*
-	Generated class for the NewMessage page.
-
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
 @Component({
 	selector: 'page-new-message',
 	templateUrl: 'new-message.html'
 })
 export class NewMessagePage {
-	friends: any[];
-	searchTerm: string = "";
-	selectedUsers: any = {};
+	messagesLoading = false;
+	partners: any = [];
+	receiversChosen: boolean = false;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams) {}
+	topic = {
+		newMessage: ""
+	};
 
-	ionViewDidLoad() {
-		console.log('ionViewDidLoad NewMessagePage');
+	constructor(public navCtrl: NavController) {}
+
+	chooseReceivers = (users) => {
+		this.partners = users;
+		this.receiversChosen = true;
 	}
 
-	ngOnInit() {
-		friendsService.awaitLoading().then(() => {
-			friendsService.listen(this.loadFriendsUsers);
-			this.loadFriendsUsers();
-		});
+	messageBursts = () => {
+		return [];
 	}
 
-	private loadFriendsUsers = () => {
-		return Bluebird.try(() => {
-			var friends = friendsService.getFriends().slice(0, 10);
-			return userService.getMultipleFormatted(friends);
-		}).then((result) => {
-			console.warn("Friends loaded");
-			this.friends = result;
-		});
-	}
-
-	getFriendsResults = () => {
-		const friends = this.getFilteredFriends();
-
-		friends.sort((a: any, b: any) => {
-			if (this.selectedUsers[a.id] && !this.selectedUsers[b.id]) {
-				return -1;
-			}
-
-			if (this.selectedUsers[b.id] && !this.selectedUsers[a.id]) {
-				return 1;
-			}
-
-			const nameA = a.name.toUpperCase();
-			const nameB = b.name.toUpperCase();
-			if (nameA < nameB) {
-				return -1;
-			}
-
-			if (nameA > nameB) {
-				return 1;
-			}
-
-			// names must be equal
-			return 0;
-		});
-
-		return friends;
-	}
-
-	getFilteredFriends = () => {
-		if (!this.friends) {
-			return [];
-		}
-
-		if (!this.searchTerm) {
-			return this.friends;
-		}
-
-		return this.friends.filter((friend) => {
-			return friend.name.indexOf(this.searchTerm) > -1
-		});
-	}
-
-	private sendToUserTopic(users) {
-		if (users.length > 1) {
-			return Bluebird.resolve();
-		}
-
-		return messageService.getUserTopic(users[0].id);
-
-	}
-
-	private getSelectedUsers() {
-		return this.friends.filter((friend) => {
-			return this.selectedUsers[friend.id];
-		})
-	}
-
-	create = () => {
-		const users = this.getSelectedUsers();
-
-		console.warn(users);
-
-		this.sendToUserTopic(users).then((topicId) => {
-			if (topicId) {
-				this.navCtrl.push(MessagesPage, { topicId: topicId });
-			}
-
-			console.warn("No topic for users: ", users);
+	sendMessage = () => {
+		messageService.sendNewTopic(this.partners.map((partner) => partner.user), this.topic.newMessage, []).then((topicId) => {
+			this.navCtrl.push(MessagesPage, { topicId: topicId });
 		});
 	}
 }

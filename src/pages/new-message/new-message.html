@@ -1,22 +1,10 @@
-<ion-header>
-	<ion-navbar [color]="'primary'">
-		<ion-title>
-			Select Contacts
-		</ion-title>
-		<ion-buttons end>
-			<button ion-button (click)="create()">
-				<ion-icon name="md-person-add"></ion-icon>
-			</button>
-		</ion-buttons>
-	</ion-navbar>
-</ion-header>
+<chooseFriends *ngIf="!receiversChosen" (chooseReceivers)="chooseReceivers($event)"></chooseFriends>
 
-<ion-content>
-	<ion-searchbar animated [(ngModel)]="searchTerm"></ion-searchbar>
-	<ion-list>
-		<ion-item *ngFor="let friend of getFriendsResults();">
-			<ion-label>{{friend.name}}</ion-label>
-			<ion-checkbox checked="false" clear item-right [(ngModel)]="selectedUsers[friend.id]"></ion-checkbox>
-		</ion-item>
-	</ion-list>
-</ion-content>
+<topicWithBursts
+	*ngIf="receiversChosen"
+    [topic]="topic"
+    [messageBurstsFunction]="messageBursts"
+    [partners]="partners"
+    [messagesLoading]="messagesLoading"
+    (sendMessage)="sendMessage()"
+></topicWithBursts>

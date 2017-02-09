@@ -28,7 +28,7 @@ export class MessagesPage {
 	@ViewChild(Content) content: Content;
 
 	messages: any[];
-	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private userService: UserService) {
+	constructor(public navParams: NavParams) {
 	}
 
 	ngOnInit() {
@@ -40,14 +40,14 @@ export class MessagesPage {
 			this.partners = topic.data.partners;
 
 			topic.loadMoreMessages().then(() => {
+				// this.content.scrollToBottom(0);
+
 				this.messagesLoading = false;
 			});
 		})
 	}
 
-	ionViewDidEnter = () => {
-		this.content.scrollToBottom(0);
-	}
+	ionViewDidEnter = () => {}
 
 	private getNewElements(messagesAndUpdates, bursts) {
 		return messagesAndUpdates.filter((message) => {
@@ -170,31 +170,6 @@ export class MessagesPage {
 		return bursts;
 	}
 
-	presentActionSheet = () => {
-		let actionSheet = this.actionSheetCtrl.create({
-			title: "What do you want to send?", // todo: translate!
-			buttons: [{
-				text: "Select from Gallery",
-				handler: () => {
-					console.log("Select smth from Gallery!");
-				}
-			}, {
-				text: "Take Photo",
-				handler: () => {
-					console.log("Take new photo!");
-				}
-			}, {
-				text: "Cancel",
-				role: "cancel",
-				handler: () => {
-					console.log("Cancel clicked.");
-				}
-			}]
-		});
-
-		actionSheet.present();
-	}
-
 	markRead = () => {
 		this.topicObject.markRead(errorService.criticalError)
 	}
@@ -207,12 +182,6 @@ export class MessagesPage {
 		messageService.sendMessage(this.topic.id, this.topic.newMessage, []).then(() => {
 			this.topic.newMessage = "";
 			this.markRead();
-		});
-	}
-
-	goToProfile(userId: number) {
-		this.navCtrl.push(ProfilePage, {
-			userId
 		});
 	}
 }

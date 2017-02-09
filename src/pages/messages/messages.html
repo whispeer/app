@@ -1,50 +1,7 @@
-<ion-header>
-	<ion-navbar [color]="'primary'" no-border>
-		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
-			<div class="hexagon__image__image" [style.background-image]="partners[0].basic.image | safeUrl"></div>
-		</ion-avatar>
-		<ion-title *ngIf="partners.length == 1">
-			<span (click)="goToProfile(partners[0].id)">{{ partners[0].name }}</span>
-		</ion-title>
-		<ion-title *ngIf="partners.length != 1">
-			<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
-				{{ partner.basic.shortname }}{{ l ? "":", " }}
-			</span>
-		</ion-title>
-	</ion-navbar>
-</ion-header>
-
-<ion-content fullscreen>
-	<ion-spinner *ngIf="messagesLoading" text-center margin class="spinner--full"></ion-spinner>
-	<ion-list no-lines>
-		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-			<span *ngIf="burst.isMessageBurst()">
-				<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
-				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
-					{{ message.data.text }}
-					<!--<gallery *ngIf="message.data.images.length > 0" data-images="message.images"></gallery>-->
-					<!-- {{message.data.images}} -->
-					<!-- <span>{{ message.data.timestamp }}</span> -->
-				</div>
-			</span>
-			<div class="messages_message" *ngIf="burst.isTopicUpdate()">
-				<!--<span class="burst-date-text">
-					{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}" -
-					{{burst.firstItem().state.timestamp}}
-				</span>-->
-			</div>
-		</ion-item>
-	</ion-list>
-
-	<div class="messages__form" ion-fixed>
-		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
-			<ion-icon name="add-circle"></ion-icon>
-		</button>
-		<ion-item class="clean-input-wrap messages__input-wrap">
-			<ion-textarea rows="1" type="text" class="messages__message-input" [(ngModel)]="topic && topic.newMessage"></ion-textarea>
-		</ion-item>
-		<button ion-button icon-only clear class="messages__send-message" (click)="sendMessage()">
-			<ion-icon name="arrow-dropup-circle"></ion-icon>
-		</button>
-	</div>
-</ion-content>
+<topicWithBursts
+    [topic]="topic"
+    [messageBurstsFunction]="messageBursts"
+    [partners]="partners"
+    [messagesLoading]="messagesLoading"
+    (sendMessage)="sendMessage()"
+></topicWithBursts>
