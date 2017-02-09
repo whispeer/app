@@ -29,4 +29,15 @@ export class SettingsPage {
 		sessionService.logout();
 	}
 
+	tos() {
+		window.open("https://whispeer.de/en/agb", "_system");
+	}
+
+	privacyPolicy() {
+		window.open("https://whispeer.de/en/privacyPolicy", "_system");
+	}
+
+	contactUs() {
+		window.open("https://whispeer.de/en/contact", "_system");
+	}
 }

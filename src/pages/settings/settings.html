@@ -24,16 +24,16 @@
 		</ion-item>
 	</ion-list>
 	<ion-list>
-		<ion-list-header>
+		<!--<ion-list-header>
 			Information about whispeer
-		</ion-list-header>
-		<ion-item detail-push>
+		</ion-list-header>-->
+		<ion-item detail-push (click)="tos()">
 			Terms of Service
 		</ion-item>
-		<ion-item detail-push>
+		<ion-item detail-push (click)="privacyPolicy()">
 			Privacy policy
 		</ion-item>
-		<ion-item detail-push>
+		<ion-item detail-push (click)="contactUs()">
 			Contact us
 		</ion-item>
 	</ion-list>
