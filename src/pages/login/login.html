@@ -12,7 +12,7 @@
 
 		<div class="login__form">
 			<p class="login__paragraph login__paragraph--primary">
-				Create a new account or simply login...
+				{{ getMessage() }}
 			</p>
 			<ion-item class="clean-input-wrap login__input-wrap">
 				<ion-input id="mail" class="login__input" type="text" placeholder="e.g. whispeerHQ" [disabled]="register" [(ngModel)]="login.identifier" (blur)="checkUserNameExistance()"></ion-input>

@@ -9,6 +9,7 @@ import jQuery from "jquery";
 	selector: 'page-login',
 	templateUrl: 'login.html'
 })
+
 export class LoginPage {
 	login: typeof loginService;
 
@@ -29,12 +30,21 @@ export class LoginPage {
 		});
 	}
 
+	getMessage() {
+		console.log('before', this.login);
+		console.log('after', this.login);
+		return CALL_TO_ACTION_PROCESS
+	}
+
 	ionViewDidLoad() {
 		console.log("ionViewDidLoad LoginPage");
 	}
 
 	checkUserNameExistance = () => {
-
+		console.log('checking username')
+		loginService.login();
+		console.log('result', loginService)
+		// this.login.login();
 	}
 
 	loginOrRegister = () => {
@@ -46,3 +56,8 @@ export class LoginPage {
 		this.register = true;
 	}
 }
+
+const CALL_TO_ACTION_PROCESS = "Create a new account or simply login..."
+const AMBUGUOUS_PROCESS = "This username exists. You can choose to continue login or register a distinct username here"
+const LOGIN_PROCESS_SUCCESS = "Success! We'll log you in securely now..."
+
