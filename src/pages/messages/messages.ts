@@ -39,7 +39,9 @@ export class MessagesPage {
 			this.topicObject = topic;
 			this.partners = topic.data.partners;
 
-			this.messagesLoading = false;
+			topic.loadMoreMessages().then(() => {
+				this.messagesLoading = false;
+			});
 		})
 	}
 

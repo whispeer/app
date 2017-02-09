@@ -1,10 +1,13 @@
 <ion-header>
-	<ion-navbar [color]="'primary'" no-border *ngIf="partners.length == 1">
-		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small">
+	<ion-navbar [color]="'primary'" no-border>
+		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
 			<div class="hexagon__image__image" [style.background-image]="partners[0].basic.image | safeUrl"></div>
 		</ion-avatar>
-		<ion-title>
+		<ion-title *ngIf="partners.length == 1">
 			<span (click)="goToProfile(partners[0].id)">{{ partners[0].name }}</span>
+		</ion-title>
+		<ion-title *ngIf="partners.length != 1">
+			<span *ngFor="let partner of partners" (click)="goToProfile(partner.id)">{{ partner.name }}</span>
 		</ion-title>
 	</ion-navbar>
 </ion-header>
