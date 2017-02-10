@@ -442,12 +442,13 @@ var Topic = function (data) {
 				}
 			});
 
-			theTopic.data.partnersDisplay = partners.slice(0, 2);
-			if (partners.length > 2) {
-				theTopic.data.remainingUser = partners.length - 2;
+			var displayCount = (partners.length > 3) ? 2 : partners.length;
+			theTopic.data.partnersDisplay = partners.slice(0, displayCount);
+			if (partners.length > displayCount) {
+				theTopic.data.remainingUser = partners.length - displayCount;
 
 				var i = 0;
-				for (i = 2; i < partners.length; i += 1) {
+				for (i = displayCount; i < partners.length; i += 1) {
 					theTopic.data.remainingUserTitle += partners[i].name;
 					if (i < partners.length - 1) {
 						theTopic.data.remainingUserTitle += ", ";
