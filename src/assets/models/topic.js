@@ -442,7 +442,8 @@ var Topic = function (data) {
 				}
 			});
 
-			var displayCount = (partners.length > 3) ? 2 : partners.length;
+			var maxDisplay = 3;
+			var displayCount = (partners.length > maxDisplay) ? 2 : partners.length;
 			theTopic.data.partnersDisplay = partners.slice(0, displayCount);
 			if (partners.length > displayCount) {
 				theTopic.data.remainingUser = partners.length - displayCount;
