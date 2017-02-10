@@ -3,7 +3,7 @@ import { Component, ViewChild } from "@angular/core";
 import { NavController, FabContainer, Content } from "ionic-angular";
 
 import { MessagesPage } from "../messages/messages";
-import { FriendsPage } from "../friends/friends";
+import { ContactsPage } from "../contacts/contacts";
 import { ProfilePage } from "../profile/profile";
 import { SettingsPage } from "../settings/settings";
 import { NewMessagePage } from "../new-message/new-message";
@@ -69,8 +69,8 @@ export class HomePage {
 
 	fabSideClick = ($event: any, fab: FabContainer, what: string) => {
 		switch (what) {
-			case "friends":
-				this.navCtrl.push(FriendsPage);
+			case "contacts":
+				this.navCtrl.push(ContactsPage);
 				break;
 			case "profile":
 				this.navCtrl.push(ProfilePage, {
