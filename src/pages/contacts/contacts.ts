@@ -26,7 +26,20 @@ export class ContactsPage {
 		return Bluebird.try(() => {
 			var friends = friendsService.getFriends();
 			return userService.getMultipleFormatted(friends);
-		}).then((result) => {
+		}).then((result: any[]) => {
+			return result.sort((a: any, b: any): number => {
+				const firstAvailable = a.names.firstname && b.names.firstname;
+				const lastAvailable = a.names.lastname && b.names.firstname;
+
+				if(!firstAvailable && !lastAvailable) {
+					return a.name.localeCompare(b.name);
+				} else if (!firstAvailable) {
+					return a.names.lastname.localeCompare(b.names.lastname);
+				} else {
+					return a.names.firstname.localeCompare(b.names.firstname);
+				}
+			});
+		}).then((result: any[]) => {
 			this.friends = result;
 			this.friendsLoading = false;
 		});

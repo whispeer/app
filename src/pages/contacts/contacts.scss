@@ -6,10 +6,6 @@ page-friends {
 	margin-top: -1px;
 }
 
-ion-item:last-of-type .item-inner {
-	border: none !important;
-}
-
 .friends__request {
 	background-color: map-get($colors, highlight);
 	color: map-get($colors, dark);
