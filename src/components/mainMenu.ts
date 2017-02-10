@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { NavController, NavParams, FabContainer } from "ionic-angular";
 
-import { FriendsPage } from "../pages/friends/friends";
+import { ContactsPage } from "../pages/contacts/contacts";
 import { ProfilePage } from "../pages/profile/profile";
 import { SettingsPage } from "../pages/settings/settings";
 
@@ -32,8 +32,8 @@ export class MainMenu {
 
 	fabSideClick = (fab: FabContainer, what: string) => {
 		switch (what) {
-			case "friends":
-				this.navCtrl.push(FriendsPage);
+			case "contacts":
+				this.navCtrl.push(ContactsPage);
 				break;
 			case "profile":
 				this.navCtrl.push(ProfilePage, {

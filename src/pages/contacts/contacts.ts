@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
-import { FriendRequestsPage } from "../friend-requests/friend-requests";
+import { ContactRequestsPage } from "../contact-requests/contact-requests";
 import { ProfilePage } from "../profile/profile";
 
 const friendsService = require("../../assets/services/friendsService");
@@ -10,10 +10,10 @@ const userService = require("../../assets/user/userService");
 import * as Bluebird from 'bluebird';
 
 @Component({
-	selector: 'page-friends',
-	templateUrl: 'friends.html'
+	selector: 'page-contacts',
+	templateUrl: 'contacts.html'
 })
-export class FriendsPage {
+export class ContactsPage {
 	friends: any[] = [];
 	friendsLoading: boolean = true;
 	requests: any[] = [];
@@ -26,7 +26,20 @@ export class FriendsPage {
 		return Bluebird.try(() => {
 			var friends = friendsService.getFriends();
 			return userService.getMultipleFormatted(friends);
-		}).then((result) => {
+		}).then((result: any[]) => {
+			return result.sort((a: any, b: any): number => {
+				const firstAvailable = a.names.firstname && b.names.firstname;
+				const lastAvailable = a.names.lastname && b.names.firstname;
+
+				if(!firstAvailable && !lastAvailable) {
+					return a.name.localeCompare(b.name);
+				} else if (!firstAvailable) {
+					return a.names.lastname.localeCompare(b.names.lastname);
+				} else {
+					return a.names.firstname.localeCompare(b.names.firstname);
+				}
+			});
+		}).then((result: any[]) => {
 			this.friends = result;
 			this.friendsLoading = false;
 		});
@@ -62,7 +75,7 @@ export class FriendsPage {
 	}
 
 	goToRequests() {
-		this.navCtrl.push(FriendRequestsPage);
+		this.navCtrl.push(ContactRequestsPage);
 	}
 
 	close = () => {
