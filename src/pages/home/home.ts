@@ -43,14 +43,24 @@ export class HomePage {
 		this.topics = messageService.data.latestTopics.data;
 
 		messageService.loadMoreLatest(() => {}).then(() => {
+			this.markLastNew();
 			this.topicsLoading = false;
 		});
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
 		messageService.loadMoreLatest().then(() => {
+			this.markLastNew();
+
 			infiniteScroll.complete();
 		})
+	}
+
+	markLastNew = () => {
+		this.topics.forEach((elem: any, index: number, arr: any[]) => {
+			// set property if this is the last topic with a new message.
+			elem.lastNew = elem.unread && arr[index + 1] && !arr[index + 1].unread;
+		});
 	}
 
 	handleClick = ($event: any, fab: FabContainer) => {
