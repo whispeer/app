@@ -1,11 +1,8 @@
 import { Component, ViewChild } from "@angular/core";
 
-import { NavController, FabContainer, Content } from "ionic-angular";
+import { NavController, Content } from "ionic-angular";
 
 import { MessagesPage } from "../messages/messages";
-import { FriendsPage } from "../friends/friends";
-import { ProfilePage } from "../profile/profile";
-import { SettingsPage } from "../settings/settings";
 import { NewMessagePage } from "../new-message/new-message";
 
 import { UserService } from "../../assets/services/user.service";
@@ -63,42 +60,13 @@ export class HomePage {
 		});
 	}
 
-	handleClick = ($event: any, fab: FabContainer) => {
-		if($event.type === "press") {
-			fab.toggleList();
-		} else {
-			if(fab._listsActive) {
-				fab.close();
-			} else {
-				this.navCtrl.push(NewMessagePage, {}, {
-					animation: "md-transition"
-				});
-			}
-		}
-	}
-
-	fabSideClick = ($event: any, fab: FabContainer, what: string) => {
-		switch (what) {
-			case "friends":
-				this.navCtrl.push(FriendsPage);
-				break;
-			case "profile":
-				this.navCtrl.push(ProfilePage, {
-					userId: sessionService.userid
-				});
-				break;
-			case "settings":
-				this.navCtrl.push(SettingsPage);
-				break;
-			default:
-				// code...
-				break;
-		}
-		fab.close();
-	}
-
 	openChat = (topicId: number) => {
 		this.navCtrl.push(MessagesPage, { topicId: topicId });
 	}
 
+	newMessage = () => {
+		this.navCtrl.push(NewMessagePage, {}, {
+			animation: "md-transition"
+		});
+	}
 }

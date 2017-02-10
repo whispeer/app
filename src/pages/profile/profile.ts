@@ -86,4 +86,8 @@ export class ProfilePage {
 			this.isRequest = false;
 		});
 	}
+
+	close = () => {
+		this.navCtrl.pop();
+	}
 }

@@ -6,13 +6,13 @@
 -->
 <ion-header>
 	<ion-navbar [color]="'primary'">
-		<ion-title>Friends</ion-title>
+		<ion-title>Contacts</ion-title>
 	</ion-navbar>
 </ion-header>
 
 
 <ion-content>
-	<ion-spinner *ngIf="friendsLoading" text-center margin class="spinner--full"></ion-spinner>
+	<ion-spinner *ngIf="friendsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list no-lines no-margin *ngIf="requests.length > 0">
 		<ion-item class="friends__request" padding (click)="goToRequests()">
 			<ion-badge item-left>{{requests.length}}</ion-badge>
@@ -26,7 +26,27 @@
 		</ion-item-divider>
 
 		<ion-item *virtualItem="let friend" (click)="goToUser(friend.id)">
-			<h2>{{friend.name}}</h2>
+			<!--
+				Please restructure this if you have a better idea how to
+				mark the name that was used when sorting
+			-->
+			<h2>
+				<strong *ngIf="friend.names.firstname">
+					{{friend.names.firstname}}
+				</strong>
+				<span *ngIf="friend.names.firstname && friend.names.lastname">
+					{{friend.names.lastname}}
+				</span>
+				<strong
+					*ngIf="!friend.names.firstname && friend.names.lastname">
+					{{friend.names.lastname}}
+				</strong>
+				<strong
+					*ngIf="!friend.names.firstname && !friend.names.lastname">
+					{{friend.name}}
+				</strong>
+			</h2>
 		</ion-item>
 	</ion-list>
+	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
 </ion-content>

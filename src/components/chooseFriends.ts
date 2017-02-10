@@ -108,4 +108,8 @@ export class chooseFriends {
 		});
 	}
 
+	close = () => {
+		this.navCtrl.pop();
+	}
+
 }
