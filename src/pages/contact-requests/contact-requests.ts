@@ -9,10 +9,10 @@ const userService = require("../../assets/user/userService");
 import * as Bluebird from 'bluebird';
 
 @Component({
-	selector: 'page-friend-requests',
-	templateUrl: 'friend-requests.html'
+	selector: 'page-contact-requests',
+	templateUrl: 'contact-requests.html'
 })
-export class FriendRequestsPage {
+export class ContactRequestsPage {
 	requests: any[] = [];
 	requestsLoading: boolean = true;
 
@@ -29,7 +29,7 @@ export class FriendRequestsPage {
 	}
 
 	ionViewDidLoad() {
-		console.log('ionViewDidLoad FriendRequestsPage');
+		console.log('ionViewDidLoad ContactRequestsPage');
 
 		friendsService.awaitLoading().then(() => {
 			friendsService.listen(this.loadRequestsUsers);
