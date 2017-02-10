@@ -78,4 +78,7 @@ export class ContactsPage {
 		this.navCtrl.push(ContactRequestsPage);
 	}
 
+	close = () => {
+		this.navCtrl.pop();
+	}
 }

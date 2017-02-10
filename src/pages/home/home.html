@@ -39,18 +39,5 @@
 		<ion-infinite-scroll-content></ion-infinite-scroll-content>
 	</ion-infinite-scroll>
 
-	<ion-fab center bottom #fab>
-		<div class="hexagon hexagon--fab">
-			<button (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light"><ion-icon name="add"></ion-icon></button>
-		</div>
-		<ion-fab-list side="top">
-			<button ion-fab color="dark" (click)="fabSideClick($event, fab, 'contacts')"><ion-icon name="md-people"></ion-icon></button>
-		</ion-fab-list>
-		<ion-fab-list side="left">
-			<button ion-fab color="dark" (click)="fabSideClick($event, fab, 'profile')"><ion-icon name="md-person"></ion-icon></button>
-		</ion-fab-list>
-		<ion-fab-list side="right">
-			<button ion-fab color="dark" (click)="fabSideClick($event, fab, 'settings')"><ion-icon name="ios-settings"></ion-icon></button>
-		</ion-fab-list>
-	</ion-fab>
+	<main-menu (mainHandle)="newMessage()"></main-menu>
 </ion-content>
