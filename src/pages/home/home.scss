@@ -36,6 +36,12 @@ page-home {
 	}
 }
 
+.user__name {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
 .topic--new--last {
 	box-shadow:	0px 1px 1px #bbc0c2,
 				0px 5px 5px rgba(#bbc0c2, 0.35),
