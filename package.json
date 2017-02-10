@@ -54,7 +54,7 @@
     "ionic_copy": "./config/copy.config.js"
   },
   "cordovaPlugins": [
-    "cordova-plugin-keyboard",
+    "ionic-plugin-keyboard",
     "cordova-plugin-whitelist",
     "cordova-plugin-console",
     "cordova-plugin-statusbar",

@@ -1,7 +1,5 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-
-import { UserService } from "../assets/services/user.service";
+import { NavController } from 'ionic-angular';
 
 import { MessagesPage } from "../pages/messages/messages";
 

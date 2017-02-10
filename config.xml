@@ -49,7 +49,6 @@
     <splash src="resources/ios/splash/Default@2x~iphone.png" width="640" height="960"/>
     <splash src="resources/ios/splash/Default~iphone.png" width="320" height="480"/>
   </platform>
-  <preference name="KeyboardShrinksView" value="true"/>
   <preference name="HideKeyboardFormAccessoryBar" value="true"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
@@ -72,6 +71,6 @@
   <plugin name="cordova-plugin-device" spec="1.1.4"/>
   <plugin name="cordova-plugin-splashscreen" spec="~4.0.1"/>
   <plugin name="cordova-plugin-wkwebview-engine" spec="https://github.com/driftyco/cordova-plugin-wkwebview-engine.git"/>
-  <plugin name="cordova-plugin-keyboard" spec="~1.1.4"/>
+  <plugin name="ionic-plugin-keyboard" spec="~2.2.1"/>
   <icon src="resources/ios/icon/icon-small@3x.png"/>
 </widget>

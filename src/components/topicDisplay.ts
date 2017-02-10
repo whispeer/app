@@ -32,6 +32,20 @@ export class TopicComponent {
 	contentHeight = 0;
 	footerHeight = 0;
 
+	ngOnInit() {
+		window.addEventListener('resize', this.keyboardChange);
+	}
+
+	ngOnDestroy() {
+		window.removeEventListener('resize', this.keyboardChange);
+	}
+
+	keyboardChange = () => {
+		console.warn("keyboard change");
+
+		this.change();
+	}
+
 	sendMessageToTopic = () => {
 		this.sendMessage.emit();
 	}
