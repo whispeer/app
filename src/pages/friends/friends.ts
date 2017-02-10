@@ -65,4 +65,7 @@ export class FriendsPage {
 		this.navCtrl.push(FriendRequestsPage);
 	}
 
+	close = () => {
+		this.navCtrl.pop();
+	}
 }
