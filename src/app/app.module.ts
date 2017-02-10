@@ -28,6 +28,7 @@ import { loginPage } from "../assets/services/location.manager";
 
 import { TopicComponent } from "../components/topicDisplay";
 import { chooseFriends } from "../components/chooseFriends";
+import { MainMenu } from "../components/mainMenu";
 
 (<any>window).startup = new Date().getTime();
 
@@ -43,6 +44,7 @@ import { chooseFriends } from "../components/chooseFriends";
 		NewMessagePage,
 		TopicComponent,
 		chooseFriends,
+		MainMenu,
 		SafeUrl
 	],
 	imports: [
@@ -70,7 +72,8 @@ import { chooseFriends } from "../components/chooseFriends";
 		FriendRequestsPage,
 		NewMessagePage,
 		TopicComponent,
-		chooseFriends
+		chooseFriends,
+		MainMenu
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},
