@@ -1,0 +1,14 @@
+<div *ngFor="let image of images">
+	<span *ngIf="image.lowest.loaded">
+		<img class="post-image" *ngIf="!runGif($index)" [src]="image.lowest.url" />
+		<span class="post-image--play fa fa-play fa-2x" *ngIf="image.lowest.gif && !runGif($index)"></span>
+		<div *ngIf="runGif($index)">
+			<img class="post-image" [src]="image.highest.url" *ngIf="!image.highest.loading" />
+			<img class="post-image" [src]="image.lowest.url" *ngIf="image.highest.loading" />
+		</div>
+	</span>
+</div>
+
+<div *ngIf="images.length > preview">
+	<button (click)="loadMoreImages()" ion-button block>Load more images</button>
+</div>

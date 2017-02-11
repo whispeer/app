@@ -27,6 +27,7 @@ import * as Bluebird from 'bluebird';
 import { loginPage } from "../assets/services/location.manager";
 
 import { TopicComponent } from "../components/topicDisplay";
+import { GalleryComponent } from "../components/gallery/gallery";
 import { chooseFriends } from "../components/chooseFriends";
 import { MainMenu } from "../components/mainMenu";
 
@@ -43,6 +44,7 @@ import { MainMenu } from "../components/mainMenu";
 		ContactRequestsPage,
 		NewMessagePage,
 		TopicComponent,
+		GalleryComponent,
 		chooseFriends,
 		MainMenu,
 		SafeUrl
@@ -72,6 +74,7 @@ import { MainMenu } from "../components/mainMenu";
 		ContactRequestsPage,
 		NewMessagePage,
 		TopicComponent,
+		GalleryComponent,
 		chooseFriends,
 		MainMenu
 	],

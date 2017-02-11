@@ -6,8 +6,8 @@ process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
 
 module.exports = {
   entry: {
-    main: process.env.IONIC_APP_ENTRY_POINT,
-    login: path.resolve(process.env.IONIC_APP_ENTRY_POINT, "../../login/login.ts")
+    login: path.resolve("src/login/login.ts"),
+    main: path.resolve("src/app/main.ts"),
   },
   output: {
     path: '{{BUILD}}',
