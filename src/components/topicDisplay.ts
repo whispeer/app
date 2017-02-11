@@ -1,14 +1,8 @@
 import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core";
 
-import { NavController, NavParams, ActionSheetController, Content, Footer } from "ionic-angular";
+import { NavController, ActionSheetController, Content, Footer } from "ionic-angular";
 
-import { UserService } from "../assets/services/user.service";
 import { ProfilePage } from "../pages/profile/profile";
-
-const messageService = require("../assets/messages/messageService");
-const TopicUpdate = require("../assets/models/topicUpdate");
-const Burst = require("../assets/messages/burst");
-import errorService from "../assets/services/error.service";
 
 import * as Bluebird from "bluebird";
 
