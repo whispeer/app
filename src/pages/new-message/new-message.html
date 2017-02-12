@@ -1,4 +1,4 @@
-<chooseFriends *ngIf="!receiversChosen" (chooseReceivers)="chooseReceivers($event)"></chooseFriends>
+<chooseFriends *ngIf="!receiversChosen" [receiverString]="receiverString" (chooseReceivers)="chooseReceivers($event)"></chooseFriends>
 
 <topicWithBursts
 	*ngIf="receiversChosen"

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 import { MessagesPage } from "../pages/messages/messages";
@@ -19,10 +19,17 @@ export class chooseFriends {
 	selectedUsers: any = {};
 
 	@Output() chooseReceivers = new EventEmitter();
+	@Input() receiverString;
 
 	constructor(public navCtrl: NavController) {}
 
 	ngOnInit() {
+		if (this.receiverString) {
+			return userService.getMultipleFormatted(this.receiverString.split(",")).then((users) => {
+				this.send(users);
+			})
+		}
+
 		friendsService.awaitLoading().then(() => {
 			friendsService.listen(this.loadFriendsUsers);
 			this.loadFriendsUsers();
@@ -31,7 +38,7 @@ export class chooseFriends {
 
 	private loadFriendsUsers = () => {
 		return Bluebird.try(() => {
-			var friends = friendsService.getFriends().slice(0, 10);
+			var friends = friendsService.getFriends();
 			return userService.getMultipleFormatted(friends);
 		}).then((result) => {
 			this.friends = result;
@@ -96,9 +103,7 @@ export class chooseFriends {
 		})
 	}
 
-	create = () => {
-		const users = this.getSelectedUsers();
-
+	send = (users) => {
 		this.sendToUserTopic(users).then((topicId) => {
 			if (topicId) {
 				this.navCtrl.push(MessagesPage, { topicId: topicId });
@@ -106,6 +111,12 @@ export class chooseFriends {
 
 			this.chooseReceivers.emit(users);
 		});
+	}
+
+	create = () => {
+		const users = this.getSelectedUsers();
+
+		this.send(users);
 	}
 
 	close = () => {

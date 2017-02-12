@@ -58,7 +58,8 @@ import { MainMenu } from "../components/mainMenu";
 				{ component: ContactRequestsPage, name: "Requests", segment: "requests" },
 				{ component: ProfilePage, name: "Profile", segment: "profile/:userId" },
 				{ component: SettingsPage, name: "Settings", segment: "settings" },
-				{ component: NewMessagePage, name: "New Message", segment: "newMessage" }
+				{ component: NewMessagePage, name: "New Message", segment: "newMessage" },
+				{ component: NewMessagePage, name: "New Message", segment: "newMessage/:receiverIds" }
 			]
 		}),
 		QRCodeModule

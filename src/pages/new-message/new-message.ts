@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
-import { UserService } from "../../assets/services/user.service";
-
 import { MessagesPage } from "../messages/messages";
 
 const messageService = require("../../assets/messages/messageService");
 
-import * as Bluebird from 'bluebird';
+const userService = require("../../assets/user/userService");
 
 @Component({
 	selector: 'page-new-message',
@@ -22,7 +20,13 @@ export class NewMessagePage {
 		newMessage: ""
 	};
 
-	constructor(public navCtrl: NavController) {}
+	receiverString: string;
+
+	constructor(public navCtrl: NavController, public navParams: NavParams) {}
+
+	ngOnInit() {
+		this.receiverString = this.navParams.get("receiverIds");
+	}
 
 	chooseReceivers = (users) => {
 		this.partners = users;

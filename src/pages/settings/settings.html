@@ -14,19 +14,22 @@
 
 
 <ion-content>
-	<!--<ion-list>
+	<ion-list>
 		<ion-list-header padding-top>
 			Notifications
 		</ion-list-header>
 		<ion-item>
 			<ion-label>Receive push notifiations</ion-label>
-			<ion-toggle checked="true"></ion-toggle>
+			<ion-toggle [ngModel]="pushEnabled" (ngModelChange)="pushWarning()"></ion-toggle>
 		</ion-item>
-	</ion-list>-->
+	</ion-list>
 	<ion-list>
 		<!--<ion-list-header>
 			Information about whispeer
 		</ion-list-header>-->
+		<ion-item detail-push (click)="feedback()">
+			Send Feedback
+		</ion-item>
 		<ion-item detail-push (click)="tos()">
 			Terms of Service
 		</ion-item>
