@@ -10,14 +10,14 @@
 		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread, 'topic--new--last': nextUnread(topic)}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
-					*ngFor="let partner of topic.partnersDisplay; let pIndex = index"
+					*ngFor="let partner of topic.partnersDisplay"
 					class="hexagon__image"
-					[ngClass]="{'hexagon__image--active': partner.online, 'hexagon__image--medium': topic.partners.length > 1}"
+					[ngClass]="{'hexagon__image--active': partner.online, 'hexagon__image--medium': topic.partnersDisplay.length > 1}"
 				>
-					<div *ngIf="pIndex < 2" class="hexagon__image__image" [style.background-image]="partner.basic.image | safeUrl"></div>
+					<div class="hexagon__image__image" [style.background-image]="partner.basic.image | safeUrl"></div>
 				</ion-avatar>
 				<ion-avatar
-					*ngIf="topic.partners.length > 2"
+					*ngIf="topic.partners.length > 3"
 					class="hexagon__image hexagon__image--medium"
 				>
 					<div class="hexagon__image__image topic__remainingUsers">

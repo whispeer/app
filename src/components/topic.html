@@ -13,7 +13,7 @@
 		</ion-title>
 	</ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content fullscreen>
 	<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
@@ -21,8 +21,7 @@
 				<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
 				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
 					{{ message.data.text }}
-					<!--<gallery *ngIf="message.data.images.length > 0" data-images="message.images"></gallery>-->
-					<!-- {{message.data.images}} -->
+					<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
 					<!-- <span>{{ message.data.timestamp }}</span> -->
 				</div>
 			</span>

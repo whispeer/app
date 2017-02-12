@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
-import { NavController, NavParams, FabContainer } from "ionic-angular";
+import { NavController, FabContainer } from "ionic-angular";
 
 import { ContactsPage } from "../pages/contacts/contacts";
 import { ProfilePage } from "../pages/profile/profile";
