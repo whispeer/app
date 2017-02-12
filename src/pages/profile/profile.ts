@@ -3,6 +3,8 @@ import { NavController, NavParams } from 'ionic-angular';
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
+import { HomePage } from "../home/home";
+
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
 
@@ -88,6 +90,6 @@ export class ProfilePage {
 	}
 
 	close = () => {
-		this.navCtrl.pop();
+		this.navCtrl.setRoot(HomePage);
 	}
 }
