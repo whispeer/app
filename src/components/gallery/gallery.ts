@@ -7,6 +7,8 @@ const blobService = require("../../assets/services/blobService");
 
 import * as Bluebird from "bluebird";
 
+import { PhotoViewer } from 'ionic-native';
+
 @Component({
 	selector: "gallery",
 	templateUrl: "gallery.html"
@@ -59,6 +61,18 @@ export class GalleryComponent {
 		});
 	}
 
+	displayImage(image) {
+		const blobID = image.lowest.blobID;
+
+		blobService.getBlob(blobID).then((blob) => {
+			return blob.decrypt().then(() => {
+				return blob.getStringRepresentation();
+			});
+		}).then((base64) => {
+			PhotoViewer.show(base64);
+		});
+	}
+
 	loadMoreImages() {
 		this.loadImagePreviews(this.images.slice(this.preview, this.preview + this.previewChunk));
 		this.preview += this.previewChunk;
@@ -69,7 +83,6 @@ export class GalleryComponent {
 	}
 
 	ngOnInit() {
-		console.warn(this.images);
 		this.loadImagePreviews(this.images.slice(0, this.preview));
 	}
 
