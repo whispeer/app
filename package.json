@@ -65,12 +65,5 @@
       "id": "cordova-plugin-wkwebview-engine"
     }
   ],
-  "cordovaPlatforms": [
-    {
-      "platform": "ios",
-      "version": "",
-      "locator": "ios"
-    }
-  ],
   "description": "whispeerMessenger: An Ionic project"
 }

@@ -5,8 +5,6 @@ import { MessagesPage } from "../messages/messages";
 
 const messageService = require("../../assets/messages/messageService");
 
-const userService = require("../../assets/user/userService");
-
 @Component({
 	selector: 'page-new-message',
 	templateUrl: 'new-message.html'
@@ -37,8 +35,8 @@ export class NewMessagePage {
 		return { changed: false, bursts: [] };
 	}
 
-	sendMessage = () => {
-		messageService.sendNewTopic(this.partners.map((partner) => partner.user), this.topic.newMessage, []).then((topicId) => {
+	sendMessage = ({ images, text }) => {
+		messageService.sendNewTopic(this.partners.map((partner) => partner.user), text, images).then((topicId) => {
 			this.navCtrl.push(MessagesPage, { topicId: topicId });
 		});
 	}

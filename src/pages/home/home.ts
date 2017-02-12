@@ -9,8 +9,6 @@ import { UserService } from "../../assets/services/user.service";
 
 const messageService = require("messages/messageService");
 
-import sessionService from '../../assets/services/session.service';
-
 @Component({
 	selector: 'page-home',
 	templateUrl: 'home.html'
