@@ -3,6 +3,8 @@ import { NavController, NavParams } from "ionic-angular";
 
 import sessionService from "../../assets/services/session.service";
 
+import { NewMessagePage } from "../../pages/new-message/new-message";
+
 /*
 	Generated class for the Settings page.
 
@@ -14,11 +16,17 @@ import sessionService from "../../assets/services/session.service";
 	templateUrl: 'settings.html'
 })
 export class SettingsPage {
+	pushEnabled = false;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
+	}
+
+	pushWarning() {
+		this.pushEnabled = false;
+		alert("This feature is not yet available but will arrive with the next update! Stay tuned!");
 	}
 
 	goBack() {
@@ -27,6 +35,12 @@ export class SettingsPage {
 
 	logout() {
 		sessionService.logout();
+	}
+
+	feedback() {
+		this.navCtrl.push(NewMessagePage, {
+			receiverIds: "2807"
+		});
 	}
 
 	tos() {
