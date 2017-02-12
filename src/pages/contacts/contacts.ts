@@ -4,6 +4,8 @@ import { NavController, NavParams } from 'ionic-angular';
 import { ContactRequestsPage } from "../contact-requests/contact-requests";
 import { ProfilePage } from "../profile/profile";
 
+import { HomePage } from "../home/home";
+
 const friendsService = require("../../assets/services/friendsService");
 const userService = require("../../assets/user/userService");
 
@@ -79,6 +81,6 @@ export class ContactsPage {
 	}
 
 	close = () => {
-		this.navCtrl.pop();
+		this.navCtrl.setRoot(HomePage);
 	}
 }
