@@ -47,11 +47,5 @@
 		</p>
 	</div>
 
-	<ion-fab center bottom #fab>
-		<div class="hexagon hexagon--fab">
-			<button (tap)="goBack()" class="hexagon__button" ion-fab color="light">
-				<ion-icon name="close"></ion-icon>
-			</button>
-		</div>
-	</ion-fab>
+	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
 </ion-content>

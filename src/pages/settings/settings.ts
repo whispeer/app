@@ -1,6 +1,8 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams } from "ionic-angular";
 
+import { HomePage } from "../home/home";
+
 import sessionService from "../../assets/services/session.service";
 
 /*
@@ -39,5 +41,9 @@ export class SettingsPage {
 
 	contactUs() {
 		window.open("https://whispeer.de/en/contact", "_system");
+	}
+
+	close = () => {
+		this.navCtrl.setRoot(HomePage);
 	}
 }
