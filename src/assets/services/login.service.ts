@@ -11,7 +11,7 @@ const errors = require("asset/errors");
 
 const loginState = new State();
 
-const failureCodes = {
+export const failureCodes = {
 	UNKNOWNNAME: 0,
 	WRONGPASSWORD: 1,
 	NOCONNECTION: 2,

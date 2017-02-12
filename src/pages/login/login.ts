@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
+import { failureCodes } from "../../assets/services/login.service";
 import loginService from "../../assets/services/login.service";
 import { mainPage } from "../../assets/services/location.manager";
 import jQuery from "jquery";
@@ -42,6 +43,12 @@ export class LoginPage {
 				return LOGIN_SUCCESS;
 			case USERNAME_REGISTER_SUCCESS:
 				return REGISTER_SUCCESS;
+			case USERNAME_NO_CONNECTION:
+				return NO_CONNECTION;
+			case USERNAME_LOGIN_INCORRECT_PASSWORD:
+				return INCORRECT_PASSWORD;
+			case USERNAME_PASSWORDS_DONT_MATCH:
+				return PASSWORDS_DONT_MATCH;
 			case USERNAME_LOGIN_ERROR:
 			case USERNAME_REGISTER_ERROR:
 				return GENERIC_ERROR_MESSAGE;
@@ -114,25 +121,31 @@ export class LoginPage {
 		)
 	}
 
-	reset() {
-		this.login.identifier = '';
-		this.login.password = '';
-		this.passwordRepeat = '';
-		this.checkUserNameExistance();
+	getLoginErrorCode = (error) => {
+		switch(error.data.failure) {
+			case failureCodes.WRONGPASSWORD:
+				return USERNAME_LOGIN_INCORRECT_PASSWORD;
+			case failureCodes.NOCONNECTION:
+				return USERNAME_NO_CONNECTION;
+			case failureCodes.UNKNOWNNAME:
+				return USERNAME_FREE;
+			default:
+				return USERNAME_LOGIN_ERROR;
+		}
 	}
 
 	loginOrRegister = () => {
-		if ([USERNAME_TAKEN, USERNAME_LOGIN_ERROR].indexOf(this.usernameState) !== -1) {
+		if ([USERNAME_TAKEN, USERNAME_LOGIN_INCORRECT_PASSWORD, USERNAME_NO_CONNECTION, USERNAME_LOGIN_ERROR].indexOf(this.usernameState) !== -1) {
 
 			// login
 			this.performLogin().then(() => {
 				this.usernameState = USERNAME_LOGIN_SUCCESS
 				mainPage()
 			}).catch((error) => {
-				this.usernameState = USERNAME_LOGIN_ERROR
+				this.usernameState = this.getLoginErrorCode(error);
 			})
 
-		} else if ([USERNAME_FREE].indexOf(this.usernameState) !== -1) {
+		} else if ([USERNAME_FREE, USERNAME_PASSWORDS_DONT_MATCH, USERNAME_REGISTER_ERROR].indexOf(this.usernameState) !== -1) {
 
 			this.usernameState = USERNAME_PASSWORD_CONFIRM
 
@@ -142,19 +155,11 @@ export class LoginPage {
 			if (this.passwordsMatch()) {
 				this.performRegister().then(() => {
 					this.usernameState = USERNAME_REGISTER_SUCCESS;
-
-					this.performLogin().then(() => {
-						mainPage()
-					}).catch(registerError)
-
+					mainPage()
 				}).catch(registerError);
-
-			} else { registerError() }
-
-		} else if ([USERNAME_REGISTER_ERROR].indexOf(this.usernameState) !== -1) {
-
-			this.reset();
-
+			} else {
+				this.usernameState = USERNAME_PASSWORDS_DONT_MATCH;
+			}
 		}
 	}
 }
@@ -167,6 +172,9 @@ const REGISTER_MESSAGE = "This username is free. You can continue to choose a se
 const GENERIC_ERROR_MESSAGE = "Something went wrong."
 const CONFIRM_PASSWORD = "Great! Now verify your new password"
 const REGISTER_SUCCESS = "Welcome on board! We'll log you in now..."
+const NO_CONNECTION = "Could not connect to whispeer"
+const INCORRECT_PASSWORD = "Incorrect password"
+const PASSWORDS_DONT_MATCH = "Passwords do not match"
 
 const USERNAME_UNKNOWN = -1;
 const USERNAME_EMPTY = 1;
@@ -178,3 +186,6 @@ const USERNAME_LOGIN_SUCCESS = 6;
 const USERNAME_PASSWORD_CONFIRM = 7;
 const USERNAME_REGISTER_SUCCESS = 8;
 const USERNAME_REGISTER_ERROR = 9;
+const USERNAME_LOGIN_INCORRECT_PASSWORD = 10;
+const USERNAME_NO_CONNECTION = 11;
+const USERNAME_PASSWORDS_DONT_MATCH = 12;
