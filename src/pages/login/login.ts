@@ -159,22 +159,25 @@ export class LoginPage {
 				}).catch(registerError);
 			} else {
 				this.usernameState = USERNAME_PASSWORDS_DONT_MATCH;
+
+				this.login.password = "";
+				this.passwordRepeat = "";
 			}
 		}
 	}
 }
 
-const INVALID_USERNAME = "Please pick another name!"
+const INVALID_USERNAME = "Usernames should start with a letter and must not include special characters."
 const DEFAULT_CALL_TO_ACTION = "Create a new account or simply login..."
-const AMBIGUOUS_PROCESS = "This username exists. You can choose to continue login or register a distinct username"
+const AMBIGUOUS_PROCESS = "This username exists. You can choose to continue login or register a unique name"
 const LOGIN_SUCCESS = "Success! We'll log you in securely now..."
 const REGISTER_MESSAGE = "This username is free. You can continue to choose a secure password..."
 const GENERIC_ERROR_MESSAGE = "Something went wrong."
-const CONFIRM_PASSWORD = "Great! Now verify your new password"
+const CONFIRM_PASSWORD = "Great! Now verify your new password..."
 const REGISTER_SUCCESS = "Welcome on board! We'll log you in now..."
 const NO_CONNECTION = "Could not connect to whispeer"
-const INCORRECT_PASSWORD = "Incorrect password"
-const PASSWORDS_DONT_MATCH = "Passwords do not match"
+const INCORRECT_PASSWORD = "Your password is wrong. Please try again."
+const PASSWORDS_DONT_MATCH = "Your repeated password does not match"
 
 const USERNAME_UNKNOWN = -1;
 const USERNAME_EMPTY = 1;
