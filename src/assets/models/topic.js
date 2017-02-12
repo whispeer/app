@@ -33,8 +33,20 @@ function sortObjGetTimeInv(a, b) {
 	return (b.obj.getTime() - a.obj.getTime());
 }
 
+function sortUnreadOrTime(a, b) {
+	if (a.unread && !b.unread) {
+		return -1;
+	}
+
+	if (!a.unread && b.unread) {
+		return 1;
+	}
+
+	return sortObjGetTimeInv(a, b);
+}
+
 var topics = {}, messagesByID = {};
-var topicArray = sortedSet(sortObjGetTimeInv);
+var topicArray = sortedSet(sortUnreadOrTime);
 
 var Topic = function (data) {
 	var messages = sortedSet(sortGetTime),
@@ -691,7 +703,7 @@ Topic.createRawData = function (receiver, cb) {
 Topic.reset = function () {
 	messagesByID = {};
 	topics = {};
-	topicArray = sortedSet(sortObjGetTimeInv);
+	topicArray = sortedSet(sortUnreadOrTime);
 };
 
 Topic.all = function () {

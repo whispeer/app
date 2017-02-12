@@ -50,6 +50,21 @@ export class HomePage {
 		})
 	}
 
+	nextUnread = (topic) => {
+		if (!topic.unread) {
+			return false;
+		}
+
+		const index = this.topics.indexOf(topic);
+		const nextTopic = this.topics[index + 1];
+
+		if (!nextTopic) {
+			return false;
+		}
+
+		return !nextTopic.unread;
+	}
+
 	openChat = (topicId: number) => {
 		this.navCtrl.push(MessagesPage, { topicId: topicId });
 	}

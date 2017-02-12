@@ -7,7 +7,7 @@
 <ion-content class="list-avatar-page">
 	<ion-spinner *ngIf="topicsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list class="space-for-fab">
-		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.topic, 'topic--new--last': topic.lastNew}" (click)="openChat(topic.id)">
+		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread, 'topic--new--last': nextUnread(topic)}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of topic.partnersDisplay"
