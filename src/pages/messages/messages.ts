@@ -1,9 +1,6 @@
 import { Component } from "@angular/core";
 
-import { NavController, NavParams, ActionSheetController, Content } from "ionic-angular";
-
-import { UserService } from "../../assets/services/user.service";
-import { ProfilePage } from "../profile/profile";
+import { NavParams } from "ionic-angular";
 
 const messageService = require("../../assets/messages/messageService");
 const TopicUpdate = require("../../assets/models/topicUpdate");
