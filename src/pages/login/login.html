@@ -35,32 +35,32 @@
 
 			</ion-item>
 
-			<ion-item *ngIf="!register"
+			<ion-item *ngIf="showPasswordFeld()"
 				class="clean-input-wrap login__input-wrap">
 
 				<ion-input id="password"
 					class="login__input"
 					type="password"
 					placeholder="enter a password"
-					[(ngModel)]="login.password"
-					(ngModelChange)="checkUserNameExistance()">
+					[(ngModel)]="login.password" >
 				</ion-input>
 
 			</ion-item>
 
-			<ion-item *ngIf="register"
+			<ion-item *ngIf="showPasswordConfirmationField()"
 				class="clean-input-wrap login__input-wrap">
 
 				<ion-input class="login__input"
 					type="password"
-					placeholder="please repeat your password"
+					placeholder="please type your password again"
 					[(ngModel)]="passwordRepeat">
 				</ion-input>
 
 			</ion-item>
 
 			<p class="login__paragraph login__paragraph--detail">
-				By signing up, you agree to our <strong>Terms of Service</strong> and our very strict <strong>Privacy Policy</strong>
+				By signing up, you agree to our <strong>Terms of Service</strong> and
+				our very strict <strong>Privacy Policy</strong>
 			</p>
 
 			<div text-center padding>
