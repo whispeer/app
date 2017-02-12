@@ -40,24 +40,29 @@ export class HomePage {
 		this.topics = messageService.data.latestTopics.data;
 
 		messageService.loadMoreLatest(() => {}).then(() => {
-			this.markLastNew();
 			this.topicsLoading = false;
 		});
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
 		messageService.loadMoreLatest().then(() => {
-			this.markLastNew();
-
 			infiniteScroll.complete();
 		})
 	}
 
-	markLastNew = () => {
-		this.topics.forEach((elem: any, index: number, arr: any[]) => {
-			// set property if this is the last topic with a new message.
-			elem.lastNew = elem.unread && arr[index + 1] && !arr[index + 1].unread;
-		});
+	nextUnread = (topic) => {
+		if (!topic.unread) {
+			return false;
+		}
+
+		const index = this.topics.indexOf(topic);
+		const nextTopic = this.topics[index + 1];
+
+		if (!nextTopic) {
+			return false;
+		}
+
+		return !nextTopic.unread;
 	}
 
 	openChat = (topicId: number) => {
