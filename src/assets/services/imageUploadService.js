@@ -117,10 +117,12 @@ ImageUpload.prototype.convertForGallery = function () {
 		upload: this,
 		highest: {
 			loading: false,
+			loaded: true,
 			url: this.getUrl()
 		},
 		lowest: {
 			loading: false,
+			loaded: true,
 			url: this.getUrl()
 		}
 	};
