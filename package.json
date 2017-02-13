@@ -54,7 +54,6 @@
     "ionic_copy": "./config/copy.config.js"
   },
   "cordovaPlugins": [
-    "ionic-plugin-keyboard",
     "cordova-plugin-whitelist",
     "cordova-plugin-console",
     "cordova-plugin-statusbar",
@@ -63,7 +62,29 @@
     {
       "locator": "https://github.com/driftyco/cordova-plugin-wkwebview-engine.git",
       "id": "cordova-plugin-wkwebview-engine"
-    }
+    },
+    "ionic-plugin-keyboard",
+    "com-sarriaroman-photoviewer",
+    {
+      "locator": "https://github.com/Telerik-Verified-Plugins/ImagePicker",
+      "id": "com.synconset.imagepicker"
+    },
+    "cordova-plugin-image-picker",
+    "cordova-plugin-file",
+    "cordova-plugin-compat",
+    "cordova-plugin-camera"
   ],
-  "description": "whispeerMessenger: An Ionic project"
+  "description": "whispeerMessenger: An Ionic project",
+  "cordovaPlatforms": [
+    {
+      "platform": "android",
+      "version": "",
+      "locator": "android"
+    },
+    {
+      "platform": "ios",
+      "version": "",
+      "locator": "ios"
+    }
+  ]
 }
