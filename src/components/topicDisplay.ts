@@ -76,6 +76,7 @@ export class TopicComponent {
 				return entry.file(resolve, reject);
 			});
 		}).then((file: any) => {
+			file.originalUrl = url;
 			file.type = type;
 
 			return file;

@@ -64,6 +64,11 @@ export class GalleryComponent {
 	}
 
 	displayImage(image) {
+		if (image.upload) {
+			PhotoViewer.show(image.upload._file.originalUrl);
+			return;
+		}
+
 		const blobID = image.lowest.blobID;
 
 		blobService.getBlob(blobID).then((blob) => {
