@@ -70,13 +70,11 @@ export class TopicComponent {
 		this.newMessageText = "";
 	}
 
-	getFileBlob = (url: string) => {
-		return File.resolveLocalFilesystemUrl(url).then((entry) => {
-			if (entry.isFile) {
-				return new Bluebird((resolve, reject) => {
-					return (<any>entry).file(resolve, reject);
-				});
-			}
+	getFileBlob = (url: string) : Bluebird<any> => {
+		return new Bluebird((resolve, reject) => {
+			File.resolveLocalFilesystemUrl(url).then((entry: any) => {
+				return entry.file(resolve, reject);
+			});
 		});
 	}
 
@@ -86,9 +84,10 @@ export class TopicComponent {
 			buttons: [{
 				text: "Select from Gallery",
 				handler: () => {
-					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).then((results) => {
-						return Bluebird.all(results.map(this.getFileBlob));
-					}).map((file) => {
+					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+						return this.getFileBlob(result);
+					}).map((file: any) => {
+						file.type = "image/png";
 						return new ImageUpload(file);
 					}).then((images) => {
 						this.sendMessage.emit({
@@ -102,7 +101,8 @@ export class TopicComponent {
 				handler: () => {
 					Camera.getPicture(CameraOptions).then((url) => {
 						return this.getFileBlob(url);
-					}).then((file) => {
+					}).then((file: any) => {
+						file.type = "image/png";
 						return new ImageUpload(file);
 					}).then((image) => {
 						this.sendMessage.emit({
