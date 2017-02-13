@@ -263,7 +263,7 @@ ImageUpload.prototype.rotate = function () {
 
 ImageUpload.prototype.generatePreviews = function () {
 	if (!this._generatePreviewsPromise) {
-		this._generatePreviewsPromise = ImageUpload.imageLibLoad(this._file, {
+		this._generatePreviewsPromise = ImageUpload.imageLibLoad(h.toUrl(this._file), {
 			maxHeight: 200, canvas: true
 		}).bind(this).then(function (img) {
 			return Bluebird.all([
@@ -365,7 +365,7 @@ ImageUpload.prototype._resizeFile = function (sizeOptions) {
 
 	var options = $.extend({}, sizeOptions.restrictions || {}, { canvas: true });
 
-	return ImageUpload.imageLibLoad(this._file, options).bind(this).then(function (canvas) {
+	return ImageUpload.imageLibLoad(this.getUrl(), options).bind(this).then(function (canvas) {
 		return canvasToBlob(ImageUpload.rotate(canvas, this.rotation), "image/jpeg");
 	});
 };
