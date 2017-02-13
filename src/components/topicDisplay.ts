@@ -6,6 +6,25 @@ import { ProfilePage } from "../pages/profile/profile";
 
 import * as Bluebird from "bluebird";
 
+import { ImagePicker, File, Camera } from 'ionic-native';
+
+const ImageUpload = require("../assets/services/imageUploadService");
+
+const ImagePickerOptions = {
+	width: 2560,
+	height: 1440,
+	maximumImagesCount: 6
+};
+
+const CameraOptions = {
+	destinationType: 2,
+	allowEdit: true,
+	encodingType: 0,
+	targetWidth: ImagePickerOptions.width,
+	targetHeight: ImagePickerOptions.height,
+	correctOrientation: true
+};
+
 @Component({
 	selector: "topicWithBursts",
 	templateUrl: "topic.html"
@@ -20,6 +39,8 @@ export class TopicComponent {
 
 	@ViewChild(Content) content: Content;
 	@ViewChild(Footer) footer: Footer;
+
+	newMessageText = "";
 
 	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController,) {}
 
@@ -41,7 +62,25 @@ export class TopicComponent {
 	}
 
 	sendMessageToTopic = () => {
-		this.sendMessage.emit();
+		this.sendMessage.emit({
+			text: this.newMessageText,
+			images: []
+		});
+
+		this.newMessageText = "";
+	}
+
+	getFile = (url: string, type: string) : Bluebird<any> => {
+		return new Bluebird((resolve, reject) => {
+			File.resolveLocalFilesystemUrl(url).then((entry: any) => {
+				return entry.file(resolve, reject);
+			});
+		}).then((file: any) => {
+			file.originalUrl = url;
+			file.type = type;
+
+			return file;
+		});
 	}
 
 	presentActionSheet = () => {
@@ -50,12 +89,30 @@ export class TopicComponent {
 			buttons: [{
 				text: "Select from Gallery",
 				handler: () => {
-					console.log("Select smth from Gallery!");
+					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+						return this.getFile(result, "image/png");
+					}).map((file: any) => {
+						return new ImageUpload(file);
+					}).then((images) => {
+						this.sendMessage.emit({
+							images: images,
+							text: ""
+						});
+					});
 				}
 			}, {
 				text: "Take Photo",
 				handler: () => {
-					console.log("Take new photo!");
+					Camera.getPicture(CameraOptions).then((url) => {
+						return this.getFile(url, "image/png");
+					}).then((file: any) => {
+						return new ImageUpload(file);
+					}).then((image) => {
+						this.sendMessage.emit({
+							images: [image],
+							text: ""
+						});
+					});
 				}
 			}, {
 				text: "Cancel",

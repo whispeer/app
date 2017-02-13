@@ -1,9 +1,6 @@
 import { Component } from "@angular/core";
 
-import { NavController, NavParams, ActionSheetController, Content } from "ionic-angular";
-
-import { UserService } from "../../assets/services/user.service";
-import { ProfilePage } from "../profile/profile";
+import { NavParams } from "ionic-angular";
 
 const messageService = require("../../assets/messages/messageService");
 const TopicUpdate = require("../../assets/models/topicUpdate");
@@ -172,12 +169,14 @@ export class MessagesPage {
 		this.topicObject.markRead(errorService.criticalError)
 	}
 
-	sendMessage = () => {
-		if (this.topic.newMessage.length === 0) {
+	sendMessage = ({ images, text }) => {
+		if (text.length === 0 && images.length === 0) {
 			return;
 		}
 
-		messageService.sendMessage(this.topic.id, this.topic.newMessage, []).then(() => {
+		console.log(images);
+
+		messageService.sendMessage(this.topic.id, text, images).then(() => {
 			this.topic.newMessage = "";
 			this.markRead();
 		});
