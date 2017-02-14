@@ -47,45 +47,20 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "whispeer/ionic-app-scripts#feature/multi-configs",
+    "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz",
     "typescript": "2.0.9"
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
     "ionic_copy": "./config/copy.config.js",
-    "ionic_uglifyjs": ["./config/uglifyjs.config.js", "./config/uglifyjs2.config.js"],
-    "ionic_ngc": ["./config/ngc.config.js", "./config/ngc2.config.js"]
+    "ionic_uglifyjs": [
+      "./config/uglifyjs.config.js",
+      "./config/uglifyjs2.config.js"
+    ],
+    "ionic_ngc": [
+      "./config/ngc.config.js",
+      "./config/ngc2.config.js"
+    ]
   },
-  "cordovaPlugins": [
-    "cordova-plugin-whitelist",
-    "cordova-plugin-console",
-    "cordova-plugin-statusbar",
-    "cordova-plugin-device",
-    "cordova-plugin-splashscreen",
-    {
-      "locator": "https://github.com/driftyco/cordova-plugin-wkwebview-engine.git",
-      "id": "cordova-plugin-wkwebview-engine"
-    },
-    "ionic-plugin-keyboard",
-    "com-sarriaroman-photoviewer",
-    {
-      "locator": "https://github.com/Telerik-Verified-Plugins/ImagePicker",
-      "id": "com.synconset.imagepicker"
-    },
-    "cordova-plugin-file",
-    "cordova-plugin-compat",
-    "cordova-plugin-camera"
-  ],
-  "description": "whispeerMessenger: An Ionic project",
-  "cordovaPlatforms": [
-    {
-      "platform": "android",
-      "version": "",
-      "locator": "android"
-    },
-    {
-      "platform": "ios",
-      "version": "",
-      "locator": "ios"
-    }
-  ]
+  "description": "whispeerMessenger: An Ionic project"
 }

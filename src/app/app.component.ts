@@ -1,8 +1,9 @@
-import { Component } from "@angular/core";
-import { Platform } from "ionic-angular";
+import { Component, ViewChild } from "@angular/core";
+import { Platform, NavController } from "ionic-angular";
 import { StatusBar, Splashscreen } from "ionic-native";
 
 import { HomePage } from '../pages/home/home';
+import { PushService } from "../assets/services/push.service";
 
 @Component({
 	templateUrl: "app.html"
@@ -11,6 +12,8 @@ import { HomePage } from '../pages/home/home';
 export class MyApp {
 
 	rootPage = HomePage;
+
+	@ViewChild("navigation") nav: NavController;
 
 	tutorialVersion = 1;
 
@@ -66,5 +69,10 @@ export class MyApp {
 			StatusBar.styleLightContent();
 			Splashscreen.hide();
 		});
+	}
+
+	ngAfterViewInit() {
+		const pushService = new PushService(this.nav);
+		pushService.register();
 	}
 }
