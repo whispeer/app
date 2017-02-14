@@ -5,8 +5,6 @@ import { NavController, Content } from "ionic-angular";
 import { MessagesPage } from "../messages/messages";
 import { NewMessagePage } from "../new-message/new-message";
 
-import { UserService } from "../../assets/services/user.service";
-
 const messageService = require("messages/messageService");
 
 @Component({
@@ -21,7 +19,7 @@ export class HomePage {
 
 	topicsLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, private userService: UserService) {}
+	constructor(public navCtrl: NavController) {}
 
 	ngOnInit() {}
 

@@ -8,13 +8,13 @@ import { MessagesPage } from "../../pages/messages/messages";
 
 import * as Bluebird from "bluebird";
 import socketService from "./socket.service";
-import Storage from "./storage.service";
+import { withPrefix } from "./storage.service";
 import errorService from "./error.service";
 
-const initService = require("services/initService");
-const messageService = require("services/messageService");
+const initService = require("./initService");
+const messageService = require("../messages/messageService");
 
-const sessionStorage = Storage.withPrefix("whispeer.session");
+const sessionStorage = withPrefix("whispeer.session");
 
 const sjcl = require("sjcl");
 
@@ -51,7 +51,8 @@ export class PushService {
 	private pushConfig = {
 		"android": {
 			"senderID": "809266780938",
-			"icon": "ic_stat_icon"
+			"icon": "ic_stat_icon",
+			"iconColor": "5ab70d"
 		},
 		"ios": {
 			"alert": true,
