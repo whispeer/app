@@ -103,4 +103,5 @@
 	</plugin>
 	<engine name="android" spec="~6.1.2"/>
 	<hook type="after_prepare" src="scripts/copyPushIcon.js" />
+	<engine name="ios" spec="~4.3.1"/>
 </widget>
