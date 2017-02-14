@@ -71,7 +71,6 @@
       "locator": "https://github.com/Telerik-Verified-Plugins/ImagePicker",
       "id": "com.synconset.imagepicker"
     },
-    "cordova-plugin-image-picker",
     "cordova-plugin-file",
     "cordova-plugin-compat",
     "cordova-plugin-camera"
