@@ -8,6 +8,7 @@ import Storage from "./storage.service";
 import errorService from "./error.service";
 
 const initService = require("services/initService");
+const messageService = require("services/messageService");
 
 const sessionStorage = Storage.withPrefix("whispeer.session");
 
@@ -37,7 +38,8 @@ const getType = () => {
 
 const pushConfig = {
 	"android": {
-		"senderID": "809266780938"
+		"senderID": "809266780938",
+		"icon": "ic_stat_icon"
 	},
 	"ios": {
 		"alert": true,
@@ -70,7 +72,29 @@ const initializePush = () => {
 	});
 
 	push.on("notification", function(data) {
+		if (data && data.additionalData) {
+			Bluebird.all([
+				sessionStorage.awaitLoading(),
+				initService.awaitLoading()
+			]).then(function () {
+				var topicid = data.additionalData.topicid;
 
+				if (!data.additionalData.foreground && topicid) {
+					// $state.go("chat-detail", { chatId: topicid });
+				}
+
+				var pushKey = sessionStorage.get("pushKey");
+
+				if (data.additionalData.encryptedContent && pushKey) {
+					pushKey = sjcl.codec.hex.toBits(pushKey);
+					data.additionalData.content = JSON.parse(sjcl.json.decrypt(pushKey, JSON.stringify(data.additionalData.encryptedContent)));
+				}
+
+				if (data.additionalData.content) {
+					messageService.addData(data.additionalData.content);
+				}
+			});
+		}
 	});
 }
 

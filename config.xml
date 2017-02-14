@@ -102,4 +102,5 @@
 		<variable name="SENDER_ID" value="809266780938"/>
 	</plugin>
 	<engine name="android" spec="~6.1.2"/>
+	<hook type="after_prepare" src="scripts/copyPushIcon.js" />
 </widget>

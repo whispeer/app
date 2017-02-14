@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "whispeer/ionic-app-scripts#feature/multi-configs",
+    "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz",
     "typescript": "2.0.9"
   },
   "config": {
