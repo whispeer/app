@@ -46,7 +46,7 @@
     "zone.js": "0.6.26"
   },
   "devDependencies": {
-    "@ionic/app-scripts": "1.0.0",
+    "@ionic/app-scripts": "whispeer/ionic-app-scripts#feature/multi-configs",
     "typescript": "2.0.9"
   },
   "config": {
