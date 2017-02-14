@@ -6,22 +6,22 @@ module.exports = {
   /**
    * sourceFile: The javascript file to minify
    */
-  sourceFile: "main.js",
+  sourceFile: "login.js",
 
   /**
    * destFileName: file name for the minified js in the build dir
    */
-  destFileName: "main.js",
+  destFileName: "login.js",
 
   /**
    * inSourceMap: file name for the input source map
    */
-  inSourceMap: "main.js.map",
+  inSourceMap: "login.js.map",
 
   /**
    * outSourceMap: file name for the output source map
    */
-  outSourceMap: "main.js.map",
+  outSourceMap: "login.js.map",
 
   /**
    * mangle: uglify 2's mangle option

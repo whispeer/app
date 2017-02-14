@@ -51,7 +51,8 @@
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
-    "ionic_copy": "./config/copy.config.js"
+    "ionic_copy": "./config/copy.config.js",
+    "ionic_uglifyjs": ["./config/uglifyjs.config.js", "./config/uglifyjs2.config.js"]
   },
   "cordovaPlugins": [
     "cordova-plugin-whitelist",
