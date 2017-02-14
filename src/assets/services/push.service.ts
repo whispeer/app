@@ -18,13 +18,8 @@ const sessionStorage = withPrefix("whispeer.session");
 
 const sjcl = require("sjcl");
 
-import { Injectable } from '@angular/core';
-
-@Injectable()
 export class PushService {
-	constructor(private navCtrl: NavController) {
-		this.initializePush();
-	}
+	constructor(private navCtrl: NavController) {}
 
 	private getOrCreatePushkey = () => {
 		const storagePushKey = sessionStorage.get("pushKey");
@@ -52,7 +47,7 @@ export class PushService {
 		"android": {
 			"senderID": "809266780938",
 			"icon": "ic_stat_icon",
-			"iconColor": "5ab70d"
+			"iconColor": "#5ab70d"
 		},
 		"ios": {
 			"alert": true,
@@ -62,6 +57,7 @@ export class PushService {
 	}
 
 	private registration = (data) => {
+		console.log("-> registartion", data);
 		const type = this.getType()
 
 		Bluebird.all([
@@ -88,7 +84,8 @@ export class PushService {
 				const topicId = data.additionalData.topicid;
 
 				if (!data.additionalData.foreground && topicId) {
-					this.navCtrl.push(MessagesPage, { topicId: topicId });
+					console.log("-> click", topicId);
+					return this.navCtrl.push(MessagesPage, { topicId: topicId });
 				}
 
 				var pushKey = sessionStorage.get("pushKey");
@@ -105,7 +102,7 @@ export class PushService {
 		}
 	};
 
-	initializePush = () => {
+	register = () => {
 		var push = Push.init(this.pushConfig);
 
 		push.on("registration", this.registration);
