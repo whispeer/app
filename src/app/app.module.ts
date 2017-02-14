@@ -16,7 +16,7 @@ import { SettingsPage } from "../pages/settings/settings";
 import { ContactRequestsPage } from "../pages/contact-requests/contact-requests";
 import { NewMessagePage } from "../pages/new-message/new-message";
 
-import { UserService } from "../assets/services/user.service";
+import { PushService } from "../assets/services/push.service";
 // yep that looks wrong, but this module does not have necessary files for
 // aot compilation which is required for production builds. this works however if we use the whole path.
 import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
@@ -81,7 +81,7 @@ import { MainMenu } from "../components/mainMenu";
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},
-		UserService
+		PushService
 	]
 })
 export class AppModule {

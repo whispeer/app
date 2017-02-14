@@ -2,6 +2,10 @@ import {
 	Push
 } from 'ionic-native';
 
+import { NavController } from "ionic-angular";
+
+import { MessagesPage } from "../../pages/messages/messages";
+
 import * as Bluebird from "bluebird";
 import socketService from "./socket.service";
 import Storage from "./storage.service";
@@ -14,73 +18,76 @@ const sessionStorage = Storage.withPrefix("whispeer.session");
 
 const sjcl = require("sjcl");
 
-const getOrCreatePushkey = () => {
-	const storagePushKey = sessionStorage.get("pushKey");
-	if (storagePushKey) {
-		return sjcl.codec.hex.toBits(storagePushKey);
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class PushService {
+	constructor(private navCtrl: NavController) {
+		this.initializePush();
 	}
 
-	const pushKey = sjcl.random.randomWords(8);
-	sessionStorage.set("pushKey", sjcl.codec.hex.fromBits(pushKey));
+	private getOrCreatePushkey = () => {
+		const storagePushKey = sessionStorage.get("pushKey");
+		if (storagePushKey) {
+			return sjcl.codec.hex.toBits(storagePushKey);
+		}
 
-	return pushKey;
-}
+		const pushKey = sjcl.random.randomWords(8);
+		sessionStorage.set("pushKey", sjcl.codec.hex.fromBits(pushKey));
 
-const getType = () => {
-	const platform = (<any>window).device.platform;
-
-	if (platform === "Android") {
-		return "android";
-	} else if (platform === "iOS") {
-		return "ios";
+		return pushKey;
 	}
-}
 
-const pushConfig = {
-	"android": {
-		"senderID": "809266780938",
-		"icon": "ic_stat_icon"
-	},
-	"ios": {
-		"alert": true,
-		"badge": true,
-		"sound": true
-	},
-	"windows": {}
-}
+	getType = () => {
+		const platform = (<any>window).device.platform;
 
-const initializePush = () => {
-	var push = Push.init(pushConfig);
+		if (platform === "Android") {
+			return "android";
+		} else if (platform === "iOS") {
+			return "ios";
+		}
+	}
 
+	private pushConfig = {
+		"android": {
+			"senderID": "809266780938",
+			"icon": "ic_stat_icon"
+		},
+		"ios": {
+			"alert": true,
+			"badge": true,
+			"sound": true
+		}
+	}
 
-	push.on("registration", function(data) {
-		const type = getType()
+	private registration = (data) => {
+		const type = this.getType()
 
 		Bluebird.all([
 			sessionStorage.awaitLoading(),
 			initService.awaitLoading(),
 			socketService.awaitConnection()
-		]).then(function () {
-			const pushKey = getOrCreatePushkey();
+		]).then(() => {
+			const pushKey = this.getOrCreatePushkey();
 
 			return socketService.definitlyEmit("pushNotification.subscribe", {
 				token: data.registrationId,
 				key: sjcl.codec.hex.fromBits(pushKey),
 				type: type
-			}, this);
+			});
 		}).catch(errorService.criticalError);
-	});
+	}
 
-	push.on("notification", function(data) {
+	private notification = (data) => {
 		if (data && data.additionalData) {
 			Bluebird.all([
 				sessionStorage.awaitLoading(),
 				initService.awaitLoading()
-			]).then(function () {
-				var topicid = data.additionalData.topicid;
+			]).then(() => {
+				const topicId = data.additionalData.topicid;
 
-				if (!data.additionalData.foreground && topicid) {
-					// $state.go("chat-detail", { chatId: topicid });
+				if (!data.additionalData.foreground && topicId) {
+					this.navCtrl.push(MessagesPage, { topicId: topicId });
 				}
 
 				var pushKey = sessionStorage.get("pushKey");
@@ -95,7 +102,12 @@ const initializePush = () => {
 				}
 			});
 		}
-	});
-}
+	};
 
-export default initializePush;
+	initializePush = () => {
+		var push = Push.init(this.pushConfig);
+
+		push.on("registration", this.registration);
+		push.on("notification", this.notification);
+	}
+}
