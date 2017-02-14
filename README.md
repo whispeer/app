@@ -54,6 +54,19 @@ on actual hardware, run
 
     $ npm install -g cordova ionic && npm install
 
+In addition to these dependencies, it is currently required
+to roll your own ionic-app-scripts. To install those, clone
+[whispeer/ionic-app-scripts][whispeer-ionic-app-scripts] and check out
+the branch `feature/multi_configs`, and link the package:
+
+		git clone git@github.com:whispeer/ionic-app-scripts.git
+		cd ionic-app-scripts
+		git checkout feature/multi_config
+		npm link
+
+Change directory into your messenger repo and run
+
+		npm link @ionic/app-scripts
 
 ### Updating Resources
 
@@ -90,3 +103,4 @@ application:
 [shrinkwrap-help]: https://github.com/thewoolleyman/npm-shrinkwrap-helper
 [app-scripts]: https://ionicframework.com/docs/v2/resources/app-scripts
 [ios-deployment]: https://cordova.apache.org/docs/en/latest/guide/platforms/ios/
+[whispeer-ionic-app-scripts]: https://github.com/whispeer/ionic-app-scripts
