@@ -45,6 +45,9 @@
 			</h2>
 		</ion-item>
 	</ion-list>
+	<ion-item-divider *ngIf="searchResults && searchResults.length > 0" class="friends__divider">
+		Worldwide
+	</ion-item-divider>
 	<ion-spinner *ngIf="searchResultsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list [virtualScroll]="searchResults" class="friends__list">
 		<ion-item *virtualItem="let searchUser" (click)="goToUser(searchUser.id)">
