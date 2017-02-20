@@ -96,6 +96,11 @@ application:
 	$ ionic platform add ios
 	$ ionic build ios --prod
 
+When those commands succeed, open the generated Xcode project and
+compile for the simulator or a physical device that is connected.
+
+	$ open ./platforms/ios/whispeer\ Messenger.xcodeproj
+
 [ionic2]: https://github.com/driftyco/ionic
 [yarn]: https://yarnpkg.com/en/docs/install
 [cocoapods]: https://cocoapods.org/
