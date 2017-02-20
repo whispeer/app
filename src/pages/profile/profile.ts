@@ -23,6 +23,7 @@ export class ProfilePage {
 	userId: number;
 
 	isRequest: boolean;
+	isRequestable: boolean;
 	isOwn: boolean;
 
 	fingerprint: string[];
@@ -39,8 +40,9 @@ export class ProfilePage {
 
 		const awaitFriendsService = friendsService.awaitLoading().then(() => {
 			var requests = friendsService.getRequests();
-
 			this.isRequest = requests.indexOf(this.userId) > -1
+
+			this.isRequestable = friendsService.noRequests(this.userId);
 		});
 
 		Bluebird.all([
@@ -71,16 +73,29 @@ export class ProfilePage {
 		this.navCtrl.pop();
 	}
 
+	private addOrAccept() {
+		if (this.isRequest) {
+			return friendsService.acceptFriendShip(this.userId);
+		}
+
+		return friendsService.friendship(this.userId);
+	}
+
 	acceptRequest() {
 		this.profileLoading = true;
 
-		friendsService.acceptFriendShip(this.userId).then(() => {
+		this.addOrAccept().then(() => {
 			this.profileLoading = false;
 			this.isRequest = false;
 		});
 	}
 
 	declineRequest() {
+		if (!this.isRequest) {
+			this.isRequestable = false;
+			return;
+		}
+
 		this.profileLoading = true;
 
 		friendsService.ignoreFriendShip(this.userId).then(() => {
