@@ -54,7 +54,7 @@ upon. These are the ionic tasks available to you directly:
 To install ionic and all other dependencies for running the application
 on actual hardware, run
 
-	$ npm install -g cordova ionic && yarn
+	$ yarn global add cordova ionic && yarn
 
 In addition to these dependencies, it is currently required
 to roll your own ionic-app-scripts. To install those, clone
@@ -93,7 +93,7 @@ deployment pipeline in cordova. To get up and running quickly, run these
 commands:
 
 	$ xcode-select --install
-	$ npm install -g ios-deploy ios-sim
+	$ yarn global add ios-deploy ios-sim
 
 Make sure there is an Apple ID in the accounts tab of your Xcode
 preferences. Once that is done, run a production build of the messenger
@@ -103,7 +103,6 @@ application:
 
 [ionic2]: https://github.com/driftyco/ionic
 [yarn]: https://yarnpkg.com/en/docs/install
-[shrinkwrap-help]: https://github.com/thewoolleyman/npm-shrinkwrap-helper
 [app-scripts]: https://ionicframework.com/docs/v2/resources/app-scripts
 [ios-deployment]: https://cordova.apache.org/docs/en/latest/guide/platforms/ios/
 [whispeer-ionic-app-scripts]: https://github.com/whispeer/ionic-app-scripts
