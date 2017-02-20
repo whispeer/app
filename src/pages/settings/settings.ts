@@ -41,7 +41,7 @@ export class SettingsPage {
 
 	feedback() {
 		this.navCtrl.push(NewMessagePage, {
-			receiverIds: "2807"
+			receiverIds: "3317"
 		});
 	}
 
