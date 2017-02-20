@@ -13,46 +13,46 @@ desired, consult the second part _Deploying to Hardware_.
 
 ### Prerequisites
 
-Make sure node and npm are installed and corresponding to the version
+Make sure node is installed and corresponding to the version
 specified in `.nvmrc`:
 
-    $ node -v && npm -v
+    $ node -v
     v7.5.0
-    4.1.2
+
+This project also requires yarn which can be installed using `npm i -g yarn`.
+Tested with yarn version `0.20.3`
+
 
 ### Installation
 
 To install ionic and all other dependencies, run
 
-    $ npm install
+    $ yarn
 
-This code repository is using an `npm-shrinkwrap.json` to ensure
+This code repository is using a `yarn.lock` to ensure
 deterministic dependency resolution on all workstations and deployments.
-To ensure proper dependency installations in the future, some diligence
-is neccessary when updating existing and installing new dependencies.
-There is existing [documentation][shrinkwrap-help] on how to work with
-shrinkwraps.
+Please commit your yarn.lock after adding new dependencies or if it changed.
 
 ### Running the Application
 
 To run the messanger locally, execute
 
-    $ npm start
+    $ yarn start
 
-This wraps `npm run ionic:serve`. All of the npm scripts wrap
+This wraps `yarn run ionic:serve`. All of the yarn scripts wrap
 [`app-scripts`][app-scripts], which this project is depending
 upon. These are the ionic tasks available to you directly:
 
-    npm run ionic:clean   # removes the build files
-    npm run ionic:build   # builds anew
-    npm run ionic:serve   # runs the dev environment
+    yarn run ionic:clean   # removes the build files
+    yarn run ionic:build   # builds anew
+    yarn run ionic:serve   # runs the dev environment
 
 ## Deploying to Hardware
 
 To install ionic and all other dependencies for running the application
 on actual hardware, run
 
-    $ npm install -g cordova ionic && npm install
+    $ npm install -g cordova ionic && yarn
 
 In addition to these dependencies, it is currently required
 to roll your own ionic-app-scripts. To install those, clone
