@@ -13,25 +13,27 @@ desired, consult the second part _Deploying to Hardware_.
 
 ### Prerequisites
 
-Make sure node is installed and corresponding to the version
-specified in `.nvmrc`:
+Make sure node is installed and corresponding to the version specified
+in `.nvmrc`, as well as [yarn][yarn]. Yarn can be installed using `npm i
+-g yarn`, when `npm` is available.
 
-    $ node -v
-    v7.5.0
-
-This project also requires yarn which can be installed using `npm i -g yarn`.
-Tested with yarn version `0.20.3`
-
+		$ node -v && yarn --version
+		v7.5.0
+		0.20.3
 
 ### Installation
 
+To install some of the required whispeer dependencies run
+
+		$ git submodule update --init
+
 To install ionic and all other dependencies, run
 
-    $ yarn
+		$ yarn
 
-This code repository is using a `yarn.lock` to ensure
-deterministic dependency resolution on all workstations and deployments.
-Please commit your yarn.lock after adding new dependencies or if it changed.
+This code repository is using a `yarn.lock` to ensure deterministic
+dependency resolution on all workstations and deployments. Please commit
+your yarn.lock after adding new dependencies or if it changed.
 
 ### Running the Application
 
@@ -52,7 +54,7 @@ upon. These are the ionic tasks available to you directly:
 To install ionic and all other dependencies for running the application
 on actual hardware, run
 
-    $ npm install -g cordova ionic && yarn
+		$ npm install -g cordova ionic && yarn
 
 In addition to these dependencies, it is currently required
 to roll your own ionic-app-scripts. To install those, clone
@@ -75,8 +77,8 @@ There is a `resources` folder with an `icon.png` as well as a
 resized counterparts in the `resources/ios` and `resources/android`
 folders with the following two commands:
 
-    $ ionic resources --icon
-    $ ionic resources --splash
+		$ ionic resources --icon
+		$ ionic resources --splash
 
 Make sure to review the results before commiting. Please also note that
 this _uploads_ the images to a web service and therefore needs internet
@@ -90,16 +92,17 @@ There's a [comprehensive documentation][ios-deployment] on the
 deployment pipeline in cordova. To get up and running quickly, run these
 commands:
 
-    $ xcode-select --install
-    $ npm install -g ios-deploy ios-sim
+		$ xcode-select --install
+		$ npm install -g ios-deploy ios-sim
 
 Make sure there is an Apple ID in the accounts tab of your Xcode
 preferences. Once that is done, run a production build of the messenger
 application:
 
-    $ ionic build ios --prod
+		$ ionic build ios --prod
 
 [ionic2]: https://github.com/driftyco/ionic
+[yarn]: https://yarnpkg.com/en/docs/install
 [shrinkwrap-help]: https://github.com/thewoolleyman/npm-shrinkwrap-helper
 [app-scripts]: https://ionicframework.com/docs/v2/resources/app-scripts
 [ios-deployment]: https://cordova.apache.org/docs/en/latest/guide/platforms/ios/
