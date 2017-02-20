@@ -103,9 +103,13 @@ export class PushService {
 	};
 
 	register = () => {
-		var push = Push.init(this.pushConfig);
+		try {
+			var push = Push.init(this.pushConfig);
 
-		push.on("registration", this.registration);
-		push.on("notification", this.notification);
+			push.on("registration", this.registration);
+			push.on("notification", this.notification);
+		} catch (e) {
+			console.warn("Push is not available!");
+		}
 	}
 }
