@@ -18,7 +18,7 @@ import { NewMessagePage } from "../../pages/new-message/new-message";
 	templateUrl: 'settings.html'
 })
 export class SettingsPage {
-	pushEnabled = false;
+	pushEnabled = true;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
@@ -27,8 +27,8 @@ export class SettingsPage {
 	}
 
 	pushWarning() {
-		this.pushEnabled = false;
-		alert("This feature is not yet available but will arrive with the next update! Stay tuned!");
+		this.pushEnabled = true;
+		alert("This feature is not ready yet but we are working on it, promise!");
 	}
 
 	goBack() {
