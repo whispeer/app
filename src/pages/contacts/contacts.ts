@@ -85,10 +85,6 @@ export class ContactsPage {
 	executeSearch = h.debounce(() => {
 		console.log(`searching for ${this.searchTerm}`);
 
-		if (this.searchTerm.length < 3) {
-			this.searchResults = [];
-		}
-
 		this.searchResultsLoading = true;
 
 		const query = this.searchTerm;
