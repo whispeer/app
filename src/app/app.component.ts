@@ -37,7 +37,7 @@ export class MyApp {
 	}
 
 	currentSlide() {
-		return `/assets/img/tutorial_step${this.slideNumber}.png`
+		return `assets/img/tutorial_step${this.slideNumber}.png`
 	}
 
 	tutorialClicked(event) {
