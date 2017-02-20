@@ -73,10 +73,18 @@ export class ProfilePage {
 		this.navCtrl.pop();
 	}
 
+	private addOrAccept() {
+		if (this.isRequest) {
+			return friendsService.acceptFriendShip(this.userId);
+		}
+
+		return friendsService.friendship(this.userId);
+	}
+
 	acceptRequest() {
 		this.profileLoading = true;
 
-		friendsService.acceptFriendShip(this.userId).then(() => {
+		this.addOrAccept().then(() => {
 			this.profileLoading = false;
 			this.isRequest = false;
 		});
