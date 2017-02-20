@@ -35,7 +35,7 @@ export class ContactsPage {
 
 		return Bluebird.try(() => {
 			var friends = friendsService.getFriends();
-			return userService.getMultipleFormatted(friends.slice(0, 5));
+			return userService.getMultipleFormatted(friends);
 		}).then((result: any[]) => {
 			return result.sort((a: any, b: any): number => {
 				const firstAvailable = a.names.firstname && b.names.firstname;
@@ -58,7 +58,7 @@ export class ContactsPage {
 	ionViewDidLoad() {
 		friendsService.awaitLoading().then(() => {
 			friendsService.listen(this.loadFriendsUsers);
-			this.loadFriendsUsers();
+			return this.loadFriendsUsers();
 		});
 
 		console.log('ionViewDidLoad FriendsPage');
