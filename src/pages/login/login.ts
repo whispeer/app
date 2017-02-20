@@ -76,7 +76,7 @@ export class LoginPage {
 
 	checkUserNameExistance = () => {
 		const { identifier: nick } = this.login
-		if (nick.length === 0) {
+		if (!nick) {
 			this.usernameState = USERNAME_EMPTY;
 		} else if (!whispeerHelper.isNickname(nick)) {
 			this.usernameState = USERNAME_INVALID;
