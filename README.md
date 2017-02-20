@@ -45,9 +45,9 @@ This wraps `yarn run ionic:serve`. All of the yarn scripts wrap
 [`app-scripts`][app-scripts], which this project is depending
 upon. These are the ionic tasks available to you directly:
 
-	yarn run ionic:clean   # removes the build files
-	yarn run ionic:build   # builds anew
-	yarn run ionic:serve   # runs the dev environment
+	$ yarn run ionic:clean   # removes the build files
+	$ yarn run ionic:build   # builds anew
+	$ yarn run ionic:serve   # runs the dev environment
 
 ## Deploying to Hardware
 
@@ -55,20 +55,6 @@ To install ionic and all other dependencies for running the application
 on actual hardware, run
 
 	$ yarn global add cordova ionic && yarn
-
-In addition to these dependencies, it is currently required
-to roll your own ionic-app-scripts. To install those, clone
-[whispeer/ionic-app-scripts][whispeer-ionic-app-scripts] and check out
-the branch `feature/multi_configs`, and link the package:
-
-	git clone git@github.com:whispeer/ionic-app-scripts.git
-	cd ionic-app-scripts
-	git checkout feature/multi_config
-	npm link
-
-Change directory into your messenger repo and run
-
-	npm link @ionic/app-scripts
 
 ### Updating Resources
 
@@ -95,14 +81,24 @@ commands:
 	$ xcode-select --install
 	$ yarn global add ios-deploy ios-sim
 
-Make sure there is an Apple ID in the accounts tab of your Xcode
+In addition to that, you will need to install [Cocoapods][cocoapods] and
+make sure it is available in your project:
+
+	$ pod --version
+	1.2.0
+
+When `pod` is installed, run `pod setup` at least once.
+
+There should be an Apple ID in the accounts tab of your Xcode
 preferences. Once that is done, run a production build of the messenger
 application:
 
+	$ ionic platform add ios
 	$ ionic build ios --prod
 
 [ionic2]: https://github.com/driftyco/ionic
 [yarn]: https://yarnpkg.com/en/docs/install
+[cocoapods]: https://cocoapods.org/
 [app-scripts]: https://ionicframework.com/docs/v2/resources/app-scripts
 [ios-deployment]: https://cordova.apache.org/docs/en/latest/guide/platforms/ios/
 [whispeer-ionic-app-scripts]: https://github.com/whispeer/ionic-app-scripts
