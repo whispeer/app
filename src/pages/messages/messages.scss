@@ -65,6 +65,10 @@ topicWithBursts {
 }
 
 .burst--me {
+	a {
+		color: white;
+	}
+
 	.messages__message {
 		background: map-get($colors, primary);
 		color: #fff;
