@@ -137,7 +137,6 @@ export class SyntaxifyDirective {
 
 	@Input()
 	set content(content: string) {
-		console.warn(content);
 		this.callSyntaxifier(0, this.el, content);
 	}
 
