@@ -3,8 +3,10 @@ require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
 import { SafeUrl } from "../assets/pipes/safeStyle";
+import { ResponsiveDatePipe } from "../assets/pipes/responsiveDate";
 
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
+import { DatePipe } from "@angular/common";
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
@@ -51,6 +53,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		MainMenu,
 		SafeUrl,
 		SyntaxifyDirective,
+		ResponsiveDatePipe,
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
@@ -83,7 +86,8 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		MainMenu
 	],
 	providers: [
-		{provide: ErrorHandler, useClass: IonicErrorHandler}
+		{provide: ErrorHandler, useClass: IonicErrorHandler},
+		DatePipe
 	]
 })
 export class AppModule {
