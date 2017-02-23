@@ -177,6 +177,8 @@ export class TopicComponent {
 			textarea.style.height     = scroll_height + "px";
 
 			contentElement.style.height = contentHeight - (footerElement.offsetHeight - this.footerHeight) + "px";
+
+			this.content.scrollToBottom();
 		}, 100);
 	}
 
