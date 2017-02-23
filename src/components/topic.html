@@ -15,15 +15,16 @@
 </ion-header>
 <ion-content fullscreen>
 	<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<ion-list no-lines>
+	<ion-list no-lines (touchstart)="touchStart($event)" (touchmove)="touchMove($event)" (touchend)="touchEnd($event)">
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 			<span *ngIf="burst.isMessageBurst()">
 				<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
-				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
-					<span whispeerSyntaxify content="{{message.data.text}}">
-					</span>
-					<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
-					<!-- <span>{{ message.data.timestamp }}</span> -->
+				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
+					<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
+						<span whispeerSyntaxify content="{{message.data.text}}"></span>
+						<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
+					</div>
+					<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 				</div>
 			</span>
 			<div class="messages_message" *ngIf="burst.isTopicUpdate()">
