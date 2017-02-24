@@ -77,6 +77,8 @@ export class TopicComponent {
 			});
 		}).then((file: any) => {
 			file.originalUrl = url;
+			// TODO: check if platform is iOS!
+			file.localURL = url.replace("file://", "http://ionic.local");
 			file.type = type;
 
 			return file;
