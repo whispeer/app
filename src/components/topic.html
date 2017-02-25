@@ -6,10 +6,13 @@
 		<ion-title *ngIf="partners.length == 1">
 			<span (click)="goToProfile(partners[0].id)">{{ partners[0].name }}</span>
 		</ion-title>
-		<ion-title *ngIf="partners.length != 1">
+		<ion-title *ngIf="partners.length != 1 && !(topic && topic.title)">
 			<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
 				{{ partner.basic.shortname }}{{ l ? "":", " }}
 			</span>
+		</ion-title>
+		<ion-title *ngIf="topic && topic.title">
+			{{topic.title}}
 		</ion-title>
 	</ion-navbar>
 </ion-header>
