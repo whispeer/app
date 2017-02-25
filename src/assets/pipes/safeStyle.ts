@@ -6,6 +6,6 @@ export class SafeUrl {
   constructor(private sanitizer:DomSanitizer){}
 
   transform(style) {
-    return this.sanitizer.bypassSecurityTrustStyle(`url(${style}`);
+    return this.sanitizer.bypassSecurityTrustStyle(`url(${style})`);
   }
 }
