@@ -96,7 +96,7 @@ export class PushService {
 				}
 
 				if (data.additionalData.content) {
-					messageService.addData(data.additionalData.content);
+					messageService.addSocketMessage(data.additionalData.content);
 				}
 			});
 		}
