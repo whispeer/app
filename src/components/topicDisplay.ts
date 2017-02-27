@@ -47,7 +47,8 @@ export class TopicComponent {
 	contentHeight = 0;
 	footerHeight = 0;
 
-	ngOnInit() {
+	ngAfterViewInit() {
+		console.warn("attach keyboard listener");
 		window.addEventListener('resize', this.keyboardChange);
 	}
 

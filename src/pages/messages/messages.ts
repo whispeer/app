@@ -38,6 +38,7 @@ export class MessagesPage {
 				// this.content.scrollToBottom(0);
 
 				this.messagesLoading = false;
+				this.topicObject.markRead(errorService.criticalError)
 			});
 		})
 	}
