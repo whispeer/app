@@ -3,15 +3,13 @@ set -e
 set -x
 
 function signAndCopy {
-	cp ./platforms/android/build/outputs/apk/$name-unsigned.apk ./release
-
-	jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ./release/my-release-key.keystore ./release/$name-unsigned.apk alias_name
+	jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ./release/my-release-key.keystore ./release/whispeer-$extra-unsigned.apk alias_name
 
 	rm -f ./release/whispeer-$extra.apk
 
-	zipalign -v 4 ./release/$name-unsigned.apk ./release/whispeer-$extra.apk
+	zipalign -v 4 ./release/whispeer-$extra-unsigned.apk ./release/whispeer-$extra.apk
 
-	rm -f ./release/$name-unsigned.apk
+	rm -f ./release/whispeer-$extra-unsigned.apk
 }
 
 echo "build for android >= 5"
@@ -24,6 +22,8 @@ cordova prepare
 # sed -i .bak 's/^ext.cdvMinSdkVersion/\/\/ext.cdvMinSdkVersion/g' ./plugins/phonegap-plugin-barcodescanner/src/android/barcodescanner.gradle
 
 ionic build android --prod --release
+cp ./platforms/android/build/outputs/apk/android-release-unsigned.apk ./release/whispeer-android-unsigned.apk
+
 mv config.xml.bak config.xml
 
 echo "build for android 4"
@@ -31,17 +31,14 @@ echo "build for android 4"
 cordova plugin add cordova-plugin-crosswalk-webview
 
 ionic build --release android
-
-name=android-release
-extra=android
-
-signAndCopy
-
-name=android-armv7-release
-extra=android4
-
-signAndCopy
+cp ./platforms/android/build/outputs/apk/android-armv7-release-unsigned.apk ./release/whispeer-android4-unsigned.apk
 
 rm -rf platforms
 rm -rf plugins
 cordova prepare
+
+extra=android
+signAndCopy
+
+extra=android4
+signAndCopy
