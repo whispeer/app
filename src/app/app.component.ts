@@ -4,6 +4,7 @@ import { StatusBar, Splashscreen } from "ionic-native";
 
 import { HomePage } from '../pages/home/home';
 import { PushService } from "../assets/services/push.service";
+import Tutorial from "./tutorial";
 
 @Component({
 	templateUrl: "app.html"
@@ -15,25 +16,14 @@ export class MyApp {
 
 	@ViewChild("navigation") nav: NavController;
 
-	tutorialVersion = 1;
-
-	tutorialVisible = true;
 	showTutorial() {
-		return this.tutorialVisible;
-	}
-
-	skip() {
-		this.tutorialVisible = false;
-		localStorage.setItem(
-			'tutorialPassed',
-			`${this.tutorialVersion}`
-		);
+		return Tutorial.tutorialVisible;
 	}
 
 	slideNumber = 1;
 	advance() {
 		this.slideNumber++;
-		if (this.slideNumber === 6) { this.skip(); }
+		if (this.slideNumber === 6) { Tutorial.skip(); }
 	}
 
 	langualge() {
@@ -41,7 +31,7 @@ export class MyApp {
 	}
 
 	currentSlide() {
-		return `assets/img/${this.langualge()}tutorial_step${this.slideNumber}.png`
+		return `assets/img/${this.langualge()}/tutorial_step${this.slideNumber}.png`
 	}
 
 	tutorialClicked(event) {
@@ -56,7 +46,7 @@ export class MyApp {
 		const py = offsetY / offsetHeight
 
 		if ((0.73 < px) && (px < 0.98) && (0.03 < py) && (py < 0.10)) {
-			this.skip()
+			Tutorial.skip()
 		} else {
 			this.advance()
 		}
@@ -64,9 +54,7 @@ export class MyApp {
 
 	constructor(platform: Platform) {
 		platform.ready().then(() => {
-
-			const passedVersion = parseInt(localStorage.getItem('tutorialPassed'), 10)
-			this.tutorialVisible = isNaN(passedVersion) || (passedVersion < this.tutorialVersion)
+			Tutorial.checkVisibility()
 
 			// Okay, so the platform is ready and our plugins are available.
 			// Here you can do any higher level native things you might need.
