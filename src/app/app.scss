@@ -185,3 +185,60 @@ ion-fab[fixed] {
 		transform: translateX(-50%);
 	}
 }
+
+// -----------------------------------------------------------
+// The following is a bugfix for headers inside of components on ios
+// This is a copy of a code snippet from the ionic code, but removing a >
+// to allow deeper nesting.
+// -----------------------------------------------------------
+
+.ios ion-nav > .ion-page .toolbar.statusbar-padding:first-child,
+.ios ion-nav > .ion-page ion-header > .toolbar.statusbar-padding:first-child,
+.ios ion-tab > .ion-page ion-header > .toolbar.statusbar-padding:first-child,
+.ios ion-tabs > .ion-page.tab-subpage ion-header > .toolbar.statusbar-padding:first-child,
+.ios ion-menu > .menu-inner .toolbar.statusbar-padding:first-child,
+.ios ion-menu > .menu-inner ion-header > .toolbar.statusbar-padding:first-child {
+	padding-top: calc(20px + 4px);
+	min-height: calc(44px + 20px);
+}
+
+.ios ion-nav > .ion-page ion-content.statusbar-padding:first-child .scroll-content,
+.ios ion-nav > .ion-page ion-header > ion-content.statusbar-padding:first-child .scroll-content,
+.ios ion-tab > .ion-page ion-header > ion-content.statusbar-padding:first-child .scroll-content,
+.ios ion-tabs > .ion-page.tab-subpage ion-header > ion-content.statusbar-padding:first-child .scroll-content,
+.ios ion-menu > .menu-inner ion-content.statusbar-padding:first-child .scroll-content,
+.ios ion-menu > .menu-inner ion-header > ion-content.statusbar-padding:first-child .scroll-content {
+	padding-top: 20px;
+}
+
+.ios ion-nav > .ion-page ion-content.statusbar-padding:first-child[padding] .scroll-content,
+.ios ion-nav > .ion-page ion-content.statusbar-padding:first-child[padding-top] .scroll-content,
+.ios ion-nav > .ion-page ion-header > ion-content.statusbar-padding:first-child[padding] .scroll-content,
+.ios ion-nav > .ion-page ion-header > ion-content.statusbar-padding:first-child[padding-top] .scroll-content,
+.ios ion-tab > .ion-page ion-header > ion-content.statusbar-padding:first-child[padding] .scroll-content,
+.ios ion-tab > .ion-page ion-header > ion-content.statusbar-padding:first-child[padding-top] .scroll-content,
+.ios ion-tabs > .ion-page.tab-subpage ion-header > ion-content.statusbar-padding:first-child[padding] .scroll-content,
+.ios ion-tabs > .ion-page.tab-subpage ion-header > ion-content.statusbar-padding:first-child[padding-top] .scroll-content,
+.ios ion-menu > .menu-inner ion-content.statusbar-padding:first-child[padding] .scroll-content,
+.ios ion-menu > .menu-inner ion-content.statusbar-padding:first-child[padding-top] .scroll-content,
+.ios ion-menu > .menu-inner ion-header > ion-content.statusbar-padding:first-child[padding] .scroll-content,
+.ios ion-menu > .menu-inner ion-header > ion-content.statusbar-padding:first-child[padding-top] .scroll-content {
+	padding-top: calc(16px + 20px);
+}
+
+.ios ion-nav > .ion-page .toolbar.statusbar-padding:first-child ion-segment,
+.ios ion-nav > .ion-page .toolbar.statusbar-padding:first-child ion-title,
+.ios ion-nav > .ion-page ion-header > .toolbar.statusbar-padding:first-child ion-segment,
+.ios ion-nav > .ion-page ion-header > .toolbar.statusbar-padding:first-child ion-title,
+.ios ion-tab > .ion-page ion-header > .toolbar.statusbar-padding:first-child ion-segment,
+.ios ion-tab > .ion-page ion-header > .toolbar.statusbar-padding:first-child ion-title,
+.ios ion-tabs > .ion-page.tab-subpage ion-header > .toolbar.statusbar-padding:first-child ion-segment,
+.ios ion-tabs > .ion-page.tab-subpage ion-header > .toolbar.statusbar-padding:first-child ion-title,
+.ios ion-menu > .menu-inner .toolbar.statusbar-padding:first-child ion-segment,
+.ios ion-menu > .menu-inner .toolbar.statusbar-padding:first-child ion-title,
+.ios ion-menu > .menu-inner ion-header > .toolbar.statusbar-padding:first-child ion-segment,
+.ios ion-menu > .menu-inner ion-header > .toolbar.statusbar-padding:first-child ion-title {
+	padding-top: 20px;
+	height: calc(44px + 20px);
+	min-height: calc(44px + 20px);
+}

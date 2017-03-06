@@ -68,11 +68,9 @@ export class MyApp {
 			// Here you can do any higher level native things you might need.
 			StatusBar.styleLightContent();
 			Splashscreen.hide();
-		});
-	}
 
-	ngAfterViewInit() {
-		const pushService = new PushService(this.nav);
-		pushService.register();
+			const pushService = new PushService(this.nav);
+			pushService.register();
+		});
 	}
 }
