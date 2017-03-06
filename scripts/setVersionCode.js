@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var configFile = "./config.xml";
 
 var fs = require("fs");
@@ -8,9 +10,11 @@ var xml2js = require("xml2js");
 var xml = fs.readFileSync(configFile);
 
 xml2js.parseString(xml, function (err, result) {
-	var version = result.widget.$.version.split(".")
+	var version = result.widget.$.version.split(".").reverse();
 
-	var versionCode = version[2] * versionIncrease + version[1] * versionIncrease * versionIncrease + version[0] * versionIncrease * versionIncrease * versionIncrease
+	var versionCode = version.reduce(function (prev, next, index) {
+		return prev + next * Math.pow(versionIncrease, index + 1);
+	}, 0);
 
 	var builder = new xml2js.Builder({
 		renderOpts: {
