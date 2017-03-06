@@ -26,9 +26,12 @@
 				</ion-avatar>
 			</div>
 			<h2 class="user__name">
-				<span *ngFor="let partner of topic.partners; let l = last">
-					{{ partner.basic.shortname }}{{ l ? "":", " }}
+				<span *ngIf="!topic.title">
+					<span *ngFor="let partner of topic.partners; let l = last">
+						{{ partner.basic.shortname }}{{ l ? "":", " }}
+					</span>
 				</span>
+				<span *ngIf="topic.title">{{topic.title}}</span>
 			</h2>
 			<p>{{topic.latestMessage.data.text}}</p>
 			<ion-note item-right>{{topic.latestMessage.data.timestamp | date: "EEEE"}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
@@ -39,5 +42,5 @@
 		<ion-infinite-scroll-content></ion-infinite-scroll-content>
 	</ion-infinite-scroll>
 
-	<main-menu (mainHandle)="newMessage()"></main-menu>
+	<main-menu (mainHandle)="newMessage()" ion-fixed></main-menu>
 </ion-content>

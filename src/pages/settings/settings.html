@@ -19,7 +19,7 @@
 			Notifications
 		</ion-list-header>
 		<ion-item>
-			<ion-label>Receive push notifiations</ion-label>
+			<ion-label>Receive push notifications</ion-label>
 			<ion-toggle [ngModel]="pushEnabled" (ngModelChange)="pushWarning()"></ion-toggle>
 		</ion-item>
 	</ion-list>
@@ -46,9 +46,9 @@
 	<div text-center class="space-for-fab">
 		<p class="text-grey" padding-vertical>
 			whispeer by mindpost GmbH<br>
-			Made with <ion-icon name="md-heart"></ion-icon> for human rights in Germany
+			Made in Germany with <ion-icon name="md-heart"></ion-icon> for human rights
 		</p>
 	</div>
 
-	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
+	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
 </ion-content>

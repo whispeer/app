@@ -12,7 +12,7 @@
 
 </ion-header>
 
-<ion-content padding *ngIf="isRequest">
+<ion-content padding *ngIf="isRequest || isRequestable">
 	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<h4 class="text-primary text-medium" text-center padding>Add this person as a contact?</h4>
 	<div class="profile__avatar-row">
@@ -47,8 +47,8 @@
 	<main-menu [icon]="'close'"></main-menu>
 </ion-content>
 
-<ion-content padding *ngIf="!isRequest">
-	<div padding-bottom *ngIf="isMe">
+<ion-content padding *ngIf="!isRequest && !isRequestable">
+	<div padding-bottom *ngIf="isOwn">
 		<ion-segment [(ngModel)]="view" color="dark">
 			<ion-segment-button value="profile">
 				Profile
@@ -95,5 +95,5 @@
 			</div>
 		</div>
 	</div>
-	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
+	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
 </ion-content>

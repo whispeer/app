@@ -15,6 +15,12 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
+main-menu[ion-fixed] {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+}
+
 ion-fab[fixed] {
 	position: fixed;
 }

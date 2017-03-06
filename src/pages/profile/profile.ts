@@ -23,6 +23,7 @@ export class ProfilePage {
 	userId: number;
 
 	isRequest: boolean;
+	isRequestable: boolean;
 	isOwn: boolean;
 
 	fingerprint: string[];
@@ -39,8 +40,11 @@ export class ProfilePage {
 
 		const awaitFriendsService = friendsService.awaitLoading().then(() => {
 			var requests = friendsService.getRequests();
-
 			this.isRequest = requests.indexOf(this.userId) > -1
+
+			this.isOwn = this.userId === parseFloat(sessionService.userid);
+
+			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn;
 		});
 
 		Bluebird.all([
@@ -52,8 +56,6 @@ export class ProfilePage {
 				this.profileLoading = false;
 				return;
 			}
-
-			this.isOwn = this.userId === parseFloat(sessionService.userid);
 
 			var fp = user.getFingerPrint();
 			this.fingerprint = [fp.substr(0,13), fp.substr(13,13), fp.substr(26,13), fp.substr(39,13)];
@@ -71,16 +73,29 @@ export class ProfilePage {
 		this.navCtrl.pop();
 	}
 
+	private addOrAccept() {
+		if (this.isRequest) {
+			return friendsService.acceptFriendShip(this.userId);
+		}
+
+		return friendsService.friendship(this.userId);
+	}
+
 	acceptRequest() {
 		this.profileLoading = true;
 
-		friendsService.acceptFriendShip(this.userId).then(() => {
+		this.addOrAccept().then(() => {
 			this.profileLoading = false;
 			this.isRequest = false;
 		});
 	}
 
 	declineRequest() {
+		if (!this.isRequest) {
+			this.isRequestable = false;
+			return;
+		}
+
 		this.profileLoading = true;
 
 		friendsService.ignoreFriendShip(this.userId).then(() => {

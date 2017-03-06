@@ -75,6 +75,31 @@ export class PushService {
 		}).catch(errorService.criticalError);
 	}
 
+	private getActiveNav = () => this.navCtrl.getActive().instance
+
+	private isOnMessagesPage = () => {
+		return this.getActiveNav() instanceof MessagesPage
+	}
+
+	private isActiveTopic = (topicId) => {
+		const navTopicID = this.getActiveNav().navParams.data.topicId
+
+		return parseInt(navTopicID, 10) === parseInt(topicId, 10)
+	}
+
+	private goToTopic = (topicId) => {
+		if (this.isOnMessagesPage()) {
+			if (this.isActiveTopic(topicId)) {
+				return;
+			}
+
+			const index = this.navCtrl.getActive().index;
+			this.navCtrl.remove(index);
+		}
+
+		return this.navCtrl.push(MessagesPage, { topicId: topicId });
+	}
+
 	private notification = (data) => {
 		if (data && data.additionalData) {
 			Bluebird.all([
@@ -85,7 +110,8 @@ export class PushService {
 
 				if (!data.additionalData.foreground && topicId) {
 					console.log("-> click", topicId);
-					return this.navCtrl.push(MessagesPage, { topicId: topicId });
+
+					this.goToTopic(topicId)
 				}
 
 				var pushKey = sessionStorage.get("pushKey");
@@ -96,16 +122,20 @@ export class PushService {
 				}
 
 				if (data.additionalData.content) {
-					messageService.addData(data.additionalData.content);
+					messageService.addSocketMessage(data.additionalData.content.message);
 				}
 			});
 		}
 	};
 
 	register = () => {
-		var push = Push.init(this.pushConfig);
+		try {
+			var push = Push.init(this.pushConfig);
 
-		push.on("registration", this.registration);
-		push.on("notification", this.notification);
+			push.on("registration", this.registration);
+			push.on("notification", this.notification);
+		} catch (e) {
+			console.warn("Push is not available!");
+		}
 	}
 }

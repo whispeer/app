@@ -30,6 +30,9 @@ import { GalleryComponent } from "../components/gallery/gallery";
 import { chooseFriends } from "../components/chooseFriends";
 import { MainMenu } from "../components/mainMenu";
 
+
+import { SyntaxifyDirective } from '../components/syntaxify';
+
 (<any>window).startup = new Date().getTime();
 
 @NgModule({
@@ -47,6 +50,7 @@ import { MainMenu } from "../components/mainMenu";
 		chooseFriends,
 		MainMenu,
 		SafeUrl,
+		SyntaxifyDirective,
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
