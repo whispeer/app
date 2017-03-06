@@ -10,66 +10,71 @@
 			</p>
 		</div>
 
-		<div class="login__form">
+		<form (ngSubmit)="loginOrRegister()">
+			<div class="login__form">
 
-			<p class="login__paragraph login__paragraph--primary">
-				{{ getMessage() }}
-			</p>
+				<p class="login__paragraph login__paragraph--primary">
+					{{ getMessage() }}
+				</p>
 
-			<ion-item class="clean-input-wrap login__input-wrap">
+				<ion-item class="clean-input-wrap login__input-wrap">
 
-				<ion-input id="mail"
-					class="login__input"
-					type="text"
-					placeholder="e.g. whispeerHQ"
-					[disabled]="register"
-					[(ngModel)]="login.identifier"
-					(ngModelChange)="checkUserNameExistance()" >
-				</ion-input>
+					<ion-input id="mail"
+						class="login__input"
+						type="text"
+						placeholder="e.g. whispeerHQ"
+						name="identifier"
+						[disabled]="register"
+						[(ngModel)]="login.identifier"
+						(ngModelChange)="checkUserNameExistance()" >
+					</ion-input>
 
-				<!--ion-label class="login__icon-label"
-					[hidden]="!register || usernameUsed"
-					fixed>
-					<ion-icon name="checkmark" />
-				</ion-label-->
+					<!--ion-label class="login__icon-label"
+						[hidden]="!register || usernameUsed"
+						fixed>
+						<ion-icon name="checkmark" />
+					</ion-label-->
 
-			</ion-item>
+				</ion-item>
 
-			<ion-item *ngIf="showPasswordFeld()"
-				class="clean-input-wrap login__input-wrap">
+				<ion-item *ngIf="showPasswordFeld()"
+					class="clean-input-wrap login__input-wrap">
 
-				<ion-input id="password"
-					class="login__input"
-					type="password"
-					placeholder="enter a password"
-					[(ngModel)]="login.password" >
-				</ion-input>
+					<ion-input id="password"
+						class="login__input"
+						type="password"
+						placeholder="enter a password"
+						name="password"
+						[(ngModel)]="login.password" >
+					</ion-input>
 
-			</ion-item>
+				</ion-item>
 
-			<ion-item *ngIf="showPasswordConfirmationField()"
-				class="clean-input-wrap login__input-wrap">
+				<ion-item *ngIf="showPasswordConfirmationField()"
+					class="clean-input-wrap login__input-wrap">
 
-				<ion-input class="login__input"
-					type="password"
-					placeholder="please type your password again"
-					[(ngModel)]="passwordRepeat">
-				</ion-input>
+					<ion-input class="login__input"
+						type="password"
+						placeholder="please type your password again"
+						name="password2"
+						[(ngModel)]="passwordRepeat">
+					</ion-input>
 
-			</ion-item>
+				</ion-item>
 
-			<p class="login__paragraph login__paragraph--detail">
-				By signing up, you agree to our <strong>Terms of Service</strong> and
-				our very strict <strong>Privacy Policy</strong>
-			</p>
+				<p class="login__paragraph login__paragraph--detail">
+					By signing up, you agree to our <strong>Terms of Service</strong> and
+					our very strict <strong>Privacy Policy</strong>
+				</p>
 
-			<div text-center padding>
-				<div class="hexagon">
-					<button ion-button icon-only color="light" class="hexagon__button" (click)="loginOrRegister()">
-						<ion-icon name="arrow-forward"></ion-icon>
-					</button>
+				<div text-center padding>
+					<div class="hexagon">
+						<button ion-button icon-only color="light" class="hexagon__button" type="submit">
+							<ion-icon name="arrow-forward"></ion-icon>
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 </ion-content>
