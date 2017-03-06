@@ -19,6 +19,12 @@ import { NewMessagePage } from "../../pages/new-message/new-message";
 })
 export class SettingsPage {
 	pushEnabled = true;
+	tutorialPassed = true;
+
+	resetTutorial() {
+		localStorage.setItem('tutorialPassed', '0');
+		window.location.reload(false);
+	}
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
