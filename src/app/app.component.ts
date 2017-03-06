@@ -23,7 +23,10 @@ export class MyApp {
 	slideNumber = 1;
 	advance() {
 		this.slideNumber++;
-		if (this.slideNumber === 6) { Tutorial.skip(); }
+		if (this.slideNumber === 6) {
+			this.slideNumber = 1;
+			Tutorial.skip();
+		}
 	}
 
 	langualge() {
