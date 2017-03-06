@@ -2,8 +2,6 @@ require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
-import { Globalization } from 'ionic-native';
-
 import { SafeUrl } from "../assets/pipes/safeStyle";
 
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
@@ -36,10 +34,6 @@ import { MainMenu } from "../components/mainMenu";
 import { SyntaxifyDirective } from '../components/syntaxify';
 
 (<any>window).startup = new Date().getTime();
-
-Globalization.getPreferredLanguage().then(({ value }) => {
-	alert(value)
-});
 
 @NgModule({
 	declarations: [

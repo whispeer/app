@@ -1,6 +1,7 @@
 import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController } from "ionic-angular";
 import { StatusBar, Splashscreen } from "ionic-native";
+import { Globalization } from 'ionic-native';
 
 import { HomePage } from '../pages/home/home';
 import { PushService } from "../assets/services/push.service";
@@ -29,35 +30,42 @@ export class MyApp {
 		}
 	}
 
-	langualge() {
-		return 'en'
-	}
-
+	lang = 'en';
 	currentSlide() {
-		return `assets/img/${this.langualge()}/tutorial_step${this.slideNumber}.png`
+		return `assets/img/${this.lang}/tutorial_step${this.slideNumber}.png`
 	}
 
 	tutorialClicked(event) {
-		const { offsetX, offsetY, target } = event
-		const { offsetHeight, offsetWidth, nodeName	} = target
+		const { offsetX, offsetY, target } = event;
+		const { offsetHeight, offsetWidth, nodeName } = target;
 
 		if (nodeName !== 'IMG') {
-			return this.advance()
+			return this.advance();
 		}
 
-		const px = offsetX / offsetWidth
-		const py = offsetY / offsetHeight
+		const px = offsetX / offsetWidth;
+		const py = offsetY / offsetHeight;
 
 		if ((0.73 < px) && (px < 0.98) && (0.03 < py) && (py < 0.10)) {
-			Tutorial.skip()
+			Tutorial.skip();
 		} else {
-			this.advance()
+			this.advance();
 		}
+	}
+
+	checkLanguage() {
+		Globalization.getPreferredLanguage().then(({ value }) => {
+			const en = (value.toLowerCase().indexOf('de') === -1);
+			this.lang = en ? 'en' : 'de';
+		}).catch(() => {
+			console.warn('Cannot get language from device, remaining with default language');
+		})
 	}
 
 	constructor(platform: Platform) {
 		platform.ready().then(() => {
-			Tutorial.checkVisibility()
+			Tutorial.checkVisibility();
+			this.checkLanguage();
 
 			// Okay, so the platform is ready and our plugins are available.
 			// Here you can do any higher level native things you might need.
