@@ -7,15 +7,14 @@ import { LoginPage } from "../pages/login/login"
 import { UserService } from "../assets/services/user.service";
 
 import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
-import { HexagonComponent } from "../components/hexagon";
+import { HexagonModule } from "../components/hexagonModule";
 
 import * as Bluebird from 'bluebird';
 
 @NgModule({
 	declarations: [
 		MyApp,
-		LoginPage,
-		HexagonComponent
+		LoginPage
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
@@ -24,12 +23,12 @@ import * as Bluebird from 'bluebird';
 			]
 		}),
 		QRCodeModule,
+		HexagonModule
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
 		MyApp,
-		LoginPage,
-		HexagonComponent
+		LoginPage
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},

@@ -30,7 +30,7 @@ import { GalleryComponent } from "../components/gallery/gallery";
 import { chooseFriends } from "../components/chooseFriends";
 import { MainMenu } from "../components/mainMenu";
 import { UserImageComponent } from "../components/userImage";
-import { HexagonComponent } from "../components/hexagon";
+import { HexagonModule } from "../components/hexagonModule";
 
 import { SyntaxifyDirective } from '../components/syntaxify';
 
@@ -53,7 +53,6 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		SafeUrl,
 		SyntaxifyDirective,
 		UserImageComponent,
-		HexagonComponent,
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
@@ -68,7 +67,8 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 				{ component: NewMessagePage, name: "New Message", segment: "newMessage/:receiverIds" }
 			]
 		}),
-		QRCodeModule
+		QRCodeModule,
+		HexagonModule
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
@@ -85,7 +85,6 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		chooseFriends,
 		MainMenu,
 		UserImageComponent,
-		HexagonComponent,
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler}
