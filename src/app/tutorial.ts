@@ -15,6 +15,12 @@ namespace Tutorial {
 		const passedVersion = parseInt(localStorage.getItem('tutorialPassed'), 10)
 		tutorialVisible = isNaN(passedVersion) || (passedVersion < tutorialVersion)
 	}
+
+	export function resetVisibility() {
+		console.log('resetting visibility')
+		localStorage.setItem('tutorialPassed', '0');
+		tutorialVisible = true;
+	}
 }
 
 export default Tutorial;

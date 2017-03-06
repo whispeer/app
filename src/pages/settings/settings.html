@@ -20,11 +20,13 @@
 		</ion-list-header>
 		<ion-item>
 			<ion-label>Receive push notifications</ion-label>
-			<ion-toggle [ngModel]="pushEnabled" (ngModelChange)="pushWarning()"></ion-toggle>
+			<ion-toggle checked="true" disabled (ngModelChange)="pushWarning()"></ion-toggle>
 		</ion-item>
 		<ion-item>
 			<ion-label>Show tutorial again</ion-label>
-			<ion-toggle [ngModel]="pushEnabled" (ngModelChange)="resetTutorial()"></ion-toggle>
+			<ion-toggle
+				[checked]="tutorialVisible()"
+				(ionChange)="resetTutorial($event)"></ion-toggle>
 		</ion-item>
 	</ion-list>
 	<ion-list>
