@@ -36,8 +36,12 @@ export class MyApp {
 		if (this.slideNumber === 6) { this.skip(); }
 	}
 
+	langualge() {
+		return 'en'
+	}
+
 	currentSlide() {
-		return `assets/img/tutorial_step${this.slideNumber}.png`
+		return `assets/img/${this.langualge()}tutorial_step${this.slideNumber}.png`
 	}
 
 	tutorialClicked(event) {
