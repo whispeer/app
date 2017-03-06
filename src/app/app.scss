@@ -25,28 +25,44 @@ ion-fab[fixed] {
 	position: fixed;
 }
 
-.hexagon {
-	display: inline-block;
-	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+.hexagon-wrap {
+	position: relative;
+}
 
-	background: map-get($colors, primary);
-	padding: 2px; }
+.hexagon {
+	height: 80px;
+
+	svg {
+		height: 80px;
+	}
+
+	.border {
+		fill: map-get($colors, primary);
+	}
+	.content {
+		fill: #fff;
+	}
+}
 
 .hexagon__button {
-	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-	border-radius: 0 !important;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -23px 0 0 -20px;
+	width: 40px;
+	height: 46px;
+	text-align: center;
 
-	width: 70px !important;
-	height: 80px !important;
-
+	background: transparent !important;
 	color: map-get($colors, grey);
 
 	.fab-close-icon {
-		line-height: 80px !important;
+		line-height: 43px !important;
 	}
 
 	.button-effect {
 		display: none !important;
+		visibility: hidden !important;
 	}
 }
 
@@ -75,53 +91,28 @@ ion-fab[fixed] {
 }
 
 .hexagon__image {
-	position: relative;
-
-	// reset ionic defaults
-	min-width: 0 !important;
-	min-height: 0 !important;
-
 	width: 54px !important;
 	height: 62px !important;
 
-	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-
-	background: map-get($colors, grey);
+	.border {
+		fill: map-get($colors, grey);
+	}
 }
 
-.hexagon__image__image {
-	position: absolute;
-	top: 2px; left: 2px;
-
-	height: calc(100% - 4px) !important;
-	width: calc(100% - 4px) !important;
-
-	background-size: cover;
-	background-position: center center;
-
-	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-	border-radius: 0 !important;
-}
-
-.hexagon__image--active {
-	background: map-get($colors, primary);
+.hexagon__image--active .border {
+	fill: map-get($colors, primary);
 }
 
 .hexagon__image--large {
 	width: 152px !important;
 	height: 175px !important;
-
-	.hexagon__image__image {
-		top: 3px; left: 3px;
-
-		height: calc(100% - 6px) !important;
-		width: calc(100% - 6px) !important;
-	}
 }
 
 .hexagon__image--medium {
 	width: 27px !important;
-	height: 31px !important;
+
+	min-width: 0 !important;
+	min-height: 0 !important;
 }
 
 .hexagon__image--small {

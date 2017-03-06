@@ -1,5 +1,6 @@
 <ion-fab center bottom fixed #fab>
-	<div class="hexagon hexagon--fab">
+	<div class="hexagon-wrap">
+		<hexagon class="hexagon hexagon--fab"></hexagon>
 		<button (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light">
 			<ion-icon name="{{icon}}"></ion-icon>
 		</button>

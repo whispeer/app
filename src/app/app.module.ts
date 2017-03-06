@@ -29,7 +29,8 @@ import { TopicComponent } from "../components/topicDisplay";
 import { GalleryComponent } from "../components/gallery/gallery";
 import { chooseFriends } from "../components/chooseFriends";
 import { MainMenu } from "../components/mainMenu";
-
+import { UserImageComponent } from "../components/userImage";
+import { HexagonComponent } from "../components/hexagon";
 
 import { SyntaxifyDirective } from '../components/syntaxify';
 
@@ -51,6 +52,8 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		MainMenu,
 		SafeUrl,
 		SyntaxifyDirective,
+		UserImageComponent,
+		HexagonComponent,
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
@@ -80,7 +83,9 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		TopicComponent,
 		GalleryComponent,
 		chooseFriends,
-		MainMenu
+		MainMenu,
+		UserImageComponent,
+		HexagonComponent,
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler}
