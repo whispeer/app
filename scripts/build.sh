@@ -36,7 +36,7 @@ echo "build for android 4"
 name=android-armv7-release
 extra=android4
 
-cordova plugin add cordova-plugin-crosswalk-webview@1.6.1
+cordova plugin add cordova-plugin-crosswalk-webview
 
 ionic build --release android
 signAndCopy
