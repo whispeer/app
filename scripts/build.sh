@@ -3,7 +3,7 @@ set -e
 set -x
 
 function signAndCopy {
-	jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ./release/my-release-key.keystore ./release/whispeer-$extra-unsigned.apk alias_name
+	jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -storepass $PASS -keystore ./release/my-release-key.keystore ./release/whispeer-$extra-unsigned.apk alias_name
 
 	rm -f ./release/whispeer-$extra.apk
 
