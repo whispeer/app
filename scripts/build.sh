@@ -35,7 +35,7 @@ cordova plugin add cordova-plugin-crosswalk-webview
 ./scripts/setVersionCode.js 0
 
 ionic build --release android
-cp ./platforms/android/build/outputs/apk/android-armv7-release-unsigned.apk ./release/whispeer-android4-unsigned.apk
+cp ./platforms/android/build/outputs/apk/android-release-unsigned.apk ./release/whispeer-android4-unsigned.apk
 
 rm -rf platforms
 rm -rf plugins
