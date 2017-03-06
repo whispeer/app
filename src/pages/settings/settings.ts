@@ -1,11 +1,9 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams } from "ionic-angular";
-
 import { HomePage } from "../home/home";
-
 import sessionService from "../../assets/services/session.service";
-
 import { NewMessagePage } from "../../pages/new-message/new-message";
+import Tutorial from "../../app/tutorial";
 
 /*
 	Generated class for the Settings page.
@@ -19,6 +17,21 @@ import { NewMessagePage } from "../../pages/new-message/new-message";
 })
 export class SettingsPage {
 	pushEnabled = true;
+	tutorialPassed = true;
+
+	tutorialVisible() {
+		return Tutorial.tutorialVisible
+	}
+
+	resetTutorial({ checked }) {
+		if (!checked) return;
+		Tutorial.resetVisibility()
+		try {
+			this.goBack();
+		} catch(e) {
+			console.log('Something went wrong when exiting settings')
+		}
+	}
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
