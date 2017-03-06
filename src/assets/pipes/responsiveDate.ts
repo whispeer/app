@@ -18,15 +18,20 @@ export class ResponsiveDatePipe {
 		}
 
 		let format: string;
-		let now: Date =  new Date;
-		now.setHours(0, 0, 0, 0);
-		const diff: number = (now.getTime() - value.getTime()) / 1000;
 
-		if(diff < 86400) {
+		let now: Date = new Date;
+		now.setHours(0, 0, 0, 0);
+
+		let date_norm: Date = new Date(value);
+		date_norm.setHours(0, 0, 0, 0);
+
+		const diff_norm: number = (now.getTime() - date_norm.getTime()) / 1000;
+
+		if(diff_norm === 0) { // same day
 			format = "HH:mm";
-		} else if(diff < 172800) {
+		} else if(diff_norm <= 86400) {
 			return "Yesterday"; // TODO: localize!!
-		} else if(diff < 518400) {
+		} else if(diff_norm <= 518400) {
 			format = "EEEE";
 		} else {
 			format = "dd.MM.y"
