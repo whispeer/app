@@ -24,8 +24,12 @@ export class SettingsPage {
 	}
 
 	resetTutorial({ checked }) {
-		if (checked) {
-			Tutorial.resetVisibility()
+		if (!checked) return;
+		Tutorial.resetVisibility()
+		try {
+			this.goBack();
+		} catch(e) {
+			console.log('Something went wrong when exiting settings')
 		}
 	}
 
