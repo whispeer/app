@@ -53,19 +53,20 @@ export class MyApp {
 		}
 	}
 
-	checkLanguage() {
+	initializeTutorialWithLanguage() {
 		Globalization.getPreferredLanguage().then(({ value }) => {
 			const en = (value.toLowerCase().indexOf('de') === -1);
 			this.lang = en ? 'en' : 'de';
 		}).catch(() => {
 			console.warn('Cannot get language from device, remaining with default language');
+		}).then(() => {
+			Tutorial.checkVisibility();
 		})
 	}
 
 	constructor(platform: Platform) {
 		platform.ready().then(() => {
-			Tutorial.checkVisibility();
-			this.checkLanguage();
+			this.initializeTutorialWithLanguage();
 
 			// Okay, so the platform is ready and our plugins are available.
 			// Here you can do any higher level native things you might need.
