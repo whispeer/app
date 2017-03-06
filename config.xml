@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="whispeer.app" version="0.2.2" android-versionCode="2200" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="whispeer.app" version="0.2.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
 	<name>whispeer Messenger</name>
 	<description>Whispeer Messenger.</description>
 	<author email="support@whispeer.de" href="https://whispeer.de/">Whispeer Team</author>
