@@ -20,7 +20,8 @@
 					*ngIf="topic.partners.length > 3"
 					class="hexagon__image hexagon__image--medium"
 				>
-					<user-image [id]="topic.partners[3].id"></user-image>
+					<hexagon></hexagon>
+					<span class="hexagon__image__image topic__remainingUsers">+{{topic.partners.length - 2}}</span>
 				</ion-avatar>
 			</div>
 			<h2 class="user__name">

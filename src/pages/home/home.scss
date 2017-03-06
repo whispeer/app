@@ -61,7 +61,13 @@ page-home {
 }
 
 .topic__remainingUsers {
-	background-color: map-get($colors, light);
+	position: absolute;
+	top: 11px;
+	left: 0;
+	width: 100%;
+	background: transparent;
+	padding: 0 2px;
+	box-sizing: border-box;
 
 	font-size: 0.65em;
 
@@ -69,7 +75,6 @@ page-home {
 	align-items: center;
 	justify-content: center;
 
-	padding: 2px;
 	box-sizing: border-box;
 
 	overflow: hidden;
