@@ -16,9 +16,6 @@ function signAndCopy {
 
 echo "build for android >= 5"
 
-name=android-release
-extra=android
-
 sed -i .bak 's/android-minSdkVersion" value="16"/android-minSdkVersion" value="21"/g' config.xml
 rm -rf platforms
 rm -rf plugins
@@ -29,16 +26,20 @@ cordova prepare
 ionic build android --prod --release
 mv config.xml.bak config.xml
 
-signAndCopy
-
 echo "build for android 4"
-
-name=android-armv7-release
-extra=android4
 
 cordova plugin add cordova-plugin-crosswalk-webview
 
 ionic build --release android
+
+name=android-release
+extra=android
+
+signAndCopy
+
+name=android-armv7-release
+extra=android4
+
 signAndCopy
 
 rm -rf platforms
