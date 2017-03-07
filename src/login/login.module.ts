@@ -7,6 +7,7 @@ import { LoginPage } from "../pages/login/login"
 import { UserService } from "../assets/services/user.service";
 
 import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
+import { HexagonModule } from "../components/hexagonModule";
 
 import * as Bluebird from 'bluebird';
 
@@ -21,7 +22,8 @@ import * as Bluebird from 'bluebird';
 				{ component: LoginPage, name: "Login", segment: "login" },
 			]
 		}),
-		QRCodeModule
+		QRCodeModule,
+		HexagonModule
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [

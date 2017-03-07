@@ -12,13 +12,11 @@
 
 		<form (ngSubmit)="loginOrRegister()">
 			<div class="login__form">
-
 				<p class="login__paragraph login__paragraph--primary">
 					{{ getMessage() }}
 				</p>
 
 				<ion-item class="clean-input-wrap login__input-wrap">
-
 					<ion-input id="mail"
 						class="login__input"
 						type="text"
@@ -66,9 +64,9 @@
 					By signing up, you agree to our <strong>Terms of Service</strong> and
 					our very strict <strong>Privacy Policy</strong>
 				</p>
-
 				<div text-center padding>
-					<div class="hexagon">
+					<div class="hexagon-wrap">
+						<hexagon class="hexagon"></hexagon>
 						<button ion-button icon-only color="light" class="hexagon__button" type="submit">
 							<ion-icon name="arrow-forward"></ion-icon>
 						</button>
