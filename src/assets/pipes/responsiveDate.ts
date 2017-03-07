@@ -19,7 +19,7 @@ export class ResponsiveDatePipe {
 
 		let format: string;
 
-		let now: Date = new Date;
+		let now: Date = new Date();
 		now.setHours(0, 0, 0, 0);
 
 		let date_norm: Date = new Date(value);
@@ -27,11 +27,13 @@ export class ResponsiveDatePipe {
 
 		const diff_norm: number = (now.getTime() - date_norm.getTime()) / 1000;
 
+		const YESTERDAY = 24 * 60 * 60
+
 		if(diff_norm === 0) { // same day
 			format = "HH:mm";
-		} else if(diff_norm <= 86400) {
-			return "Yesterday"; // TODO: localize!!
-		} else if(diff_norm <= 518400) {
+		} else if(diff_norm == YESTERDAY) {
+			return "Yesterday";
+		} else if(diff_norm <= YESTERDAY * 6) {
 			format = "EEEE";
 		} else {
 			format = "dd.MM.y"
