@@ -6,13 +6,14 @@ page-profile {
 	border-top: none !important;
 }
 
-.item-block:first-child:not(:last-child),
-.item-block:last-child:not(:first-child) {
+.item-block:first-child:not(:last-child) {
 	border: none !important;
 }
 
 .profile__info {
 	color: map-get($colors, dark) !important;
+
+	padding: 11px 0;
 }
 
 .profile__avatar-row {
@@ -37,8 +38,21 @@ page-profile {
 	margin: auto;
 }
 
+.profile__big-name {
+	margin-top: 3rem;
+	margin-bottom: 0;
+
+	font-weight: 400;
+}
+
+.profile__small-name {
+	margin-top: 0;
+
+	font-weight: 400;
+}
+
 .profile__info-list {
-	margin-top: 3em;
+	margin-top: 1rem;
 }
 
 .profile__qr {

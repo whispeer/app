@@ -16,7 +16,8 @@ const friendsService = require("../../assets/services/friendsService");
 export class ProfilePage {
 	user: any = {
 		basic: {},
-		names: {}
+		names: {},
+		advanced: {}
 	};
 
 	userObject: any;

@@ -71,18 +71,40 @@
 			<ion-avatar *ngIf="isOwn" class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 				<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 			</ion-avatar>
+			<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
+			<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firtname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
 			<ion-list class="profile__info-list space-for-fab">
-				<ion-item>
-					<ion-label fixed color="primaryDarker" text-right>Account</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.names.nickname}}</p>
+				<ion-item *ngIf="user.advanced.birthday">
+					<ion-label fixed color="primaryDarker" text-right>Birthday</ion-label>
+					<p item-content class="profile__info">{{user.advanced.birthday.day}}.<span *ngIf="user.advanced.birthday.month.length === 1">0</span>{{user.advanced.birthday.month}}.{{user.advanced.birthday.year}}</p>
 				</ion-item>
-				<ion-item>
-					<ion-label fixed color="primaryDarker" text-right>Name</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.names.firstname}}</p>
+				<ion-item *ngIf="user.advanced.location">
+					<ion-label fixed color="primaryDarker" text-right>Location</ion-label>
+					<p item-content class="profile__info">{{user.advanced.location.town}} {{user.advanced.location.country}}</p>
 				</ion-item>
-				<ion-item>
-					<ion-label fixed color="primaryDarker" text-right>Surname</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.names.lastname}}</p>
+				<!-- <ion-item *ngIf="user.advanced.relationship">
+					<ion-label fixed color="primaryDarker" text-right>Relationship</ion-label>
+					<p item-content class="profile__info">{{user.advanced.location.town}} {{user.advanced.location.country}}</p>
+				</ion-item> -->
+				<ion-item *ngIf="user.advanced.education">
+					<ion-label fixed color="primaryDarker" text-right>Education</ion-label>
+					<p item-content class="profile__info">
+						<span *ngFor="let school of user.advanced.education; let last = last">{{school.name}}{{last ? '' : ', '}}</span>
+					</p>
+				</ion-item>
+				<ion-item *ngIf="user.advanced.work">
+					<ion-label fixed color="primaryDarker" text-right>Work</ion-label>
+					<p item-content class="profile__info">{{user.advanced.work.what}} at {{user.advanced.work.where}}</p>
+				</ion-item>
+				<!-- <ion-item *ngIf="user.advanced.gender">
+					<ion-label fixed color="primaryDarker" text-right>Gender</ion-label>
+					<p item-content class="profile__info">{{user.advanced.work.what}} at {{user.advanced.work.where}}</p>
+				</ion-item> -->
+				<ion-item *ngIf="user.advanced.languages">
+					<ion-label fixed color="primaryDarker" text-right>Languages</ion-label>
+					<p item-content class="profile__info">
+						<span *ngFor="let language of user.advanced.languages; let last = last">{{language.name}}{{last ? '' : ', '}}</span>
+					</p>
 				</ion-item>
 			</ion-list>
 		</div>
