@@ -13,6 +13,7 @@
 
 <ion-content>
 	<ion-searchbar animated [(ngModel)]="searchTerm"></ion-searchbar>
+	<ion-spinner *ngIf="friendsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list>
 		<ion-item *ngFor="let friend of getFriendsResults();">
 			<ion-label>{{friend.name}}</ion-label>

@@ -15,6 +15,7 @@ import * as Bluebird from 'bluebird';
 })
 export class chooseFriends {
 	friends: any[];
+	friendsLoading: boolean = true;
 	searchTerm: string = "";
 	selectedUsers: any = {};
 
@@ -37,11 +38,13 @@ export class chooseFriends {
 	}
 
 	private loadFriendsUsers = () => {
+		this.friendsLoading = true;
 		return Bluebird.try(() => {
 			var friends = friendsService.getFriends();
 			return userService.getMultipleFormatted(friends);
 		}).then((result) => {
 			this.friends = result;
+			this.friendsLoading = false;
 		});
 	}
 
