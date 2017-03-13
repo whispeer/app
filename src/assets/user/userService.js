@@ -4,6 +4,8 @@ var signatureCache = require("crypto/signatureCache");
 var Bluebird = require("bluebird");
 var trustManager = require("crypto/trustManager");
 
+var sjcl = require("sjcl");
+
 var errorService = require("services/error.service.ts").errorServiceInstance;
 var keyStoreService = require("crypto/keyStore");
 var socketService = require("services/socket.service.ts").default;
@@ -323,6 +325,16 @@ function loadOwnUser(data, server) {
 	}).then(function (user) {
 		requestKeyService.cacheKey(user.getSignKey(), "user-sign-" + user.getID(), requestKeyService.MAXCACHETIME);
 		requestKeyService.cacheKey(user.getMainKey(), "user-main-" + user.getID(), requestKeyService.MAXCACHETIME);
+	}).catch(function (e) {
+		if (e instanceof sjcl.exception.corrupt) {
+			alert("Password did not match. Logging out")
+
+			sessionService.logout();
+
+			return new Bluebird(function () {});
+		}
+
+		return Bluebird.reject(e)
 	});
 }
 
