@@ -54,6 +54,14 @@ page-profile {
 .profile__qr {
 	display: block;
 	text-align: center;
+	img {
+		max-width: 400px;
+		border: 0;
+		width: 60vw;
+		height: 60vw;
+		margin: 5vw;
+		max-height: 400px;
+	}
 }
 
 .fingerprint {
