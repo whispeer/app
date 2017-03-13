@@ -23,7 +23,7 @@
 			<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 		</ion-avatar>
 		<div class="profile__request-hex" id="request__decline">
-			<img src="/assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
+			<img src="/assets/images/icons/deny.svg" class="profile__request-button" id="request__accept__button" (click)="declineRequest()">
 		</div>
 	</div>
 	<ion-list class="profile__info-list space-for-fab">
@@ -40,7 +40,7 @@
 			<p item-content padding-horizontal class="profile__info">{{user.names.lastname}}</p>
 		</ion-item>
 	</ion-list>
-	<main-menu [icon]="'close'"></main-menu>
+	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
 </ion-content>
 
 <ion-content padding *ngIf="!isRequest && !isRequestable">
