@@ -61,7 +61,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		IonicModule.forRoot(MyApp, {}, {
 			links: [
 				{ component: HomePage, name: "Home", segment: "home" },
-				{ component: MessagesPage, name: "Messages", segment: "messages/:topicId" },
+				{ component: MessagesPage, name: "Messages", segment: "messages/:topicId", defaultHistory: [HomePage] },
 				{ component: ContactsPage, name: "Contacts", segment: "contacts" },
 				{ component: ContactRequestsPage, name: "Requests", segment: "requests" },
 				{ component: ProfilePage, name: "Profile", segment: "profile/:userId" },
