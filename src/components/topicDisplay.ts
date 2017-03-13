@@ -86,42 +86,43 @@ export class TopicComponent {
 
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({
-			title: "What do you want to send?",
-			buttons: [{
-				text: "Select from Gallery",
-				handler: () => {
-					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
-						return this.getFile(result, "image/png");
-					}).map((file: any) => {
-						return new ImageUpload(file);
-					}).then((images) => {
-						this.sendMessage.emit({
-							images: images,
-							text: ""
+			buttons: [
+				{
+					text: "Take Photo",
+					handler: () => {
+						Camera.getPicture(CameraOptions).then((url) => {
+							return this.getFile(url, "image/png");
+						}).then((file: any) => {
+							return new ImageUpload(file);
+						}).then((image) => {
+							this.sendMessage.emit({
+								images: [image],
+								text: ""
+							});
 						});
-					});
-				}
-			}, {
-				text: "Take Photo",
-				handler: () => {
-					Camera.getPicture(CameraOptions).then((url) => {
-						return this.getFile(url, "image/png");
-					}).then((file: any) => {
-						return new ImageUpload(file);
-					}).then((image) => {
-						this.sendMessage.emit({
-							images: [image],
-							text: ""
+					}
+				}, {
+					text: "Select from Gallery",
+					handler: () => {
+						Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+							return this.getFile(result, "image/png");
+						}).map((file: any) => {
+							return new ImageUpload(file);
+						}).then((images) => {
+							this.sendMessage.emit({
+								images: images,
+								text: ""
+							});
 						});
-					});
+					}
+				}, {
+					text: "Cancel",
+					role: "cancel",
+					handler: () => {
+						console.log("Cancel clicked.");
+					}
 				}
-			}, {
-				text: "Cancel",
-				role: "cancel",
-				handler: () => {
-					console.log("Cancel clicked.");
-				}
-			}]
+			]
 		});
 
 		actionSheet.present();
