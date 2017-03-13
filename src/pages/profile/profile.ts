@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, ActionSheetController, AlertController, Platform } from 'ionic-angular';
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
 import { HomePage } from "../home/home";
+import { NewMessagePage } from "../new-message/new-message";
 
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
@@ -32,7 +33,7 @@ export class ProfilePage {
 
 	profileLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCrtl: AlertController, private platform: Platform) {}
 
 	ngOnInit() {
 		this.userId = parseFloat(this.navParams.get("userId"));
@@ -102,6 +103,37 @@ export class ProfilePage {
 			this.profileLoading = false;
 			this.isRequest = false;
 		});
+	}
+
+	writeMessage() {
+		this.navCtrl.push(NewMessagePage, { receiverIds: this.user.id });
+	}
+
+	contactOptions() {
+		this.actionSheetCtrl.create({
+			buttons: [{
+				text: "Remove from Contacts",
+				role: "destructive",
+				icon: !this.platform.is("ios") ? "trash" : null,
+				handler: () => {
+					this.alertCrtl.create({
+						title: "Remove Contact",
+						message: "Are you sure that you want to remove this Contact?",
+						buttons: [{
+							text: "Cancel",
+							role: "cancel"
+						}, {
+							text: "Remove",
+							role: "destructive",
+							cssClass: "alert-button-danger",
+							handler: () => {
+								this.user.user.removeAsFriend();
+							}
+						}]
+					}).present();
+				}
+			}]
+		}).present();
 	}
 
 	close = () => {

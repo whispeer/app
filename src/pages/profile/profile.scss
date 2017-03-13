@@ -20,27 +20,17 @@ page-profile {
 }
 
 .profile__request-hex {
+	display: flex;
+	align-content: center;
+	justify-content: center;
+
 	margin: auto;
-	//height: 64px !important;
-	flex-grow: 0;
-	flex-shrink: 0;
+
+	width: 50px;
 }
 
 .profile__request-button {
-
-}
-
-#request__decline {
-	background-color: map-get($colors, highlight);
-}
-
-#request__decline__button {
-	background-color: map-get($colors, highlight);
-	color: map-get($colors, grey);
-}
-
-#request__accept__button {
-	color: map-get($colors, light);
+	margin: auto auto 0;
 }
 
 .profile__image {
