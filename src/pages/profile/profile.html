@@ -16,14 +16,14 @@
 	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<h4 class="text-primary text-medium" text-center padding>Add this person as a contact?</h4>
 	<div class="profile__avatar-row">
-		<div class="profile__request-hex" (click)="acceptRequest()">
-			<img src="/assets/images/icons/add.svg" class="profile__request-button" id="request__accept__button">
+		<div class="profile__request-hex">
+			<img src="/assets/images/icons/add.svg" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()">
 		</div>
 		<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 			<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 		</ion-avatar>
-		<div class="profile__request-hex" id="request__decline" (click)="writeMessage()">
-			<img src="/assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button">
+		<div class="profile__request-hex" id="request__decline">
+			<img src="/assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
 		</div>
 	</div>
 	<ion-list class="profile__info-list space-for-fab">
@@ -58,14 +58,14 @@
 	<div [ngSwitch]="view">
 		<div *ngSwitchCase="'profile'">
 			<div *ngIf="!isOwn" class="profile__avatar-row">
-				<div class="profile__request-hex" (click)="contactOptions()">
-					<img src="/assets/images/icons/added.svg" class="profile__request-button" id="request__accept__button">
+				<div class="profile__request-hex">
+					<img src="/assets/images/icons/added.svg" class="profile__request-button" id="request__accept__button" (click)="contactOptions()">
 				</div>
 				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 				</ion-avatar>
-				<div class="profile__request-hex" id="request__decline" (click)="writeMessage()">
-					<img src="/assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button">
+				<div class="profile__request-hex" id="request__decline">
+					<img src="/assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
 				</div>
 			</div>
 			<ion-avatar *ngIf="isOwn" class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
