@@ -1,6 +1,6 @@
 import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core";
 
-import { NavController, ActionSheetController, Content, Footer } from "ionic-angular";
+import { NavController, ActionSheetController, Platform, Content, Footer } from "ionic-angular";
 
 import { ProfilePage } from "../pages/profile/profile";
 
@@ -17,7 +17,7 @@ const ImagePickerOptions = {
 };
 
 const CameraOptions = {
-	destinationType: 2,
+	destinationType: 1, // value 2 breaks ios.
 	allowEdit: true,
 	encodingType: 0,
 	targetWidth: ImagePickerOptions.width,
@@ -42,7 +42,7 @@ export class TopicComponent {
 
 	newMessageText = "";
 
-	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController,) {}
+	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController, private platform: Platform) {}
 
 	contentHeight = 0;
 	footerHeight = 0;
@@ -77,8 +77,9 @@ export class TopicComponent {
 			});
 		}).then((file: any) => {
 			file.originalUrl = url;
-			// TODO: check if platform is iOS!
-			file.localURL = url.replace("file://", "http://ionic.local");
+			if(this.platform.is("ios")) {
+				file.localURL = url.replace("file://", "http://ionic.local");
+			}
 			file.type = type;
 
 			return file;
