@@ -22,19 +22,19 @@ $fab-size: 76px;
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
 
-$colors: (
-	primary:		#5ab70d,
-	primaryDarker:	#3a8100,
-	secondary:		#013c4c,
-	danger:			#f53d3d,
-	light:			#fff,
-	dark:			#545b5e,
-	grey:			#788286,
-	light_grey:		#f9f9f9,
-	other_grey:		#e5e5e5,
-	blue_grey:		#d8dfe2,
-	more_grey:		#efeff4,
-	highlight:		#ffeda5
+$colors:  (
+	primary: #5ab70d,
+	primaryDarker: #3a8100,
+	secondary: #013c4c,
+	danger: #f53d3d,
+	light: #fff,
+	dark: #545b5e,
+	grey: #788286,
+	light_grey: #f9f9f9,
+	other_grey: #e5e5e5,
+	blue_grey: #d8dfe2,
+	more_grey: #efeff4,
+	highlight: #ffeda5
 );
 
 // $primary: #3a8100;
