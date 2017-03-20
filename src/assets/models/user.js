@@ -99,7 +99,7 @@ function User (providedData) {
 	var addFriendState = new State.default();
 	var ignoreFriendState = new State.default();
 
-	var basicDataLoaded = false;
+	var loadBasicDataPromise;
 
 	this.data = {};
 
@@ -363,7 +363,7 @@ function User (providedData) {
 		}).then(function () {
 			myProfile.updated();
 
-			basicDataLoaded = false;
+			loadBasicDataPromise = null;
 			return theUser.loadFullData();
 		}).nodeify(cb);
 	};
@@ -558,60 +558,58 @@ function User (providedData) {
 	};
 
 	this.reLoadBasicData = function (cb) {
-		basicDataLoaded = false;
+		loadBasicDataPromise = null;
 		this.loadBasicData(cb);
 	};
 
 	this.loadBasicData = function (cb) {
-		if (basicDataLoaded) {
-			return Bluebird.resolve().nodeify(cb);
-		}
+		if (!loadBasicDataPromise) {
+			loadBasicDataPromise = Bluebird.try(function () {
+				return Bluebird.all([
+					theUser.getShortName(),
+					theUser.getName(),
+					theUser.getTrustLevel(),
+					theUser.verify()
+				]);
+			}).spread(function (shortname, names, trustLevel, signatureValid) {
+				theUser.data.signatureValid = signatureValid;
 
-		return Bluebird.try(function () {
-			return Bluebird.all([
-				theUser.getShortName(),
-				theUser.getName(),
-				theUser.getTrustLevel(),
-				theUser.verify()
-			]);
-		}).spread(function (shortname, names, trustLevel, signatureValid) {
-			basicDataLoaded = true;
+				theUser.data.me = theUser.isOwn();
+				theUser.data.other = !theUser.isOwn();
 
-			theUser.data.signatureValid = signatureValid;
+				theUser.data.trustLevel = trustLevel;
 
-			theUser.data.me = theUser.isOwn();
-			theUser.data.other = !theUser.isOwn();
+				theUser.data.online = friendsService.onlineStatus(theUser.getID()) || 0;
 
-			theUser.data.trustLevel = trustLevel;
+				friendsService.listen(function (status) {
+					theUser.data.online = status;
+				}, "online:" + theUser.getID());
 
-			theUser.data.online = friendsService.onlineStatus(theUser.getID()) || 0;
+				theUser.data.name = names.name;
+				theUser.data.names = names;
 
-			friendsService.listen(function (status) {
-				theUser.data.online = status;
-			}, "online:" + theUser.getID());
+				theUser.data.basic.shortname = shortname;
 
-			theUser.data.name = names.name;
-			theUser.data.names = names;
-
-			theUser.data.basic.shortname = shortname;
-
-			friendsService.awaitLoading().then(function () {
-				theUser.data.added = friendsService.didIRequest(theUser.getID());
-				theUser.data.isMyFriend = friendsService.areFriends(theUser.getID());
-
-				friendsService.listen(function () {
+				friendsService.awaitLoading().then(function () {
 					theUser.data.added = friendsService.didIRequest(theUser.getID());
 					theUser.data.isMyFriend = friendsService.areFriends(theUser.getID());
+
+					friendsService.listen(function () {
+						theUser.data.added = friendsService.didIRequest(theUser.getID());
+						theUser.data.isMyFriend = friendsService.areFriends(theUser.getID());
+					});
 				});
+
+				theUser.data.addFriendState = addFriendState.data;
+				theUser.data.ignoreFriendState = ignoreFriendState.data;
+
+				theUser.loadImage();
+
+				return null;
 			});
+		}
 
-			theUser.data.addFriendState = addFriendState.data;
-			theUser.data.ignoreFriendState = ignoreFriendState.data;
-
-			theUser.loadImage();
-
-			return null;
-		}).nodeify(cb);
+		return loadBasicDataPromise.nodeify(cb)
 	};
 
 	this.setMigrationState = function (migrationState, cb) {
