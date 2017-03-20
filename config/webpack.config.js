@@ -25,6 +25,7 @@ module.exports = {
 			workerQueue: "worker/worker-queue",
 			PromiseWorker: "worker/worker-loader",
 			imageLib: "blueimp-load-image/js/load-image",
+			toBlob: "blueimp-canvas-to-blob/js/canvas-to-blob"
 		}
 	},
 

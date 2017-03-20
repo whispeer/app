@@ -1,6 +1,8 @@
 /**
 * imageUploadService
 **/
+require("toBlob");
+
 var h = require("whispeerHelper");
 var Progress = require("asset/Progress");
 var Queue = require("asset/Queue");
