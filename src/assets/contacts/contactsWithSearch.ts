@@ -43,7 +43,11 @@ export class ContactsWithSearch {
 
 		if(recordIndex === 0) {
 			if (this.searchTerm) {
-				return "Contacts";
+				if (record.isMyFriend) {
+					return "Contacts";
+				} else {
+					return "Global";
+				}
 			}
 
 			return firstChar.toUpperCase();
