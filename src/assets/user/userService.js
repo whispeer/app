@@ -127,7 +127,7 @@ function doLoad(identifier, cb) {
 	}).nodeify(cb);
 }
 
-var delay = h.delayMultiplePromise(Bluebird, THROTTLE, doLoad, 5);
+var delay = h.delayMultiplePromise(Bluebird, THROTTLE, doLoad, 10);
 
 function loadUser(identifier, cb) {
 	return Bluebird.try(function () {
