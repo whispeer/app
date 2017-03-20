@@ -74,18 +74,18 @@
 			<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
 			<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firtname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
 			<ion-list class="profile__info-list space-for-fab">
-				<ion-item *ngIf="user.advanced.birthday">
+				<ion-item *ngIf="attributeSet(user.advanced.birthday)">
 					<ion-label fixed color="primaryDarker" text-right>Birthday</ion-label>
-					<p item-content class="profile__info">{{user.advanced.birthday.day}}.<span *ngIf="user.advanced.birthday.month.length === 1">0</span>{{user.advanced.birthday.month}}.{{user.advanced.birthday.year}}</p>
+					<p item-content class="profile__info">{{user.advanced.birthday.day}}.<span *ngIf="user.advanced.birthday.month && user.advanced.birthday.month.length === 1">0</span>{{user.advanced.birthday.month}}.{{user.advanced.birthday.year}}</p>
 				</ion-item>
-				<ion-item *ngIf="user.advanced.location">
+				<ion-item *ngIf="attributeSet(user.advanced.location)">
 					<ion-label fixed color="primaryDarker" text-right>Location</ion-label>
 					<p item-content class="profile__info">{{user.advanced.location.town}} {{user.advanced.location.country}}</p>
 				</ion-item>
 				<!-- <ion-item *ngIf="user.advanced.relationship">
 					<ion-label fixed color="primaryDarker" text-right>Relationship</ion-label>
 					<p item-content class="profile__info">{{user.advanced.location.town}} {{user.advanced.location.country}}</p>
-				</ion-item> -->
+				</ion-item>
 				<ion-item *ngIf="user.advanced.education">
 					<ion-label fixed color="primaryDarker" text-right>Education</ion-label>
 					<p item-content class="profile__info">
@@ -96,11 +96,11 @@
 					<ion-label fixed color="primaryDarker" text-right>Work</ion-label>
 					<p item-content class="profile__info">{{user.advanced.work.what}} at {{user.advanced.work.where}}</p>
 				</ion-item>
-				<!-- <ion-item *ngIf="user.advanced.gender">
+				<ion-item *ngIf="user.advanced.gender">
 					<ion-label fixed color="primaryDarker" text-right>Gender</ion-label>
 					<p item-content class="profile__info">{{user.advanced.work.what}} at {{user.advanced.work.where}}</p>
 				</ion-item> -->
-				<ion-item *ngIf="user.advanced.languages">
+				<ion-item *ngIf="attributeSet(user.advanced.languages)">
 					<ion-label fixed color="primaryDarker" text-right>Languages</ion-label>
 					<p item-content class="profile__info">
 						<span *ngFor="let language of user.advanced.languages; let last = last">{{language.name}}{{last ? '' : ', '}}</span>
