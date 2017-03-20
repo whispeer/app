@@ -14,7 +14,7 @@
 <ion-content>
 	<ion-searchbar *ngIf="!contactsLoading" animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<ion-list [virtualScroll]="getContactsWithSelected()" [headerFn]="contactDividersWithSelected" class="friends__list" class="space-for-fab">
+	<ion-list [virtualScroll]="getContactsWithSelected()" [headerFn]="contactDividersWithSelected" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
 		</ion-item-divider>

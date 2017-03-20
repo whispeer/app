@@ -21,7 +21,7 @@
 			<ion-note item-right><span>Details&nbsp;</span><ion-icon name="arrow-forward"></ion-icon></ion-note>
 		</ion-item>
 	</ion-list>
-	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list">
+	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
 		</ion-item-divider>
