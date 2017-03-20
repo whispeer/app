@@ -23,9 +23,27 @@ export class chooseFriends {
 
 	constructor(public navCtrl: NavController) {}
 
+	hasReceiverParam() {
+		const type = typeof this.receiverString;
+
+		return ["number", "string"].indexOf(type) > -1;
+	}
+
+	getReceiverParam() {
+		if (typeof this.receiverString === "number") {
+			return [this.receiverString];
+		}
+
+		if (typeof this.receiverString === "string") {
+			return this.receiverString.split(",").map((r) => { return parseInt(r, 10) });
+		}
+
+		throw new Error("invalid receiver param");
+	}
+
 	ngOnInit() {
-		if (this.receiverString) {
-			return userService.getMultipleFormatted(this.receiverString.split(",")).then((users) => {
+		if (this.hasReceiverParam()) {
+			return userService.getMultipleFormatted(this.getReceiverParam()).then((users) => {
 				this.send(users);
 			})
 		}
