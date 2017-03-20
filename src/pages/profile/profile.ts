@@ -42,7 +42,9 @@ export class ProfilePage {
 			var requests = friendsService.getRequests();
 			this.isRequest = requests.indexOf(this.userId) > -1
 
-			this.isRequestable = friendsService.noRequests(this.userId);
+			this.isOwn = this.userId === parseFloat(sessionService.userid);
+
+			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn;
 		});
 
 		Bluebird.all([
@@ -54,8 +56,6 @@ export class ProfilePage {
 				this.profileLoading = false;
 				return;
 			}
-
-			this.isOwn = this.userId === parseFloat(sessionService.userid);
 
 			var fp = user.getFingerPrint();
 			this.fingerprint = [fp.substr(0,13), fp.substr(13,13), fp.substr(26,13), fp.substr(39,13)];

@@ -1,15 +1,18 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
 		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
-			<div class="hexagon__image__image" [style.background-image]="partners[0].basic.image | safeUrl"></div>
+			<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>
 		</ion-avatar>
 		<ion-title *ngIf="partners.length == 1">
 			<span (click)="goToProfile(partners[0].id)">{{ partners[0].name }}</span>
 		</ion-title>
-		<ion-title *ngIf="partners.length != 1">
+		<ion-title *ngIf="partners.length != 1 && !(topic && topic.title)">
 			<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
 				{{ partner.basic.shortname }}{{ l ? "":", " }}
 			</span>
+		</ion-title>
+		<ion-title *ngIf="topic && topic.title">
+			{{topic.title}}
 		</ion-title>
 	</ion-navbar>
 </ion-header>
@@ -37,7 +40,7 @@
 </ion-content>
 
 <ion-footer>
-	<div class="messages__form" ion-fixed>
+	<div class="messages__form">
 		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
 			<ion-icon name="add-circle"></ion-icon>
 		</button>

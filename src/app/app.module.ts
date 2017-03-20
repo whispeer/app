@@ -3,8 +3,10 @@ require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
 import { SafeUrl } from "../assets/pipes/safeStyle";
+import { ResponsiveDatePipe } from "../assets/pipes/responsiveDate";
 
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
+import { DatePipe } from "@angular/common";
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
@@ -29,7 +31,8 @@ import { TopicComponent } from "../components/topicDisplay";
 import { GalleryComponent } from "../components/gallery/gallery";
 import { chooseFriends } from "../components/chooseFriends";
 import { MainMenu } from "../components/mainMenu";
-
+import { UserImageComponent } from "../components/userImage";
+import { HexagonModule } from "../components/hexagonModule";
 
 import { SyntaxifyDirective } from '../components/syntaxify';
 
@@ -51,6 +54,8 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		MainMenu,
 		SafeUrl,
 		SyntaxifyDirective,
+		ResponsiveDatePipe,
+		UserImageComponent,
 	],
 	imports: [
 		IonicModule.forRoot(MyApp, {}, {
@@ -65,7 +70,8 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 				{ component: NewMessagePage, name: "New Message", segment: "newMessage/:receiverIds" }
 			]
 		}),
-		QRCodeModule
+		QRCodeModule,
+		HexagonModule
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
@@ -80,10 +86,12 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		TopicComponent,
 		GalleryComponent,
 		chooseFriends,
-		MainMenu
+		MainMenu,
+		UserImageComponent,
 	],
 	providers: [
-		{provide: ErrorHandler, useClass: IonicErrorHandler}
+		{provide: ErrorHandler, useClass: IonicErrorHandler},
+		DatePipe
 	]
 })
 export class AppModule {

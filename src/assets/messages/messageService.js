@@ -16,27 +16,28 @@ var Topic = require("models/topic");
 
 var messageService;
 
-function addSocketMessage(messageData) {
-	if (messageData) {
-		var messageToAdd;
-
-		Bluebird.try(function () {
-			return Topic.messageFromData(messageData);
-		}).then(function (_messageToAdd) {
-			messageToAdd = _messageToAdd;
-			return Topic.get(messageToAdd.getTopicID());
-		}).then(function (theTopic) {
-			theTopic.addMessage(messageToAdd, true);
-			messageService.notify(messageToAdd, "message");
-		}).catch(errorService.criticalError);
-	}
-}
-
 var currentlyLoadingTopics = false;
 
 var activeTopic = 0;
 
 messageService = {
+	addSocketMessage: function (messageData) {
+		if (messageData) {
+			var messageToAdd;
+
+			Bluebird.try(function () {
+				return Topic.messageFromData(messageData);
+			}).then(function (_messageToAdd) {
+				messageToAdd = _messageToAdd;
+				return Topic.get(messageToAdd.getTopicID());
+			}).then(function (theTopic) {
+				theTopic.addMessage(messageToAdd, true);
+				messageService.notify(messageToAdd, "message");
+
+				return theTopic.refetchMessages();
+			}).catch(errorService.criticalError);
+		}
+	},
 	isActiveTopic: function (topicid) {
 		return activeTopic === h.parseDecimal(topicid);
 	},
@@ -249,10 +250,10 @@ socket.channel("message", function (e, data) {
 					changeReadTopic(topic.getID(), true);
 				}
 
-				addSocketMessage(data.message);
+				messageService.addSocketMessage(data.message);
 			});
 		} else {
-			addSocketMessage(data.message);
+			messageService.addSocketMessage(data.message);
 		}
 	} else {
 		errorService.criticalError(e);

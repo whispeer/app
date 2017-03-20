@@ -20,9 +20,9 @@ const CameraOptions = {
 	destinationType: 1, // value 2 breaks ios.
 	allowEdit: true,
 	encodingType: 0,
-	targetWidth: ImagePickerOptions.width,
-	targetHeight: ImagePickerOptions.height,
-	correctOrientation: true
+	// targetWidth: ImagePickerOptions.width,
+	// targetHeight: ImagePickerOptions.height,
+	// correctOrientation: true
 };
 
 @Component({
@@ -47,7 +47,8 @@ export class TopicComponent {
 	contentHeight = 0;
 	footerHeight = 0;
 
-	ngOnInit() {
+	ngAfterViewInit() {
+		console.warn("attach keyboard listener");
 		window.addEventListener('resize', this.keyboardChange);
 	}
 
@@ -88,42 +89,43 @@ export class TopicComponent {
 
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({
-			title: "What do you want to send?",
-			buttons: [{
-				text: "Select from Gallery",
-				handler: () => {
-					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
-						return this.getFile(result, "image/png");
-					}).map((file: any) => {
-						return new ImageUpload(file);
-					}).then((images) => {
-						this.sendMessage.emit({
-							images: images,
-							text: ""
+			buttons: [
+				{
+					text: "Take Photo",
+					handler: () => {
+						Camera.getPicture(CameraOptions).then((url) => {
+							return this.getFile(url, "image/png");
+						}).then((file: any) => {
+							return new ImageUpload(file);
+						}).then((image) => {
+							this.sendMessage.emit({
+								images: [image],
+								text: ""
+							});
 						});
-					});
-				}
-			}, {
-				text: "Take Photo",
-				handler: () => {
-					Camera.getPicture(CameraOptions).then((url) => {
-						return this.getFile(url, "image/png");
-					}).then((file: any) => {
-						return new ImageUpload(file);
-					}).then((image) => {
-						this.sendMessage.emit({
-							images: [image],
-							text: ""
+					}
+				}, {
+					text: "Select from Gallery",
+					handler: () => {
+						Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+							return this.getFile(result, "image/png");
+						}).map((file: any) => {
+							return new ImageUpload(file);
+						}).then((images) => {
+							this.sendMessage.emit({
+								images: images,
+								text: ""
+							});
 						});
-					});
+					}
+				}, {
+					text: "Cancel",
+					role: "cancel",
+					handler: () => {
+						console.log("Cancel clicked.");
+					}
 				}
-			}, {
-				text: "Cancel",
-				role: "cancel",
-				handler: () => {
-					console.log("Cancel clicked.");
-				}
-			}]
+			]
 		});
 
 		actionSheet.present();
@@ -151,34 +153,38 @@ export class TopicComponent {
 	}
 
 	change() {
-		const fontSize = 16;
-		const maxSize = fontSize*7;
+		setTimeout(() => {
+			const fontSize = 16;
+			const maxSize = fontSize*7;
 
-		const contentElement = this.content.getScrollElement();
-		const footerElement = this.footer.getNativeElement();
+			const contentElement = this.content.getScrollElement();
+			const footerElement = this.footer.getNativeElement();
 
-		if (!this.footerHeight) {
-			this.footerHeight = footerElement.offsetHeight;
-		}
+			if (!this.footerHeight) {
+				this.footerHeight = footerElement.offsetHeight;
+			}
 
-		const element   = document.getElementById("sendMessageBox");
-		const textarea  = element.getElementsByTagName("textarea")[0];
+			const element   = document.getElementById("sendMessageBox");
+			const textarea  = element.getElementsByTagName("textarea")[0];
 
-		textarea.style.minHeight  = "0";
-		textarea.style.height     = "0";
-		contentElement.style.height = "";
+			textarea.style.minHeight  = "0";
+			textarea.style.height     = "0";
+			contentElement.style.height = "";
 
-		const contentHeight = contentElement.offsetHeight;
+			const contentHeight = contentElement.offsetHeight;
 
 
-		const scroll_height = Math.min(textarea.scrollHeight, maxSize);
+			const scroll_height = Math.min(textarea.scrollHeight, maxSize);
 
-		// apply new style
-		element.style.height      = scroll_height + "px";
-		textarea.style.minHeight  = scroll_height + "px";
-		textarea.style.height     = scroll_height + "px";
+			// apply new style
+			element.style.height      = scroll_height + "px";
+			textarea.style.minHeight  = scroll_height + "px";
+			textarea.style.height     = scroll_height + "px";
 
-		contentElement.style.height = contentHeight - (footerElement.offsetHeight - this.footerHeight) + "px";
+			contentElement.style.height = contentHeight - (footerElement.offsetHeight - this.footerHeight) + "px";
+
+			this.content.scrollToBottom(0);
+		}, 100);
 	}
 
 	goToProfile(userId: number) {

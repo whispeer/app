@@ -22,7 +22,7 @@
 			</button>
 		</div>
 		<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
-			<div class="hexagon__image__image" [style.background-image]="user.basic.image | safeUrl"></div>
+			<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 		</ion-avatar>
 		<div class="hexagon profile__request-hex" (click)="acceptRequest()">
 			<button ion-button icon-only class="hexagon__button hexagon__button--medium profile__request-button" id="request__accept__button">
@@ -62,7 +62,7 @@
 	<div [ngSwitch]="view">
 		<div *ngSwitchCase="'profile'">
 			<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
-				<div class="hexagon__image__image" [style.background-image]="user.basic.image | safeUrl"></div>
+				<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 			</ion-avatar>
 			<ion-list class="profile__info-list space-for-fab">
 				<ion-item>

@@ -14,24 +14,26 @@
 					class="hexagon__image"
 					[ngClass]="{'hexagon__image--active': partner.online, 'hexagon__image--medium': topic.partnersDisplay.length > 1}"
 				>
-					<div class="hexagon__image__image" [style.background-image]="partner.basic.image | safeUrl"></div>
+					<user-image [id]="partner.id" [image]="partner.basic.image"></user-image>
 				</ion-avatar>
 				<ion-avatar
 					*ngIf="topic.partners.length > 3"
 					class="hexagon__image hexagon__image--medium"
 				>
-					<div class="hexagon__image__image topic__remainingUsers">
-						+{{topic.partners.length - 2}}
-					</div>
+					<hexagon></hexagon>
+					<span class="hexagon__image__image topic__remainingUsers">+{{topic.partners.length - 2}}</span>
 				</ion-avatar>
 			</div>
 			<h2 class="user__name">
-				<span *ngFor="let partner of topic.partners; let l = last">
-					{{ partner.basic.shortname }}{{ l ? "":", " }}
+				<span *ngIf="!topic.title">
+					<span *ngFor="let partner of topic.partners; let l = last">
+						{{ partner.basic.shortname }}{{ l ? "":", " }}
+					</span>
 				</span>
+				<span *ngIf="topic.title">{{topic.title}}</span>
 			</h2>
 			<p>{{topic.latestMessage.data.text}}</p>
-			<ion-note item-right>{{topic.latestMessage.data.timestamp | date: "EEEE"}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
+			<ion-note item-right>{{topic.latestMessage.data.timestamp | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 		</ion-item>
 	</ion-list>
 

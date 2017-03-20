@@ -167,7 +167,7 @@ var Topic = function (data) {
 
 	this.refetchMessages = function () {
 		if (this.fetchingMessages) {
-			return;
+			return this.refetchPromise;
 		}
 
 		this.fetchingMessages = true;
@@ -198,7 +198,7 @@ var Topic = function (data) {
 			messageCountOnFlush: 10
 		};
 
-		return socket.emit("messages.refetch", request).bind(this).then(function (response) {
+		this.refetchPromise = socket.definitlyEmit("messages.refetch", request).bind(this).then(function (response) {
 			if (response.clearMessages) {
 				//remove all sent messages we have!
 				messages.clear();
@@ -216,6 +216,8 @@ var Topic = function (data) {
 		}).finally(function () {
 			this.fetchingMessages = false;
 		});
+
+		return this.refetchPromise;
 	};
 
 	this.awaitEarlierSend = function (time) {
