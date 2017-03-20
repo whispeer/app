@@ -1417,9 +1417,9 @@ invert-kv@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-1.0.0.tgz#104a8e4aaca6d3d8cd157a8ef8bfab2d7a3ffdb6"
 
-ionic-angular@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/ionic-angular/-/ionic-angular-2.0.0.tgz#5f2447c1a812e5905da0f6295f4ab672ff74d438"
+ionic-angular@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/ionic-angular/-/ionic-angular-2.2.0.tgz#5c48212d4c491626863ddce9292af0d3e6e2adca"
 
 ionic-native@2.4.1:
   version "2.4.1"

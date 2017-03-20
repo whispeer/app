@@ -44,8 +44,8 @@
 	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
 </ion-content>
 
-<ion-content padding *ngIf="!isRequest && !isRequestable">
-	<div padding-bottom *ngIf="isOwn">
+<ion-content *ngIf="!isRequest && !isRequestable">
+	<div padding *ngIf="isOwn">
 		<ion-segment [(ngModel)]="view" color="dark">
 			<ion-segment-button value="profile">
 				Profile
@@ -57,6 +57,7 @@
 	</div>
 	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<div [ngSwitch]="view">
+
 		<div *ngSwitchCase="'profile'">
 			<div *ngIf="!isOwn" class="profile__avatar-row">
 				<div class="profile__request-hex">
@@ -108,21 +109,31 @@
 					</p>
 				</ion-item>
 			</ion-list>
+
 		</div>
 		<div *ngSwitchCase="'qr'">
+
 			<qr-code [data]="user.fingerprint" [size]="150" class="profile__qr"></qr-code>
-			<ion-list class="profile__fingerprint-list">
-				<ion-item>
-					<ion-label class="profile__key-label" fixed color="primaryDarker" text-right>Your ID</ion-label>
-					<div item-content class="profile__key-part-wrap">
-						<p *ngFor="let part of fingerprint; let l = last" class="profile__key-part">{{part}}{{l ? '' : ' - '}}</p>
-					</div>
-				</ion-item>
-			</ion-list>
+
+			<ion-grid class="fingerprint">
+				<ion-row>
+					<ion-col class="fingerprint-label" col-3>Your ID<br/> as a text</ion-col>
+					<ion-col class="fingerprint-value" col-9>
+						<pre *ngFor="let part of fingerprint" class="fingerprint-part">{{part}}</pre>
+					</ion-col>
+				</ion-row>
+			</ion-grid>
 
 			<div class="space-for-fab" padding-horizontal>
-				<p class="text-grey">This is your personal and unique ID for whispeer. You need this <span class="text-primary">to verify with friends</span> on whispeer - for extra security.</p>
+				<p class="text-grey" padding-horizontal>
+					This is your personal and unique ID on whispeer. You need this
+					<span class="text-primary">to verify with friends</span>—for
+					extra security! They scan your ID, you scan their ID and both
+					of you have easily increased your security measures. Cool,
+					huh?
+				</p>
 			</div>
+
 		</div>
 	</div>
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
