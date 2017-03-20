@@ -36,8 +36,8 @@ var defaultOptions = {
 		{
 			name: "highest",
 			restrictions: {
-				maxWidth: 2560,
-				maxHeight: 1440
+				maxWidth: 1280,
+				maxHeight: 720
 			}
 		}
 	],
@@ -266,7 +266,7 @@ ImageUpload.prototype.rotate = function () {
 };
 
 ImageUpload.prototype.generatePreviews = function () {
-	if (PREVIEWSDISABLED)
+	if (PREVIEWSDISABLED) {
 		return Bluebird.reject(new Error("Previews are disabled"))
 	}
 
