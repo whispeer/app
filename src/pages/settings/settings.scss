@@ -3,3 +3,12 @@ page-settings {
 		background-color: map-get($colors, more_grey) !important;
 	}
 }
+
+.logout-confirm {
+	.button-inner {
+		color: map-get($colors, grey);
+	}
+	.alert-button:last-child .button-inner {
+		color: map-get($colors, danger);
+	}
+}

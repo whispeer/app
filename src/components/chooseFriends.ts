@@ -7,85 +7,96 @@ const friendsService = require("../assets/services/friendsService");
 const userService = require("../assets/user/userService");
 const messageService = require("../assets/messages/messageService");
 
+import { ContactsWithSearch } from '../assets/contacts/contactsWithSearch'
+
 import * as Bluebird from 'bluebird';
+
+const h = require("whispeerHelper");
 
 @Component({
 	selector: 'chooseFriends',
 	templateUrl: 'chooseFriends.html'
 })
-export class chooseFriends {
+export class chooseFriends extends ContactsWithSearch {
 	friends: any[];
 	searchTerm: string = "";
-	selectedUsers: any = {};
+	selectedUserMap: any = {};
+	selectedUsers: any[] = [];
 
 	@Output() chooseReceivers = new EventEmitter();
 	@Input() receiverString;
 
-	constructor(public navCtrl: NavController) {}
+	constructor(public navCtrl: NavController) {
+		super()
+	}
+
+	hasReceiverParam() {
+		const type = typeof this.receiverString;
+
+		return ["number", "string"].indexOf(type) > -1;
+	}
+
+	getReceiverParam() {
+		if (typeof this.receiverString === "number") {
+			return [this.receiverString];
+		}
+
+		if (typeof this.receiverString === "string") {
+			return this.receiverString.split(",").map((r) => { return parseInt(r, 10) });
+		}
+
+		throw new Error("invalid receiver param");
+	}
 
 	ngOnInit() {
-		if (this.receiverString) {
-			return userService.getMultipleFormatted(this.receiverString.split(",")).then((users) => {
+		if (this.hasReceiverParam()) {
+			return userService.getMultipleFormatted(this.getReceiverParam()).then((users) => {
 				this.send(users);
 			})
 		}
 
 		friendsService.awaitLoading().then(() => {
-			friendsService.listen(this.loadFriendsUsers);
-			this.loadFriendsUsers();
+			friendsService.listen(this.loadContactsUsers);
+			this.loadContactsUsers();
 		});
 	}
 
-	private loadFriendsUsers = () => {
-		return Bluebird.try(() => {
-			var friends = friendsService.getFriends();
-			return userService.getMultipleFormatted(friends);
-		}).then((result) => {
-			this.friends = result;
-		});
+	addSelectedUser = (user) => {
+		if (this.selectedUsers.indexOf(user) === -1) {
+			this.selectedUsers.push(user);
+		}
 	}
 
-	getFriendsResults = () => {
-		const friends = this.getFilteredFriends();
-
-		friends.sort((a: any, b: any) => {
-			if (this.selectedUsers[a.id] && !this.selectedUsers[b.id]) {
-				return -1;
-			}
-
-			if (this.selectedUsers[b.id] && !this.selectedUsers[a.id]) {
-				return 1;
-			}
-
-			const nameA = a.name.toUpperCase();
-			const nameB = b.name.toUpperCase();
-			if (nameA < nameB) {
-				return -1;
-			}
-
-			if (nameA > nameB) {
-				return 1;
-			}
-
-			// names must be equal
-			return 0;
-		});
-
-		return friends;
+	removeSelectedUser = (user) => {
+		h.removeArray(this.selectedUsers, user);
 	}
 
-	getFilteredFriends = () => {
-		if (!this.friends) {
-			return [];
+	updateSelectedUsers = (user) => {
+		if (this.selectedUserMap[user.id]) {
+			this.addSelectedUser(user);
+		} else {
+			this.removeSelectedUser(user);
+		}
+	}
+
+	getContactsWithSelected = () => {
+		const users = this.getUsers();
+
+		return this.selectedUsers.concat(users);
+	}
+
+	contactDividersWithSelected = (record, recordIndex, records) => {
+		const selectedLength = this.selectedUsers.length;
+
+		if (recordIndex < selectedLength) {
+			if (recordIndex === 0) {
+				return "Selected";
+			}
+
+			return null;
 		}
 
-		if (!this.searchTerm) {
-			return this.friends;
-		}
-
-		return this.friends.filter((friend) => {
-			return friend.name.indexOf(this.searchTerm) > -1
-		});
+		return this.contactDividers(record, recordIndex - selectedLength, records.slice(selectedLength));
 	}
 
 	private sendToUserTopic(users) {
@@ -95,12 +106,6 @@ export class chooseFriends {
 
 		return messageService.getUserTopic(users[0].id);
 
-	}
-
-	private getSelectedUsers() {
-		return this.friends.filter((friend) => {
-			return this.selectedUsers[friend.id];
-		})
 	}
 
 	send = (users) => {
@@ -114,9 +119,7 @@ export class chooseFriends {
 	}
 
 	create = () => {
-		const users = this.getSelectedUsers();
-
-		this.send(users);
+		this.send(this.selectedUsers);
 	}
 
 	close = () => {

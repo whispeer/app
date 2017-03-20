@@ -12,8 +12,8 @@
 
 
 <ion-content>
-	<ion-searchbar *ngIf="!friendsLoading" animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
-	<ion-spinner *ngIf="friendsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-searchbar *ngIf="!contactsLoading" animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
+	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list no-lines no-margin *ngIf="requests.length > 0">
 		<ion-item class="friends__request" padding (click)="goToRequests()">
 			<ion-badge item-left>{{requests.length}}</ion-badge>
@@ -21,53 +21,30 @@
 			<ion-note item-right><span>Details&nbsp;</span><ion-icon name="arrow-forward"></ion-icon></ion-note>
 		</ion-item>
 	</ion-list>
-	<ion-list [virtualScroll]="getFriends()" [headerFn]="friendDividers" class="friends__list">
+	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
 		</ion-item-divider>
 
-		<ion-item *virtualItem="let friend" (click)="goToUser(friend.id)">
+		<ion-item *virtualItem="let contact" (click)="goToUser(contact.id)">
 			<h2>
-				<strong *ngIf="friend.names.firstname">
-					{{friend.names.firstname}}
+				<strong *ngIf="contact.names.firstname">
+					{{contact.names.firstname}}
 				</strong>
-				<span *ngIf="friend.names.firstname && friend.names.lastname">
-					{{friend.names.lastname}}
+				<span *ngIf="contact.names.firstname && contact.names.lastname">
+					{{contact.names.lastname}}
 				</span>
 				<strong
-					*ngIf="!friend.names.firstname && friend.names.lastname">
-					{{friend.names.lastname}}
+					*ngIf="!contact.names.firstname && contact.names.lastname">
+					{{contact.names.lastname}}
 				</strong>
 				<strong
-					*ngIf="!friend.names.firstname && !friend.names.lastname">
-					{{friend.name}}
+					*ngIf="!contact.names.firstname && !contact.names.lastname">
+					{{contact.name}}
 				</strong>
 			</h2>
 		</ion-item>
 	</ion-list>
-	<ion-item-divider *ngIf="searchResults && searchResults.length > 0" class="friends__divider">
-		Worldwide
-	</ion-item-divider>
 	<ion-spinner *ngIf="searchResultsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<ion-list [virtualScroll]="searchResults" class="friends__list">
-		<ion-item *virtualItem="let searchUser" (click)="goToUser(searchUser.id)">
-			<h2>
-				<strong *ngIf="searchUser.names.firstname">
-					{{searchUser.names.firstname}}
-				</strong>
-				<span *ngIf="searchUser.names.firstname && searchUser.names.lastname">
-					{{searchUser.names.lastname}}
-				</span>
-				<strong
-					*ngIf="!searchUser.names.firstname && searchUser.names.lastname">
-					{{searchUser.names.lastname}}
-				</strong>
-				<strong
-					*ngIf="!searchUser.names.firstname && !searchUser.names.lastname">
-					{{searchUser.name}}
-				</strong>
-			</h2>
-		</ion-item>
-	</ion-list>
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
 </ion-content>

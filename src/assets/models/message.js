@@ -75,6 +75,7 @@ Message.prototype.setData = function () {
 	this.data = {
 		text: "",
 		timestamp: this.getTime(),
+		date: new Date(this.getTime()),
 
 		loading: true,
 		loaded: false,
