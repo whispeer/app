@@ -180,7 +180,7 @@ export class TopicComponent {
 
 			contentElement.style.height = contentHeight - (footerElement.offsetHeight - this.footerHeight) + "px";
 
-			this.content.scrollToBottom();
+			this.content.scrollToBottom(0);
 		}, 100);
 	}
 
