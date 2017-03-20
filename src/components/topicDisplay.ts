@@ -20,9 +20,9 @@ const CameraOptions = {
 	destinationType: 2,
 	allowEdit: true,
 	encodingType: 0,
-	targetWidth: ImagePickerOptions.width,
-	targetHeight: ImagePickerOptions.height,
-	correctOrientation: true
+	// targetWidth: ImagePickerOptions.width,
+	// targetHeight: ImagePickerOptions.height,
+	// correctOrientation: true
 };
 
 @Component({
