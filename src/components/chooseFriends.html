@@ -12,12 +12,19 @@
 </ion-header>
 
 <ion-content>
-	<ion-searchbar animated [(ngModel)]="searchTerm"></ion-searchbar>
-	<ion-list>
-		<ion-item *ngFor="let friend of getFriendsResults();">
-			<ion-label>{{friend.name}}</ion-label>
-			<ion-checkbox checked="false" clear item-right [(ngModel)]="selectedUsers[friend.id]"></ion-checkbox>
+	<ion-searchbar *ngIf="!contactsLoading" animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
+	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-list [virtualScroll]="getContactsWithSelected()" [headerFn]="contactDividersWithSelected" class="friends__list">
+		<ion-item-divider *virtualHeader="let header" class="friends__divider">
+			{{ header }}
+		</ion-item-divider>
+
+		<ion-item *virtualItem="let contact" (click)="goToUser(contact.id)">
+			<ion-label>{{contact.name}}</ion-label>
+			<ion-checkbox checked="false" clear item-right [(ngModel)]="selectedUserMap[contact.id]" (ngModelChange)="updateSelectedUsers(contact)"></ion-checkbox>
 		</ion-item>
 	</ion-list>
+	<ion-spinner *ngIf="searchResultsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
 </ion-content>

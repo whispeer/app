@@ -90,7 +90,7 @@ export class ContactsWithSearch {
 				return user.data;
 			});
 		}).then((userData) => {
-			this.searchResults = userData;
+			this.searchResults = userData || [];
 			this.searchResultsLoading = false;
 		});
 	}, 100)
