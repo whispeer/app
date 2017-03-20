@@ -176,7 +176,6 @@ export class MessagesPage {
 
 		console.log(images);
 
-		// TODO: The iOS problem is probably around here.
 		messageService.sendMessage(this.topic.id, text, images).then(() => {
 			this.topic.newMessage = "";
 			this.markRead();
