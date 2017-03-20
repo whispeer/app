@@ -5,7 +5,7 @@ import { Component, Input } from "@angular/core";
 	templateUrl: "userImage.svg"
 })
 export class UserImageComponent {
-	@Input() image: string = "/assets/img/user.png";
+	@Input() image: string = "assets/img/user.png";
 	@Input() id: string;
 
 	constructor() {};
