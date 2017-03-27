@@ -45,8 +45,8 @@
 </ion-content>
 
 <ion-content *ngIf="!isRequest && !isRequestable">
-	<div padding *ngIf="isOwn">
-		<ion-segment [(ngModel)]="view" color="dark">
+	<ion-toolbar *ngIf="isOwn" padding color="light">
+		<ion-segment [(ngModel)]="view" color="grey">
 			<ion-segment-button value="profile">
 				Profile
 			</ion-segment-button>
@@ -54,7 +54,7 @@
 				QR-Code
 			</ion-segment-button>
 		</ion-segment>
-	</div>
+	</ion-toolbar>
 	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<div [ngSwitch]="view">
 
