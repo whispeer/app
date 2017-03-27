@@ -1,5 +1,8 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
+		<button *ngIf="forceBackButton" (click)="navCtrl.pop()" class="bar-button bar-button-ios" ion-button icon-only>
+			<ion-icon name="arrow-back"></ion-icon>
+		</button>
 		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
 			<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>
 		</ion-avatar>
