@@ -2,7 +2,7 @@ import {
 	Push
 } from 'ionic-native';
 
-import { NavController } from "ionic-angular";
+import { NavController, Platform } from "ionic-angular";
 
 import { MessagesPage } from "../../pages/messages/messages";
 import { ProfilePage } from "../../pages/profile/profile";
@@ -20,7 +20,7 @@ const sessionStorage = withPrefix("whispeer.session");
 const sjcl = require("sjcl");
 
 export class PushService {
-	constructor(private navCtrl: NavController) {}
+	constructor(private navCtrl: NavController, private platform: Platform) {}
 
 	private getOrCreatePushkey = () => {
 		const storagePushKey = sessionStorage.get("pushKey");
@@ -125,7 +125,7 @@ export class PushService {
 				sessionStorage.awaitLoading(),
 				initService.awaitLoading()
 			]).then(() => {
-				if (!additionalData.foreground && additionalData.reference) {
+				if (!additionalData.foreground && !additionalData.coldstart && additionalData.reference) {
 					this.goToReference(additionalData.reference)
 				}
 
@@ -145,10 +145,15 @@ export class PushService {
 
 	register = () => {
 		try {
-			var push = Push.init(this.pushConfig);
+			const push = Push.init(this.pushConfig);
 
 			push.on("registration", this.registration);
 			push.on("notification", this.notification);
+
+			this.platform.resume.subscribe(() => {
+				console.warn("Resume app");
+				push.clearAllNotifications(() => {}, () => {});
+			})
 		} catch (e) {
 			console.warn("Push is not available!");
 		}
