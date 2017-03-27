@@ -1,7 +1,7 @@
 <ion-fab center bottom fixed #fab>
 	<div class="hexagon-wrap">
 		<hexagon class="hexagon hexagon--fab"></hexagon>
-		<button [mode]="'ios'" (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light">
+		<button [mode]="'ios'" (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light" clear>
 			<ion-icon name="{{icon}}"></ion-icon>
 		</button>
 	</div>
