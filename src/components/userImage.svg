@@ -1,10 +1,10 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 433 500" style="enable-background:new 0 0 433 500;" xml:space="preserve">
 	<defs>
-		<pattern [attr.id]="id" patternUnits="userSpaceOnUse" width="500" height="500" x="0" y="0">
+		<pattern [attr.id]="'userimage-' + id" patternUnits="userSpaceOnUse" width="500" height="500" x="0" y="0">
 			<svg:image [attr.xlink:href]="image" x="-35.5" y="0" width="500" height="500"/>
 		</pattern>
 	</defs>
 	<path class="border" d="M216.5,0L0,125v250l216.5,125L433,375V125L216.5,0z M417.9,366.3L216.5,482.6L15.1,366.3V133.7L216.5,17.4
 		l201.4,116.3V366.3z"/>
-	<polygon class="content" points="15.1,133.7 216.5,17.4 417.9,133.7 417.9,366.3 216.5,482.6 15.1,366.3" [attr.fill]="'url(#' + id + ')'"/>
+	<polygon class="content" points="15.1,133.7 216.5,17.4 417.9,133.7 417.9,366.3 216.5,482.6 15.1,366.3" [attr.fill]="'url(#userimage-' + id + ')'"/>
 </svg>

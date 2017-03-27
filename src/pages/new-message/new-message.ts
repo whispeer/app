@@ -37,7 +37,7 @@ export class NewMessagePage {
 
 	sendMessage = ({ images, text }) => {
 		messageService.sendNewTopic(this.partners.map((partner) => partner.user.getID()), text, images).then((topicId) => {
-			this.navCtrl.push(MessagesPage, { topicId: topicId });
+			this.navCtrl.setRoot(MessagesPage, { topicId: topicId });
 		});
 	}
 }
