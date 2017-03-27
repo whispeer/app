@@ -5,6 +5,7 @@ import {
 import { NavController } from "ionic-angular";
 
 import { MessagesPage } from "../../pages/messages/messages";
+import { ProfilePage } from "../../pages/profile/profile";
 
 import * as Bluebird from "bluebird";
 import socketService from "./socket.service";
@@ -100,29 +101,43 @@ export class PushService {
 		return this.navCtrl.push(MessagesPage, { topicId: topicId });
 	}
 
+	private goToUser = (userId) => {
+		return this.navCtrl.push(ProfilePage, { userId: userId });
+	}
+
+	private goToReference = (reference) => {
+		if (reference.type === "message") {
+			this.goToTopic(reference.id);
+		}
+
+		if (reference.type === "contactRequest") {
+			this.goToUser(reference.id);
+		}
+	}
+
 	private notification = (data) => {
+		console.log(data);
+
 		if (data && data.additionalData) {
+			const additionalData = data.additionalData;
+
 			Bluebird.all([
 				sessionStorage.awaitLoading(),
 				initService.awaitLoading()
 			]).then(() => {
-				const topicId = data.additionalData.topicid;
-
-				if (!data.additionalData.foreground && topicId) {
-					console.log("-> click", topicId);
-
-					this.goToTopic(topicId)
+				if (!additionalData.foreground && additionalData.reference) {
+					this.goToReference(additionalData.reference)
 				}
 
 				var pushKey = sessionStorage.get("pushKey");
 
-				if (data.additionalData.encryptedContent && pushKey) {
+				if (additionalData.encryptedContent && pushKey) {
 					pushKey = sjcl.codec.hex.toBits(pushKey);
-					data.additionalData.content = JSON.parse(sjcl.json.decrypt(pushKey, JSON.stringify(data.additionalData.encryptedContent)));
+					additionalData.content = JSON.parse(sjcl.json.decrypt(pushKey, JSON.stringify(additionalData.encryptedContent)));
 				}
 
-				if (data.additionalData.content) {
-					messageService.addSocketMessage(data.additionalData.content.message);
+				if (additionalData.content) {
+					messageService.addSocketMessage(additionalData.content.message);
 				}
 			});
 		}
