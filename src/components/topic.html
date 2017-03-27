@@ -1,21 +1,27 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
-		<button *ngIf="forceBackButton" (click)="navCtrl.pop()" class="bar-button bar-button-ios" ion-button icon-only>
-			<ion-icon name="arrow-back"></ion-icon>
-		</button>
-		<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
-			<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>
-		</ion-avatar>
-		<ion-title *ngIf="partners.length == 1">
-			<span (click)="goToProfile(partners[0].id)">{{ partners[0].name }}</span>
-		</ion-title>
-		<ion-title *ngIf="partners.length != 1 && !(topic && topic.title)">
-			<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
-				{{ partner.basic.shortname }}{{ l ? "":", " }}
+		<ion-title [ngClass]="{'title--force-back': forceBackButton}">
+			<div class="messages__header__fake-back">
+				<button *ngIf="forceBackButton" (click)="navCtrl.pop()" class="bar-button bar-button-ios" color="light" ion-button icon-only clear>
+					<ion-icon name="arrow-back"></ion-icon>
+				</button>
+			</div>
+			<span class="messages__header__username" [ngClass]="{'messages__header__username--no-image': partners.length > 1}">
+				<span *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">
+					{{ partners[0].name }}
+				</span>
+				<span *ngIf="partners.length != 1 && !(topic && topic.title)">
+					<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
+						{{ partner.basic.shortname }}{{ l ? "":", " }}
+					</span>
+				</span>
+				<span *ngIf="topic && topic.title">
+					{{topic.title}}
+				</span>
 			</span>
-		</ion-title>
-		<ion-title *ngIf="topic && topic.title">
-			{{topic.title}}
+			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
+				<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>
+			</ion-avatar>
 		</ion-title>
 	</ion-navbar>
 </ion-header>

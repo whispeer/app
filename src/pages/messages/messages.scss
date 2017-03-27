@@ -28,16 +28,50 @@ topicWithBursts {
 	}
 }
 
-.md .messages__header-image {
-	order: 1; // first element in header row
+.md {
+	.messages__header__fake-back {
+		position: absolute;
+		left: 3px;
+		top: 50%;
+		margin-top: -17.5px;
+	}
+	.messages__header-image {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		margin-top: -13px;
+	}
+	.messages__header__username {
+		padding-left: 24px;
+	}
+	.messages__header__username--no-image {
+		padding-left: 0;
+	}
+
+	.title--force-back {
+		.messages__header-image {
+			left: 37px;
+		}
+		.messages__header__username {
+			padding-left: 57px;
+		}
+	}
 }
 
-.ios .messages__header-image {
-	order: 4; // last element in header row
-	align-self: flex-end;
-	margin: auto 0 auto auto;
+.ios {
+	.messages__header__fake-back {
+		position: absolute;
+		left: 0.5em;
+		top: 50%;
+		margin-top: -17.5px;
+	}
+	.messages__header-image {
+		position: absolute;
+		top: 50%;
+		right: 1em;
+		margin-top: -13px;
+	}
 }
-
 .messages__message {
 	position: relative;
 	padding: 5px 20px;
