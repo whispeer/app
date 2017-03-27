@@ -177,6 +177,11 @@ ion-fab[fixed] {
 	}
 }
 
+.alert-button-danger {
+	color: map-get($colors, danger) !important;
+	font-weight: normal !important;
+}
+
 // -----------------------------------------------------------
 // The following is a bugfix for headers inside of components on ios
 // This is a copy of a code snippet from the ionic code, but removing a >

@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { NavController, NavParams } from "ionic-angular";
+import { NavController, NavParams, AlertController } from "ionic-angular";
 import { HomePage } from "../home/home";
 import sessionService from "../../assets/services/session.service";
 import { NewMessagePage } from "../../pages/new-message/new-message";
@@ -33,7 +33,7 @@ export class SettingsPage {
 		}
 	}
 
-	constructor(public navCtrl: NavController, public navParams: NavParams) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
@@ -49,7 +49,23 @@ export class SettingsPage {
 	}
 
 	logout() {
-		sessionService.logout();
+		let logoutConfirm = this.alertCtrl.create({
+			title: 'Logout',
+			message: 'Do you want to log out from your account on this device?',
+			buttons: [
+				{ text: 'Cancel', role: 'cancel' },
+				{ text: 'Logout',
+					handler: () => {
+						sessionService.logout();
+					}
+				}
+			]
+		});
+		// there seems to be a bug in current ionic, which prevents
+		// cssClass properties in options to propagate, instead these have
+		// to be set with a subsequent call like this:
+		logoutConfirm.setCssClass('logout-confirm');
+		logoutConfirm.present();
 	}
 
 	feedback() {

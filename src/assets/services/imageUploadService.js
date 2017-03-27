@@ -1,6 +1,8 @@
 /**
 * imageUploadService
 **/
+require("toBlob");
+
 var h = require("whispeerHelper");
 var Progress = require("asset/Progress");
 var Queue = require("asset/Queue");
@@ -13,6 +15,8 @@ var blobService = require("services/blobService");
 
 
 var canvasToBlob = Bluebird.promisify(h.canvasToBlob.bind(h));
+
+var PREVIEWSDISABLED = true;
 
 var defaultOptions = {
 	minimumSizeDifference: 1024,
@@ -34,8 +38,8 @@ var defaultOptions = {
 		{
 			name: "highest",
 			restrictions: {
-				maxWidth: 2560,
-				maxHeight: 1440
+				maxWidth: 1280,
+				maxHeight: 720
 			}
 		}
 	],
@@ -264,6 +268,10 @@ ImageUpload.prototype.rotate = function () {
 };
 
 ImageUpload.prototype.generatePreviews = function () {
+	if (PREVIEWSDISABLED) {
+		return Bluebird.reject(new Error("Previews are disabled"))
+	}
+
 	if (!this._generatePreviewsPromise) {
 		this._generatePreviewsPromise = ImageUpload.imageLibLoad(h.toUrl(this._file), {
 			maxHeight: 200, canvas: true
@@ -296,7 +304,9 @@ ImageUpload.prototype.getName = function () {
 };
 
 ImageUpload.prototype.getUrl = function () {
-	this.generatePreviews();
+	if (!PREVIEWSDISABLED) {
+		this.generatePreviews();
+	}
 
 	this._url = this._url || h.toUrl(this._file);
 	return this._url;
@@ -360,6 +370,14 @@ ImageUpload.prototype.getFile = function () {
 	return this._file;
 };
 
+ImageUpload.prototype._getImage = function () {
+	if (!this._getImagePromise) {
+		this._getImagePromise = ImageUpload.imageLibLoad(this.getUrl());
+	}
+
+	return this._getImagePromise;
+}
+
 ImageUpload.prototype._resizeFile = function (sizeOptions) {
 	if (this._isGif && !sizeOptions.restrictions) {
 		return Bluebird.resolve(this._file);
@@ -367,7 +385,8 @@ ImageUpload.prototype._resizeFile = function (sizeOptions) {
 
 	var options = $.extend({}, sizeOptions.restrictions || {}, { canvas: true });
 
-	return ImageUpload.imageLibLoad(this.getUrl(), options).bind(this).then(function (canvas) {
+	return this._getImage().bind(this).then(function (img) {
+		var canvas = imageLib.scale(img, options);
 		return canvasToBlob(ImageUpload.rotate(canvas, this.rotation), "image/jpeg");
 	});
 };

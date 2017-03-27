@@ -1,6 +1,6 @@
 import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core";
 
-import { NavController, ActionSheetController, Content, Footer } from "ionic-angular";
+import { NavController, ActionSheetController, Platform, Content, Footer } from "ionic-angular";
 
 import { ProfilePage } from "../pages/profile/profile";
 
@@ -17,12 +17,12 @@ const ImagePickerOptions = {
 };
 
 const CameraOptions = {
-	destinationType: 2,
+	destinationType: 1, // value 2 breaks ios.
 	allowEdit: true,
 	encodingType: 0,
-	targetWidth: ImagePickerOptions.width,
-	targetHeight: ImagePickerOptions.height,
-	correctOrientation: true
+	// targetWidth: ImagePickerOptions.width,
+	// targetHeight: ImagePickerOptions.height,
+	// correctOrientation: true
 };
 
 @Component({
@@ -42,7 +42,7 @@ export class TopicComponent {
 
 	newMessageText = "";
 
-	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController,) {}
+	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController, private platform: Platform) {}
 
 	contentHeight = 0;
 	footerHeight = 0;
@@ -78,6 +78,9 @@ export class TopicComponent {
 			});
 		}).then((file: any) => {
 			file.originalUrl = url;
+			if(this.platform.is("ios")) {
+				file.localURL = url.replace("file://", "http://ionic.local");
+			}
 			file.type = type;
 
 			return file;
@@ -86,42 +89,43 @@ export class TopicComponent {
 
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({
-			title: "What do you want to send?",
-			buttons: [{
-				text: "Select from Gallery",
-				handler: () => {
-					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
-						return this.getFile(result, "image/png");
-					}).map((file: any) => {
-						return new ImageUpload(file);
-					}).then((images) => {
-						this.sendMessage.emit({
-							images: images,
-							text: ""
+			buttons: [
+				{
+					text: "Take Photo",
+					handler: () => {
+						Camera.getPicture(CameraOptions).then((url) => {
+							return this.getFile(url, "image/png");
+						}).then((file: any) => {
+							return new ImageUpload(file);
+						}).then((image) => {
+							this.sendMessage.emit({
+								images: [image],
+								text: ""
+							});
 						});
-					});
-				}
-			}, {
-				text: "Take Photo",
-				handler: () => {
-					Camera.getPicture(CameraOptions).then((url) => {
-						return this.getFile(url, "image/png");
-					}).then((file: any) => {
-						return new ImageUpload(file);
-					}).then((image) => {
-						this.sendMessage.emit({
-							images: [image],
-							text: ""
+					}
+				}, {
+					text: "Select from Gallery",
+					handler: () => {
+						Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+							return this.getFile(result, "image/png");
+						}).map((file: any) => {
+							return new ImageUpload(file);
+						}).then((images) => {
+							this.sendMessage.emit({
+								images: images,
+								text: ""
+							});
 						});
-					});
+					}
+				}, {
+					text: "Cancel",
+					role: "cancel",
+					handler: () => {
+						console.log("Cancel clicked.");
+					}
 				}
-			}, {
-				text: "Cancel",
-				role: "cancel",
-				handler: () => {
-					console.log("Cancel clicked.");
-				}
-			}]
+			]
 		});
 
 		actionSheet.present();
@@ -179,7 +183,7 @@ export class TopicComponent {
 
 			contentElement.style.height = contentHeight - (footerElement.offsetHeight - this.footerHeight) + "px";
 
-			this.content.scrollToBottom();
+			this.content.scrollToBottom(0);
 		}, 100);
 	}
 

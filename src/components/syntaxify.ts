@@ -4,7 +4,7 @@ import { Directive, ElementRef, Input } from '@angular/core';
 import jQuery from "jquery";
 
 /*const emojify = new EmojifyConverter();
-emojify.img_sets.apple.sheet = "/assets/img/sheet_apple_64.png";
+emojify.img_sets.apple.sheet = "assets/img/sheet_apple_64.png";
 emojify.use_sheet = true;
 emojify.include_title = true;*/
 

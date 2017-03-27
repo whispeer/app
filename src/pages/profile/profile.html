@@ -16,18 +16,15 @@
 	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<h4 class="text-primary text-medium" text-center padding>Add this person as a contact?</h4>
 	<div class="profile__avatar-row">
-		<div class="hexagon profile__request-hex" id="request__decline" (click)="declineRequest()">
-			<button ion-button icon-only class="hexagon__button hexagon__button--medium profile__request-button" id="request__decline__button">
-				<ion-icon name="close"></ion-icon>
-			</button>
+		<div class="profile__request-hex">
+			<img src="assets/images/icons/add.svg" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()">
 		</div>
 		<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 			<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 		</ion-avatar>
-		<div class="hexagon profile__request-hex" (click)="acceptRequest()">
-			<button ion-button icon-only class="hexagon__button hexagon__button--medium profile__request-button" id="request__accept__button">
-				<ion-icon name="checkmark"></ion-icon>
-			</button>
+		<div class="profile__request-hex" id="request__decline">
+			<img src="assets/images/icons/deny.svg" *ngIf="isRequest" class="profile__request-button" id="request__accept__button" (click)="declineRequest()">
+			<img src="assets/images/icons/write.svg" *ngIf="!isRequest" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
 		</div>
 	</div>
 	<ion-list class="profile__info-list space-for-fab">
@@ -44,11 +41,11 @@
 			<p item-content padding-horizontal class="profile__info">{{user.names.lastname}}</p>
 		</ion-item>
 	</ion-list>
-	<main-menu [icon]="'close'"></main-menu>
+	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
 </ion-content>
 
-<ion-content padding *ngIf="!isRequest && !isRequestable">
-	<div padding-bottom *ngIf="isOwn">
+<ion-content *ngIf="!isRequest && !isRequestable">
+	<div padding *ngIf="isOwn">
 		<ion-segment [(ngModel)]="view" color="dark">
 			<ion-segment-button value="profile">
 				Profile
@@ -60,39 +57,83 @@
 	</div>
 	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<div [ngSwitch]="view">
+
 		<div *ngSwitchCase="'profile'">
-			<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
+			<div *ngIf="!isOwn" class="profile__avatar-row">
+				<div class="profile__request-hex">
+					<img src="assets/images/icons/added.svg" class="profile__request-button" id="request__accept__button" (click)="contactOptions()">
+				</div>
+				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
+					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
+				</ion-avatar>
+				<div class="profile__request-hex" id="request__decline">
+					<img src="assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
+				</div>
+			</div>
+			<ion-avatar *ngIf="isOwn" class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 				<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 			</ion-avatar>
+			<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
+			<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firtname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
 			<ion-list class="profile__info-list space-for-fab">
-				<ion-item>
-					<ion-label fixed color="primaryDarker" text-right>Account</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.names.nickname}}</p>
+				<ion-item *ngIf="attributeSet(user.advanced.birthday)">
+					<ion-label fixed color="primaryDarker" text-right>Birthday</ion-label>
+					<p item-content class="profile__info">{{user.advanced.birthday.day}}.<span *ngIf="user.advanced.birthday.month && user.advanced.birthday.month.length === 1">0</span>{{user.advanced.birthday.month}}.{{user.advanced.birthday.year}}</p>
 				</ion-item>
-				<ion-item>
-					<ion-label fixed color="primaryDarker" text-right>Name</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.names.firstname}}</p>
+				<ion-item *ngIf="attributeSet(user.advanced.location)">
+					<ion-label fixed color="primaryDarker" text-right>Location</ion-label>
+					<p item-content class="profile__info">{{user.advanced.location.town}} {{user.advanced.location.country}}</p>
 				</ion-item>
-				<ion-item>
-					<ion-label fixed color="primaryDarker" text-right>Surname</ion-label>
-					<p item-content padding-horizontal class="profile__info">{{user.names.lastname}}</p>
+				<!-- <ion-item *ngIf="user.advanced.relationship">
+					<ion-label fixed color="primaryDarker" text-right>Relationship</ion-label>
+					<p item-content class="profile__info">{{user.advanced.location.town}} {{user.advanced.location.country}}</p>
 				</ion-item>
-			</ion-list>
-		</div>
-		<div *ngSwitchCase="'qr'">
-			<qr-code [data]="user.fingerprint" [size]="150" class="profile__qr"></qr-code>
-			<ion-list class="profile__fingerprint-list">
-				<ion-item>
-					<ion-label class="profile__key-label" fixed color="primaryDarker" text-right>Your ID</ion-label>
-					<div item-content class="profile__key-part-wrap">
-						<p *ngFor="let part of fingerprint; let l = last" class="profile__key-part">{{part}}{{l ? '' : ' - '}}</p>
-					</div>
+				<ion-item *ngIf="user.advanced.education">
+					<ion-label fixed color="primaryDarker" text-right>Education</ion-label>
+					<p item-content class="profile__info">
+						<span *ngFor="let school of user.advanced.education; let last = last">{{school.name}}{{last ? '' : ', '}}<br></span>
+					</p>
+				</ion-item>
+				<ion-item *ngIf="user.advanced.work">
+					<ion-label fixed color="primaryDarker" text-right>Work</ion-label>
+					<p item-content class="profile__info">{{user.advanced.work.what}} at {{user.advanced.work.where}}</p>
+				</ion-item>
+				<ion-item *ngIf="user.advanced.gender">
+					<ion-label fixed color="primaryDarker" text-right>Gender</ion-label>
+					<p item-content class="profile__info">{{user.advanced.work.what}} at {{user.advanced.work.where}}</p>
+				</ion-item> -->
+				<ion-item *ngIf="attributeSet(user.advanced.languages)">
+					<ion-label fixed color="primaryDarker" text-right>Languages</ion-label>
+					<p item-content class="profile__info">
+						<span *ngFor="let language of user.advanced.languages; let last = last">{{language.name}}{{last ? '' : ', '}}</span>
+					</p>
 				</ion-item>
 			</ion-list>
 
+		</div>
+		<div *ngSwitchCase="'qr'">
+
+			<qr-code [data]="user.fingerprint" [size]="150" class="profile__qr"></qr-code>
+
+			<ion-grid class="fingerprint">
+				<ion-row>
+					<ion-col class="fingerprint-label" col-3>Your ID<br/> as a text</ion-col>
+					<ion-col class="fingerprint-value" col-9>
+						<pre *ngFor="let part of fingerprint" class="fingerprint-part">{{part}}</pre>
+					</ion-col>
+				</ion-row>
+			</ion-grid>
+
 			<div class="space-for-fab" padding-horizontal>
-				<p class="text-grey">This is your personal and unique ID for whispeer. You need this <span class="text-primary">to verify with friends</span> on whispeer - for extra security.</p>
+				<p class="text-grey" padding-horizontal>
+					This is your personal and unique ID on whispeer. You need this
+					<span class="text-primary">to verify with friends</span>—for
+					extra security! They scan your ID, you scan their ID and both
+					of you have easily increased your security measures. Cool,
+					huh?
+				</p>
 			</div>
+
 		</div>
 	</div>
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
