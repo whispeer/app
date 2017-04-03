@@ -5,11 +5,11 @@
 </ion-header>
 
 <ion-content class="list-avatar-page">
-	<button ion-button full icon-right class="contactRequests" (click)="openContactRequests()">
+	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="openContactRequests()">
 		<div class="badgeContainer">
-			<span class="hexBadge">99</span>
+			<span class="hexBadge">{{requests.length}}</span>
 		</div>
-		New contact requests
+		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
 
