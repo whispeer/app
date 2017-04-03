@@ -150,7 +150,10 @@ export class LoginPage {
 			this.usernameState = USERNAME_PASSWORD_CONFIRM
 
 		} else if ([USERNAME_PASSWORD_CONFIRM].indexOf(this.usernameState) !== -1) {
-			const registerError = () => { this.usernameState = USERNAME_REGISTER_ERROR; }
+			const registerError = (e) => {
+				console.error(e);
+				this.usernameState = USERNAME_REGISTER_ERROR;
+			}
 
 			if (this.passwordsMatch()) {
 				this.performRegister().then(() => {
