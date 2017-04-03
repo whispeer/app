@@ -9,11 +9,13 @@ import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 import { HomePage } from "../pages/home/home";
 import { MessagesPage } from "../pages/messages/messages";
 import { ContactsPage } from "../pages/contacts/contacts";
 import { ProfilePage } from "../pages/profile/profile";
+import { VerifyContactPage } from "../pages/verify-contact/verify-contact";
 import { SettingsPage } from "../pages/settings/settings";
 import { ContactRequestsPage } from "../pages/contact-requests/contact-requests";
 import { NewMessagePage } from "../pages/new-message/new-message";
@@ -45,6 +47,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		MessagesPage,
 		ContactsPage,
 		ProfilePage,
+		VerifyContactPage,
 		SettingsPage,
 		ContactRequestsPage,
 		NewMessagePage,
@@ -65,6 +68,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 				{ component: ContactsPage, name: "Contacts", segment: "contacts" },
 				{ component: ContactRequestsPage, name: "Requests", segment: "requests" },
 				{ component: ProfilePage, name: "Profile", segment: "profile/:userId" },
+				{ component: VerifyContactPage, name: "Verify Contact", segment: "profile/:userId/verify" },
 				{ component: SettingsPage, name: "Settings", segment: "settings" },
 				{ component: NewMessagePage, name: "New Message", segment: "newMessage" },
 				{ component: NewMessagePage, name: "New Message", segment: "newMessage/:receiverIds" }
@@ -80,6 +84,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		MessagesPage,
 		ContactsPage,
 		ProfilePage,
+		VerifyContactPage,
 		SettingsPage,
 		ContactRequestsPage,
 		NewMessagePage,
@@ -91,7 +96,8 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},
-		DatePipe
+		DatePipe,
+		BarcodeScanner
 	]
 })
 export class AppModule {

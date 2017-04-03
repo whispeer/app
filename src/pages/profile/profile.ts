@@ -5,6 +5,7 @@ import * as Bluebird from 'bluebird';
 
 import { HomePage } from "../home/home";
 import { NewMessagePage } from "../new-message/new-message";
+import { VerifyContactPage } from "../verify-contact/verify-contact";
 
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
@@ -159,7 +160,7 @@ export class ProfilePage {
 	}
 
 	verifyPerson() {
-
+		this.navCtrl.push(VerifyContactPage, { userId: this.user.id });
 	}
 
 	contactOptions() {

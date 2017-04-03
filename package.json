@@ -21,6 +21,8 @@
     "@angular/platform-browser": "2.2.1",
     "@angular/platform-browser-dynamic": "2.2.1",
     "@angular/platform-server": "2.2.1",
+    "@ionic-native/barcode-scanner": "^3.4.4",
+    "@ionic-native/core": "^3.4.4",
     "@ionic/storage": "1.1.7",
     "@types/bluebird": "^3.0.36",
     "@types/jquery": "^2.0.39",
