@@ -51,6 +51,7 @@ $colors:  (
 // $light_grey: #f9f9f9;
 // $blue_grey: #d8dfe2;
 
+$list-text-color: map-get($colors, dark);
 $list-border-color: map-get($colors, other_grey);
 
 // App iOS Variables
@@ -58,6 +59,7 @@ $list-border-color: map-get($colors, other_grey);
 // iOS only Sass variables can go here
 
 $list-ios-activated-background-color: #efeff4;
+$alert-ios-message-text-color: map-get($colors, dark);
 
 
 // App Material Design Variables

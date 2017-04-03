@@ -34,7 +34,7 @@ export class ProfilePage {
 
 	profileLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCrtl: AlertController, private platform: Platform) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCtrl: AlertController, private platform: Platform) {}
 
 	ngOnInit() {
 		this.userId = parseFloat(this.navParams.get("userId"));
@@ -96,6 +96,42 @@ export class ProfilePage {
 	}
 
 	acceptRequest() {
+		let addOrAcceptConfirm;
+
+		if(this.isRequest) {
+			addOrAcceptConfirm = this.alertCtrl.create({
+				title: 'Accept Request?',
+				message: 'Do you want to add this person as a contact?',
+				buttons: [
+					{ text: 'Decline', role: 'danger' },
+					{ text: 'Accept',
+						handler: () => {
+							this.doAdd();
+						}
+					}
+				]
+			});
+			addOrAcceptConfirm.setCssClass("profile__request-accept");
+		} else {
+			addOrAcceptConfirm = this.alertCtrl.create({
+				title: 'Send Request?',
+				message: 'Do you want to send a contact request to this person?',
+				buttons: [
+					{ text: 'Cancel', role: 'cancel' },
+					{ text: 'Send',
+						handler: () => {
+							this.doAdd();
+						}
+					}
+				]
+			});
+			addOrAcceptConfirm.setCssClass("profile__send-confirm");
+		}
+
+		addOrAcceptConfirm.present();
+	}
+
+	private doAdd() {
 		this.profileLoading = true;
 
 		this.addOrAccept().then(() => {
@@ -122,14 +158,24 @@ export class ProfilePage {
 		this.navCtrl.push(NewMessagePage, { receiverIds: this.user.id });
 	}
 
+	verifyPerson() {
+
+	}
+
 	contactOptions() {
 		this.actionSheetCtrl.create({
 			buttons: [{
+				icon: !this.platform.is("ios") ? "lock": null,
+				text: "Verify this Contact",
+				handler: () => {
+					this.verifyPerson();
+				}
+			}, {
 				text: "Remove from Contacts",
 				role: "destructive",
 				icon: !this.platform.is("ios") ? "trash" : null,
 				handler: () => {
-					this.alertCrtl.create({
+					this.alertCtrl.create({
 						title: "Remove Contact",
 						message: "Are you sure that you want to remove this Contact?",
 						buttons: [{

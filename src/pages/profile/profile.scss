@@ -1,13 +1,11 @@
 page-profile {
-
+	.item-block:last-child {
+		border-bottom: 1px solid $list-border-color !important;
+	}
 }
 
 .item-block {
 	border-top: none !important;
-}
-
-.item-block:first-child:not(:last-child) {
-	border: none !important;
 }
 
 .profile__info {
@@ -18,11 +16,11 @@ page-profile {
 
 .profile__avatar-row {
 	display: flex;
-	padding-bottom: 2em;
+	padding: 2em;
 }
 
 .profile__request-hex {
-	display: flex;
+	display: inline-block;
 	align-content: center;
 	justify-content: center;
 
@@ -36,11 +34,15 @@ page-profile {
 }
 
 .profile__image {
-	margin: auto;
+	margin: auto auto 0;
+}
+
+.profile__names {
+	margin-bottom: 2rem;
 }
 
 .profile__big-name {
-	margin-top: 3rem;
+	margin-top: 0;
 	margin-bottom: 0;
 
 	font-weight: 400;
@@ -54,6 +56,23 @@ page-profile {
 
 .profile__info-list {
 	margin-top: 1rem;
+}
+
+.profile__request-accept {
+	.alert-button:first-child .button-inner {
+		color: map-get($colors, danger);
+	}
+	.button-inner {
+		color: map-get($colors, primary);
+	}
+}
+.profile__send-confirm {
+	.alert-button:first-child .button-inner {
+		color: map-get($colors, grey);
+	}
+	.button-inner {
+		color: map-get($colors, primary);
+	}
 }
 
 .profile__qr {

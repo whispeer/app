@@ -12,39 +12,7 @@
 
 </ion-header>
 
-<ion-content padding *ngIf="isRequest || isRequestable">
-	<ion-spinner *ngIf="profileLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<h4 class="text-primary text-medium" text-center padding>Add this person as a contact?</h4>
-	<div class="profile__avatar-row">
-		<div class="profile__request-hex">
-			<img src="assets/images/icons/add.svg" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()">
-		</div>
-		<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
-			<user-image [id]="user.id" [image]="user.basic.image"></user-image>
-		</ion-avatar>
-		<div class="profile__request-hex" id="request__decline">
-			<img src="assets/images/icons/deny.svg" *ngIf="isRequest" class="profile__request-button" id="request__accept__button" (click)="declineRequest()">
-			<img src="assets/images/icons/write.svg" *ngIf="!isRequest" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
-		</div>
-	</div>
-	<ion-list class="profile__info-list space-for-fab">
-		<ion-item>
-			<ion-label fixed color="primaryDarker" text-right>Account</ion-label>
-			<p item-content padding-horizontal class="profile__info">{{user.names.nickname}}</p>
-		</ion-item>
-		<ion-item>
-			<ion-label fixed color="primaryDarker" text-right>Name</ion-label>
-			<p item-content padding-horizontal class="profile__info">{{user.names.firstname}}</p>
-		</ion-item>
-		<ion-item>
-			<ion-label fixed color="primaryDarker" text-right>Surname</ion-label>
-			<p item-content padding-horizontal class="profile__info">{{user.names.lastname}}</p>
-		</ion-item>
-	</ion-list>
-	<main-menu [icon]="'close'" (mainHandle)="close()"></main-menu>
-</ion-content>
-
-<ion-content *ngIf="!isRequest && !isRequestable">
+<ion-content class="has-main-menu">
 	<ion-toolbar *ngIf="isOwn" padding color="light">
 		<ion-segment [(ngModel)]="view" color="grey">
 			<ion-segment-button value="profile">
@@ -61,7 +29,8 @@
 		<div *ngSwitchCase="'profile'">
 			<div *ngIf="!isOwn" class="profile__avatar-row">
 				<div class="profile__request-hex">
-					<img src="assets/images/icons/added.svg" class="profile__request-button" id="request__accept__button" (click)="contactOptions()">
+					<img *ngIf="isRequest || isRequestable" src="assets/images/icons/add.svg" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()">
+					<img *ngIf="!(isRequest || isRequestable)" src="assets/images/icons/added.svg" class="profile__request-button" id="request__accept__button" (click)="contactOptions()">
 				</div>
 				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
@@ -73,9 +42,11 @@
 			<ion-avatar *ngIf="isOwn" class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 				<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 			</ion-avatar>
-			<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
-			<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firtname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
-			<ion-list class="profile__info-list space-for-fab">
+			<div class="profile__names">
+				<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
+				<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firtname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
+			</div>
+			<ion-list class="profile__info-list space-for-fab" inset>
 				<ion-item *ngIf="attributeSet(user.advanced.birthday)">
 					<ion-label fixed color="primaryDarker" text-right>Birthday</ion-label>
 					<p item-content class="profile__info">{{user.advanced.birthday.day}}.<span *ngIf="user.advanced.birthday.month && user.advanced.birthday.month.length === 1">0</span>{{user.advanced.birthday.month}}.{{user.advanced.birthday.year}}</p>
@@ -110,6 +81,22 @@
 				</ion-item>
 			</ion-list>
 
+			<ion-list showWhen="ios">
+				<button ion-item (click)="verifyPerson()">
+					Verify this contact
+				</button>
+				<button *ngIf="isRequest" ion-item (click)="declineRequest()">
+					<span ion-text color="danger">Decline this request</span>
+				</button>
+			</ion-list>
+			<div padding-horizontal hideWhen="ios">
+				<button ion-button block color="light" (click)="verifyPerson()">
+					Verify this contact
+				</button>
+				<button *ngIf="isRequest" ion-button block color="danger" (click)="declineRequest()">
+					Decline this request
+				</button>
+			</div>
 		</div>
 		<div *ngSwitchCase="'qr'">
 

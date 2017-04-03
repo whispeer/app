@@ -25,6 +25,10 @@ ion-fab[fixed] {
 	position: fixed;
 }
 
+.has-main-menu .scroll-content {
+	padding-bottom: 100px;
+}
+
 .hexagon-wrap {
 	position: relative;
 }
@@ -175,6 +179,10 @@ ion-fab[fixed] {
 		left: 50%;
 		transform: translateX(-50%);
 	}
+}
+
+.ios .alert-head {
+	color: map-get($colors, dark);
 }
 
 .alert-button-danger {
