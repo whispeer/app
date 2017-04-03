@@ -65,12 +65,6 @@ class LoginService {
 
 			return null;
 		});
-
-		sessionStorage.awaitLoading().then(function () {
-			if (sessionStorage.get("loggedin") === "true") {
-				mainPage();
-			}
-		});
 	}
 
 	loginServer (name: string, password: string, callback?: Function) {

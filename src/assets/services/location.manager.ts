@@ -20,15 +20,18 @@ const removeOther = (ele: JQuery) => {
 };
 
 const setTopLocation = (url: string) => {
-	window.top.location.href = basePath + url;
+	console.warn("set top location", url, basePath + url)
+	window.top.location.href = basePath + url
 }
 
 export const mainPage = () => {
-	setTopLocation("index.html");
+	setTopLocation("#/home")
+	window.top.location.reload()
 }
 
 export const landingPage = () => {
-	setTopLocation("login.html");
+	setTopLocation("#/login")
+	window.top.location.reload()
 }
 
 export const isLoginPage = () => {
@@ -36,7 +39,7 @@ export const isLoginPage = () => {
 }
 
 export const loginPage = () => {
-	setTopLocation("login.html");
+	setTopLocation("#/login");
 }
 
 export const isBlockedReturnUrl = (url: string) => {

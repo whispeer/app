@@ -5,14 +5,11 @@ var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
 
 module.exports = {
-	entry: {
-		login: path.resolve("src/login/login.ts"),
-		main: path.resolve("src/app/main.ts"),
-	},
+	entry: process.env.IONIC_APP_ENTRY_POINT,
 	output: {
 		path: "{{BUILD}}",
 		publicPath: "build/",
-		filename: "[name].js",
+		filename: process.env.IONIC_OUTPUT_JS_FILE_NAME,
 		devtoolModuleFilenameTemplate: ionicWebpackFactory.getSourceMapperFunction(),
 	},
 	devtool: process.env.IONIC_SOURCE_MAP_TYPE,
