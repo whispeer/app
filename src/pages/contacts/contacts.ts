@@ -23,7 +23,12 @@ export class ContactsPage extends ContactsWithSearch {
 
 	ionViewDidLoad() {
 		contactsService.awaitLoading().then(() => {
-			contactsService.listen(this.loadContactsUsers);
+			this.requests = contactsService.getRequests()
+
+			contactsService.listen(() => {
+				this.requests = contactsService.getRequests()
+				this.loadContactsUsers()
+			});
 			return this.loadContactsUsers();
 		});
 	}
