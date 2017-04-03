@@ -26,7 +26,6 @@ const setTopLocation = (url: string) => {
 
 export const mainPage = () => {
 	setTopLocation("#/home")
-	window.top.location.reload()
 }
 
 export const landingPage = () => {

@@ -4,7 +4,7 @@ import { withPrefix } from "../services/storage.service";
 
 import socketService from "../services/socket.service";
 
-import { mainPage, loginPage, isLoginPage } from "../services/location.manager";
+import { loginPage, isLoginPage } from "../services/location.manager";
 
 const chelper = require("crypto/helper");
 const errors = require("asset/errors");
@@ -120,7 +120,6 @@ class LoginService {
 			return this.loginServer(this.identifier, this.password);
 		}).then(() => {
 			loginState.success();
-			mainPage();
 		}).catch((e) => {
 			loginState.failed();
 

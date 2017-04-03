@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
+import sessionService from '../../assets/services/session.service';
 import { failureCodes } from "../../assets/services/login.service";
 import loginService from "../../assets/services/login.service";
 import { mainPage } from "../../assets/services/location.manager";
@@ -140,7 +141,9 @@ export class LoginPage {
 			// login
 			this.performLogin().then(() => {
 				this.usernameState = USERNAME_LOGIN_SUCCESS
-				mainPage()
+				sessionService.loadLogin().then(() => {
+					mainPage()
+				})
 			}).catch((error) => {
 				this.usernameState = this.getLoginErrorCode(error);
 			})

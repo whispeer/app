@@ -55,15 +55,7 @@
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
-    "ionic_copy": "./config/copy.config.js",
-    "ionic_uglifyjs": [
-      "./config/uglifyjs.config.js",
-      "./config/uglifyjs2.config.js"
-    ],
-    "ionic_ngc": [
-      "./config/ngc.config.js",
-      "./config/ngc2.config.js"
-    ]
+    "ionic_copy": "./config/copy.config.js"
   },
   "description": "whispeerMessenger: An Ionic project"
 }
