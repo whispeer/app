@@ -14,7 +14,9 @@ import { ContactsWithSearch } from '../../assets/contacts/contactsWithSearch'
 	selector: 'page-contacts',
 	templateUrl: 'contacts.html'
 })
+
 export class ContactsPage extends ContactsWithSearch {
+
 	requests: any[] = [];
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {

@@ -2,6 +2,8 @@ import { Component, ViewChild } from "@angular/core";
 
 import { NavController, Content } from "ionic-angular";
 
+import { ContactRequestsPage } from "../contact-requests/contact-requests";
+
 import { MessagesPage } from "../messages/messages";
 import { NewMessagePage } from "../new-message/new-message";
 
@@ -62,7 +64,7 @@ export class HomePage {
 	}
 
 	openContactRequests = () => {
-		alert('open contact requests');
+		this.navCtrl.push(ContactRequestsPage);
 	}
 
 	openChat = (topicId: number) => {
