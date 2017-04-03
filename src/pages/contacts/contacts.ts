@@ -35,6 +35,10 @@ export class ContactsPage extends ContactsWithSearch {
 		});
 	}
 
+	get requestsLabel() {
+		return this.requests.length > 1 ? 'New contact requests' : 'New contact request'
+	}
+
 	goToUser(userId) {
 		this.navCtrl.push(ProfilePage, {
 			userId: userId
