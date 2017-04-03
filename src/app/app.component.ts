@@ -73,7 +73,7 @@ export class MyApp {
 			StatusBar.styleLightContent();
 			Splashscreen.hide();
 
-			const pushService = new PushService(this.nav);
+			const pushService = new PushService(this.nav, platform);
 			pushService.register();
 		});
 	}
