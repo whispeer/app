@@ -5,6 +5,11 @@
 </ion-header>
 
 <ion-content class="list-avatar-page">
+	<button ion-button full icon-right class="contactRequests" (click)="openContactRequests()">
+		New contact requests
+		<ion-icon name="arrow-forward"></ion-icon>
+	</button>
+
 	<ion-list class="space-for-fab">
 		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread, 'topic--new--last': nextUnread(topic)}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>

@@ -61,6 +61,10 @@ export class HomePage {
 		return !nextTopic.unread;
 	}
 
+	openContactRequests = () => {
+		alert('open contact requests');
+	}
+
 	openChat = (topicId: number) => {
 		this.navCtrl.push(MessagesPage, { topicId: topicId });
 	}
