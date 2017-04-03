@@ -4,7 +4,6 @@ $font-path: "../assets/fonts";
 
 @import "ionic.globals";
 
-
 // Shared Variables
 // --------------------------------------------------
 // To customize the look and feel of this app, you can override
@@ -97,3 +96,4 @@ $list-ios-activated-background-color: #efeff4;
 
 @import "roboto";
 @import "noto-sans";
+@import "node_modules/mathsass/dist/math";
