@@ -2,6 +2,27 @@ page-home {
 
 }
 
+.contactRequests, .contactRequests:active {
+	margin-top: 0;
+	background-color: #ffeda5;
+	color: black;
+	min-height: 70px;
+
+	.icon {
+		position: absolute;
+		right: 16px;
+	}
+
+	.button-inner {
+		text-transform: initial;
+		justify-content: initial;
+		padding-left: 70px;
+		.platform-android & { padding-left: 62px; }
+		font-weight: 400;
+	}
+}
+
+
 .topic {
 	.label p {
 		// let's hope this works everywhere...
