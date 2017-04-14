@@ -220,6 +220,10 @@ export class ProfilePage {
 						}]
 					}).present();
 				}
+			}, {
+				text: "Cancel",
+				role: "cancel",
+				icon: !this.platform.is("ios") ? "close" : null,
 			}]
 		}).present();
 	}
