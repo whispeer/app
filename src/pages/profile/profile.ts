@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, ActionSheetController, AlertController, Platform } from 'ionic-angular';
+import { ImagePicker, File, Camera } from 'ionic-native';
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
@@ -9,6 +10,21 @@ import { VerifyContactPage } from "../verify-contact/verify-contact";
 
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
+
+const ImagePickerOptions = {
+	width: 2560,
+	height: 1440,
+	maximumImagesCount: 1
+};
+
+const CameraOptions = {
+	destinationType: 1, // value 2 breaks ios.
+	allowEdit: true,
+	encodingType: 0,
+	// targetWidth: ImagePickerOptions.width,
+	// targetHeight: ImagePickerOptions.height,
+	// correctOrientation: true
+};
 
 @Component({
 	selector: 'page-profile',
@@ -192,6 +208,81 @@ export class ProfilePage {
 						}]
 					}).present();
 				}
+			}]
+		}).present();
+	}
+
+	// 1:1 copy from topicDisplay. maybe this should go into the helper?
+	getFile = (url: string, type: string) : Bluebird<any> => {
+		return new Bluebird((resolve, reject) => {
+			File.resolveLocalFilesystemUrl(url).then((entry: any) => {
+				return entry.file(resolve, reject);
+			});
+		}).then((file: any) => {
+			file.originalUrl = url;
+			if(this.platform.is("ios")) {
+				file.localURL = url.replace("file://", "http://ionic.local");
+			}
+			file.type = type;
+
+			return file;
+		});
+	}
+
+	avatarClicked() {
+		this.actionSheetCtrl.create({
+			buttons: [{
+				icon: !this.platform.is("ios") ? "eye": null,
+				text: "View",
+				handler: () => {
+					console.log("view image")
+				}
+			}, {
+				icon: !this.platform.is("ios") ? "camera": null,
+				text: "Take a Photo",
+				handler: () => {
+					Camera.getPicture(CameraOptions).then((url) => {
+						return this.getFile(url, "image/png");
+					}).then((file: any) => {
+						// TODO: make this the profile image!
+					});
+				}
+			}, {
+				icon: !this.platform.is("ios") ? "image": null,
+				text: "Select from Gallery",
+				handler: () => {
+					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+						return this.getFile(result, "image/png");
+					}).then((file: any) => {
+						// image count is one so images only contains one entry!
+						// TODO: make this the profile image!
+					});
+				}
+			}, {
+				text: "Remove",
+				role: "destructive",
+				icon: !this.platform.is("ios") ? "trash" : null,
+				handler: () => {
+					this.alertCtrl.create({
+						title: "Remove Picture",
+						message: "Are you sure that you want to remove your Picture?",
+						buttons: [{
+							text: "Cancel",
+							role: "cancel"
+						}, {
+							text: "Remove",
+							role: "destructive",
+							cssClass: "alert-button-danger",
+							handler: () => {
+								console.log("remove user image!")
+							}
+						}]
+					}).present();
+				}
+			}, {
+				text: "Cancel",
+				role: "cancel",
+				icon: !this.platform.is("ios") ? "close" : null
 			}]
 		}).present();
 	}

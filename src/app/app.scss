@@ -190,6 +190,12 @@ ion-fab[fixed] {
 	font-weight: normal !important;
 }
 
+// action sheet cancel text color
+// there was no variable for this...
+.action-sheet-ios .action-sheet-cancel {
+	color: map-get($colors, dark);
+}
+
 // -----------------------------------------------------------
 // The following is a bugfix for headers inside of components on ios
 // This is a copy of a code snippet from the ionic code, but removing a >

@@ -39,7 +39,7 @@
 					<img src="assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
 				</div>
 			</div>
-			<ion-avatar *ngIf="isOwn" class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
+			<ion-avatar *ngIf="isOwn" class="hexagon__image hexagon__image--active hexagon__image--large profile__image" (click)="avatarClicked()">
 				<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 			</ion-avatar>
 			<div class="profile__names">

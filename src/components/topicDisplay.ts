@@ -92,6 +92,7 @@ export class TopicComponent {
 			buttons: [
 				{
 					text: "Take Photo",
+					icon: !this.platform.is("ios") ? "camera": null,
 					handler: () => {
 						Camera.getPicture(CameraOptions).then((url) => {
 							return this.getFile(url, "image/png");
@@ -106,6 +107,7 @@ export class TopicComponent {
 					}
 				}, {
 					text: "Select from Gallery",
+					icon: !this.platform.is("ios") ? "image": null,
 					handler: () => {
 						Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
 							return this.getFile(result, "image/png");
@@ -120,6 +122,7 @@ export class TopicComponent {
 					}
 				}, {
 					text: "Cancel",
+					icon: !this.platform.is("ios") ? "close" : null,
 					role: "cancel",
 					handler: () => {
 						console.log("Cancel clicked.");
