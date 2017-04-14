@@ -39,9 +39,11 @@
 					<img src="assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
 				</div>
 			</div>
-			<ion-avatar *ngIf="isOwn" class="hexagon__image hexagon__image--active hexagon__image--large profile__image" (click)="avatarClicked()">
-				<user-image [id]="user.id" [image]="user.basic.image"></user-image>
-			</ion-avatar>
+			<div *ngIf="isOwn" class="profile__avatar-row">
+				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image" (click)="avatarClicked()">
+					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
+				</ion-avatar>
+			</div>
 			<div class="profile__names">
 				<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
 				<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firtname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
@@ -81,21 +83,23 @@
 				</ion-item>
 			</ion-list>
 
-			<ion-list showWhen="ios">
-				<button ion-item (click)="verifyPerson()">
-					Verify this contact
-				</button>
-				<button *ngIf="isRequest" ion-item (click)="declineRequest()">
-					<span ion-text color="danger">Decline this request</span>
-				</button>
-			</ion-list>
-			<div padding-horizontal hideWhen="ios">
-				<button ion-button block color="light" (click)="verifyPerson()">
-					Verify this contact
-				</button>
-				<button *ngIf="isRequest" ion-button block color="danger" (click)="declineRequest()">
-					Decline this request
-				</button>
+			<div *ngIf="!isOwn">
+				<ion-list showWhen="ios">
+					<button ion-item (click)="verifyPerson()">
+						Verify this contact
+					</button>
+					<button *ngIf="isRequest" ion-item (click)="declineRequest()">
+						<span ion-text color="danger">Decline this request</span>
+					</button>
+				</ion-list>
+				<div padding-horizontal hideWhen="ios">
+					<button ion-button block color="light" (click)="verifyPerson()">
+						Verify this contact
+					</button>
+					<button *ngIf="isRequest" ion-button block color="danger" (click)="declineRequest()">
+						Decline this request
+					</button>
+				</div>
 			</div>
 		</div>
 		<div *ngSwitchCase="'qr'">
