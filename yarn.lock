@@ -50,6 +50,14 @@
   dependencies:
     tsickle "^0.1.7"
 
+"@ionic-native/barcode-scanner@^3.4.4":
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@ionic-native/barcode-scanner/-/barcode-scanner-3.4.4.tgz#0833d6205e89f65f285e379583609970d9724048"
+
+"@ionic-native/core@^3.4.4":
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@ionic-native/core/-/core-3.4.4.tgz#6d8b69fd7e3723354c71cc43a53c48010025c025"
+
 "@ionic/app-scripts@whispeer/ionic-app-scripts#feature/multi_configs":
   version "0.0.48"
   resolved "https://codeload.github.com/whispeer/ionic-app-scripts/tar.gz/0fcdfb29a757db5de024b77ec008237e7a82c38e"
