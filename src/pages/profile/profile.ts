@@ -106,10 +106,22 @@ export class ProfilePage {
 
 	private addOrAccept() {
 		if (this.isRequest) {
-			return friendsService.acceptFriendShip(this.userId);
+			return friendsService.acceptFriendShip(this.userId).then(() => {
+				this.alertCtrl.create({
+					title: "Accepted!",
+					message: `${this.user.name} is now in your contacts.`,
+					buttons: ["Ok"]
+				}).present();
+			});
 		}
 
-		return friendsService.friendship(this.userId);
+		return friendsService.friendship(this.userId).then(() => {
+			this.alertCtrl.create({
+				title: "Request sent!",
+				message: `You've sent a contact request to ${this.user.name}.`,
+				buttons: ["Ok"]
+			}).present();
+		});
 	}
 
 	acceptRequest() {
