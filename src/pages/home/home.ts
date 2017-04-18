@@ -47,7 +47,7 @@ export class HomePage {
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
-		messageService.loadMoreLatest().then(() => {
+		messageService.loadMoreLatest(() => {}).then(() => {
 			infiniteScroll.complete();
 		})
 	}
