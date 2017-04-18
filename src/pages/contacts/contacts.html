@@ -14,13 +14,13 @@
 <ion-content>
 	<ion-searchbar *ngIf="!contactsLoading" animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<ion-list no-lines no-margin *ngIf="requests.length > 0">
-		<ion-item class="friends__request" padding (click)="goToRequests()">
-			<ion-badge item-left>{{requests.length}}</ion-badge>
-			<h2>New contact requests</h2>
-			<ion-note item-right><span>Details&nbsp;</span><ion-icon name="arrow-forward"></ion-icon></ion-note>
-		</ion-item>
-	</ion-list>
+	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="goToRequests()">
+		<div class="badgeContainer">
+			<span class="hexBadge">{{requests.length}}</span>
+		</div>
+		{{requestsLabel}}
+		<ion-icon name="arrow-forward"></ion-icon>
+	</button>
 	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}

@@ -34,6 +34,7 @@ export class TopicComponent {
 	@Input() topic;
 	@Input() messageBurstsFunction;
 	@Input() messagesLoading;
+	@Input() forceBackButton;
 
 	@Output() sendMessage = new EventEmitter();
 

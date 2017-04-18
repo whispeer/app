@@ -2,6 +2,87 @@ page-home {
 
 }
 
+@mixin hexagon($height, $color: rgba(90, 183, 13, .5), $fg: white) {
+
+	$half_height: $height / 2;
+	$double_half_height: 2 * $half_height;
+	$cathetus_width: $half_height / sqrt(3);
+	$double_cathetus_width: 2 * $cathetus_width;
+
+	left: 0;
+	top: 0;
+
+	display: inline-block;
+	font-size: .7 * $height;
+	font-family: -apple-system, "Helvetica Neue", Roboto, sans-serif;
+	color: $fg;
+	height: $double_half_height;
+	line-height: $double_half_height;
+	vertical-align: bottom;
+	position: relative;
+	min-width: 1.07 * $double_cathetus_width;
+	text-align: center;
+	margin: 0 $cathetus_width;
+	padding: 0 1px;
+	box-sizing: border-box;
+	background-color: $color;
+	transform: translateZ(0);
+
+	&:before, &:after {
+		content: "";
+		position: absolute;
+		min-height: 0px;
+		top: 0;
+		width: $cathetus_width;
+		background-color: transparent;
+		border-top: $half_height solid transparent;
+		border-bottom: $half_height solid transparent;
+		box-sizing: border-box;
+		transform: translateZ(0);
+	}
+	&:before {
+		left: -$cathetus_width;
+		border-right: $cathetus_width solid $color;
+	}
+	&:after {
+		right: -$cathetus_width;
+		border-left: $cathetus_width solid $color;
+	}
+}
+
+.contactRequests, .contactRequests:active {
+	margin-top: 0;
+	background-color: #ffeda5;
+	color: map-get($colors, dark);
+	min-height: 70px;
+
+	.icon {
+		position: absolute;
+		right: 16px;
+	}
+
+	.button-inner {
+		text-transform: initial;
+		justify-content: initial;
+		padding-left: 70px;
+		.platform-android & { padding-left: 62px; }
+		font-weight: 400;
+	}
+
+	.badgeContainer {
+		display: block;
+		position: absolute;
+		left: 0;
+		width: 86px;
+		.platform-android & { width: 78px; }
+	}
+
+	.hexBadge {
+		@include hexagon(27px, map-get($colors, primary));
+	}
+}
+
+
 .topic {
 	.label p {
 		// let's hope this works everywhere...
