@@ -14,7 +14,9 @@ import { ContactsWithSearch } from '../../assets/contacts/contactsWithSearch'
 	selector: 'page-contacts',
 	templateUrl: 'contacts.html'
 })
+
 export class ContactsPage extends ContactsWithSearch {
+
 	requests: any[] = [];
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {
@@ -23,9 +25,18 @@ export class ContactsPage extends ContactsWithSearch {
 
 	ionViewDidLoad() {
 		contactsService.awaitLoading().then(() => {
-			contactsService.listen(this.loadContactsUsers);
+			this.requests = contactsService.getRequests()
+
+			contactsService.listen(() => {
+				this.requests = contactsService.getRequests()
+				this.loadContactsUsers()
+			});
 			return this.loadContactsUsers();
 		});
+	}
+
+	get requestsLabel() {
+		return this.requests.length > 1 ? 'New contact requests' : 'New contact request'
 	}
 
 	goToUser(userId) {

@@ -395,6 +395,10 @@ bluebird@^3.4.7:
   version "3.4.7"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.4.7.tgz#f72d760be09b7f76d08ed8fae98b289a8d05fab3"
 
+blueimp-canvas-to-blob@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/blueimp-canvas-to-blob/-/blueimp-canvas-to-blob-3.7.0.tgz#6e985b935c0223410c3a2ad96c0ba3ea214c2b13"
+
 blueimp-load-image@^2.10.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/blueimp-load-image/-/blueimp-load-image-2.11.0.tgz#bf9ea2804152ce8bd52eb18f8cf24efb081c44ef"
@@ -1739,6 +1743,10 @@ magic-string@^0.16.0:
 map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
+
+mathsass@^0.9.5:
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/mathsass/-/mathsass-0.9.5.tgz#a63ebe022171eaf82e3d57b5f2ad3d687e347a3e"
 
 media-typer@0.3.0:
   version "0.3.0"

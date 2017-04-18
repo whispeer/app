@@ -12,6 +12,7 @@ import * as Bluebird from 'bluebird';
 	selector: 'page-contact-requests',
 	templateUrl: 'contact-requests.html'
 })
+
 export class ContactRequestsPage {
 	requests: any[] = [];
 	requestsLoading: boolean = true;

@@ -2,19 +2,24 @@ import { Component, ViewChild } from "@angular/core";
 
 import { NavController, Content } from "ionic-angular";
 
+import { ContactRequestsPage } from "../contact-requests/contact-requests";
+
 import { MessagesPage } from "../messages/messages";
 import { NewMessagePage } from "../new-message/new-message";
 
 const messageService = require("messages/messageService");
+const contactsService = require("../../assets/services/friendsService");
 
 @Component({
 	selector: 'page-home',
 	templateUrl: 'home.html'
 })
+
 export class HomePage {
 	@ViewChild(Content) content: Content;
 
 	topics: any[];
+	requests: any[] = [];
 	searchTerm: string = "";
 
 	topicsLoading: boolean = true;
@@ -29,10 +34,11 @@ export class HomePage {
 		// another problem is that the search bars have different heights.
 
 		//this.content.scrollTo(0, 58, 0);
-		this.getTopics();
+		this.loadTopics();
+		this.loadRequests();
 	}
 
-	getTopics = () => {
+	loadTopics = () => {
 		this.topics = messageService.data.latestTopics.data;
 
 		messageService.loadMoreLatest(() => {}).then(() => {
@@ -59,6 +65,25 @@ export class HomePage {
 		}
 
 		return !nextTopic.unread;
+	}
+
+	updateRequests = () => {
+		this.requests = contactsService.getRequests()
+	}
+
+	loadRequests = () => {
+		contactsService.awaitLoading().then(() => {
+			this.updateRequests()
+			contactsService.listen(this.updateRequests);
+		});
+	}
+
+	get requestsLabel() {
+		return this.requests.length > 1 ? 'New contact requests' : 'New contact request'
+	}
+
+	openContactRequests = () => {
+		this.navCtrl.push(ContactRequestsPage);
 	}
 
 	openChat = (topicId: number) => {
