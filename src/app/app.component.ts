@@ -7,6 +7,8 @@ import { HomePage } from '../pages/home/home';
 import { PushService } from "../assets/services/push.service";
 import Tutorial from "./tutorial";
 
+const tutorialDisabled = ["login"]
+
 @Component({
 	templateUrl: "app.html"
 })
@@ -17,8 +19,10 @@ export class MyApp {
 
 	@ViewChild("navigation") nav: NavController;
 
-	showTutorial() {
-		return Tutorial.tutorialVisible;
+	showTutorial = () => {
+		const activeView = this.nav.getActive()
+
+		return activeView && tutorialDisabled.indexOf(activeView.id) === -1 && Tutorial.tutorialVisible;
 	}
 
 	slideNumber = 1;
