@@ -4,8 +4,11 @@ import { StatusBar, Splashscreen } from "ionic-native";
 import { Globalization } from 'ionic-native';
 
 import { HomePage } from '../pages/home/home';
+import { LoginPage } from '../pages/login/login';
 import { PushService } from "../assets/services/push.service";
 import Tutorial from "./tutorial";
+
+import sessionService from '../assets/services/session.service';
 
 const tutorialDisabled = ["login"]
 
@@ -79,6 +82,13 @@ export class MyApp {
 
 			const pushService = new PushService(this.nav, platform);
 			pushService.register();
+
+			sessionService.loadLogin().then((loggedin) => {
+				if (!loggedin) {
+					this.nav.remove(0, this.nav.length() - 1)
+					this.nav.setRoot(LoginPage)
+				}
+			});
 		});
 	}
 }

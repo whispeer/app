@@ -23,10 +23,7 @@ import { NewMessagePage } from "../pages/new-message/new-message";
 // aot compilation which is required for production builds. this works however if we use the whole path.
 import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
 
-import sessionService from '../assets/services/session.service';
 import * as Bluebird from 'bluebird';
-
-import { loginPage } from "../assets/services/location.manager";
 
 import { TopicComponent } from "../components/topicDisplay";
 import { GalleryComponent } from "../components/gallery/gallery";
@@ -101,15 +98,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 export class AppModule {
 	constructor(private zone: NgZone) {
 		Bluebird.setScheduler((fn) => {
-			setTimeout(() => {
-				this.zone.run(fn);
-			}, 0)
-		});
-
-		sessionService.loadLogin().then((loggedin) => {
-			if (!loggedin) {
-				loginPage();
-			}
+			(<any>window).Zone.current.scheduleMicroTask('bluebird', fn)
 		});
 	}
 }
