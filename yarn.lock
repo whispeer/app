@@ -50,9 +50,9 @@
   dependencies:
     tsickle "^0.1.7"
 
-"@ionic/app-scripts@whispeer/ionic-app-scripts#feature/multi_configs":
-  version "0.0.48"
-  resolved "https://codeload.github.com/whispeer/ionic-app-scripts/tar.gz/0fcdfb29a757db5de024b77ec008237e7a82c38e"
+"@ionic/app-scripts@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ionic/app-scripts/-/app-scripts-1.0.0.tgz#58d7efa11cf3615b65de48d4e44e5e1016d55cf1"
   dependencies:
     autoprefixer "6.4.1"
     chalk "1.1.3"
@@ -394,6 +394,10 @@ block-stream@*:
 bluebird@^3.4.7:
   version "3.4.7"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.4.7.tgz#f72d760be09b7f76d08ed8fae98b289a8d05fab3"
+
+blueimp-canvas-to-blob@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/blueimp-canvas-to-blob/-/blueimp-canvas-to-blob-3.7.0.tgz#6e985b935c0223410c3a2ad96c0ba3ea214c2b13"
 
 blueimp-load-image@^2.10.0:
   version "2.11.0"
