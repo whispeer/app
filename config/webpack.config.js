@@ -40,6 +40,11 @@ module.exports = {
 				test: /\.ts$/,
 				loader: process.env.IONIC_WEBPACK_LOADER
 			}
+		],
+		noParse: [
+			/sjcl\.js$/,
+			/socket\.io\.js$/,
+			/visionmedia-debug\/.*debug\.js$/,
 		]
 	},
 
