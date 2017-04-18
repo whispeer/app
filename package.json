@@ -49,7 +49,7 @@
     "zone.js": "0.6.26"
   },
   "devDependencies": {
-    "@ionic/app-scripts": "whispeer/ionic-app-scripts#feature/multi_configs",
+    "@ionic/app-scripts": "1.0.0",
     "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz",
     "mathsass": "^0.9.5",
     "typescript": "2.0.9",
@@ -57,15 +57,7 @@
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
-    "ionic_copy": "./config/copy.config.js",
-    "ionic_uglifyjs": [
-      "./config/uglifyjs.config.js",
-      "./config/uglifyjs2.config.js"
-    ],
-    "ionic_ngc": [
-      "./config/ngc.config.js",
-      "./config/ngc2.config.js"
-    ]
+    "ionic_copy": "./config/copy.config.js"
   },
   "description": "whispeerMessenger: An Ionic project"
 }

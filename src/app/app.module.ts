@@ -14,6 +14,7 @@ import { HomePage } from "../pages/home/home";
 import { MessagesPage } from "../pages/messages/messages";
 import { ContactsPage } from "../pages/contacts/contacts";
 import { ProfilePage } from "../pages/profile/profile";
+import { LoginPage } from "../pages/login/login";
 import { SettingsPage } from "../pages/settings/settings";
 import { ContactRequestsPage } from "../pages/contact-requests/contact-requests";
 import { NewMessagePage } from "../pages/new-message/new-message";
@@ -42,6 +43,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 	declarations: [
 		MyApp,
 		HomePage,
+		LoginPage,
 		MessagesPage,
 		ContactsPage,
 		ProfilePage,
@@ -61,6 +63,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 		IonicModule.forRoot(MyApp, {}, {
 			links: [
 				{ component: HomePage, name: "Home", segment: "home" },
+				{ component: LoginPage, name: "Login", segment: "login" },
 				{ component: MessagesPage, name: "Messages", segment: "messages/:topicId", defaultHistory: [HomePage] },
 				{ component: ContactsPage, name: "Contacts", segment: "contacts" },
 				{ component: ContactRequestsPage, name: "Requests", segment: "requests" },
@@ -77,6 +80,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 	entryComponents: [
 		MyApp,
 		HomePage,
+		LoginPage,
 		MessagesPage,
 		ContactsPage,
 		ProfilePage,

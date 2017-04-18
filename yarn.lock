@@ -50,9 +50,9 @@
   dependencies:
     tsickle "^0.1.7"
 
-"@ionic/app-scripts@whispeer/ionic-app-scripts#feature/multi_configs":
-  version "0.0.48"
-  resolved "https://codeload.github.com/whispeer/ionic-app-scripts/tar.gz/0fcdfb29a757db5de024b77ec008237e7a82c38e"
+"@ionic/app-scripts@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ionic/app-scripts/-/app-scripts-1.0.0.tgz#58d7efa11cf3615b65de48d4e44e5e1016d55cf1"
   dependencies:
     autoprefixer "6.4.1"
     chalk "1.1.3"
