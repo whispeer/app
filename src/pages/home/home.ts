@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 
-import { NavController, Content } from "ionic-angular";
+import { NavController, Content, IonicPage } from "ionic-angular";
 
 import { ContactRequestsPage } from "../contact-requests/contact-requests";
 
@@ -10,11 +10,14 @@ import { NewMessagePage } from "../new-message/new-message";
 const messageService = require("messages/messageService");
 const contactsService = require("../../assets/services/friendsService");
 
+@IonicPage({
+	name: "Home",
+	segment: "home"
+})
 @Component({
 	selector: 'page-home',
 	templateUrl: 'home.html'
 })
-
 export class HomePage {
 	@ViewChild(Content) content: Content;
 

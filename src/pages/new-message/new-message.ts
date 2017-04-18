@@ -1,10 +1,14 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
 import { MessagesPage } from "../messages/messages";
 
 const messageService = require("../../assets/messages/messageService");
 
+@IonicPage({
+	name: "New Message",
+	segment: "newMessage/:receiverIds"
+})
 @Component({
 	selector: 'page-new-message',
 	templateUrl: 'new-message.html'

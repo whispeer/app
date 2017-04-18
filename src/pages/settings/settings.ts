@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { NavController, NavParams, AlertController } from "ionic-angular";
+import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
 import { HomePage } from "../home/home";
 import sessionService from "../../assets/services/session.service";
 import { NewMessagePage } from "../../pages/new-message/new-message";
@@ -11,6 +11,10 @@ import Tutorial from "../../app/tutorial";
 	See http://ionicframework.com/docs/v2/components/#navigation for more info on
 	Ionic pages and navigation.
 */
+@IonicPage({
+	name: "Settings",
+	segment: "settings"
+})
 @Component({
 	selector: 'page-settings',
 	templateUrl: 'settings.html'

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform } from 'ionic-angular';
+import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform, IonicPage } from 'ionic-angular';
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
@@ -9,6 +9,10 @@ import { NewMessagePage } from "../new-message/new-message";
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
 
+@IonicPage({
+	name: "Profile",
+	segment: "profile/:userId"
+})
 @Component({
 	selector: 'page-profile',
 	templateUrl: 'profile.html'

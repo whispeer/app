@@ -6,6 +6,11 @@ import * as Bluebird from 'bluebird';
 
 const h = require("whispeerHelper");
 
+const testArray = [{
+	names: {},
+	name: ""
+}]
+
 export class ContactsWithSearch {
 	contacts: any[] = [];
 	contactsLoading: boolean = true;
@@ -35,10 +40,14 @@ export class ContactsWithSearch {
 		}).then((result: any[]) => {
 			this.contacts = result;
 			this.contactsLoading = false;
-		});
+		})
 	}
 
 	contactDividers = (record, recordIndex, records) => {
+		if (this.contactsLoading) {
+			return null
+		}
+
 		const firstChar: string = record.name[0];
 
 		if(recordIndex === 0) {
@@ -66,6 +75,8 @@ export class ContactsWithSearch {
 		if(firstChar.toLowerCase() !== previousEntry.name[0].toLowerCase()) {
 			return firstChar.toUpperCase();
 		}
+
+		console.log('return null')
 
 		return null;
 	}
@@ -110,6 +121,10 @@ export class ContactsWithSearch {
 	}
 
 	getUsers = () => {
+		if (this.contactsLoading) {
+			return testArray
+		}
+
 		return this.getContacts().concat(this.searchResults)
 	}
 }

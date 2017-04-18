@@ -1,6 +1,4 @@
-import {
-	Push
-} from 'ionic-native';
+import { Push } from '@ionic-native/push';
 
 import { NavController, Platform } from "ionic-angular";
 
@@ -20,7 +18,7 @@ const sessionStorage = withPrefix("whispeer.session");
 const sjcl = require("sjcl");
 
 export class PushService {
-	constructor(private navCtrl: NavController, private platform: Platform) {}
+	constructor(private navCtrl: NavController, private platform: Platform, private push: Push) {}
 
 	private getOrCreatePushkey = () => {
 		const storagePushKey = sessionStorage.get("pushKey");
@@ -145,14 +143,14 @@ export class PushService {
 
 	register = () => {
 		try {
-			const push = Push.init(this.pushConfig);
+			const push = this.push.init(this.pushConfig);
 
-			push.on("registration", this.registration);
-			push.on("notification", this.notification);
+			push.on("registration").subscribe(this.registration);
+			push.on("notification").subscribe(this.notification);
 
 			this.platform.resume.subscribe(() => {
 				console.warn("Resume app");
-				push.clearAllNotifications(() => {}, () => {});
+				push.clearAllNotifications()
 			})
 		} catch (e) {
 			console.warn("Push is not available!");

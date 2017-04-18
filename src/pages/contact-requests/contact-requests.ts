@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
 import { ProfilePage } from "../profile/profile";
 
@@ -8,6 +8,10 @@ const userService = require("../../assets/user/userService");
 
 import * as Bluebird from 'bluebird';
 
+@IonicPage({
+	name: "Requests",
+	segment: "requests"
+})
 @Component({
 	selector: 'page-contact-requests',
 	templateUrl: 'contact-requests.html'

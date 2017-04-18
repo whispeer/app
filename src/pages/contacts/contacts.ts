@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
 import { ContactRequestsPage } from "../contact-requests/contact-requests";
 import { ProfilePage } from "../profile/profile";
@@ -10,11 +10,14 @@ const contactsService = require("../../assets/services/friendsService");
 
 import { ContactsWithSearch } from '../../assets/contacts/contactsWithSearch'
 
+@IonicPage({
+	name: "Contacts",
+	segment: "contacts"
+})
 @Component({
 	selector: 'page-contacts',
 	templateUrl: 'contacts.html'
 })
-
 export class ContactsPage extends ContactsWithSearch {
 
 	requests: any[] = [];
