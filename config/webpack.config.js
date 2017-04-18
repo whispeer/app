@@ -2,14 +2,18 @@ var path = require("path");
 var webpack = require("webpack");
 var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
+var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+
 process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
+
+var isExternal = /node_modules[^!]*\.js$/
 
 module.exports = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,
 	output: {
 		path: "{{BUILD}}",
 		publicPath: "build/",
-		filename: process.env.IONIC_OUTPUT_JS_FILE_NAME,
+		filename: "[name].js",
 		devtoolModuleFilenameTemplate: ionicWebpackFactory.getSourceMapperFunction(),
 	},
 	devtool: process.env.IONIC_SOURCE_MAP_TYPE,
@@ -41,10 +45,20 @@ module.exports = {
 
 	plugins: [
 		ionicWebpackFactory.getIonicEnvironmentPlugin(),
-		// ionicWebpackFactory.getNonIonicCommonChunksPlugin(),
-		// ionicWebpackFactory.getIonicCommonChunksPlugin(),
+		new webpack.optimize.CommonsChunkPlugin({
+			name: "external",
+			minChunks: function (module) {
+				return module.chunks[0].name === "main" &&
+					module.request && isExternal.test(module.request)
+			}
+		}),
 		new webpack.DefinePlugin({
 			"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV)
+		}),
+		new BundleAnalyzerPlugin({
+			analyzerMode: "static",
+			reportFilename: "report.html",
+			openAnalyzer: false
 		})
 	],
 
