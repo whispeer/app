@@ -98,7 +98,7 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 export class AppModule {
 	constructor(private zone: NgZone) {
 		Bluebird.setScheduler((fn) => {
-			(<any>window).Zone.current.scheduleMicroTask('bluebird', fn)
+			this.zone.run(fn)
 		});
 	}
 }
