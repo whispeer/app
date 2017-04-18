@@ -97,8 +97,10 @@ import { SyntaxifyDirective } from '../components/syntaxify';
 })
 export class AppModule {
 	constructor(private zone: NgZone) {
-		Bluebird.setScheduler((fn) => {
-			this.zone.run(fn)
+		const originalScheduler: any = Bluebird.setScheduler((fn) => {
+			originalScheduler(() => {
+				this.zone.run(fn)
+			});
 		});
 	}
 }
