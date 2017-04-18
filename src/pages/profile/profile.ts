@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ActionSheetController, AlertController, Platform } from 'ionic-angular';
+import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform } from 'ionic-angular';
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
@@ -34,7 +34,7 @@ export class ProfilePage {
 
 	profileLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCrtl: AlertController, private platform: Platform) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCtrl: AlertController, private platform: Platform) {}
 
 	ngOnInit() {
 		this.userId = parseFloat(this.navParams.get("userId"));
@@ -129,7 +129,7 @@ export class ProfilePage {
 				role: "destructive",
 				icon: !this.platform.is("ios") ? "trash" : null,
 				handler: () => {
-					this.alertCrtl.create({
+					this.alertCtrl.create(<AlertOptions>{
 						title: "Remove Contact",
 						message: "Are you sure that you want to remove this Contact?",
 						buttons: [{
