@@ -2,8 +2,6 @@ import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core
 
 import { NavController, ActionSheetController, Platform, Content, Footer } from "ionic-angular";
 
-import { ProfilePage } from "../pages/profile/profile";
-
 import * as Bluebird from "bluebird";
 
 import { ImagePicker } from '@ionic-native/image-picker';
@@ -198,7 +196,7 @@ export class TopicComponent {
 	}
 
 	goToProfile(userId: number) {
-		this.navCtrl.push(ProfilePage, {
+		this.navCtrl.push("Profile", {
 			userId
 		});
 	}

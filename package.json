@@ -50,7 +50,7 @@
     "rxjs": "^5.3.0",
     "sjcl": "git+https://github.com/whispeer/sjcl.git#custom-build",
     "socket.io-client": "~1.7.3",
-    "sw-toolbox": "3.4.0",
+    "sw-toolbox": "3.6.0",
     "whatwg-fetch": "^2.0.1",
     "zone.js": "0.8.5"
   },

@@ -2,24 +2,24 @@ require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { IonicApp, IonicErrorHandler } from 'ionic-angular';
+import { IonicModule } from 'ionic-angular';
+import * as Bluebird from 'bluebird';
+
 import { MyApp } from './app.component';
 
-import { HomePageModule } from "../pages/home/home.module";
-import { MessagesPageModule } from "../pages/messages/messages.module";
-import { ContactsPageModule } from "../pages/contacts/contacts.module";
-import { ProfilePageModule } from "../pages/profile/profile.module";
-import { LoginPageModule } from "../pages/login/login.module";
-import { SettingsPageModule } from "../pages/settings/settings.module";
-import { ContactRequestPageModule } from "../pages/contact-requests/contact-requests.module";
-import { NewMessagePageModule } from "../pages/new-message/new-message.module";
+import { BrowserModule } from '@angular/platform-browser';
 
-import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
-
-import * as Bluebird from 'bluebird';
+import { SplashScreen } from "@ionic-native/splash-screen";
+import { StatusBar } from "@ionic-native/status-bar";
+import { Globalization } from '@ionic-native/globalization';
+import { Push } from '@ionic-native/push';
+import { PhotoViewer } from '@ionic-native/photo-viewer';
+import { ImagePicker } from '@ionic-native/image-picker';
+import { File } from '@ionic-native/file';
+import { Camera } from '@ionic-native/camera';
 
 (<any>window).startup = new Date().getTime();
 
@@ -28,17 +28,8 @@ import * as Bluebird from 'bluebird';
 		MyApp
 	],
 	imports: [
-		BrowserModule,
 		IonicModule.forRoot(MyApp),
-
-		HomePageModule,
-		LoginPageModule,
-		MessagesPageModule,
-		ContactsPageModule,
-		ProfilePageModule,
-		SettingsPageModule,
-		ContactRequestPageModule,
-		NewMessagePageModule,
+		BrowserModule,
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
@@ -46,7 +37,15 @@ import * as Bluebird from 'bluebird';
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},
-		DatePipe
+		DatePipe,
+		SplashScreen,
+		StatusBar,
+		Globalization,
+		Push,
+		PhotoViewer,
+		ImagePicker,
+		File,
+		Camera,
 	]
 })
 export class AppModule {

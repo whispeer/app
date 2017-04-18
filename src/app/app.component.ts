@@ -6,7 +6,6 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { Globalization } from '@ionic-native/globalization';
 import { Push } from '@ionic-native/push';
 
-import { HomePage } from '../pages/home/home';
 import { PushService } from "../assets/services/push.service";
 import Tutorial from "./tutorial";
 
@@ -20,7 +19,7 @@ const tutorialDisabled = ["login"]
 
 export class MyApp {
 
-	rootPage = HomePage;
+	rootPage = "Home";
 
 	@ViewChild("navigation") nav: NavController;
 

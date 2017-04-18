@@ -3,7 +3,6 @@ import { Push } from '@ionic-native/push';
 import { NavController, Platform } from "ionic-angular";
 
 import { MessagesPage } from "../../pages/messages/messages";
-import { ProfilePage } from "../../pages/profile/profile";
 
 import * as Bluebird from "bluebird";
 import socketService from "./socket.service";
@@ -96,11 +95,11 @@ export class PushService {
 			this.navCtrl.remove(index);
 		}
 
-		return this.navCtrl.push(MessagesPage, { topicId: topicId });
+		return this.navCtrl.push("Messages", { topicId: topicId });
 	}
 
 	private goToUser = (userId) => {
-		return this.navCtrl.push(ProfilePage, { userId: userId });
+		return this.navCtrl.push("Profile", { userId: userId });
 	}
 
 	private goToReference = (reference) => {

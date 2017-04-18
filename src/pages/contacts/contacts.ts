@@ -4,8 +4,6 @@ import { NavController, NavParams, IonicPage } from 'ionic-angular';
 import { ContactRequestsPage } from "../contact-requests/contact-requests";
 import { ProfilePage } from "../profile/profile";
 
-import { HomePage } from "../home/home";
-
 const contactsService = require("../../assets/services/friendsService");
 
 import { ContactsWithSearch } from '../../assets/contacts/contactsWithSearch'
@@ -43,16 +41,16 @@ export class ContactsPage extends ContactsWithSearch {
 	}
 
 	goToUser(userId) {
-		this.navCtrl.push(ProfilePage, {
+		this.navCtrl.push("Profile", {
 			userId: userId
 		})
 	}
 
 	goToRequests() {
-		this.navCtrl.push(ContactRequestsPage);
+		this.navCtrl.push("Requests");
 	}
 
 	close = () => {
-		this.navCtrl.setRoot(HomePage);
+		this.navCtrl.setRoot("Home");
 	}
 }

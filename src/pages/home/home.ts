@@ -2,11 +2,6 @@ import { Component, ViewChild } from "@angular/core";
 
 import { NavController, Content, IonicPage } from "ionic-angular";
 
-import { ContactRequestsPage } from "../contact-requests/contact-requests";
-
-import { MessagesPage } from "../messages/messages";
-import { NewMessagePage } from "../new-message/new-message";
-
 const messageService = require("messages/messageService");
 const contactsService = require("../../assets/services/friendsService");
 
@@ -86,15 +81,15 @@ export class HomePage {
 	}
 
 	openContactRequests = () => {
-		this.navCtrl.push(ContactRequestsPage);
+		this.navCtrl.push("Requests");
 	}
 
 	openChat = (topicId: number) => {
-		this.navCtrl.push(MessagesPage, { topicId: topicId });
+		this.navCtrl.push("Messages", { topicId: topicId });
 	}
 
 	newMessage = () => {
-		this.navCtrl.push(NewMessagePage, {}, {
+		this.navCtrl.push("New Message", {}, {
 			animation: "md-transition"
 		});
 	}

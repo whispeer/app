@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
-import { ProfilePage } from "../profile/profile";
-
 const friendsService = require("../../assets/services/friendsService");
 const userService = require("../../assets/user/userService");
 
@@ -59,7 +57,7 @@ export class ContactRequestsPage {
 	}
 
 	checkRequest(userId) {
-		this.navCtrl.push(ProfilePage, {
+		this.navCtrl.push("Profile", {
 			userId: userId
 		})
 	}

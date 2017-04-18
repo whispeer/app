@@ -1,8 +1,6 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
-import { HomePage } from "../home/home";
 import sessionService from "../../assets/services/session.service";
-import { NewMessagePage } from "../../pages/new-message/new-message";
 import Tutorial from "../../app/tutorial";
 
 /*
@@ -73,7 +71,7 @@ export class SettingsPage {
 	}
 
 	feedback() {
-		this.navCtrl.push(NewMessagePage, {
+		this.navCtrl.push("New Message", {
 			receiverIds: "3317"
 		});
 	}
@@ -91,6 +89,6 @@ export class SettingsPage {
 	}
 
 	close = () => {
-		this.navCtrl.setRoot(HomePage);
+		this.navCtrl.setRoot("Home");
 	}
 }

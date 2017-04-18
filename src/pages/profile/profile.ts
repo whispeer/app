@@ -3,9 +3,6 @@ import { NavController, NavParams, ActionSheetController, AlertController, Alert
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
-import { HomePage } from "../home/home";
-import { NewMessagePage } from "../new-message/new-message";
-
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
 
@@ -123,7 +120,7 @@ export class ProfilePage {
 	}
 
 	writeMessage() {
-		this.navCtrl.push(NewMessagePage, { receiverIds: this.user.id });
+		this.navCtrl.push("New Message", { receiverIds: this.user.id });
 	}
 
 	contactOptions() {
@@ -154,6 +151,6 @@ export class ProfilePage {
 	}
 
 	close = () => {
-		this.navCtrl.setRoot(HomePage);
+		this.navCtrl.setRoot("Home");
 	}
 }

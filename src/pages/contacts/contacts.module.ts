@@ -3,12 +3,15 @@ import { IonicPageModule } from 'ionic-angular';
 
 import { ContactsPage } from './contacts'
 
+import { ComponentsModule } from "../../components/components.module";
+
 @NgModule({
   declarations: [
     ContactsPage
   ],
   imports: [
-    IonicPageModule.forChild(ContactsPage)
+    IonicPageModule.forChild(ContactsPage),
+		ComponentsModule,
   ],
   entryComponents: [
     ContactsPage

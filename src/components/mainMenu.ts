@@ -1,10 +1,6 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { NavController, FabContainer } from "ionic-angular";
 
-import { ContactsPage } from "../pages/contacts/contacts";
-import { ProfilePage } from "../pages/profile/profile";
-import { SettingsPage } from "../pages/settings/settings";
-
 import sessionService from "../assets/services/session.service";
 
 @Component({
@@ -33,15 +29,15 @@ export class MainMenu {
 	fabSideClick = (fab: FabContainer, what: string) => {
 		switch (what) {
 			case "contacts":
-				this.navCtrl.push(ContactsPage);
+				this.navCtrl.push("Contacts");
 				break;
 			case "profile":
-				this.navCtrl.push(ProfilePage, {
+				this.navCtrl.push("Profile", {
 					userId: sessionService.userid
 				});
 				break;
 			case "settings":
-				this.navCtrl.push(SettingsPage);
+				this.navCtrl.push("Settings");
 				break;
 			default:
 				// code...
