@@ -4,7 +4,7 @@ import { NavController, NavParams } from 'ionic-angular';
 import sessionService from '../../assets/services/session.service';
 import { failureCodes } from "../../assets/services/login.service";
 import loginService from "../../assets/services/login.service";
-import { mainPage } from "../../assets/services/location.manager";
+import { HomePage } from "../home/home";
 import jQuery from "jquery";
 
 const registerService = require('../../assets/services/registerService');
@@ -30,6 +30,15 @@ export class LoginPage {
 				? jQuery("#password input")
 				: jQuery("#mail input")).focus();
 		});
+	}
+
+	ionViewCanEnter(): boolean {
+		return !sessionService.loggedin
+	}
+
+	private mainPage() {
+		this.navCtrl.remove(0, this.navCtrl.length() - 1)
+		this.navCtrl.setRoot(HomePage)
 	}
 
 	getMessage() {
@@ -142,7 +151,7 @@ export class LoginPage {
 			this.performLogin().then(() => {
 				this.usernameState = USERNAME_LOGIN_SUCCESS
 				sessionService.loadLogin().then(() => {
-					mainPage()
+					this.mainPage()
 				})
 			}).catch((error) => {
 				this.usernameState = this.getLoginErrorCode(error);
@@ -161,7 +170,7 @@ export class LoginPage {
 			if (this.passwordsMatch()) {
 				this.performRegister().then(() => {
 					this.usernameState = USERNAME_REGISTER_SUCCESS;
-					mainPage()
+					this.mainPage()
 				}).catch(registerError);
 			} else {
 				this.usernameState = USERNAME_PASSWORDS_DONT_MATCH;

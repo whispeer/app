@@ -24,10 +24,6 @@ const setTopLocation = (url: string) => {
 	window.top.location.href = basePath + url
 }
 
-export const mainPage = () => {
-	setTopLocation("#/home")
-}
-
 export const landingPage = () => {
 	setTopLocation("#/login")
 	window.top.location.reload()
