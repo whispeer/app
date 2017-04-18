@@ -58,7 +58,7 @@ export class PushService {
 	}
 
 	private registration = (data) => {
-		console.log("-> registartion", data);
+		console.log("-> registration", data);
 		const type = this.getType()
 
 		Bluebird.all([
