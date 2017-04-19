@@ -65,6 +65,7 @@
   },
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
+    "ionic_sass": "./config/sass.config.js",
     "ionic_copy": "./config/copy.config.js"
   },
   "description": "whispeerMessenger: An Ionic project"
