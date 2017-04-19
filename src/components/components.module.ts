@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from 'ionic-angular';
-import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
 
 import { SafeUrl } from "../assets/pipes/safeStyle";
 import { ResponsiveDatePipe } from "../assets/pipes/responsiveDate";
@@ -27,7 +26,6 @@ import { GalleryComponent } from "./gallery/gallery"
 	],
 	imports: [
 		HexagonModule,
-		QRCodeModule,
 		IonicModule,
 		CommonModule,
 	],
@@ -42,7 +40,6 @@ import { GalleryComponent } from "./gallery/gallery"
 		ChooseFriends,
 
 		HexagonModule,
-		QRCodeModule,
 		CommonModule,
 	]
 })
