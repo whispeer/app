@@ -694,6 +694,8 @@ function User (providedData) {
 			basic = basic || {};
 			var nickname = theUser.getNickname();
 
+			var searchNames = [nickname]
+
 			var name = "";
 			if (basic.firstname && basic.lastname) {
 				name = basic.firstname + " " + basic.lastname;
@@ -703,8 +705,17 @@ function User (providedData) {
 				name = nickname;
 			}
 
+			if (basic.firstname) {
+				searchNames.push(basic.firstname)
+			}
+
+			if (basic.lastname) {
+				searchNames.push(basic.lastname)
+			}
+
 			return {
 				name: name,
+				searchName: searchNames.join(" "),
 				firstname: basic.firstname || "",
 				lastname: basic.lastname || "",
 				nickname: nickname || ""

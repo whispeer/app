@@ -105,7 +105,7 @@ export class ContactsWithSearch {
 		}
 
 		return this.contacts.filter((contact) => {
-			return contact.name.indexOf(this.searchTerm) > -1;
+			return contact.names.searchName.indexOf(this.searchTerm) > -1;
 		});
 	}
 
