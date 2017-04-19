@@ -21,7 +21,7 @@ import { NewMessagePage } from "../pages/new-message/new-message";
 
 // yep that looks wrong, but this module does not have necessary files for
 // aot compilation which is required for production builds. this works however if we use the whole path.
-import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
+import { QRCodeModule } from "angular2-qrcode";
 
 import sessionService from '../assets/services/session.service';
 import * as Bluebird from 'bluebird';
