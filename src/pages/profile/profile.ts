@@ -120,7 +120,9 @@ export class ProfilePage {
 	}
 
 	writeMessage() {
-		this.navCtrl.push("New Message", { receiverIds: this.user.id });
+		this.navCtrl.push("New Message", {
+			receiverIds: this.user.id.toString()
+		});
 	}
 
 	contactOptions() {

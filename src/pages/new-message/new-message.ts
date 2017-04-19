@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
-import { MessagesPage } from "../messages/messages";
-
 const messageService = require("../../assets/messages/messageService");
 
 @IonicPage({
@@ -41,7 +39,7 @@ export class NewMessagePage {
 
 	sendMessage = ({ images, text }) => {
 		messageService.sendNewTopic(this.partners.map((partner) => partner.user.getID()), text, images).then((topicId) => {
-			this.navCtrl.setRoot(MessagesPage, { topicId: topicId });
+			this.navCtrl.setRoot("Messages", { topicId: topicId });
 		});
 	}
 }

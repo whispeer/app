@@ -6,11 +6,6 @@ import * as Bluebird from 'bluebird';
 
 const h = require("whispeerHelper");
 
-const testArray = [{
-	names: {},
-	name: ""
-}]
-
 export class ContactsWithSearch {
 	contacts: any[] = [];
 	contactsLoading: boolean = true;
@@ -44,10 +39,6 @@ export class ContactsWithSearch {
 	}
 
 	contactDividers = (record, recordIndex, records) => {
-		if (this.contactsLoading) {
-			return null
-		}
-
 		const firstChar: string = record.name[0];
 
 		if(recordIndex === 0) {
@@ -121,10 +112,6 @@ export class ContactsWithSearch {
 	}
 
 	getUsers = () => {
-		if (this.contactsLoading) {
-			return testArray
-		}
-
 		return this.getContacts().concat(this.searchResults)
 	}
 }
