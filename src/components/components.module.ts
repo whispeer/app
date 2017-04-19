@@ -14,29 +14,36 @@ import { SyntaxifyDirective } from "./syntaxify"
 import { ChooseFriends } from "./chooseFriends"
 import { GalleryComponent } from "./gallery/gallery"
 
-const declarations: any[] = [
-	ResponsiveDatePipe,
-	SafeUrl,
-	MainMenu,
-	UserImageComponent,
-	TopicComponent,
-	SyntaxifyDirective,
-	GalleryComponent,
-	ChooseFriends,
-]
-
 @NgModule({
-	declarations: declarations,
+	declarations: [
+		ResponsiveDatePipe,
+		SafeUrl,
+		MainMenu,
+		UserImageComponent,
+		TopicComponent,
+		SyntaxifyDirective,
+		GalleryComponent,
+		ChooseFriends,
+	],
 	imports: [
 		HexagonModule,
 		QRCodeModule,
 		IonicModule,
 		CommonModule,
 	],
-	exports: declarations.concat([
+	exports: [
+		ResponsiveDatePipe,
+		SafeUrl,
+		MainMenu,
+		UserImageComponent,
+		TopicComponent,
+		SyntaxifyDirective,
+		GalleryComponent,
+		ChooseFriends,
+
 		HexagonModule,
 		QRCodeModule,
 		CommonModule,
-	])
+	]
 })
 export class ComponentsModule { }
