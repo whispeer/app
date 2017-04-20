@@ -144,7 +144,7 @@ export class TopicComponent {
 	}
 
 	awaitRendering = () => {
-		return Bluebird.delay(50);
+		return Bluebird.delay(0);
 	}
 
 	realScrollHeight(element) {
