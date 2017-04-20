@@ -6,8 +6,6 @@ var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlug
 
 process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
 
-var isExternal = /node_modules[^!]*\.js$/
-
 module.exports = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,
 	output: {
@@ -56,8 +54,7 @@ module.exports = {
 		new webpack.optimize.CommonsChunkPlugin({
 			name: "external",
 			minChunks: function (module) {
-				return module.chunks[0].name === "main" &&
-					module.request && isExternal.test(module.request)
+				return module.context && module.context.indexOf("node_modules") !== -1;
 			}
 		}),
 		new webpack.DefinePlugin({
