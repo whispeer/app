@@ -146,7 +146,9 @@ export class TopicComponent {
 	messageBursts = () => {
 		const { changed, bursts } = this.messageBurstsFunction();
 
-		if (changed) {
+		const maybeFalse = false
+
+		if (maybeFalse && changed) {
 			const dimension = this.content.getContentDimensions();
 			const scrollFromBottom = dimension.scrollHeight - dimension.scrollTop;
 

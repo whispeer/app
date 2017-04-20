@@ -25,7 +25,7 @@
 		</ion-title>
 	</ion-navbar>
 </ion-header>
-<ion-content fullscreen>
+<div class="messages__list">
 	<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
@@ -47,18 +47,15 @@
 			</div>
 		</ion-item>
 	</ion-list>
-</ion-content>
-
-<ion-footer>
-	<div class="messages__form">
-		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
-			<ion-icon name="add-circle"></ion-icon>
-		</button>
-		<ion-item class="clean-input-wrap messages__input-wrap">
-			<ion-textarea rows="1" type="text" class="messages__message-input" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
-		</ion-item>
-		<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToTopic()">
-			<ion-icon name="arrow-dropup-circle"></ion-icon>
-		</button>
-	</div>
-</ion-footer>
+</div>
+<div class="messages__form">
+	<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
+		<ion-icon name="add-circle"></ion-icon>
+	</button>
+	<ion-item class="clean-input-wrap messages__input-wrap">
+		<ion-textarea rows="1" type="text" class="messages__message-input" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
+	</ion-item>
+	<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToTopic()">
+		<ion-icon name="arrow-dropup-circle"></ion-icon>
+	</button>
+</div>
