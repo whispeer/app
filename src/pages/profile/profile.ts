@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ActionSheetController, AlertController, Platform } from 'ionic-angular';
+import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform, IonicPage } from 'ionic-angular';
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
-
-import { HomePage } from "../home/home";
-import { NewMessagePage } from "../new-message/new-message";
 
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
 
+@IonicPage({
+	name: "Profile",
+	segment: "profile/:userId"
+})
 @Component({
 	selector: 'page-profile',
 	templateUrl: 'profile.html'
@@ -34,7 +35,7 @@ export class ProfilePage {
 
 	profileLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCrtl: AlertController, private platform: Platform) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCtrl: AlertController, private platform: Platform) {}
 
 	ngOnInit() {
 		this.userId = parseFloat(this.navParams.get("userId"));
@@ -119,7 +120,9 @@ export class ProfilePage {
 	}
 
 	writeMessage() {
-		this.navCtrl.push(NewMessagePage, { receiverIds: this.user.id });
+		this.navCtrl.push("New Message", {
+			receiverIds: this.user.id.toString()
+		});
 	}
 
 	contactOptions() {
@@ -129,7 +132,7 @@ export class ProfilePage {
 				role: "destructive",
 				icon: !this.platform.is("ios") ? "trash" : null,
 				handler: () => {
-					this.alertCrtl.create({
+					this.alertCtrl.create(<AlertOptions>{
 						title: "Remove Contact",
 						message: "Are you sure that you want to remove this Contact?",
 						buttons: [{
@@ -150,6 +153,6 @@ export class ProfilePage {
 	}
 
 	close = () => {
-		this.navCtrl.setRoot(HomePage);
+		this.navCtrl.setRoot("Home");
 	}
 }

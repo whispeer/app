@@ -1,11 +1,15 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, NgZone } from "@angular/core";
 import { Platform, NavController } from "ionic-angular";
-import { StatusBar, Splashscreen } from "ionic-native";
-import { Globalization } from 'ionic-native';
 
-import { HomePage } from '../pages/home/home';
+import { SplashScreen } from "@ionic-native/splash-screen";
+import { StatusBar } from "@ionic-native/status-bar";
+import { Globalization } from '@ionic-native/globalization';
+import { Push } from '@ionic-native/push';
+
 import { PushService } from "../assets/services/push.service";
 import Tutorial from "./tutorial";
+
+import sessionService from '../assets/services/session.service';
 
 const tutorialDisabled = ["login"]
 
@@ -15,7 +19,7 @@ const tutorialDisabled = ["login"]
 
 export class MyApp {
 
-	rootPage = HomePage;
+	rootPage = "Home";
 
 	@ViewChild("navigation") nav: NavController;
 
@@ -58,7 +62,7 @@ export class MyApp {
 	}
 
 	initializeTutorialWithLanguage() {
-		Globalization.getPreferredLanguage().then(({ value }) => {
+		this.globalization.getPreferredLanguage().then(({ value }) => {
 			const en = (value.toLowerCase().indexOf('de') === -1);
 			this.lang = en ? 'en' : 'de';
 		}).catch(() => {
@@ -68,17 +72,24 @@ export class MyApp {
 		})
 	}
 
-	constructor(platform: Platform) {
+	constructor(platform: Platform, private zone: NgZone, private splashScreen: SplashScreen, private statusBar: StatusBar, private globalization: Globalization, private push: Push) {
 		platform.ready().then(() => {
-			this.initializeTutorialWithLanguage();
-
 			// Okay, so the platform is ready and our plugins are available.
 			// Here you can do any higher level native things you might need.
-			StatusBar.styleLightContent();
-			Splashscreen.hide();
+			this.statusBar.styleLightContent();
+			this.splashScreen.hide();
 
-			const pushService = new PushService(this.nav, platform);
+			const pushService = new PushService(this.nav, platform, this.push);
 			pushService.register();
+
+			sessionService.loadLogin().then((loggedin) => {
+				if (!loggedin) {
+					this.nav.remove(0, this.nav.length() - 1)
+					this.nav.setRoot("Login")
+				} else {
+					this.initializeTutorialWithLanguage();
+				}
+			});
 		});
 	}
 }

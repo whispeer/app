@@ -1,20 +1,18 @@
 import { Component, ViewChild } from "@angular/core";
 
-import { NavController, Content } from "ionic-angular";
-
-import { ContactRequestsPage } from "../contact-requests/contact-requests";
-
-import { MessagesPage } from "../messages/messages";
-import { NewMessagePage } from "../new-message/new-message";
+import { NavController, Content, IonicPage } from "ionic-angular";
 
 const messageService = require("messages/messageService");
 const contactsService = require("../../assets/services/friendsService");
 
+@IonicPage({
+	name: "Home",
+	segment: "home"
+})
 @Component({
 	selector: 'page-home',
 	templateUrl: 'home.html'
 })
-
 export class HomePage {
 	@ViewChild(Content) content: Content;
 
@@ -83,15 +81,15 @@ export class HomePage {
 	}
 
 	openContactRequests = () => {
-		this.navCtrl.push(ContactRequestsPage);
+		this.navCtrl.push("Requests");
 	}
 
 	openChat = (topicId: number) => {
-		this.navCtrl.push(MessagesPage, { topicId: topicId });
+		this.navCtrl.push("Messages", { topicId: topicId });
 	}
 
 	newMessage = () => {
-		this.navCtrl.push(NewMessagePage, {}, {
+		this.navCtrl.push("New Message", {}, {
 			animation: "md-transition"
 		});
 	}

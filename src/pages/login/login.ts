@@ -1,20 +1,22 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
 import sessionService from '../../assets/services/session.service';
 import { failureCodes } from "../../assets/services/login.service";
 import loginService from "../../assets/services/login.service";
-import { HomePage } from "../home/home";
 import jQuery from "jquery";
 
 const registerService = require('../../assets/services/registerService');
 const whispeerHelper = require('whispeerHelper')
 
+@IonicPage({
+	name: "Login",
+	segment: "login"
+})
 @Component({
 	selector: 'page-login',
 	templateUrl: 'login.html'
 })
-
 export class LoginPage {
 
 	login: typeof loginService;
@@ -38,7 +40,7 @@ export class LoginPage {
 
 	private mainPage() {
 		this.navCtrl.remove(0, this.navCtrl.length() - 1)
-		this.navCtrl.setRoot(HomePage)
+		this.navCtrl.setRoot("Home")
 	}
 
 	getMessage() {
