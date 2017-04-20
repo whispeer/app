@@ -54,7 +54,7 @@
 		<ion-icon name="add-circle"></ion-icon>
 	</button>
 	<ion-item class="clean-input-wrap messages__input-wrap">
-		<ion-textarea rows="1" type="text" class="messages__message-input" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
+		<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 	</ion-item>
 	<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToTopic()">
 		<ion-icon name="arrow-dropup-circle"></ion-icon>
