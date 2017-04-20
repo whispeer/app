@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-const friendsService = require("../assets/services/friendsService");
-const userService = require("../assets/user/userService");
-const messageService = require("../assets/messages/messageService");
+const friendsService = require("../lib/services/friendsService");
+const userService = require("../lib/user/userService");
+const messageService = require("../lib/messages/messageService");
 
-import { ContactsWithSearch } from '../assets/contacts/contactsWithSearch'
+import { ContactsWithSearch } from '../lib/contacts/contactsWithSearch'
 
 import * as Bluebird from 'bluebird';
 

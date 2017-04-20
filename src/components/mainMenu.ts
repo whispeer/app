@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { NavController, FabContainer } from "ionic-angular";
 
-import sessionService from "../assets/services/session.service";
+import sessionService from "../lib/services/session.service";
 
 @Component({
 	selector: "main-menu",

@@ -3,7 +3,7 @@ import { Component, ViewChild } from "@angular/core";
 import { NavController, Content, IonicPage } from "ionic-angular";
 
 const messageService = require("messages/messageService");
-const contactsService = require("../../assets/services/friendsService");
+const contactsService = require("../../lib/services/friendsService");
 
 @IonicPage({
 	name: "Home",

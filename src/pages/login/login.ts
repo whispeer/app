@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
-import sessionService from '../../assets/services/session.service';
-import { failureCodes } from "../../assets/services/login.service";
-import loginService from "../../assets/services/login.service";
+import sessionService from '../../lib/services/session.service';
+import { failureCodes } from "../../lib/services/login.service";
+import loginService from "../../lib/services/login.service";
 import jQuery from "jquery";
 
-const registerService = require('../../assets/services/registerService');
+const registerService = require('../../lib/services/registerService');
 const whispeerHelper = require('whispeerHelper')
 
 @IonicPage({

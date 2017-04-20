@@ -1,6 +1,6 @@
 [submodule "src/assets/helper"]
-	path = src/assets/helper
+	path = src/lib/helper
 	url = https://github.com/whispeer/whispeerHelper.git
 [submodule "src/assets/validation"]
-	path = src/assets/validation
+	path = src/lib/validation
 	url = https://github.com/whispeer/whispeerValidations.git

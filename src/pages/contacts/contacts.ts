@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
-const contactsService = require("../../assets/services/friendsService");
+const contactsService = require("../../lib/services/friendsService");
 
-import { ContactsWithSearch } from '../../assets/contacts/contactsWithSearch'
+import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
 
 @IonicPage({
 	name: "Contacts",
