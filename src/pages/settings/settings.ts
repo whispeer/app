@@ -1,8 +1,6 @@
 import { Component } from "@angular/core";
-import { NavController, NavParams, AlertController } from "ionic-angular";
-import { HomePage } from "../home/home";
+import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
 import sessionService from "../../assets/services/session.service";
-import { NewMessagePage } from "../../pages/new-message/new-message";
 import Tutorial from "../../app/tutorial";
 
 /*
@@ -11,6 +9,10 @@ import Tutorial from "../../app/tutorial";
 	See http://ionicframework.com/docs/v2/components/#navigation for more info on
 	Ionic pages and navigation.
 */
+@IonicPage({
+	name: "Settings",
+	segment: "settings"
+})
 @Component({
 	selector: 'page-settings',
 	templateUrl: 'settings.html'
@@ -69,7 +71,7 @@ export class SettingsPage {
 	}
 
 	feedback() {
-		this.navCtrl.push(NewMessagePage, {
+		this.navCtrl.push("New Message", {
 			receiverIds: "3317"
 		});
 	}
@@ -87,6 +89,6 @@ export class SettingsPage {
 	}
 
 	close = () => {
-		this.navCtrl.setRoot(HomePage);
+		this.navCtrl.setRoot("Home");
 	}
 }

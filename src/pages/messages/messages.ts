@@ -1,6 +1,6 @@
 import { Component, ElementRef } from "@angular/core";
 
-import { NavParams } from "ionic-angular";
+import { NavParams, IonicPage } from "ionic-angular";
 
 const messageService = require("../../assets/messages/messageService");
 const TopicUpdate = require("../../assets/models/topicUpdate");
@@ -8,6 +8,11 @@ const Burst = require("../../assets/messages/burst");
 import errorService from "../../assets/services/error.service";
 const inView = require("in-view");
 
+@IonicPage({
+	name: "Messages",
+	segment: "messages/:topicId",
+	defaultHistory: ["Home"]
+})
 @Component({
 	selector: 'page-messages',
 	templateUrl: 'messages.html'

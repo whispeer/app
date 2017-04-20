@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-
-import { ProfilePage } from "../profile/profile";
+import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
 const friendsService = require("../../assets/services/friendsService");
 const userService = require("../../assets/user/userService");
 
 import * as Bluebird from 'bluebird';
 
+@IonicPage({
+	name: "Requests",
+	segment: "requests"
+})
 @Component({
 	selector: 'page-contact-requests',
 	templateUrl: 'contact-requests.html'
@@ -55,7 +57,7 @@ export class ContactRequestsPage {
 	}
 
 	checkRequest(userId) {
-		this.navCtrl.push(ProfilePage, {
+		this.navCtrl.push("Profile", {
 			userId: userId
 		})
 	}

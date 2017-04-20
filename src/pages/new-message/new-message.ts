@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-
-import { MessagesPage } from "../messages/messages";
+import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
 const messageService = require("../../assets/messages/messageService");
 
+@IonicPage({
+	name: "New Message",
+	segment: "newMessage/:receiverIds"
+})
 @Component({
 	selector: 'page-new-message',
 	templateUrl: 'new-message.html'
@@ -37,7 +39,7 @@ export class NewMessagePage {
 
 	sendMessage = ({ images, text }) => {
 		messageService.sendNewTopic(this.partners.map((partner) => partner.user.getID()), text, images).then((topicId) => {
-			this.navCtrl.setRoot(MessagesPage, { topicId: topicId });
+			this.navCtrl.setRoot("Messages", { topicId: topicId });
 		});
 	}
 }
