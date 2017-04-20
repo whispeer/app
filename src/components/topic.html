@@ -25,8 +25,9 @@
 		</ion-title>
 	</ion-navbar>
 </ion-header>
-<div class="messages__list">
+<div class="messages__list" #content>
 	<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<div class="messages_filler"></div>
 	<ion-list no-lines>
 		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 			<span *ngIf="burst.isMessageBurst()">
@@ -39,7 +40,7 @@
 					<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 				</div>
 			</span>
-			<div class="messages_message" *ngIf="burst.isTopicUpdate()">
+			<div class="messages_message" *ngIf="burst.isTopicUpdate() && false">
 				<!--<span class="burst-date-text">
 					{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}" -
 					{{burst.firstItem().state.timestamp}}

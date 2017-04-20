@@ -38,7 +38,7 @@ export class TopicComponent {
 
 	@Output() sendMessage = new EventEmitter();
 
-	@ViewChild(Content) content: Content;
+	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
 
 	newMessageText = "";
@@ -143,20 +143,25 @@ export class TopicComponent {
 		return Bluebird.delay(100);
 	}
 
+	stabilizeScroll() {
+		const element = this.content.nativeElement
+
+		const scrollFromBottom = element.scrollHeight - element.scrollTop;
+
+		console.log('stabilize scroll before', element.scrollHeight, element.scrollTop)
+
+		this.awaitRendering().then(() => {
+			console.log('stabilize scroll after', element.scrollHeight, element.scrollTop, scrollFromBottom)
+
+			element.scrollTop = element.scrollHeight - scrollFromBottom
+		})
+	}
+
 	messageBursts = () => {
 		const { changed, bursts } = this.messageBurstsFunction();
 
-		const maybeFalse = false
-
-		if (maybeFalse && changed) {
-			const dimension = this.content.getContentDimensions();
-			const scrollFromBottom = dimension.scrollHeight - dimension.scrollTop;
-
-			this.awaitRendering().then(() => {
-				const newDimension = this.content.getContentDimensions();
-
-				this.content.scrollTo(dimension.scrollLeft, newDimension.scrollHeight - scrollFromBottom, 0);
-			})
+		if (changed) {
+			this.stabilizeScroll()
 		}
 
 		return bursts;
@@ -183,8 +188,6 @@ export class TopicComponent {
 			// apply new style
 			textarea.style.minHeight  = scroll_height + "px";
 			textarea.style.height     = scroll_height + "px";
-
-			// this.content.scrollToBottom(0);
 		}, 100);
 	}
 

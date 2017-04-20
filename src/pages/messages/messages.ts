@@ -189,7 +189,7 @@ export class MessagesPage {
 			return
 		}
 
-		document.querySelector("topicwithbursts .scroll-content").addEventListener("scroll", this.onElementInView)
+		document.querySelector("topicwithbursts .messages__list").addEventListener("scroll", this.onElementInView)
 	}
 
 	messageBursts = () => {
