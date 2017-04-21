@@ -230,6 +230,10 @@ topicWithBursts {
 		padding: 4px 10px;
 
 		margin: 0 !important;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
 }
 
