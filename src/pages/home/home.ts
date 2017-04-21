@@ -1,12 +1,14 @@
 import { Component, ViewChild } from "@angular/core";
 
-import { NavController, Content } from "ionic-angular";
-
-import { MessagesPage } from "../messages/messages";
-import { NewMessagePage } from "../new-message/new-message";
+import { NavController, Content, IonicPage } from "ionic-angular";
 
 const messageService = require("messages/messageService");
+const contactsService = require("../../assets/services/friendsService");
 
+@IonicPage({
+	name: "Home",
+	segment: "home"
+})
 @Component({
 	selector: 'page-home',
 	templateUrl: 'home.html'
@@ -15,6 +17,7 @@ export class HomePage {
 	@ViewChild(Content) content: Content;
 
 	topics: any[];
+	requests: any[] = [];
 	searchTerm: string = "";
 
 	topicsLoading: boolean = true;
@@ -29,10 +32,11 @@ export class HomePage {
 		// another problem is that the search bars have different heights.
 
 		//this.content.scrollTo(0, 58, 0);
-		this.getTopics();
+		this.loadTopics();
+		this.loadRequests();
 	}
 
-	getTopics = () => {
+	loadTopics = () => {
 		this.topics = messageService.data.latestTopics.data;
 
 		messageService.loadMoreLatest(() => {}).then(() => {
@@ -41,7 +45,7 @@ export class HomePage {
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
-		messageService.loadMoreLatest().then(() => {
+		messageService.loadMoreLatest(() => {}).then(() => {
 			infiniteScroll.complete();
 		})
 	}
@@ -61,12 +65,31 @@ export class HomePage {
 		return !nextTopic.unread;
 	}
 
+	updateRequests = () => {
+		this.requests = contactsService.getRequests()
+	}
+
+	loadRequests = () => {
+		contactsService.awaitLoading().then(() => {
+			this.updateRequests()
+			contactsService.listen(this.updateRequests);
+		});
+	}
+
+	get requestsLabel() {
+		return this.requests.length > 1 ? 'New contact requests' : 'New contact request'
+	}
+
+	openContactRequests = () => {
+		this.navCtrl.push("Requests");
+	}
+
 	openChat = (topicId: number) => {
-		this.navCtrl.push(MessagesPage, { topicId: topicId });
+		this.navCtrl.push("Messages", { topicId: topicId });
 	}
 
 	newMessage = () => {
-		this.navCtrl.push(NewMessagePage, {}, {
+		this.navCtrl.push("New Message", {}, {
 			animation: "md-transition"
 		});
 	}

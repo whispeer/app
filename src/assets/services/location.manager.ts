@@ -7,7 +7,7 @@ const loginStorage: Storage = StorageService.withPrefix("whispeer.login");
 
 const blockedReturnUrls: string[] = ["/b2c", "/recovery"];
 
-var basePath = window.top.location.href.match(/([^?#]*)\//)[0]
+var basePath = window.top.location.href.match(/([^?#]*)/)[0]
 
 const removeOther = (ele: JQuery) => {
 	ele.siblings().remove();
@@ -20,15 +20,13 @@ const removeOther = (ele: JQuery) => {
 };
 
 const setTopLocation = (url: string) => {
-	window.top.location.href = basePath + url;
-}
-
-export const mainPage = () => {
-	setTopLocation("index.html");
+	console.warn("set top location", url, basePath + url)
+	window.top.location.href = basePath + url
 }
 
 export const landingPage = () => {
-	setTopLocation("login.html");
+	setTopLocation("#/login")
+	window.top.location.reload()
 }
 
 export const isLoginPage = () => {
@@ -36,7 +34,7 @@ export const isLoginPage = () => {
 }
 
 export const loginPage = () => {
-	setTopLocation("login.html");
+	setTopLocation("#/login");
 }
 
 export const isBlockedReturnUrl = (url: string) => {

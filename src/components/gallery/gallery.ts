@@ -7,7 +7,7 @@ const blobService = require("../../assets/services/blobService");
 
 import * as Bluebird from "bluebird";
 
-import { PhotoViewer } from 'ionic-native';
+import { PhotoViewer } from '@ionic-native/photo-viewer';
 
 @Component({
 	selector: "gallery",
@@ -19,7 +19,7 @@ export class GalleryComponent {
 	previewChunk: number = 2
 	preview: number = this.previewChunk;
 
-	constructor(private sanitizer:DomSanitizer){}
+	constructor(private sanitizer:DomSanitizer, private photoViewer: PhotoViewer){}
 
 	loadImage(data) {
 		const blobid = data.blobID;
@@ -53,7 +53,7 @@ export class GalleryComponent {
 
 	loadImagePreviews(images) {
 		images.forEach((image) => {
-			if (image.upload) {
+			if (image.upload && typeof image.lowest.url === "string") {
 				image.highest.url = this.sanitizer.bypassSecurityTrustUrl(image.highest.url);
 				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(image.lowest.url);
 				return;
@@ -63,9 +63,9 @@ export class GalleryComponent {
 		});
 	}
 
-	displayImage(image) {
+	displayImage = (image) => {
 		if (image.upload) {
-			PhotoViewer.show(image.upload._file.originalUrl);
+			this.photoViewer.show(image.upload._file.originalUrl);
 			return;
 		}
 
@@ -76,7 +76,7 @@ export class GalleryComponent {
 				return blob.getStringRepresentation();
 			});
 		}).then((base64) => {
-			PhotoViewer.show(base64);
+			this.photoViewer.show(base64);
 		});
 	}
 

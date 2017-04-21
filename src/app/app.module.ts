@@ -2,116 +2,62 @@ require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
-import { SafeUrl } from "../assets/pipes/safeStyle";
-import { ResponsiveDatePipe } from "../assets/pipes/responsiveDate";
-
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { MyApp } from './app.component';
-import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
-import { HomePage } from "../pages/home/home";
-import { MessagesPage } from "../pages/messages/messages";
-import { ContactsPage } from "../pages/contacts/contacts";
-import { ProfilePage } from "../pages/profile/profile";
-import { VerifyContactPage } from "../pages/verify-contact/verify-contact";
-import { SettingsPage } from "../pages/settings/settings";
-import { ContactRequestsPage } from "../pages/contact-requests/contact-requests";
-import { NewMessagePage } from "../pages/new-message/new-message";
+import { IonicApp, IonicErrorHandler } from 'ionic-angular';
+import { IonicModule } from 'ionic-angular';
 
-// yep that looks wrong, but this module does not have necessary files for
-// aot compilation which is required for production builds. this works however if we use the whole path.
-import { QRCodeModule } from "../../node_modules/angular2-qrcode/angular2-qrcode";
-
-import sessionService from '../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
-import { loginPage } from "../assets/services/location.manager";
+import { MyApp } from './app.component';
 
-import { TopicComponent } from "../components/topicDisplay";
-import { GalleryComponent } from "../components/gallery/gallery";
-import { chooseFriends } from "../components/chooseFriends";
-import { MainMenu } from "../components/mainMenu";
-import { UserImageComponent } from "../components/userImage";
-import { HexagonModule } from "../components/hexagonModule";
+import { BrowserModule } from '@angular/platform-browser';
 
-import { SyntaxifyDirective } from '../components/syntaxify';
+import { SplashScreen } from "@ionic-native/splash-screen";
+import { StatusBar } from "@ionic-native/status-bar";
+import { Globalization } from '@ionic-native/globalization';
+import { Push } from '@ionic-native/push';
+import { PhotoViewer } from '@ionic-native/photo-viewer';
+import { ImagePicker } from '@ionic-native/image-picker';
+import { File } from '@ionic-native/file';
+import { Camera } from '@ionic-native/camera';
+import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 
 (<any>window).startup = new Date().getTime();
 
 @NgModule({
 	declarations: [
-		MyApp,
-		HomePage,
-		MessagesPage,
-		ContactsPage,
-		ProfilePage,
-		VerifyContactPage,
-		SettingsPage,
-		ContactRequestsPage,
-		NewMessagePage,
-		TopicComponent,
-		GalleryComponent,
-		chooseFriends,
-		MainMenu,
-		SafeUrl,
-		SyntaxifyDirective,
-		ResponsiveDatePipe,
-		UserImageComponent,
+		MyApp
 	],
 	imports: [
-		IonicModule.forRoot(MyApp, {}, {
-			links: [
-				{ component: HomePage, name: "Home", segment: "home" },
-				{ component: MessagesPage, name: "Messages", segment: "messages/:topicId", defaultHistory: [HomePage] },
-				{ component: ContactsPage, name: "Contacts", segment: "contacts" },
-				{ component: ContactRequestsPage, name: "Requests", segment: "requests" },
-				{ component: ProfilePage, name: "Profile", segment: "profile/:userId" },
-				{ component: VerifyContactPage, name: "Verify Contact", segment: "profile/:userId/verify" },
-				{ component: SettingsPage, name: "Settings", segment: "settings" },
-				{ component: NewMessagePage, name: "New Message", segment: "newMessage" },
-				{ component: NewMessagePage, name: "New Message", segment: "newMessage/:receiverIds" }
-			]
-		}),
-		QRCodeModule,
-		HexagonModule
+		IonicModule.forRoot(MyApp),
+		BrowserModule,
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
 		MyApp,
-		HomePage,
-		MessagesPage,
-		ContactsPage,
-		ProfilePage,
-		VerifyContactPage,
-		SettingsPage,
-		ContactRequestsPage,
-		NewMessagePage,
-		TopicComponent,
-		GalleryComponent,
-		chooseFriends,
-		MainMenu,
-		UserImageComponent,
 	],
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},
 		DatePipe,
-		BarcodeScanner
+		BarcodeScanner,
+		SplashScreen,
+		StatusBar,
+		Globalization,
+		Push,
+		PhotoViewer,
+		ImagePicker,
+		File,
+		Camera
 	]
 })
 export class AppModule {
 	constructor(private zone: NgZone) {
-		Bluebird.setScheduler((fn) => {
-			setTimeout(() => {
-				this.zone.run(fn);
-			}, 0)
-		});
-
-		sessionService.loadLogin().then((loggedin) => {
-			if (!loggedin) {
-				loginPage();
-			}
+		const originalScheduler: any = Bluebird.setScheduler((fn) => {
+			originalScheduler(() => {
+				this.zone.run(fn)
+			});
 		});
 	}
 }

@@ -1,8 +1,6 @@
-import {
-	Push
-} from 'ionic-native';
+import { Push } from '@ionic-native/push';
 
-import { NavController } from "ionic-angular";
+import { NavController, Platform } from "ionic-angular";
 
 import { MessagesPage } from "../../pages/messages/messages";
 
@@ -19,7 +17,7 @@ const sessionStorage = withPrefix("whispeer.session");
 const sjcl = require("sjcl");
 
 export class PushService {
-	constructor(private navCtrl: NavController) {}
+	constructor(private navCtrl: NavController, private platform: Platform, private push: Push) {}
 
 	private getOrCreatePushkey = () => {
 		const storagePushKey = sessionStorage.get("pushKey");
@@ -57,7 +55,7 @@ export class PushService {
 	}
 
 	private registration = (data) => {
-		console.log("-> registartion", data);
+		console.log("-> registration", data);
 		const type = this.getType()
 
 		Bluebird.all([
@@ -97,32 +95,46 @@ export class PushService {
 			this.navCtrl.remove(index);
 		}
 
-		return this.navCtrl.push(MessagesPage, { topicId: topicId });
+		return this.navCtrl.push("Messages", { topicId: topicId });
+	}
+
+	private goToUser = (userId) => {
+		return this.navCtrl.push("Profile", { userId: userId });
+	}
+
+	private goToReference = (reference) => {
+		if (reference.type === "message") {
+			this.goToTopic(reference.id);
+		}
+
+		if (reference.type === "contactRequest") {
+			this.goToUser(reference.id);
+		}
 	}
 
 	private notification = (data) => {
+		console.log(data);
+
 		if (data && data.additionalData) {
+			const additionalData = data.additionalData;
+
 			Bluebird.all([
 				sessionStorage.awaitLoading(),
 				initService.awaitLoading()
 			]).then(() => {
-				const topicId = data.additionalData.topicid;
-
-				if (!data.additionalData.foreground && topicId) {
-					console.log("-> click", topicId);
-
-					this.goToTopic(topicId)
+				if (!additionalData.foreground && !additionalData.coldstart && additionalData.reference) {
+					this.goToReference(additionalData.reference)
 				}
 
 				var pushKey = sessionStorage.get("pushKey");
 
-				if (data.additionalData.encryptedContent && pushKey) {
+				if (additionalData.encryptedContent && pushKey) {
 					pushKey = sjcl.codec.hex.toBits(pushKey);
-					data.additionalData.content = JSON.parse(sjcl.json.decrypt(pushKey, JSON.stringify(data.additionalData.encryptedContent)));
+					additionalData.content = JSON.parse(sjcl.json.decrypt(pushKey, JSON.stringify(additionalData.encryptedContent)));
 				}
 
-				if (data.additionalData.content) {
-					messageService.addSocketMessage(data.additionalData.content.message);
+				if (additionalData.content) {
+					messageService.addSocketMessage(additionalData.content.message);
 				}
 			});
 		}
@@ -130,10 +142,15 @@ export class PushService {
 
 	register = () => {
 		try {
-			var push = Push.init(this.pushConfig);
+			const push = this.push.init(this.pushConfig);
 
-			push.on("registration", this.registration);
-			push.on("notification", this.notification);
+			push.on("registration").subscribe(this.registration);
+			push.on("notification").subscribe(this.notification);
+
+			this.platform.resume.subscribe(() => {
+				console.warn("Resume app");
+				push.clearAllNotifications()
+			})
 		} catch (e) {
 			console.warn("Push is not available!");
 		}

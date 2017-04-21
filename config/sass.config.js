@@ -1,5 +1,6 @@
-
 // https://www.npmjs.com/package/node-sass
+
+console.warn('sass own config')
 
 module.exports = {
 
@@ -33,7 +34,8 @@ module.exports = {
       'Explorer >= 11',
       'ExplorerMobile >= 11'
     ],
-    cascade: false
+    cascade: false,
+    remove: false
   },
 
   /**

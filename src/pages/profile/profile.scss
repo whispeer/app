@@ -100,8 +100,8 @@ page-profile {
 		color: map-get($colors, dark);
 		.fingerprint-part {
 			display: inline;
-			&::after { content: '‒'; }
-			&:nth-of-type(2n+2)::after { content: '‒\A'; }
+			&::after { content: '\2013'; }
+			&:nth-of-type(2n+2)::after { content: '\2013\A'; }
 			&:last-of-type::after { content: ''; }
 		}
 	}

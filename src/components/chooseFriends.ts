@@ -1,8 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { MessagesPage } from "../pages/messages/messages";
-
 const friendsService = require("../assets/services/friendsService");
 const userService = require("../assets/user/userService");
 const messageService = require("../assets/messages/messageService");
@@ -17,7 +15,7 @@ const h = require("whispeerHelper");
 	selector: 'chooseFriends',
 	templateUrl: 'chooseFriends.html'
 })
-export class chooseFriends extends ContactsWithSearch {
+export class ChooseFriends extends ContactsWithSearch {
 	friends: any[];
 	searchTerm: string = "";
 	selectedUserMap: any = {};
@@ -111,7 +109,7 @@ export class chooseFriends extends ContactsWithSearch {
 	send = (users) => {
 		this.sendToUserTopic(users).then((topicId) => {
 			if (topicId) {
-				this.navCtrl.push(MessagesPage, { topicId: topicId });
+				this.navCtrl.push("Messages", { topicId: topicId });
 			}
 
 			this.chooseReceivers.emit(users);

@@ -1,6 +1,6 @@
-var watch = require('../dist/watch');
-var copy = require('../dist/copy');
-var copyConfig = require('./copy.config');
+var watch = require('../node_modules/@ionic/app-scripts/dist/watch');
+var copy = require('../node_modules/@ionic/app-scripts/dist/copy');
+var copyConfig = require('../node_modules/@ionic/app-scripts/config/copy.config');
 
 // this is a custom dictionary to make it easy to extend/override
 // provide a name for an entry, it can be anything such as 'srcFiles' or 'copyConfig'
@@ -9,8 +9,8 @@ var copyConfig = require('./copy.config');
 
 module.exports = {
   srcFiles: {
-    paths: ['{{SRC}}/**/*.(ts|html|s(c|a)ss)'],
-    options: { ignored: ['{{SRC}}/**/*.spec.ts', '{{SRC}}/**/*.e2e.ts', '**/*.DS_Store'] },
+    paths: ['{{SRC}}/**/*.(ts|js|html|s(c|a)ss)'],
+    options: { ignored: ['{{SRC}}/**/*.spec.ts', '{{SRC}}/**/*.e2e.ts', '**/*.DS_Store', '{{SRC}}/index.html'] },
     callback: watch.buildUpdate
   },
   copyConfig: copy.copyConfigToWatchConfig()

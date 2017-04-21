@@ -1,19 +1,22 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
+import sessionService from '../../assets/services/session.service';
 import { failureCodes } from "../../assets/services/login.service";
 import loginService from "../../assets/services/login.service";
-import { mainPage } from "../../assets/services/location.manager";
 import jQuery from "jquery";
 
 const registerService = require('../../assets/services/registerService');
 const whispeerHelper = require('whispeerHelper')
 
+@IonicPage({
+	name: "Login",
+	segment: "login"
+})
 @Component({
 	selector: 'page-login',
 	templateUrl: 'login.html'
 })
-
 export class LoginPage {
 
 	login: typeof loginService;
@@ -29,6 +32,15 @@ export class LoginPage {
 				? jQuery("#password input")
 				: jQuery("#mail input")).focus();
 		});
+	}
+
+	ionViewCanEnter(): boolean {
+		return !sessionService.loggedin
+	}
+
+	private mainPage() {
+		this.navCtrl.remove(0, this.navCtrl.length() - 1)
+		this.navCtrl.setRoot("Home")
 	}
 
 	getMessage() {
@@ -140,7 +152,9 @@ export class LoginPage {
 			// login
 			this.performLogin().then(() => {
 				this.usernameState = USERNAME_LOGIN_SUCCESS
-				mainPage()
+				sessionService.loadLogin().then(() => {
+					this.mainPage()
+				})
 			}).catch((error) => {
 				this.usernameState = this.getLoginErrorCode(error);
 			})
@@ -150,12 +164,15 @@ export class LoginPage {
 			this.usernameState = USERNAME_PASSWORD_CONFIRM
 
 		} else if ([USERNAME_PASSWORD_CONFIRM].indexOf(this.usernameState) !== -1) {
-			const registerError = () => { this.usernameState = USERNAME_REGISTER_ERROR; }
+			const registerError = (e) => {
+				console.error(e);
+				this.usernameState = USERNAME_REGISTER_ERROR;
+			}
 
 			if (this.passwordsMatch()) {
 				this.performRegister().then(() => {
 					this.usernameState = USERNAME_REGISTER_SUCCESS;
-					mainPage()
+					this.mainPage()
 				}).catch(registerError);
 			} else {
 				this.usernameState = USERNAME_PASSWORDS_DONT_MATCH;

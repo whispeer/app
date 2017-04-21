@@ -2,11 +2,11 @@ import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core
 
 import { NavController, ActionSheetController, Platform, Content, Footer } from "ionic-angular";
 
-import { ProfilePage } from "../pages/profile/profile";
-
 import * as Bluebird from "bluebird";
 
-import { ImagePicker, File, Camera } from 'ionic-native';
+import { ImagePicker } from '@ionic-native/image-picker';
+import { File } from '@ionic-native/file';
+import { Camera } from '@ionic-native/camera';
 
 const ImageUpload = require("../assets/services/imageUploadService");
 
@@ -34,6 +34,7 @@ export class TopicComponent {
 	@Input() topic;
 	@Input() messageBurstsFunction;
 	@Input() messagesLoading;
+	@Input() forceBackButton;
 
 	@Output() sendMessage = new EventEmitter();
 
@@ -42,7 +43,14 @@ export class TopicComponent {
 
 	newMessageText = "";
 
-	constructor(public navCtrl: NavController, private actionSheetCtrl: ActionSheetController, private platform: Platform) {}
+	constructor(
+		public navCtrl: NavController,
+		private actionSheetCtrl: ActionSheetController,
+		private platform: Platform,
+		private imagePicker: ImagePicker,
+		private file: File,
+		private camera: Camera
+	) {}
 
 	contentHeight = 0;
 	footerHeight = 0;
@@ -73,7 +81,7 @@ export class TopicComponent {
 
 	getFile = (url: string, type: string) : Bluebird<any> => {
 		return new Bluebird((resolve, reject) => {
-			File.resolveLocalFilesystemUrl(url).then((entry: any) => {
+			this.file.resolveLocalFilesystemUrl(url).then((entry: any) => {
 				return entry.file(resolve, reject);
 			});
 		}).then((file: any) => {
@@ -94,7 +102,7 @@ export class TopicComponent {
 					text: "Take Photo",
 					icon: !this.platform.is("ios") ? "camera": null,
 					handler: () => {
-						Camera.getPicture(CameraOptions).then((url) => {
+						this.camera.getPicture(CameraOptions).then((url) => {
 							return this.getFile(url, "image/png");
 						}).then((file: any) => {
 							return new ImageUpload(file);
@@ -109,7 +117,7 @@ export class TopicComponent {
 					text: "Select from Gallery",
 					icon: !this.platform.is("ios") ? "image": null,
 					handler: () => {
-						Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+						Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
 							return this.getFile(result, "image/png");
 						}).map((file: any) => {
 							return new ImageUpload(file);
@@ -191,7 +199,7 @@ export class TopicComponent {
 	}
 
 	goToProfile(userId: number) {
-		this.navCtrl.push(ProfilePage, {
+		this.navCtrl.push("Profile", {
 			userId
 		});
 	}

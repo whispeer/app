@@ -1,3 +1,11 @@
+=== 0.2.7 ===
+- Login-Button sieht auf alten Geräten schöner aus
+- Push-Notification wenn eine neue Kontaktanfrage existiert
+- Login-View ist nun scrollbar
+- Kleinere Bugfixes
+- Nachrichten werden korrekt als gelesen markiert
+
+=== 0.2.6 ===
 - Startbildschirme aktualisiert
 - Redesign des Nutzerprofils
  - Größerer QR-Code

@@ -1,12 +1,18 @@
-import { Component } from "@angular/core";
+import { Component, ElementRef } from "@angular/core";
 
-import { NavParams } from "ionic-angular";
+import { NavParams, IonicPage } from "ionic-angular";
 
 const messageService = require("../../assets/messages/messageService");
 const TopicUpdate = require("../../assets/models/topicUpdate");
 const Burst = require("../../assets/messages/burst");
 import errorService from "../../assets/services/error.service";
+const inView = require("in-view");
 
+@IonicPage({
+	name: "Messages",
+	segment: "messages/:topicId",
+	defaultHistory: ["Home"]
+})
 @Component({
 	selector: 'page-messages',
 	templateUrl: 'messages.html'
@@ -21,9 +27,10 @@ export class MessagesPage {
 
 	burstTopic: number = 0;
 	bursts: any[] = [];
+	lastMessageElement: any;
 
 	messages: any[];
-	constructor(public navParams: NavParams) {
+	constructor(public navParams: NavParams, private element: ElementRef) {
 	}
 
 	ngOnInit() {
@@ -156,6 +163,35 @@ export class MessagesPage {
 		return { changed: true, bursts: this.bursts };
 	}
 
+	ngAfterViewChecked() {
+		this.registerMarkReadListener()
+	}
+
+	onElementInView = ({ target }) => {
+		if (inView.is(this.lastMessageElement)) {
+			this.markRead()
+			target.removeEventListener("scroll", this.onElementInView)
+		}
+	}
+
+	registerMarkReadListener() {
+		const selector = ".messages__burst:last-child .messages__wrap:last-child"
+		const lastMessageElement: Element = this.element.nativeElement.querySelector(selector)
+
+		if (!lastMessageElement || lastMessageElement === this.lastMessageElement) {
+			return
+		}
+
+		this.lastMessageElement = lastMessageElement
+
+		if (inView.is(lastMessageElement)) {
+			this.markRead()
+			return
+		}
+
+		document.querySelector("topicwithbursts .scroll-content").addEventListener("scroll", this.onElementInView)
+	}
+
 	messageBursts = () => {
 		var burstInfo = this.getBursts();
 
@@ -167,7 +203,10 @@ export class MessagesPage {
 	}
 
 	markRead = () => {
-		this.topicObject.markRead(errorService.criticalError)
+		setTimeout(() => {
+			console.log('mark topic read', this.topicObject.getID())
+			this.topicObject.markRead(errorService.criticalError)
+		}, 0)
 	}
 
 	sendMessage = ({ images, text }) => {

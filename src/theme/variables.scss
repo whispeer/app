@@ -4,7 +4,6 @@ $font-path: "../assets/fonts";
 
 @import "ionic.globals";
 
-
 // Shared Variables
 // --------------------------------------------------
 // To customize the look and feel of this app, you can override
@@ -22,7 +21,7 @@ $fab-size: 76px;
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
 
-$colors:  (
+$colors: (
 	primary: #5ab70d,
 	primaryDarker: #3a8100,
 	secondary: #013c4c,
@@ -101,3 +100,4 @@ $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
 
 @import "roboto";
 @import "noto-sans";
+@import "node_modules/mathsass/dist/math";

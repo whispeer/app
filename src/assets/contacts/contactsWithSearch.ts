@@ -35,7 +35,7 @@ export class ContactsWithSearch {
 		}).then((result: any[]) => {
 			this.contacts = result;
 			this.contactsLoading = false;
-		});
+		})
 	}
 
 	contactDividers = (record, recordIndex, records) => {
@@ -66,6 +66,8 @@ export class ContactsWithSearch {
 		if(firstChar.toLowerCase() !== previousEntry.name[0].toLowerCase()) {
 			return firstChar.toUpperCase();
 		}
+
+		console.log('return null')
 
 		return null;
 	}
@@ -105,7 +107,7 @@ export class ContactsWithSearch {
 		}
 
 		return this.contacts.filter((contact) => {
-			return contact.name.indexOf(this.searchTerm) > -1;
+			return contact.names.searchName.indexOf(this.searchTerm) > -1;
 		});
 	}
 

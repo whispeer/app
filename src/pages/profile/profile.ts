@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
-import { NavController, NavParams, ActionSheetController, AlertController, Platform } from 'ionic-angular';
-import { ImagePicker, File, Camera } from 'ionic-native';
+import { Component } from "@angular/core";
+import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform, IonicPage } from 'ionic-angular';
 import sessionService from '../../assets/services/session.service';
 import * as Bluebird from 'bluebird';
 
-import { HomePage } from "../home/home";
-import { NewMessagePage } from "../new-message/new-message";
-import { VerifyContactPage } from "../verify-contact/verify-contact";
-
 const userService = require("user/userService");
 const friendsService = require("../../assets/services/friendsService");
+
+import { ImagePicker } from "@ionic-native/image-picker";
+import { File } from "@ionic-native/file";
+import { Camera } from "@ionic-native/camera";
+import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -26,6 +26,10 @@ const CameraOptions = {
 	// correctOrientation: true
 };
 
+@IonicPage({
+	name: "Profile",
+	segment: "profile/:userId"
+})
 @Component({
 	selector: 'page-profile',
 	templateUrl: 'profile.html'
@@ -51,7 +55,17 @@ export class ProfilePage {
 
 	profileLoading: boolean = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private actionSheetCtrl: ActionSheetController, private alertCtrl: AlertController, private platform: Platform) {}
+	constructor(
+		public navCtrl: NavController,
+		public navParams: NavParams,
+		private actionSheetCtrl: ActionSheetController,
+		private alertCtrl: AlertController,
+		private platform: Platform,
+		private file: File,
+		private camera: Camera,
+		private imagePicker: ImagePicker,
+		private barcodeScanner: BarcodeScanner
+	) {}
 
 	ngOnInit() {
 		this.userId = parseFloat(this.navParams.get("userId"));
@@ -184,11 +198,17 @@ export class ProfilePage {
 	}
 
 	writeMessage() {
-		this.navCtrl.push(NewMessagePage, { receiverIds: this.user.id });
+		this.navCtrl.push("New Message", {
+			receiverIds: this.user.id.toString()
+		});
 	}
 
 	verifyPerson() {
-		this.navCtrl.push(VerifyContactPage, { userId: this.user.id });
+		this.barcodeScanner.scan().then((res) => {
+			console.log(res);
+		}).catch((err) => {
+			console.error(err);
+		});
 	}
 
 	contactOptions() {
@@ -204,7 +224,7 @@ export class ProfilePage {
 				role: "destructive",
 				icon: !this.platform.is("ios") ? "trash" : null,
 				handler: () => {
-					this.alertCtrl.create({
+					this.alertCtrl.create(<AlertOptions>{
 						title: "Remove Contact",
 						message: "Are you sure that you want to remove this Contact?",
 						buttons: [{
@@ -231,7 +251,7 @@ export class ProfilePage {
 	// 1:1 copy from topicDisplay. maybe this should go into the helper?
 	getFile = (url: string, type: string) : Bluebird<any> => {
 		return new Bluebird((resolve, reject) => {
-			File.resolveLocalFilesystemUrl(url).then((entry: any) => {
+			this.file.resolveLocalFilesystemUrl(url).then((entry: any) => {
 				return entry.file(resolve, reject);
 			});
 		}).then((file: any) => {
@@ -257,7 +277,7 @@ export class ProfilePage {
 				icon: !this.platform.is("ios") ? "camera": null,
 				text: "Take a Photo",
 				handler: () => {
-					Camera.getPicture(CameraOptions).then((url) => {
+					this.camera.getPicture(CameraOptions).then((url) => {
 						return this.getFile(url, "image/png");
 					}).then((file: any) => {
 						// TODO: make this the profile image!
@@ -267,7 +287,7 @@ export class ProfilePage {
 				icon: !this.platform.is("ios") ? "image": null,
 				text: "Select from Gallery",
 				handler: () => {
-					Bluebird.resolve(ImagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+					Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
 						return this.getFile(result, "image/png");
 					}).then((file: any) => {
 						// image count is one so images only contains one entry!
@@ -304,6 +324,6 @@ export class ProfilePage {
 	}
 
 	close = () => {
-		this.navCtrl.setRoot(HomePage);
+		this.navCtrl.setRoot("Home");
 	}
 }
