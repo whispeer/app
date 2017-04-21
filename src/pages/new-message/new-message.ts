@@ -16,6 +16,8 @@ export class NewMessagePage {
 	partners: any = [];
 	receiversChosen: boolean = false;
 
+	bursts = []
+
 	topic = {
 		newMessage: ""
 	};
@@ -34,12 +36,17 @@ export class NewMessagePage {
 	}
 
 	messageBursts = () => {
-		return { changed: false, bursts: [] };
+		return { changed: false, bursts: this.bursts };
 	}
 
 	sendMessage = ({ images, text }) => {
+		this.bursts = []
+		this.messagesLoading = true
+
 		messageService.sendNewTopic(this.partners.map((partner) => partner.user.getID()), text, images).then((topicId) => {
-			this.navCtrl.setRoot("Messages", { topicId: topicId });
+			this.navCtrl.push("Messages", { topicId: topicId }).then(() => {
+				this.navCtrl.remove(this.navCtrl.length() - 2, 1)
+			})
 		});
 	}
 }

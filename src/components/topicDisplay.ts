@@ -170,7 +170,7 @@ export class TopicComponent {
 	}, 20)
 
 	checkLoadMoreMessages() {
-		if (this.messagesLoading || !this.moreMessagesAvailable) {
+		if (this.messagesLoading || !this.moreMessagesAvailable || !this.loadMoreMessages) {
 			return
 		}
 
