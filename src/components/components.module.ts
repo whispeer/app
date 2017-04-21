@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from 'ionic-angular';
 
-import { SafeUrl } from "../assets/pipes/safeStyle";
-import { ResponsiveDatePipe } from "../assets/pipes/responsiveDate";
+import { SafeUrl } from "../lib/pipes/safeStyle";
+import { ResponsiveDatePipe } from "../lib/pipes/responsiveDate";
 
 import { UserImageComponent } from "./userImage";
 import { MainMenu } from "./mainMenu";

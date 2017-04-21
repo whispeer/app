@@ -18,7 +18,7 @@ module.exports = {
 
 	resolve: {
 		extensions: [".ts", ".js", ".json"],
-		modules: [path.resolve("src/assets/"), path.resolve("node_modules")],
+		modules: [path.resolve("src/lib/"), path.resolve("node_modules")],
 		alias: {
 			whispeerHelper: "helper/helper",
 			workerQueue: "worker/worker-queue",

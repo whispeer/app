@@ -2,10 +2,10 @@ import { Component, ElementRef } from "@angular/core";
 
 import { NavParams, IonicPage } from "ionic-angular";
 
-const messageService = require("../../assets/messages/messageService");
-const TopicUpdate = require("../../assets/models/topicUpdate");
-const Burst = require("../../assets/messages/burst");
-import errorService from "../../assets/services/error.service";
+const messageService = require("../../lib/messages/messageService");
+const TopicUpdate = require("../../lib/models/topicUpdate");
+const Burst = require("../../lib/messages/burst");
+import errorService from "../../lib/services/error.service";
 const inView = require("in-view");
 
 @IonicPage({

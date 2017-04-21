@@ -8,7 +8,7 @@ import { ImagePicker } from '@ionic-native/image-picker';
 import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 
-const ImageUpload = require("../assets/services/imageUploadService");
+const ImageUpload = require("../lib/services/imageUploadService");
 const h = require("whispeerHelper");
 
 const ImagePickerOptions = {

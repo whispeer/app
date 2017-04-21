@@ -6,10 +6,10 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { Globalization } from '@ionic-native/globalization';
 import { Push } from '@ionic-native/push';
 
-import { PushService } from "../assets/services/push.service";
+import { PushService } from "../lib/services/push.service";
 import Tutorial from "./tutorial";
 
-import sessionService from '../assets/services/session.service';
+import sessionService from '../lib/services/session.service';
 
 const tutorialDisabled = ["login"]
 
