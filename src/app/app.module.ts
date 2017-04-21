@@ -4,8 +4,10 @@ require("services/trust.service");
 
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
+
 import { IonicApp, IonicErrorHandler } from 'ionic-angular';
 import { IonicModule } from 'ionic-angular';
+
 import * as Bluebird from 'bluebird';
 
 import { MyApp } from './app.component';
