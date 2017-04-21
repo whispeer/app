@@ -48,6 +48,7 @@ export class TopicComponent {
 	newMessageText = "";
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
+	oldScrollFromBottom: number = 0
 
 	constructor(
 		public navCtrl: NavController,
@@ -60,16 +61,17 @@ export class TopicComponent {
 
 	ngAfterViewInit() {
 		window.addEventListener('resize', this.keyboardChange);
-
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 	}
 
 	ngOnDestroy() {
 		window.removeEventListener('resize', this.keyboardChange);
+		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 	}
 
+
 	keyboardChange = () => {
-		this.change();
+		this.stabilizeScroll(this.oldScrollFromBottom)
 	}
 
 	sendMessageToTopic = () => {
@@ -187,6 +189,7 @@ export class TopicComponent {
 	}
 
 	onScroll = () => {
+		this.oldScrollFromBottom = this.scrollFromBottom()
 		this.updateElementsInView()
 		this.checkLoadMoreMessages()
 	}
