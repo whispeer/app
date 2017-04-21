@@ -12,14 +12,18 @@ topicWithBursts {
 
 		display: flex;
 		flex-direction: column;
+
+		// ios scrolling
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.messages__list > .list {
+		// ios margin bottom
+		margin-bottom: 0 !important;
 	}
 
 	.messages_filler {
 		flex: 1;
-	}
-
-	.list-md {
-		margin-bottom: 0;
 	}
 }
 
@@ -54,6 +58,11 @@ topicWithBursts {
 }
 
 .ios {
+	.messages__list {
+		margin-top: 64px; // ios needs more margin because of the status bar
+		// may look odd in the browser but sits neat in the app
+	}
+
 	.messages__header__fake-back {
 		position: absolute;
 		left: 0.5em;
