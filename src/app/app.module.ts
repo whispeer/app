@@ -4,8 +4,10 @@ require("services/trust.service");
 
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
+
 import { IonicApp, IonicErrorHandler } from 'ionic-angular';
 import { IonicModule } from 'ionic-angular';
+
 import * as Bluebird from 'bluebird';
 
 import { MyApp } from './app.component';
@@ -50,10 +52,15 @@ import { Camera } from '@ionic-native/camera';
 })
 export class AppModule {
 	constructor(private zone: NgZone) {
-		const originalScheduler: any = Bluebird.setScheduler((fn) => {
-			originalScheduler(() => {
-				this.zone.run(fn)
-			});
+		Bluebird.setScheduler((fn) => {
+			setTimeout(() => {
+				if((<any>this.zone).inner !== (<any>window).Zone.current) {
+					this.zone.run(fn)
+					return
+				}
+
+				fn()
+			}, 0);
 		});
 	}
 }

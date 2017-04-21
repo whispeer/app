@@ -53,7 +53,7 @@ export class GalleryComponent {
 
 	loadImagePreviews(images) {
 		images.forEach((image) => {
-			if (image.upload) {
+			if (image.upload && typeof image.lowest.url === "string") {
 				image.highest.url = this.sanitizer.bypassSecurityTrustUrl(image.highest.url);
 				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(image.lowest.url);
 				return;

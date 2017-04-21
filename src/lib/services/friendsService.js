@@ -289,7 +289,7 @@ friendsService = {
 		}).nodeify(cb);
 	},
 	acceptFriendShip: function (uid, cb) {
-		if (requests.indexOf(uid) > -1 && !h.containsOr(uid, friends, requested)) {
+		if (requests.indexOf(uid) > -1 && !h.containsOr(uid, friends)) {
 			return addAsFriend(uid).nodeify(cb);
 		}
 	},
@@ -384,6 +384,8 @@ friendsService = {
 			ignored = data.ignored.map(h.parseDecimal);
 			removed = data.removed.map(h.parseDecimal);
 			deleted = data.deleted.map(h.parseDecimal);
+
+			console.log(friends, requests, requested, ignored, removed, deleted)
 
 			updateCounters();
 

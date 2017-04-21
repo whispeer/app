@@ -101,8 +101,23 @@ export class LoginPage {
 		}
 	}
 
+	focusInput(id, repeated = false) {
+		const input = jQuery(`#${id} .text-input`)
+
+		if (input.length) {
+			return input.focus();
+		}
+
+		if (repeated) {
+			return
+		}
+
+		setTimeout(() => this.focusInput(id, true), 100)
+	}
+
 	performLogin() {
 		const { identifier: nick, password: pass } = this.login;
+
 		return loginService.loginServer(nick, pass);
 	}
 
@@ -133,6 +148,10 @@ export class LoginPage {
 		)
 	}
 
+	passwordSet() {
+		return Boolean(this.login.password)
+	}
+
 	getLoginErrorCode = (error) => {
 		switch(error.data.failure) {
 			case failureCodes.WRONGPASSWORD:
@@ -148,6 +167,10 @@ export class LoginPage {
 
 	loginOrRegister = () => {
 		if ([USERNAME_TAKEN, USERNAME_LOGIN_INCORRECT_PASSWORD, USERNAME_NO_CONNECTION, USERNAME_LOGIN_ERROR].indexOf(this.usernameState) !== -1) {
+			if (!this.passwordSet()) {
+				this.focusInput("password")
+				return;
+			}
 
 			// login
 			this.performLogin().then(() => {
@@ -160,9 +183,13 @@ export class LoginPage {
 			})
 
 		} else if ([USERNAME_FREE, USERNAME_PASSWORDS_DONT_MATCH, USERNAME_REGISTER_ERROR].indexOf(this.usernameState) !== -1) {
+			if (!this.passwordSet()) {
+				this.focusInput("password")
+				return;
+			}
 
 			this.usernameState = USERNAME_PASSWORD_CONFIRM
-
+			this.focusInput("password2")
 		} else if ([USERNAME_PASSWORD_CONFIRM].indexOf(this.usernameState) !== -1) {
 			const registerError = (e) => {
 				console.error(e);
@@ -176,6 +203,8 @@ export class LoginPage {
 				}).catch(registerError);
 			} else {
 				this.usernameState = USERNAME_PASSWORDS_DONT_MATCH;
+
+				this.focusInput("password")
 
 				this.login.password = "";
 				this.passwordRepeat = "";

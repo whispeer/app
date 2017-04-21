@@ -136,7 +136,7 @@ Message.prototype.send = function () {
 	}
 
 	return socket.awaitConnection().bind(this).then(function () {
-		return this._topic.refetchMessages();
+		return [this._topic.refetchMessages(), this._topic.loadNewest()];
 	}).then(function () {
 		return this._topic.awaitEarlierSend(this.getTime());
 	}).then(function () {

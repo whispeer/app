@@ -36,7 +36,7 @@
     "@types/socket.io-client": "^1.4.29",
     "@types/webpack": "^2.0.0",
     "amanda": "~0.4.7",
-    "angular2-qrcode": "^1.0.5",
+    "angular2-qrcode": "^2.0.1",
     "bluebird": "^3.4.7",
     "blueimp-canvas-to-blob": "^3.7.0",
     "blueimp-load-image": "^2.10.0",
@@ -66,7 +66,8 @@
   "config": {
     "ionic_webpack": "./config/webpack.config.js",
     "ionic_sass": "./config/sass.config.js",
-    "ionic_copy": "./config/copy.config.js"
+    "ionic_copy": "./config/copy.config.js",
+    "ionic_watch": "./config/watch.config.js"
   },
   "description": "whispeerMessenger: An Ionic project"
 }
