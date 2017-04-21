@@ -24,6 +24,8 @@ export class LoginPage {
 
 	usernameState: number = USERNAME_UNKNOWN;
 
+	tutorialDisabled = true;
+
 	constructor(public navCtrl: NavController, public navParams: NavParams) {
 		this.login = loginService;
 		loginService.loadedStorage.then(() => {
