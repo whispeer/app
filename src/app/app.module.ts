@@ -54,10 +54,15 @@ import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 })
 export class AppModule {
 	constructor(private zone: NgZone) {
-		const originalScheduler: any = Bluebird.setScheduler((fn) => {
-			originalScheduler(() => {
-				this.zone.run(fn)
-			});
+		Bluebird.setScheduler((fn) => {
+			setTimeout(() => {
+				if((<any>this.zone).inner !== (<any>window).Zone.current) {
+					this.zone.run(fn)
+					return
+				}
+
+				fn()
+			}, 0);
 		});
 	}
 }

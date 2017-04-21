@@ -2,10 +2,10 @@ import { Component, ElementRef } from "@angular/core";
 
 import { NavParams, IonicPage } from "ionic-angular";
 
-const messageService = require("../../assets/messages/messageService");
-const TopicUpdate = require("../../assets/models/topicUpdate");
-const Burst = require("../../assets/messages/burst");
-import errorService from "../../assets/services/error.service";
+const messageService = require("../../lib/messages/messageService");
+const TopicUpdate = require("../../lib/models/topicUpdate");
+const Burst = require("../../lib/messages/burst");
+import errorService from "../../lib/services/error.service";
 const inView = require("in-view");
 
 @IonicPage({
@@ -41,7 +41,7 @@ export class MessagesPage {
 			this.topicObject = topic;
 			this.partners = topic.data.partners;
 
-			topic.loadMoreMessages().then(() => {
+			topic.loadInitialMessages().then(() => {
 				// this.content.scrollToBottom(0);
 
 				this.messagesLoading = false;
@@ -131,7 +131,7 @@ export class MessagesPage {
 		}, true);
 	}
 
-	private getBursts = () => {
+	private getBursts = (options) => {
 		if (!this.topic || this.topic.messagesAndUpdates.length === 0) {
 			return { changed: false, bursts: [] };
 		}
@@ -146,6 +146,19 @@ export class MessagesPage {
 		}
 
 		var newElements = this.getNewElements(messagesAndUpdates, this.bursts);
+
+		if (options) {
+			const firstViewMessage = messagesAndUpdates.find((elem) => {
+				return options.after == elem.getID().toString()
+			})
+
+			const index = messagesAndUpdates.indexOf(firstViewMessage)
+
+			newElements = newElements.filter((element) => {
+				return messagesAndUpdates.indexOf(element) > index
+			})
+		}
+
 		if (newElements.length === 0) {
 			return { changed: false, bursts: this.bursts };
 		}
@@ -189,11 +202,22 @@ export class MessagesPage {
 			return
 		}
 
-		document.querySelector("topicwithbursts .scroll-content").addEventListener("scroll", this.onElementInView)
+		document.querySelector("topicwithbursts .messages__list").addEventListener("scroll", this.onElementInView)
 	}
 
-	messageBursts = () => {
-		var burstInfo = this.getBursts();
+	loadMoreMessages = () => {
+		console.warn("load more messages")
+
+		this.messagesLoading = true;
+
+		return this.topicObject.loadMoreMessages().then(() => {
+			this.messagesLoading = false;
+			return this.topic.remaining
+		})
+	}
+
+	messageBursts = (options) => {
+		var burstInfo = this.getBursts(options);
 
 		burstInfo.bursts.sort((b1, b2) => {
 			return b1.firstItem().getTime() - b2.firstItem().getTime();

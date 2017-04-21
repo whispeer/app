@@ -104,7 +104,7 @@
 		</div>
 		<div *ngSwitchCase="'qr'">
 
-			<qr-code [data]="user.fingerprint" [size]="150" class="profile__qr"></qr-code>
+			<qr-code [value]="user.fingerprint" [size]="400" class="profile__qr"></qr-code>
 
 			<ion-grid class="fingerprint">
 				<ion-row>

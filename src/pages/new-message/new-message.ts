@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
-const messageService = require("../../assets/messages/messageService");
+const messageService = require("../../lib/messages/messageService");
 
 @IonicPage({
 	name: "New Message",

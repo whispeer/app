@@ -1,6 +1,6 @@
-import { Component, ViewChild, Input, Output, EventEmitter } from "@angular/core";
+import { Component, ViewChild, Input, Output, EventEmitter, ElementRef } from "@angular/core";
 
-import { NavController, ActionSheetController, Platform, Content, Footer } from "ionic-angular";
+import { NavController, ActionSheetController, Platform } from "ionic-angular";
 
 import * as Bluebird from "bluebird";
 
@@ -8,7 +8,8 @@ import { ImagePicker } from '@ionic-native/image-picker';
 import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 
-const ImageUpload = require("../assets/services/imageUploadService");
+const ImageUpload = require("../lib/services/imageUploadService");
+const h = require("whispeerHelper");
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -25,6 +26,8 @@ const CameraOptions = {
 	// correctOrientation: true
 };
 
+const INFINITE_SCROLLING_THRESHOLD = 1000
+
 @Component({
 	selector: "topicWithBursts",
 	templateUrl: "topic.html"
@@ -33,15 +36,18 @@ export class TopicComponent {
 	@Input() partners;
 	@Input() topic;
 	@Input() messageBurstsFunction;
+	@Input() loadMoreMessages;
 	@Input() messagesLoading;
 	@Input() forceBackButton;
 
 	@Output() sendMessage = new EventEmitter();
 
-	@ViewChild(Content) content: Content;
-	@ViewChild(Footer) footer: Footer;
+	@ViewChild('content') content: ElementRef;
+	@ViewChild('footer') footer: ElementRef;
 
 	newMessageText = "";
+	moreMessagesAvailable = true
+	inViewMessages: any[] = []
 
 	constructor(
 		public navCtrl: NavController,
@@ -52,12 +58,10 @@ export class TopicComponent {
 		private camera: Camera
 	) {}
 
-	contentHeight = 0;
-	footerHeight = 0;
-
 	ngAfterViewInit() {
-		console.warn("attach keyboard listener");
 		window.addEventListener('resize', this.keyboardChange);
+
+		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 	}
 
 	ngOnDestroy() {
@@ -65,8 +69,6 @@ export class TopicComponent {
 	}
 
 	keyboardChange = () => {
-		console.warn("keyboard change");
-
 		this.change();
 	}
 
@@ -77,6 +79,8 @@ export class TopicComponent {
 		});
 
 		this.newMessageText = "";
+
+		this.change();
 	}
 
 	getFile = (url: string, type: string) : Bluebird<any> => {
@@ -143,58 +147,133 @@ export class TopicComponent {
 	}
 
 	awaitRendering = () => {
-		return Bluebird.delay(100);
+		return Bluebird.delay(0);
 	}
 
-	messageBursts = () => {
+	realScrollHeight(element) {
+		return element.scrollHeight - element.clientHeight
+	}
+
+	isInView = (element, headerHeight) => {
+		const top = element.getBoundingClientRect().top - headerHeight
+
+		return top > 0 && top < this.content.nativeElement.clientHeight
+	}
+
+	updateElementsInView = h.debounce(() => {
+		const headerHeight = document.querySelector(".header").clientHeight
+
+		const messages = Array.prototype.slice.call(
+			this.content.nativeElement.querySelectorAll(".messages__wrap")
+		)
+
+		this.inViewMessages = messages.filter((e) => this.isInView(e, headerHeight))
+	}, 20)
+
+	checkLoadMoreMessages() {
+		if (this.messagesLoading || !this.moreMessagesAvailable) {
+			return
+		}
+
+		const scrollTop = this.content.nativeElement.scrollTop
+
+		if (scrollTop < INFINITE_SCROLLING_THRESHOLD) {
+			this.messagesLoading = true
+
+			setTimeout(() => {
+				this.loadMoreMessages().then((remaining) => {
+					this.moreMessagesAvailable = remaining !== 0
+					this.messagesLoading = false
+				})
+			}, 0)
+		}
+	}
+
+	onScroll = () => {
+		this.updateElementsInView()
+		this.checkLoadMoreMessages()
+	}
+
+	scrollFromBottom = () => {
+		const element = this.content.nativeElement
+		return this.realScrollHeight(element) - element.scrollTop;
+	}
+
+	stabilizeScroll = (scrollFromBottom: number) => {
+		const element = this.content.nativeElement
+		const newScrollTop = this.realScrollHeight(element) - scrollFromBottom
+
+		element.scrollTop = newScrollTop
+	}
+
+	getFirstInViewMessageId = () => {
+		const firstInViewMessage = this.inViewMessages[0]
+
+		if (firstInViewMessage) {
+			return firstInViewMessage.getAttribute("data-messageid")
+		}
+	}
+
+	afterViewBurstMessages() {
+		const id = this.getFirstInViewMessageId()
+
+		if (!id) {
+			return { changed: false, bursts: [] }
+		}
+
+		const { changed, bursts } = this.messageBurstsFunction({
+			after: id
+		});
+
+		return { changed, bursts };
+	}
+
+	allBurstMessages() {
 		const { changed, bursts } = this.messageBurstsFunction();
 
 		if (changed) {
-			const dimension = this.content.getContentDimensions();
-			const scrollFromBottom = dimension.scrollHeight - dimension.scrollTop;
-
-			this.awaitRendering().then(() => {
-				const newDimension = this.content.getContentDimensions();
-
-				this.content.scrollTo(dimension.scrollLeft, newDimension.scrollHeight - scrollFromBottom, 0);
-			})
+			const scrollFromBottom = this.scrollFromBottom()
+			this.awaitRendering().then(() => this.stabilizeScroll(scrollFromBottom))
 		}
 
 		return bursts;
 	}
 
+	messageBursts = () => {
+		const scrollFromBottom = this.scrollFromBottom()
+
+		if (scrollFromBottom > 15) {
+			const { changed, bursts } = this.afterViewBurstMessages()
+
+			if (changed) {
+				return bursts
+			}
+		}
+
+		return this.allBurstMessages()
+	}
+
 	change() {
 		setTimeout(() => {
+			const scrollFromBottom = this.scrollFromBottom()
+
 			const fontSize = 16;
 			const maxSize = fontSize*7;
 
-			const contentElement = this.content.getScrollElement();
-			const footerElement = this.footer.getNativeElement();
+			const footerElement = this.footer.nativeElement;
 
-			if (!this.footerHeight) {
-				this.footerHeight = footerElement.offsetHeight;
-			}
-
-			const element   = document.getElementById("sendMessageBox");
-			const textarea  = element.getElementsByTagName("textarea")[0];
+			const textarea  = footerElement.getElementsByTagName("textarea")[0];
 
 			textarea.style.minHeight  = "0";
 			textarea.style.height     = "0";
-			contentElement.style.height = "";
-
-			const contentHeight = contentElement.offsetHeight;
-
 
 			const scroll_height = Math.min(textarea.scrollHeight, maxSize);
 
 			// apply new style
-			element.style.height      = scroll_height + "px";
 			textarea.style.minHeight  = scroll_height + "px";
 			textarea.style.height     = scroll_height + "px";
 
-			contentElement.style.height = contentHeight - (footerElement.offsetHeight - this.footerHeight) + "px";
-
-			this.content.scrollToBottom(0);
+			this.stabilizeScroll(scrollFromBottom)
 		}, 100);
 	}
 

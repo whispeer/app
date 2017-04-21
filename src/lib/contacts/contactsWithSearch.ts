@@ -1,6 +1,6 @@
-const contactsService = require("../../assets/services/friendsService");
-const userService = require("../../assets/user/userService");
-import errorService from "../../assets/services/error.service";
+const contactsService = require("../../lib/services/friendsService");
+const userService = require("../../lib/user/userService");
+import errorService from "../../lib/services/error.service";
 
 import * as Bluebird from 'bluebird';
 

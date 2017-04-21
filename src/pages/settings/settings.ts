@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
-import sessionService from "../../assets/services/session.service";
+import sessionService from "../../lib/services/session.service";
 import Tutorial from "../../app/tutorial";
 
 /*

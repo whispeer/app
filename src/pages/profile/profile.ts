@@ -1,10 +1,10 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform, IonicPage } from 'ionic-angular';
-import sessionService from '../../assets/services/session.service';
+import sessionService from '../../lib/services/session.service';
 import * as Bluebird from 'bluebird';
 
 const userService = require("user/userService");
-const friendsService = require("../../assets/services/friendsService");
+const friendsService = require("../../lib/services/friendsService");
 
 import { ImagePicker } from "@ionic-native/image-picker";
 import { File } from "@ionic-native/file";
