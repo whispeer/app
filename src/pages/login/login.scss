@@ -2,6 +2,16 @@ page-login {
 	display: flex;
 }
 
+.login__scroll {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	height: 100%;
+	width: 100%;
+
+	color: #000;
+	background-color: #fff;
+}
+
 .login__wrap {
 	display: flex;
 	flex-direction: column;
@@ -23,7 +33,6 @@ page-login {
 
 .login__paragraph {
 	text-align: center;
-	min-height: 3.5rem;
 }
 
 .login__paragraph--primary {
@@ -49,6 +58,12 @@ page-login {
 	width: 100%;
 
 	padding: 0 2em;
+
+	.login__paragraph {
+		min-height: 2.4em;
+		line-height: 1.2em;
+		font-size: 14px;
+	}
 }
 
 .login__input-wrap {
