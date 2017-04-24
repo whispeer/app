@@ -19,6 +19,8 @@ const sjcl = require("sjcl");
 export class PushService {
 	constructor(private navCtrl: NavController, private platform: Platform, private push: Push) {}
 
+	pushInstance: any;
+
 	private getOrCreatePushkey = () => {
 		const storagePushKey = sessionStorage.get("pushKey");
 		if (storagePushKey) {
@@ -129,27 +131,33 @@ export class PushService {
 				var pushKey = sessionStorage.get("pushKey");
 
 				if (additionalData.encryptedContent && pushKey) {
+					if (typeof additionalData.encryptedContent === "object") {
+						additionalData.encryptedContent = JSON.stringify(additionalData.encryptedContent)
+					}
+
 					pushKey = sjcl.codec.hex.toBits(pushKey);
-					additionalData.content = JSON.parse(sjcl.json.decrypt(pushKey, JSON.stringify(additionalData.encryptedContent)));
+					additionalData.content = JSON.parse(sjcl.json.decrypt(pushKey, additionalData.encryptedContent));
 				}
 
 				if (additionalData.content) {
-					messageService.addSocketMessage(additionalData.content.message);
+					return messageService.addSocketMessage(additionalData.content.message);
 				}
+			}).then(() => {
+				this.pushInstance.finish(() => {console.log(`push done at ${new Date()}`)}, () => {console.warn("Finishing push failed!")}, additionalData.notId)
 			});
 		}
 	};
 
 	register = () => {
 		try {
-			const push = this.push.init(this.pushConfig);
+			this.pushInstance = this.push.init(this.pushConfig);
 
-			push.on("registration").subscribe(this.registration);
-			push.on("notification").subscribe(this.notification);
+			this.pushInstance.on("registration").subscribe(this.registration);
+			this.pushInstance.on("notification").subscribe(this.notification);
 
 			this.platform.resume.subscribe(() => {
 				console.warn("Resume app");
-				push.clearAllNotifications()
+				this.pushInstance.clearAllNotifications()
 			})
 		} catch (e) {
 			console.warn("Push is not available!");

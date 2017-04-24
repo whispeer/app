@@ -22,21 +22,22 @@ var loadLatestPromise
 
 messageService = {
 	addSocketMessage: function (messageData) {
-		if (messageData) {
-			var messageToAdd;
-
-			Bluebird.try(function () {
-				return Topic.messageFromData(messageData);
-			}).then(function (_messageToAdd) {
-				messageToAdd = _messageToAdd;
-				return Topic.get(messageToAdd.getTopicID());
-			}).then(function (theTopic) {
-				theTopic.addMessage(messageToAdd, true);
-				messageService.notify(messageToAdd, "message");
-
-				return theTopic.refetchMessages();
-			}).catch(errorService.criticalError);
+		if (!messageData) {
+			return Bluebird.resolve()
 		}
+		var messageToAdd;
+
+		return Bluebird.try(function () {
+			return Topic.messageFromData(messageData);
+		}).then(function (_messageToAdd) {
+			messageToAdd = _messageToAdd;
+			return Topic.get(messageToAdd.getTopicID());
+		}).then(function (theTopic) {
+			theTopic.addMessage(messageToAdd, true);
+			messageService.notify(messageToAdd, "message");
+
+			return theTopic.refetchMessages();
+		}).catch(errorService.criticalError);
 	},
 	isActiveTopic: function (topicid) {
 		return activeTopic === h.parseDecimal(topicid);
