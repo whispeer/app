@@ -45,9 +45,7 @@ page-login {
 }
 
 .login__welcome-text {
-	//margin-top: 1em;
-
-	font-size: 1.67em;
+	font-size: 20px;
 	text-align: center;
 }
 
@@ -63,6 +61,14 @@ page-login {
 		min-height: 2.4em;
 		line-height: 1.2em;
 		font-size: 14px;
+		margin: 12px 0;
+		position: relative;
+		> p {
+			width: 100%;
+			position: absolute;
+			bottom: 0;
+			margin: 0;
+		}
 	}
 }
 

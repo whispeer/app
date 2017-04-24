@@ -12,9 +12,10 @@
 
 		<form (ngSubmit)="loginOrRegister()">
 			<div class="login__form">
-				<p class="login__paragraph login__paragraph--primary">
-					{{ getMessage() }}
-				</p>
+
+				<div class="login__paragraph login__paragraph--primary">
+					<p>{{ getMessage() }}</p>
+				</div>
 
 				<ion-item class="clean-input-wrap login__input-wrap">
 					<ion-input id="mail"
