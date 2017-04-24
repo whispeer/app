@@ -122,7 +122,7 @@ export class PushService {
 				sessionStorage.awaitLoading(),
 				initService.awaitLoading()
 			]).then(() => {
-				if (!additionalData.foreground && !additionalData.coldstart && additionalData.reference) {
+				if (!additionalData.foreground && additionalData.reference) {
 					this.goToReference(additionalData.reference)
 				}
 
