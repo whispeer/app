@@ -99,6 +99,10 @@ export class LoginPage {
 			this.usernameState = USERNAME_INVALID;
 		} else {
 			registerService.nicknameUsed(nick).then((isUsed) => {
+				if (this.login.identifier !== nick) {
+					return
+				}
+
 				this.usernameState = isUsed
 					? USERNAME_TAKEN
 					: USERNAME_FREE;
