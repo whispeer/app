@@ -83,6 +83,7 @@
 	<preference name="SplashScreenDelay" value="3000"/>
 	<preference name="KeyboardShrinksView" value="true"/>
 	<preference name="xwalkMultipleApk" value="false"/>
+	<preference name="Orientation" value="portrait" />
 	<feature name="StatusBar">
 		<param name="ios-package" onload="true" value="CDVStatusBar"/>
 	</feature>

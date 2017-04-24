@@ -85,7 +85,8 @@ page-login {
 	font-size: 14px;
 
 	input {
-		margin: 1em;
+		padding: 1em;
+		margin: 0;
 	}
 
 	&[disabled="true"], &[ng-reflect-disabled="true"] {
