@@ -16,27 +16,28 @@ var Topic = require("models/topic");
 
 var messageService;
 
-var currentlyLoadingTopics = false;
-
 var activeTopic = 0;
+
+var loadLatestPromise
 
 messageService = {
 	addSocketMessage: function (messageData) {
-		if (messageData) {
-			var messageToAdd;
-
-			Bluebird.try(function () {
-				return Topic.messageFromData(messageData);
-			}).then(function (_messageToAdd) {
-				messageToAdd = _messageToAdd;
-				return Topic.get(messageToAdd.getTopicID());
-			}).then(function (theTopic) {
-				theTopic.addMessage(messageToAdd, true);
-				messageService.notify(messageToAdd, "message");
-
-				return theTopic.refetchMessages();
-			}).catch(errorService.criticalError);
+		if (!messageData) {
+			return Bluebird.resolve()
 		}
+		var messageToAdd;
+
+		return Bluebird.try(function () {
+			return Topic.messageFromData(messageData);
+		}).then(function (_messageToAdd) {
+			messageToAdd = _messageToAdd;
+			return Topic.get(messageToAdd.getTopicID());
+		}).then(function (theTopic) {
+			theTopic.addMessage(messageToAdd, true);
+			messageService.notify(messageToAdd, "message");
+
+			return theTopic.refetchMessages();
+		}).catch(errorService.criticalError);
 	},
 	isActiveTopic: function (topicid) {
 		return activeTopic === h.parseDecimal(topicid);
@@ -56,17 +57,16 @@ messageService = {
 
 		messageService.data.unread = 0;
 	},
-	loadMoreLatest: function (cb) {
+	loadMoreLatest: function () {
 		var l = messageService.data.latestTopics;
-		messageService.listenOnce(cb, "loadingDone");
 
 		if (l.loading) {
-			return;
+			return loadLatestPromise;
 		}
 
 		l.loading = true;
 
-		return initService.awaitLoading().then(function () {
+		loadLatestPromise = initService.awaitLoading().then(function () {
 			var last, topics = Topic.all().filter(function (topic) {
 				return !topic.obj.getIgnoreAsLastTopic();
 			});
@@ -77,7 +77,7 @@ messageService = {
 				last = 0;
 			}
 
-			return socket.emit("messages.getTopics", {
+			return socket.definitlyEmit("messages.getTopics", {
 				afterTopic: last
 			});
 		}).then(function (latest) {
@@ -93,9 +93,9 @@ messageService = {
 			topics.forEach(function (topic) {
 				topic.setIgnoreAsLastTopic(false);
 			});
-
-			messageService.notify("", "loadingDone");
 		}).catch(errorService.criticalError);
+
+		return loadLatestPromise
 	},
 	sendUnsentMessages: function () {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
@@ -110,10 +110,6 @@ messageService = {
 	},
 	getTopic: function (topicid, cb) {
 		return Bluebird.try(function () {
-			if (currentlyLoadingTopics) {
-				return messageService.listenPromise("loadingDone");
-			}
-		}).then(function () {
 			return Topic.get(topicid);
 		}).nodeify(cb);
 	},

@@ -1,7 +1,5 @@
 // https://www.npmjs.com/package/node-sass
 
-console.warn('sass own config')
-
 module.exports = {
 
   /**

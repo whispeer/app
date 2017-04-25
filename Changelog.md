@@ -1,3 +1,12 @@
+=== 0.2.8 ===
+- Autocomplete und Autocorrect funktionieren
+- Nachrichten werden nachgeladen wenn man hoch scrollt in einem Chat
+- QR-Code Auflösung verbessert
+- Schnelleres Laden nach Login
+- Kontaktanfragen auf dem Startbildschirm
+- Scrolling im Chat verbessert
+- Bugfixes
+
 === 0.2.7 ===
 - Login-Button sieht auf alten Geräten schöner aus
 - Push-Notification wenn eine neue Kontaktanfrage existiert
@@ -16,4 +25,4 @@
 - Bugfixes:
  - Annehmen und Ablehnen von Kontaktanfragen geht wieder
  - Aufgenommene Fotos werden nicht mehr verzehrt/verkleinert
- - Fenster wackelt nicht mehr bei der Eingabe von mehr als 2 Zeilen 
+ - Fenster wackelt nicht mehr bei der Eingabe von mehr als 2 Zeilen

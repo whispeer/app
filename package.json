@@ -3,6 +3,7 @@
   "author": "mindpost GmbH",
   "homepage": "http://whispeer.de/",
   "private": true,
+  "version": "0.2.8",
   "scripts": {
     "start": "npm run ionic:serve",
     "build": "npm run ionic:build -- --dev",
@@ -62,6 +63,7 @@
     "node-sass": "^4.5.2",
     "typescript": "~2.2.1",
     "webpack-bundle-analyzer": "^2.4.0",
+    "webpack-bundle-size-analyzer": "^2.6.0",
     "xml2js": "^0.4.17"
   },
   "config": {

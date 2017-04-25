@@ -6,7 +6,7 @@ import * as Bluebird from "bluebird";
 
 import { ImagePicker } from '@ionic-native/image-picker';
 import { File } from '@ionic-native/file';
-import { Camera } from '@ionic-native/camera';
+import { Camera, CameraOptions } from '@ionic-native/camera';
 
 const ImageUpload = require("../lib/services/imageUploadService");
 const h = require("whispeerHelper");
@@ -15,15 +15,6 @@ const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
 	maximumImagesCount: 6
-};
-
-const CameraOptions = {
-	destinationType: 1, // value 2 breaks ios.
-	allowEdit: true,
-	encodingType: 0,
-	// targetWidth: ImagePickerOptions.width,
-	// targetHeight: ImagePickerOptions.height,
-	// correctOrientation: true
 };
 
 const INFINITE_SCROLLING_THRESHOLD = 1000
@@ -48,6 +39,9 @@ export class TopicComponent {
 	newMessageText = "";
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
+	oldScrollFromBottom: number = 0
+
+	cameraOptions: CameraOptions
 
 	constructor(
 		public navCtrl: NavController,
@@ -56,20 +50,31 @@ export class TopicComponent {
 		private imagePicker: ImagePicker,
 		private file: File,
 		private camera: Camera
-	) {}
+	) {
+		this.cameraOptions = {
+			quality: 50,
+			destinationType: this.camera.DestinationType.FILE_URI,
+			sourceType: this.camera.PictureSourceType.CAMERA,
+			encodingType: this.camera.EncodingType.JPEG,
+			mediaType: this.camera.MediaType.PICTURE,
+			allowEdit: !this.platform.is('ios'),
+			correctOrientation: true
+		}
+	}
 
 	ngAfterViewInit() {
 		window.addEventListener('resize', this.keyboardChange);
-
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 	}
 
 	ngOnDestroy() {
 		window.removeEventListener('resize', this.keyboardChange);
+		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 	}
 
+
 	keyboardChange = () => {
-		this.change();
+		this.stabilizeScroll(this.oldScrollFromBottom)
 	}
 
 	sendMessageToTopic = () => {
@@ -106,7 +111,7 @@ export class TopicComponent {
 					text: "Take Photo",
 					icon: !this.platform.is("ios") ? "camera": null,
 					handler: () => {
-						this.camera.getPicture(CameraOptions).then((url) => {
+						this.camera.getPicture(this.cameraOptions).then((url) => {
 							return this.getFile(url, "image/png");
 						}).then((file: any) => {
 							return new ImageUpload(file);
@@ -171,7 +176,7 @@ export class TopicComponent {
 	}, 20)
 
 	checkLoadMoreMessages() {
-		if (this.messagesLoading || !this.moreMessagesAvailable) {
+		if (this.messagesLoading || !this.moreMessagesAvailable || !this.loadMoreMessages) {
 			return
 		}
 
@@ -190,6 +195,7 @@ export class TopicComponent {
 	}
 
 	onScroll = () => {
+		this.oldScrollFromBottom = this.scrollFromBottom()
 		this.updateElementsInView()
 		this.checkLoadMoreMessages()
 	}

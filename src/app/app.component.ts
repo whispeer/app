@@ -11,8 +11,6 @@ import Tutorial from "./tutorial";
 
 import sessionService from '../lib/services/session.service';
 
-const tutorialDisabled = ["login"]
-
 @Component({
 	templateUrl: "app.html"
 })
@@ -26,7 +24,11 @@ export class MyApp {
 	showTutorial = () => {
 		const activeView = this.nav.getActive()
 
-		return activeView && tutorialDisabled.indexOf(activeView.id) === -1 && Tutorial.tutorialVisible;
+		if (!activeView || !activeView.instance) {
+			return false
+		}
+
+		return !activeView.instance.tutorialDisabled && Tutorial.tutorialVisible;
 	}
 
 	slideNumber = 1;
@@ -86,9 +88,9 @@ export class MyApp {
 				if (!loggedin) {
 					this.nav.remove(0, this.nav.length() - 1)
 					this.nav.setRoot("Login")
-				} else {
-					this.initializeTutorialWithLanguage();
 				}
+
+				this.initializeTutorialWithLanguage();
 			});
 		});
 	}

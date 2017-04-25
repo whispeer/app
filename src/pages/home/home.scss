@@ -73,6 +73,8 @@ page-home {
 		display: block;
 		position: absolute;
 		left: 0;
+		top: 50%;
+		margin-top: -13.5px;
 		width: 86px;
 		.platform-android & { width: 78px; }
 	}

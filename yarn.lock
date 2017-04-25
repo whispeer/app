@@ -986,7 +986,7 @@ commander@2.8.x:
   dependencies:
     graceful-readlink ">= 1.0.0"
 
-commander@^2.8.1, commander@^2.9.0:
+commander@^2.7.1, commander@^2.8.1, commander@^2.9.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.9.0.tgz#9c99094176e12240cb22d6c5146098400fe0f7d4"
   dependencies:
@@ -1521,7 +1521,7 @@ filename-regex@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.0.tgz#996e3e80479b98b9897f15a8a58b3d084e926775"
 
-filesize@^3.5.6:
+filesize@^3.1.2, filesize@^3.5.6:
   version "3.5.6"
   resolved "https://registry.yarnpkg.com/filesize/-/filesize-3.5.6.tgz#5fd98f3eac94ec9516ef8ed5782fad84a01a0a1a"
 
@@ -1851,6 +1851,10 @@ http-signature@~1.1.0:
 https-browserify@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-0.0.1.tgz#3f91365cabe60b77ed0ebba24b454e3e09d95a82"
+
+humanize@0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/humanize/-/humanize-0.0.9.tgz#1994ffaecdfe9c441ed2bdac7452b7bb4c9e41a4"
 
 ieee754@^1.1.4:
   version "1.1.8"
@@ -2345,17 +2349,17 @@ mime-db@~1.27.0:
   version "1.27.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.27.0.tgz#820f572296bbd20ec25ed55e5b5de869e5436eb1"
 
-mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.7:
-  version "2.1.14"
-  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee"
-  dependencies:
-    mime-db "~1.26.0"
-
-mime-types@~2.1.15:
+mime-types@^2.1.12, mime-types@~2.1.15:
   version "2.1.15"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.15.tgz#a4ebf5064094569237b8cf70046776d09fc92aed"
   dependencies:
     mime-db "~1.27.0"
+
+mime-types@~2.1.11, mime-types@~2.1.7:
+  version "2.1.14"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee"
+  dependencies:
+    mime-db "~1.26.0"
 
 mime@1.3.4:
   version "1.3.4"
@@ -2836,11 +2840,11 @@ qrious@^2.2.0:
   optionalDependencies:
     canvas "^1.3.12"
 
-qs@6.2.0:
+qs@6.2.0, qs@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.2.0.tgz#3b7848c03c2dece69a9522b0fae8c4126d745f3b"
 
-qs@6.4.0, qs@^6.2.0:
+qs@6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
 
@@ -3700,6 +3704,14 @@ webpack-bundle-analyzer@^2.4.0:
     lodash "^4.17.4"
     mkdirp "^0.5.1"
     opener "^1.4.3"
+
+webpack-bundle-size-analyzer@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/webpack-bundle-size-analyzer/-/webpack-bundle-size-analyzer-2.6.0.tgz#73e0e35ac9a65497cb68e2bfb0f5337c2adac6da"
+  dependencies:
+    commander "^2.7.1"
+    filesize "^3.1.2"
+    humanize "0.0.9"
 
 webpack-sources@^0.1.4:
   version "0.1.5"

@@ -4,6 +4,8 @@ var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
 var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 
+var WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").WebpackBundleSizeAnalyzerPlugin;
+
 process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
 
 module.exports = {
@@ -24,7 +26,8 @@ module.exports = {
 			workerQueue: "worker/worker-queue",
 			PromiseWorker: "worker/worker-loader",
 			imageLib: "blueimp-load-image/js/load-image",
-			toBlob: "blueimp-canvas-to-blob/js/canvas-to-blob"
+			toBlob: "blueimp-canvas-to-blob/js/canvas-to-blob",
+			json3: "asset/json"
 		}
 	},
 
@@ -44,7 +47,7 @@ module.exports = {
 		],
 		noParse: [
 			/sjcl\.js$/,
-			/socket\.io\.js$/,
+			/socket\.io\.slim/,
 			/visionmedia-debug\/.*debug\.js$/,
 		]
 	},
@@ -62,9 +65,10 @@ module.exports = {
 		}),
 		new BundleAnalyzerPlugin({
 			analyzerMode: "static",
-			reportFilename: "report.html",
+			reportFilename: "report-chunks.html",
 			openAnalyzer: false
-		})
+		}),
+		new WebpackBundleSizeAnalyzerPlugin("./report-size.txt")
 	],
 
 	// Some libraries import Node modules but don't use them in the browser.
