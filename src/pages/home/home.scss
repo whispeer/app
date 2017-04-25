@@ -1,5 +1,7 @@
 page-home {
-
+	.list-ios {
+		margin: 0;
+	}
 }
 
 @mixin hexagon($height, $color: rgba(90, 183, 13, .5), $fg: white) {
