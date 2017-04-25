@@ -74,7 +74,14 @@ export class MyApp {
 		})
 	}
 
-	constructor(platform: Platform, private zone: NgZone, private splashScreen: SplashScreen, private statusBar: StatusBar, private globalization: Globalization, private push: Push) {
+	constructor(
+		platform: Platform,
+		private zone: NgZone,
+		private splashScreen: SplashScreen,
+		private statusBar: StatusBar,
+		private globalization: Globalization,
+		private push: Push
+	) {
 		platform.ready().then(() => {
 			// Okay, so the platform is ready and our plugins are available.
 			// Here you can do any higher level native things you might need.
