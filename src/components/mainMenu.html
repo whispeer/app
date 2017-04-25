@@ -1,15 +1,16 @@
 <ion-fab center bottom fixed #fab>
 	<div class="hexagon-wrap">
 		<hexagon class="hexagon hexagon--fab"></hexagon>
-		<button [mode]="'ios'" (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light" clear>
+		<button [mode]="'android'" (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light" clear>
 			<ion-icon name="{{icon}}"></ion-icon>
 		</button>
 	</div>
 	<ion-fab-list side="top">
+		<button ion-fab color="dark" (click)="fabSideClick(fab, 'profile')"><ion-icon name="md-person"></ion-icon></button>
 		<button ion-fab color="dark" (click)="fabSideClick(fab, 'contacts')"><ion-icon name="md-people"></ion-icon></button>
 	</ion-fab-list>
 	<ion-fab-list side="left">
-		<button ion-fab color="dark" (click)="fabSideClick(fab, 'profile')"><ion-icon name="md-person"></ion-icon></button>
+		<button ion-fab color="dark" (click)="fabSideClick(fab, 'contacts', { search: true})"><ion-icon name="ios-search"></ion-icon></button>
 	</ion-fab-list>
 	<ion-fab-list side="right">
 		<button ion-fab color="dark" (click)="fabSideClick(fab, 'settings')"><ion-icon name="ios-settings"></ion-icon></button>

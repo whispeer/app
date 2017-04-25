@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { NavController, NavParams, IonicPage } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { NavController, NavParams, IonicPage, Searchbar } from 'ionic-angular';
 
 const contactsService = require("../../lib/services/friendsService");
 
@@ -15,10 +15,20 @@ import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
 })
 export class ContactsPage extends ContactsWithSearch {
 
+	@ViewChild(Searchbar) searchBar: Searchbar;
+
 	requests: any[] = [];
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {
 		super()
+	}
+
+	ionViewDidEnter() {
+		if (this.navParams.get("search")) {
+			setTimeout(() => {
+				this.searchBar.setFocus()
+			})
+		}
 	}
 
 	ionViewDidLoad() {
@@ -30,7 +40,7 @@ export class ContactsPage extends ContactsWithSearch {
 				this.loadContactsUsers()
 			});
 			return this.loadContactsUsers();
-		});
+		})
 	}
 
 	get requestsLabel() {
