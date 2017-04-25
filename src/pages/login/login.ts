@@ -4,6 +4,7 @@ import { NavController, NavParams, IonicPage } from 'ionic-angular';
 import sessionService from '../../lib/services/session.service';
 import { failureCodes } from "../../lib/services/login.service";
 import loginService from "../../lib/services/login.service";
+import passwordStrengthService from '../../lib/services/passwordStrength.service'
 import jQuery from "jquery";
 
 const registerService = require('../../lib/services/registerService');
@@ -63,6 +64,8 @@ export class LoginPage {
 				return INCORRECT_PASSWORD;
 			case USERNAME_PASSWORDS_DONT_MATCH:
 				return PASSWORDS_DONT_MATCH;
+			case USERNAME_PASSWORD_TOO_SHORT:
+				return PASSWORD_TOO_SHORT;
 			case USERNAME_LOGIN_ERROR:
 			case USERNAME_REGISTER_ERROR:
 				return GENERIC_ERROR_MESSAGE;
@@ -96,6 +99,10 @@ export class LoginPage {
 			this.usernameState = USERNAME_INVALID;
 		} else {
 			registerService.nicknameUsed(nick).then((isUsed) => {
+				if (this.login.identifier !== nick) {
+					return
+				}
+
 				this.usernameState = isUsed
 					? USERNAME_TAKEN
 					: USERNAME_FREE;
@@ -167,6 +174,10 @@ export class LoginPage {
 		}
 	}
 
+	passwordToShort = () => {
+		return passwordStrengthService.passwordStrength(this.login.password) === 0
+	}
+
 	loginOrRegister = () => {
 		if ([USERNAME_TAKEN, USERNAME_LOGIN_INCORRECT_PASSWORD, USERNAME_NO_CONNECTION, USERNAME_LOGIN_ERROR].indexOf(this.usernameState) !== -1) {
 			if (!this.passwordSet()) {
@@ -184,8 +195,15 @@ export class LoginPage {
 				this.usernameState = this.getLoginErrorCode(error);
 			})
 
-		} else if ([USERNAME_FREE, USERNAME_PASSWORDS_DONT_MATCH, USERNAME_REGISTER_ERROR].indexOf(this.usernameState) !== -1) {
+		} else if ([USERNAME_FREE, USERNAME_PASSWORD_TOO_SHORT, USERNAME_PASSWORDS_DONT_MATCH, USERNAME_REGISTER_ERROR].indexOf(this.usernameState) !== -1) {
 			if (!this.passwordSet()) {
+				this.focusInput("password")
+				return;
+			}
+
+			if (this.passwordToShort()) {
+				this.usernameState = USERNAME_PASSWORD_TOO_SHORT;
+
 				this.focusInput("password")
 				return;
 			}
@@ -226,6 +244,7 @@ const REGISTER_SUCCESS = "Welcome on board! We'll log you in now..."
 const NO_CONNECTION = "Could not connect to whispeer"
 const INCORRECT_PASSWORD = "Your password is wrong. Please try again."
 const PASSWORDS_DONT_MATCH = "Your repeated password does not match"
+const PASSWORD_TOO_SHORT = "Your password is too short. We require a minimum of 8 characters"
 
 const USERNAME_UNKNOWN = -1;
 const USERNAME_EMPTY = 1;
@@ -240,3 +259,4 @@ const USERNAME_REGISTER_ERROR = 9;
 const USERNAME_LOGIN_INCORRECT_PASSWORD = 10;
 const USERNAME_NO_CONNECTION = 11;
 const USERNAME_PASSWORDS_DONT_MATCH = 12;
+const USERNAME_PASSWORD_TOO_SHORT = 13;

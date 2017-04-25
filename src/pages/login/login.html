@@ -1,4 +1,4 @@
-<ion-content padding>
+<div class="login__scroll">
 	<div class="login__wrap">
 		<div class="login__logo-wrap">
 			<img class="login__logo" src="assets/images/logo_grey.svg">
@@ -12,9 +12,10 @@
 
 		<form (ngSubmit)="loginOrRegister()">
 			<div class="login__form">
-				<p class="login__paragraph login__paragraph--primary">
-					{{ getMessage() }}
-				</p>
+
+				<div class="login__paragraph login__paragraph--primary">
+					<p>{{ getMessage() }}</p>
+				</div>
 
 				<ion-item class="clean-input-wrap login__input-wrap">
 					<ion-input id="mail"
@@ -76,4 +77,4 @@
 			</div>
 		</form>
 	</div>
-</ion-content>
+</div>
