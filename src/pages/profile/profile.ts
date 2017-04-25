@@ -85,8 +85,8 @@ export class ProfilePage {
 			awaitFriendsService
 		]).then(([user]) => {
 			if (user.isNotExistingUser()) {
-				this.user = user.data;
-				this.profileLoading = false;
+				this.user = user.data
+				this.profileLoading = false
 				return;
 			}
 
@@ -203,9 +203,9 @@ export class ProfilePage {
 		});
 	}
 
-	verifyPerson() {
-		this.barcodeScanner.scan().then((res) => {
-			console.log(res);
+	verifyPerson = () => {
+		return this.barcodeScanner.scan().then((res) => {
+			return this.userObject.verifyFingerPrint(res.text);
 		}).catch((err) => {
 			console.error(err);
 		});

@@ -83,7 +83,7 @@
 				</ion-item>
 			</ion-list>
 
-			<div *ngIf="!isOwn">
+			<div *ngIf="!isOwn && user.trustLevel < 2">
 				<ion-list showWhen="ios">
 					<button ion-item (click)="verifyPerson()">
 						Verify this contact
