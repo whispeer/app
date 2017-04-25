@@ -21,8 +21,26 @@ main-menu[ion-fixed] {
 	width: 100%;
 }
 
+ion-spinner {
+	overflow: hidden;
+}
+
 ion-fab[fixed] {
 	position: fixed;
+}
+
+ion-fab-list[side="top"] {
+	flex-direction: row;
+	margin-left: -21px;
+	margin-bottom: 73px;
+
+	button:first-child {
+		margin-right: 20px;
+	}
+
+	button:last-child {
+		margin-left: 20px;
+	}
 }
 
 .hexagon-wrap {

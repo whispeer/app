@@ -112,6 +112,10 @@ export class ContactsWithSearch {
 	}
 
 	getUsers = () => {
+		if (this.contactsLoading) {
+			return []
+		}
+
 		return this.getContacts().concat(this.searchResults)
 	}
 }
