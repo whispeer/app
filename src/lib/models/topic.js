@@ -186,17 +186,23 @@ var Topic = function (data) {
 		var sentMessages = this.getSentMessages().map(function (message) {
 			return message.getServerID();
 		});
-		var oldest = sentMessages.shift();
-		var newest = sentMessages.pop();
+
+		var oldest = sentMessages[0];
+		var newest = sentMessages[sentMessages.length - 1];
 
 		var request = {
 			topicid: this.getID(),
 			oldest: oldest,
 			newest: newest,
-			inBetween: sentMessages,
+			inBetween: sentMessages.slice(1, -1),
 			maximum: 20,
 			messageCountOnFlush: 10
 		};
+
+		if (sentMessages.length === 0) {
+			this.refetchPromise = this.loadMoreMessages()
+			return this.refetchPromise
+		}
 
 		this.refetchPromise = socket.definitlyEmit("messages.refetch", request).bind(this).then(function (response) {
 			if (response.clearMessages) {
@@ -500,7 +506,7 @@ var Topic = function (data) {
 		}).nodeify(cb);
 	};
 
-	this.loadMoreMessages = function loadMoreMessagesF(cb, max) {
+	this.loadMoreMessages = function(cb, max) {
 		var loadMore = new Date().getTime();
 		var remaining = 0;
 
