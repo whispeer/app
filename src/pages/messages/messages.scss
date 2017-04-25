@@ -2,6 +2,10 @@ topicWithBursts {
 	background: white;
 	height: 100%;
 
+	ion-spinner {
+		flex-shrink: 0;
+	}
+
 	.fixed-content {
 		display: none;
 	}
