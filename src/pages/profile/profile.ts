@@ -3,13 +3,15 @@ import { NavController, NavParams, ActionSheetController, AlertController, Alert
 import sessionService from '../../lib/services/session.service';
 import * as Bluebird from 'bluebird';
 
-const userService = require("user/userService");
-const friendsService = require("../../lib/services/friendsService");
+const userService = require("user/userService")
+const friendsService = require("services/friendsService")
+const blobService = require("services/blobService")
 
 import { ImagePicker } from "@ionic-native/image-picker";
 import { File } from "@ionic-native/file";
 import { Camera } from "@ionic-native/camera";
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
+import { PhotoViewer } from '@ionic-native/photo-viewer';
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -64,7 +66,8 @@ export class ProfilePage {
 		private file: File,
 		private camera: Camera,
 		private imagePicker: ImagePicker,
-		private barcodeScanner: BarcodeScanner
+		private barcodeScanner: BarcodeScanner,
+		private photoViewer: PhotoViewer,
 	) {}
 
 	ngOnInit() {
@@ -265,12 +268,52 @@ export class ProfilePage {
 		});
 	}
 
+	removeProfileImage() {
+		return Promise.all([
+			this.userObject.removeProfileAttribute("image"),
+			this.userObject.removeProfileAttribute("imageBlob")
+		]).then(() => {
+			return this.userObject.uploadChangedProfile()
+		})
+	}
+
+	uploadProfileImage(url) {
+		return this.getFile(url, "image/png").then(() => {
+			throw new Error("not implemented")
+		}).then(() => {
+			const blobid = 5, hash = 5
+
+			var setImageBlobAttributePromise = this.userObject.setProfileAttribute("imageBlob", {
+				blobid: blobid,
+				imageHash: hash
+			});
+
+			var removeImageAttributePromise = this.userObject.removeProfileAttribute("image");
+
+			return Promise.all([
+				setImageBlobAttributePromise,
+				removeImageAttributePromise
+			]);
+		}).then(() => {
+			return this.userObject.uploadChangedProfile()
+		})
+	}
+
 	avatarClicked() {
 		this.actionSheetCtrl.create({
 			buttons: [{
 				icon: !this.platform.is("ios") ? "eye": null,
 				text: "View",
 				handler: () => {
+					this.userObject.getProfileAttribute("imageBlob").then(({ blobid }) => {
+						return blobService.getBlob(blobid)
+					}).then((blob) => {
+						return blob.decrypt().thenReturn(blob)
+					}).then((blob) => {
+						return blob.getStringRepresentation();
+					}).then((base64) => {
+						this.photoViewer.show(base64);
+					});
 					console.log("view image")
 				}
 			}, {
@@ -278,21 +321,16 @@ export class ProfilePage {
 				text: "Take a Photo",
 				handler: () => {
 					this.camera.getPicture(CameraOptions).then((url) => {
-						return this.getFile(url, "image/png");
-					}).then((file: any) => {
-						// TODO: make this the profile image!
-					});
+						return this.uploadProfileImage(url)
+					})
 				}
 			}, {
 				icon: !this.platform.is("ios") ? "image": null,
 				text: "Select from Gallery",
 				handler: () => {
 					Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
-						return this.getFile(result, "image/png");
-					}).then((file: any) => {
-						// image count is one so images only contains one entry!
-						// TODO: make this the profile image!
-					});
+						return this.uploadProfileImage(result)
+					})
 				}
 			}, {
 				text: "Remove",
@@ -310,7 +348,7 @@ export class ProfilePage {
 							role: "destructive",
 							cssClass: "alert-button-danger",
 							handler: () => {
-								console.log("remove user image!")
+								this.removeProfileImage()
 							}
 						}]
 					}).present();

@@ -292,6 +292,8 @@ function User (providedData) {
 		});
 	}
 
+	this.getProfileAttribute = getProfileAttribute
+
 	/** uses the me profile to generate new profiles */
 	this.rebuildProfiles = function () {
 		var scopes, privacySettings;
@@ -373,10 +375,12 @@ function User (providedData) {
 	* @param value value of the attribute
 	* @param cb
 	*/
-	this.setProfileAttribute = function (attribute, value, cb) {
-		return new Bluebird(function(resolve) {
-			myProfile.setAttribute(attribute, value, resolve);
-		}).nodeify(cb);
+	this.setProfileAttribute = function (attribute, value) {
+		return myProfile.setAttribute(attribute, value);
+	};
+
+	this.removeProfileAttribute = function (attribute, value) {
+		return myProfile.removeAttribute(attribute, value);
 	};
 
 	this.getFingerPrint = function () {
