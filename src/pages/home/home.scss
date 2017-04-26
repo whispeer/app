@@ -86,6 +86,15 @@ page-home {
 
 
 .topic {
+	.badgeContainer {
+		display: inline-block;
+	}
+
+	.hexBadge {
+		margin-bottom: 1.5px;
+		@include hexagon(16px, map-get($colors, primary));
+	}
+
 	.label p {
 		// let's hope this works everywhere...
 		display: -webkit-box;
@@ -98,10 +107,15 @@ page-home {
 		-webkit-box-orient: vertical;
 	}
 
+	.label-ios {
+		margin: 8px 8px 8px 0;
+	}
+
 	.note {
 		align-self: flex-start;
 		line-height: 1em;
 		font-size: 0.9em;
+		margin-top: 10.5px;
 		.icon {
 			font-size: 1em;
 			line-height: 1em;
@@ -113,8 +127,10 @@ page-home {
 	.label p {
 		min-height: 3.5em;
 		-webkit-line-clamp: 3;
+		font-weight: 500;
+		color: map-get($colors, dark);
 	}
-	.user__name {
+	.user__name, .note {
 		color: map-get($colors, primary);
 	}
 }
@@ -123,17 +139,6 @@ page-home {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
-}
-
-.topic--new--last {
-	box-shadow:	0px 1px 1px #bbc0c2,
-				0px 5px 5px rgba(#bbc0c2, 0.35),
-				0 10px 0 10px #e4e4e4;
-	margin-bottom: 20px;
-	z-index: 1;
-	.item-inner {
-		border: none !important;
-	}
 }
 
 .user__image-wrap {

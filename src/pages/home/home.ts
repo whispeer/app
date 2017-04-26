@@ -50,21 +50,6 @@ export class HomePage {
 		})
 	}
 
-	nextUnread = (topic) => {
-		if (!topic.unread) {
-			return false;
-		}
-
-		const index = this.topics.indexOf(topic);
-		const nextTopic = this.topics[index + 1];
-
-		if (!nextTopic) {
-			return false;
-		}
-
-		return !nextTopic.unread;
-	}
-
 	updateRequests = () => {
 		this.requests = contactsService.getRequests()
 	}

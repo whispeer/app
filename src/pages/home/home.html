@@ -14,7 +14,7 @@
 	</button>
 
 	<ion-list class="space-for-fab">
-		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread, 'topic--new--last': nextUnread(topic)}" (click)="openChat(topic.id)">
+		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of topic.partnersDisplay"
@@ -38,6 +38,11 @@
 					</span>
 				</span>
 				<span *ngIf="topic.title">{{topic.title}}</span>
+				<div class="badgeContainer" *ngIf="topic.unread">
+					<span class="hexBadge">
+						{{ topic.obj.getUnreadCount() }}
+					</span>
+				</div>
 			</h2>
 			<p>{{topic.latestMessage.data.text}}</p>
 			<ion-note item-right>{{topic.latestMessage.data.timestamp | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>

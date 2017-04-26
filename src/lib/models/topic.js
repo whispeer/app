@@ -392,6 +392,10 @@ var Topic = function (data) {
 		return null;
 	};
 
+	this.getUnreadCount = function () {
+		return unreadMessages.length
+	}
+
 	this.addMessages = function (messages, addUnread) {
 		messages.forEach(function (message) {
 			var id = message.getID();
