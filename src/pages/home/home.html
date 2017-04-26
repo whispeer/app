@@ -51,9 +51,11 @@
 
 	<ion-spinner *ngIf="topicsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 
-	<ion-infinite-scroll (ionInfinite)="loadMoreTopics($event)">
+	<ion-infinite-scroll [enabled]="moreTopicsAvailable" (ionInfinite)="loadMoreTopics($event)">
 		<ion-infinite-scroll-content></ion-infinite-scroll-content>
 	</ion-infinite-scroll>
+
+	<div class="space-for-fab"></div>
 
 	<main-menu (mainHandle)="newMessage()" ion-fixed></main-menu>
 </ion-content>

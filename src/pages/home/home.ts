@@ -21,6 +21,7 @@ export class HomePage {
 	searchTerm: string = "";
 
 	topicsLoading: boolean = true;
+	moreTopicsAvailable: boolean = true;
 
 	constructor(public navCtrl: NavController) {}
 
@@ -40,12 +41,14 @@ export class HomePage {
 		this.topics = messageService.data.latestTopics.data;
 
 		messageService.loadMoreLatest(() => {}).then(() => {
+			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
 			this.topicsLoading = false;
 		});
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
 		messageService.loadMoreLatest(() => {}).then(() => {
+			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
 			infiniteScroll.complete();
 		})
 	}
