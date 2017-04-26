@@ -40,7 +40,7 @@
 				<span *ngIf="topic.title">{{topic.title}}</span>
 				<div class="topic__badgeContainer" *ngIf="topic.unread">
 					<span class="topic__hexBadge">
-						<span>{{ topic.obj.getUnreadCount() }}</span>
+						<span class="topic__hexBadge__text">{{ topic.obj.getUnreadCount() }}</span>
 					</span>
 				</div>
 			</h2>

@@ -119,19 +119,19 @@ page-home {
 }
 
 .topic__badgeContainer {
-	display: inline-block;
+	display: inline-flex;
+	margin: auto 5px;
 }
 
 .topic__hexBadge {
 	margin-bottom: 1.5px;
-	@include hexagon(16px, map-get($colors, primary));
+	@include hexagon(18px, map-get($colors, primary));
 
 	display: inline-flex;
 	align-content: center;
 	justify-content: center;
-	text-align: center;
 
-	min-width: 9px;
+	min-width: 11px;
 }
 
 .topic--new {
