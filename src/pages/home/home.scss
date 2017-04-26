@@ -144,12 +144,19 @@ page-home {
 	.user__name, .note {
 		color: map-get($colors, primary);
 	}
+	.user__name {
+		font-weight: 500;
+	}
 }
 
 .user__name {
+	display: inline-flex;
+
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
+
+	align-content: center;
 }
 
 .user__image-wrap {
