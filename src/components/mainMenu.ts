@@ -8,7 +8,7 @@ import sessionService from "../lib/services/session.service";
 	templateUrl: "mainMenu.html"
 })
 export class MainMenu {
-	@Input() icon: string = "add";
+	@Input() icon: string = "md-add";
 
 	@Output() mainHandle = new EventEmitter();
 
@@ -26,18 +26,19 @@ export class MainMenu {
 		}
 	}
 
-	fabSideClick = (fab: FabContainer, what: string) => {
+	fabSideClick = (fab: FabContainer, what: string, params: any = {}) => {
 		switch (what) {
 			case "contacts":
-				this.navCtrl.push("Contacts");
+				this.navCtrl.push("Contacts", params);
 				break;
 			case "profile":
 				this.navCtrl.push("Profile", {
+					...params,
 					userId: sessionService.userid
 				});
 				break;
 			case "settings":
-				this.navCtrl.push("Settings");
+				this.navCtrl.push("Settings", params);
 				break;
 			default:
 				// code...

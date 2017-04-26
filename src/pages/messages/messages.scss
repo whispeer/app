@@ -1,20 +1,35 @@
 topicWithBursts {
 	background: white;
-	display: flex;
-	flex-direction: column;
 	height: 100%;
+
+	ion-spinner {
+		flex-shrink: 0;
+	}
+
+	.fixed-content {
+		display: none;
+	}
+
+	.scroll-content {
+		overflow: hidden;
+		display: flex;
+
+		flex-direction: column;
+	}
 
 	.messages__list {
 		flex: 1;
 		overflow-x: hidden;
 		overflow-y: scroll;
-		margin-top: 56px;
 
 		display: flex;
 		flex-direction: column;
 
 		// ios scrolling
 		-webkit-overflow-scrolling: touch;
+
+		will-change: scroll-position;
+		contain: size style layout;
 	}
 
 	.messages__list > .list {
@@ -58,11 +73,6 @@ topicWithBursts {
 }
 
 .ios {
-	.messages__list {
-		margin-top: 64px; // ios needs more margin because of the status bar
-		// may look odd in the browser but sits neat in the app
-	}
-
 	.messages__header__fake-back {
 		position: absolute;
 		left: 0.5em;

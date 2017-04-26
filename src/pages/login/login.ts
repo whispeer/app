@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular';
+import { StatusBar } from "@ionic-native/status-bar";
 
 import sessionService from '../../lib/services/session.service';
 import { failureCodes } from "../../lib/services/login.service";
@@ -27,7 +28,9 @@ export class LoginPage {
 
 	tutorialDisabled = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams) {
+	constructor(public navCtrl: NavController, public navParams: NavParams, private statusBar: StatusBar) {
+		this.statusBar.styleDefault();
+
 		this.login = loginService;
 		loginService.loadedStorage.then(() => {
 			this.checkUserNameExistance();
@@ -189,6 +192,7 @@ export class LoginPage {
 			this.performLogin().then(() => {
 				this.usernameState = USERNAME_LOGIN_SUCCESS
 				sessionService.loadLogin().then(() => {
+					this.statusBar.styleLightContent()
 					this.mainPage()
 				})
 			}).catch((error) => {

@@ -12,7 +12,7 @@
 
 
 <ion-content>
-	<ion-searchbar *ngIf="!contactsLoading" animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
+	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="goToRequests()">
 		<div class="badgeContainer">
@@ -45,6 +45,6 @@
 			</h2>
 		</ion-item>
 	</ion-list>
-	<ion-spinner *ngIf="searchResultsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-spinner *ngIf="searchResultsLoading && !contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
 </ion-content>

@@ -25,38 +25,40 @@
 		</ion-title>
 	</ion-navbar>
 </ion-header>
-<div class="messages__list" #content>
-	<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<div class="messages_filler"></div>
-	<ion-list no-lines>
-		<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-			<span *ngIf="burst.isMessageBurst()">
-				<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
-				<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
-					<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
-						<span whispeerSyntaxify content="{{message.data.text}}"></span>
-						<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
+<ion-content>
+	<div class="messages__list" #content>
+		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+		<div class="messages_filler"></div>
+		<ion-list no-lines>
+			<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
+				<span *ngIf="burst.isMessageBurst()">
+					<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
+					<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
+						<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
+							<span whispeerSyntaxify content="{{message.data.text}}"></span>
+							<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
+						</div>
+						<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 					</div>
-					<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+				</span>
+				<div class="messages_message" *ngIf="burst.isTopicUpdate() && false">
+					<!--<span class="burst-date-text">
+						{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}" -
+						{{burst.firstItem().state.timestamp}}
+					</span>-->
 				</div>
-			</span>
-			<div class="messages_message" *ngIf="burst.isTopicUpdate() && false">
-				<!--<span class="burst-date-text">
-					{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}" -
-					{{burst.firstItem().state.timestamp}}
-				</span>-->
-			</div>
+			</ion-item>
+		</ion-list>
+	</div>
+	<div class="messages__form" #footer>
+		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
+			<ion-icon name="add-circle"></ion-icon>
+		</button>
+		<ion-item class="clean-input-wrap messages__input-wrap">
+			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 		</ion-item>
-	</ion-list>
-</div>
-<div class="messages__form" #footer>
-	<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
-		<ion-icon name="add-circle"></ion-icon>
-	</button>
-	<ion-item class="clean-input-wrap messages__input-wrap">
-		<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
-	</ion-item>
-	<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToTopic()">
-		<ion-icon name="arrow-dropup-circle"></ion-icon>
-	</button>
-</div>
+		<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToTopic()">
+			<ion-icon name="arrow-dropup-circle"></ion-icon>
+		</button>
+	</div>
+</ion-content>
