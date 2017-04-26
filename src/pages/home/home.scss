@@ -105,6 +105,8 @@ page-home {
 
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
+
+		color: map-get($colors, dark);
 	}
 
 	.label-ios {
