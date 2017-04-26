@@ -88,15 +88,6 @@ page-home {
 
 
 .topic {
-	.badgeContainer {
-		display: inline-block;
-	}
-
-	.hexBadge {
-		margin-bottom: 1.5px;
-		@include hexagon(16px, map-get($colors, primary));
-	}
-
 	.label p {
 		// let's hope this works everywhere...
 		display: -webkit-box;
@@ -125,6 +116,22 @@ page-home {
 			line-height: 1em;
 		}
 	}
+}
+
+.topic__badgeContainer {
+	display: inline-block;
+}
+
+.topic__hexBadge {
+	margin-bottom: 1.5px;
+	@include hexagon(16px, map-get($colors, primary));
+
+	display: inline-flex;
+	align-content: center;
+	justify-content: center;
+	text-align: center;
+
+	min-width: 9px;
 }
 
 .topic--new {
