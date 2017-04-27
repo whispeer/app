@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, Output, EventEmitter, ElementRef } from "@angular/core";
+import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core";
 
 import { NavController, ActionSheetController, Platform } from "ionic-angular";
 
@@ -256,8 +256,22 @@ export class TopicComponent {
 		return this.allBurstMessages()
 	}
 
+	ngOnChanges(changes: SimpleChanges) {
+		const topicChanges = changes["topic"]
+
+		if (!topicChanges || !topicChanges.currentValue || this.newMessageText !== "") {
+			return
+		}
+
+		this.newMessageText = topicChanges.currentValue.newMessage
+	}
+
 	change() {
 		setTimeout(() => {
+			if (this.topic) {
+				this.topic.newMessage = this.newMessageText
+			}
+
 			const scrollFromBottom = this.scrollFromBottom()
 
 			const fontSize = 16;
