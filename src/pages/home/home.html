@@ -31,21 +31,25 @@
 					<span class="hexagon__image__image topic__remainingUsers">+{{topic.partners.length - 2}}</span>
 				</ion-avatar>
 			</div>
-			<h2 class="user__name">
-				<span *ngIf="!topic.title">
-					<span *ngFor="let partner of topic.partners; let l = last">
-						{{ partner.basic.shortname }}{{ l ? "":", " }}
+			<div class="topic__header">
+				<h2 class="user__name">
+					<span *ngIf="!topic.title">
+						<span *ngFor="let partner of topic.partners; let l = last">
+							{{ partner.basic.shortname }}{{ l ? "":", " }}
+						</span>
 					</span>
-				</span>
-				<span *ngIf="topic.title">{{topic.title}}</span>
-				<div class="topic__badgeContainer" *ngIf="topic.unread">
-					<span class="topic__hexBadge">
-						<span class="topic__hexBadge__text">{{ topic.obj.getUnreadCount() | maxValue: 99 }}</span>
-					</span>
+					<span *ngIf="topic.title">{{topic.title}}</span>
+					<div class="topic__badgeContainer" *ngIf="topic.unread">
+						<span class="topic__hexBadge">
+							<span class="topic__hexBadge__text">{{ topic.obj.getUnreadCount() | maxValue: 99 }}</span>
+						</span>
+					</div>
+				</h2>
+				<div>
+					<ion-note item-right>{{topic.latestMessage.data.timestamp | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 				</div>
-			</h2>
+			</div>
 			<p>{{topic.latestMessage.data.text}}</p>
-			<ion-note item-right>{{topic.latestMessage.data.timestamp | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 		</ion-item>
 	</ion-list>
 

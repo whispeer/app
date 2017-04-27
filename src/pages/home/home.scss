@@ -88,6 +88,11 @@ page-home {
 
 
 .topic {
+	.topic__header {
+		display: flex;
+		justify-content: space-between;
+	}
+
 	.label p {
 		// let's hope this works everywhere...
 		display: -webkit-box;
@@ -110,7 +115,7 @@ page-home {
 		align-self: flex-start;
 		line-height: 1em;
 		font-size: 0.9em;
-		margin-top: 10.5px;
+		margin: 0;
 		.icon {
 			font-size: 1em;
 			line-height: 1em;
