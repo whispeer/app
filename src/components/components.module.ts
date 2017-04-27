@@ -4,6 +4,7 @@ import { IonicModule } from 'ionic-angular';
 
 import { SafeUrl } from "../lib/pipes/safeStyle";
 import { ResponsiveDatePipe } from "../lib/pipes/responsiveDate";
+import { MaxValuePipe } from "../lib/pipes/maxValue";
 
 import { UserImageComponent } from "./userImage";
 import { MainMenu } from "./mainMenu";
@@ -17,6 +18,7 @@ import { GalleryComponent } from "./gallery/gallery"
 	declarations: [
 		ResponsiveDatePipe,
 		SafeUrl,
+		MaxValuePipe,
 		MainMenu,
 		UserImageComponent,
 		TopicComponent,
@@ -32,6 +34,7 @@ import { GalleryComponent } from "./gallery/gallery"
 	exports: [
 		ResponsiveDatePipe,
 		SafeUrl,
+		MaxValuePipe,
 		MainMenu,
 		UserImageComponent,
 		TopicComponent,

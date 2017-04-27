@@ -13,8 +13,8 @@
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
 
-	<ion-list>
-		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread, 'topic--new--last': nextUnread(topic)}" (click)="openChat(topic.id)">
+	<ion-list class="space-for-fab">
+		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of topic.partnersDisplay"
@@ -31,16 +31,25 @@
 					<span class="hexagon__image__image topic__remainingUsers">+{{topic.partners.length - 2}}</span>
 				</ion-avatar>
 			</div>
-			<h2 class="user__name">
-				<span *ngIf="!topic.title">
-					<span *ngFor="let partner of topic.partners; let l = last">
-						{{ partner.basic.shortname }}{{ l ? "":", " }}
+			<div class="topic__header">
+				<h2 class="user__name">
+					<span *ngIf="!topic.title">
+						<span *ngFor="let partner of topic.partners; let l = last">
+							{{ partner.basic.shortname }}{{ l ? "":", " }}
+						</span>
 					</span>
-				</span>
-				<span *ngIf="topic.title">{{topic.title}}</span>
-			</h2>
+					<span *ngIf="topic.title">{{topic.title}}</span>
+					<div class="topic__badgeContainer" *ngIf="topic.unread">
+						<span class="topic__hexBadge">
+							<span class="topic__hexBadge__text">{{ topic.obj.getUnreadCount() | maxValue: 99 }}</span>
+						</span>
+					</div>
+				</h2>
+				<div>
+					<ion-note item-right>{{topic.latestMessage.data.timestamp | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
+				</div>
+			</div>
 			<p>{{topic.latestMessage.data.text}}</p>
-			<ion-note item-right>{{topic.latestMessage.data.timestamp | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 		</ion-item>
 	</ion-list>
 
