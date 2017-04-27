@@ -210,3 +210,10 @@ page-home {
 	margin-left: 26px;
 	z-index: 1;
 }
+
+.home--empty {
+	background-image: url('../assets/images/no_conversations.png');
+	background-size: contain;
+	background-position-x: center;
+	background-repeat: no-repeat;
+}
