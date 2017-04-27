@@ -56,6 +56,7 @@ var defaultOptions = {
 		}
 	],
 	gif: true,
+	encrypt: true,
 	original: false
 };
 
@@ -90,7 +91,7 @@ function sizeSorter(a, b) {
 var ImageUpload = function (file, options) {
 	this.rotation = "0";
 	this._file = file;
-	this._options = $.extend({}, defaultOptions, options);
+	this._options = options || defaultOptions;
 	this._progress = new Progress();
 	this._progress.listen(this._maybeApply.bind(this), "progress");
 	this._previousProgress = 0;
@@ -142,16 +143,19 @@ ImageUpload.prototype.getProgress = function () {
 	return this._progress.getProgress();
 };
 
-ImageUpload.prototype._uploadPreparedBlob = function (encryptionKey, blobMeta) {
+ImageUpload.prototype._uploadAndEncryptPreparedBlob = function (encryptionKey, blobMeta) {
 	this._progress.addDepend(blobMeta.blob._uploadProgress);
 	this._progress.addDepend(blobMeta.blob._encryptProgress);
 
 	return encryptionQueue.enqueue(blobMeta.blob.getSize(), function () {
-		var encryptAndUpload = Bluebird.promisify(blobMeta.blob.encryptAndUpload.bind(blobMeta.blob));
-		return encryptAndUpload(encryptionKey).then(function (blobKey) {
-			return blobKey;
-		});
+		return blobMeta.blob.encryptAndUpload(encryptionKey);
 	});
+};
+
+ImageUpload.prototype._uploadPreparedBlob = function (blobMeta) {
+	this._progress.addDepend(blobMeta.blob._uploadProgress);
+
+	return blobMeta.blob.upload();
 };
 
 ImageUpload.blobToDataSet = function (blob) {
@@ -321,7 +325,11 @@ ImageUpload.prototype.upload = function (encryptionKey) {
 	return uploadQueue.enqueue(1, function () {
 		return Bluebird.resolve(_this._blobs).bind(_this).map(function (blobWithMetaData) {
 			console.info("Uploading blob");
-			return _this._uploadPreparedBlob(encryptionKey, blobWithMetaData);
+			if (_this._options.encrypt) {
+				return _this._uploadAndEncryptPreparedBlob(encryptionKey, blobWithMetaData);
+			}
+
+			return _this._uploadPreparedBlob(blobWithMetaData);
 		});
 	});
 };
@@ -386,6 +394,13 @@ ImageUpload.prototype._resizeFile = function (sizeOptions) {
 	var options = $.extend({}, sizeOptions.restrictions || {}, { canvas: true });
 
 	return this._getImage().bind(this).then(function (img) {
+		if (options.square) {
+			img = imageLib.scale(img, {
+				contain: true,
+				aspectRatio: 1
+			})
+		}
+
 		var canvas = imageLib.scale(img, options);
 		return canvasToBlob(ImageUpload.rotate(canvas, this.rotation), "image/jpeg");
 	});

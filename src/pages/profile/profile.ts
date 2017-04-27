@@ -6,6 +6,7 @@ import * as Bluebird from 'bluebird';
 const userService = require("user/userService")
 const friendsService = require("services/friendsService")
 const blobService = require("services/blobService")
+const ImageUpload = require("services/imageUploadService")
 
 import { ImagePicker } from "@ionic-native/image-picker";
 import { File } from "@ionic-native/file";
@@ -27,6 +28,22 @@ const CameraOptions = {
 	// targetHeight: ImagePickerOptions.height,
 	// correctOrientation: true
 };
+
+const imageUploadOptions = {
+	sizes: [
+		{
+			name: "lowest",
+			restrictions: {
+				maxWidth: 480,
+				maxHeight: 480,
+				square: true
+			}
+		}
+	],
+	gif: false,
+	original: false,
+	encrypt: false
+}
 
 @IonicPage({
 	name: "Profile",
@@ -278,14 +295,16 @@ export class ProfilePage {
 	}
 
 	uploadProfileImage(url) {
-		return this.getFile(url, "image/png").then(() => {
-			throw new Error("not implemented")
-		}).then(() => {
-			const blobid = 5, hash = 5
+		return this.getFile(url, "image/png").then((file) => {
+			const upload = new ImageUpload(file, imageUploadOptions)
 
+			return upload.prepare().then(({ lowest }) => {
+				return upload.upload().thenReturn(lowest)
+			})
+		}).then((imageMeta) => {
 			var setImageBlobAttributePromise = this.userObject.setProfileAttribute("imageBlob", {
-				blobid: blobid,
-				imageHash: hash
+				blobid: imageMeta.blobID,
+				imageHash: imageMeta.blobHash
 			});
 
 			var removeImageAttributePromise = this.userObject.removeProfileAttribute("image");
