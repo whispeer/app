@@ -45,7 +45,6 @@ export default class BlobDownloader extends Observer {
 	};
 
 	private concatParts() {
-		debugger
 		return Bluebird.resolve({
 			blob: new Blob(this.blobParts),
 			meta: this.meta
