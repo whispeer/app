@@ -4,7 +4,7 @@
 	</ion-navbar>
 </ion-header>
 
-<ion-content class="list-avatar-page">
+<ion-content class="list-avatar-page" [ngClass]="{'home--empty': !topicsLoading && topics.length === 0}">
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="openContactRequests()">
 		<div class="badgeContainer">
 			<span class="hexBadge">{{requests.length}}</span>

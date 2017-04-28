@@ -181,6 +181,12 @@ export class LoginPage {
 		return passwordStrengthService.passwordStrength(this.login.password) === 0
 	}
 
+	loadLogin = () =>
+		sessionService.loadLogin().then(() => {
+			this.statusBar.styleLightContent()
+			this.mainPage()
+		})
+
 	loginOrRegister = () => {
 		if ([USERNAME_TAKEN, USERNAME_LOGIN_INCORRECT_PASSWORD, USERNAME_NO_CONNECTION, USERNAME_LOGIN_ERROR].indexOf(this.usernameState) !== -1) {
 			if (!this.passwordSet()) {
@@ -191,10 +197,7 @@ export class LoginPage {
 			// login
 			this.performLogin().then(() => {
 				this.usernameState = USERNAME_LOGIN_SUCCESS
-				sessionService.loadLogin().then(() => {
-					this.statusBar.styleLightContent()
-					this.mainPage()
-				})
+				return this.loadLogin()
 			}).catch((error) => {
 				this.usernameState = this.getLoginErrorCode(error);
 			})
@@ -223,7 +226,8 @@ export class LoginPage {
 			if (this.passwordsMatch()) {
 				this.performRegister().then(() => {
 					this.usernameState = USERNAME_REGISTER_SUCCESS;
-					this.mainPage()
+
+					return this.loadLogin()
 				}).catch(registerError);
 			} else {
 				this.usernameState = USERNAME_PASSWORDS_DONT_MATCH;
