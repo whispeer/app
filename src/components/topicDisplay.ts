@@ -99,7 +99,6 @@ export class TopicComponent {
 		if (updateScroll) {
 			return this.stabilizeScroll()
 		}
-
 		console.warn("Only elements below newest messages have changed not updating viewport")
 	}
 
@@ -126,7 +125,7 @@ export class TopicComponent {
 		}).then((file: any) => {
 			file.originalUrl = url;
 			if(this.platform.is("ios")) {
-				file.localURL = url.replace("file://", "http://ionic.local");
+				file.localURL = url.replace("file://", `http://${window.location.host}`);
 			}
 			file.type = type;
 

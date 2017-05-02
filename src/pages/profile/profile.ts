@@ -277,7 +277,7 @@ export class ProfilePage {
 		}).then((file: any) => {
 			file.originalUrl = url;
 			if(this.platform.is("ios")) {
-				file.localURL = url.replace("file://", "http://ionic.local");
+				file.localURL = url.replace("file://", `http://${window.location.host}`);
 			}
 			file.type = type;
 
