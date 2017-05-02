@@ -365,7 +365,7 @@ var Topic = function (data) {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
 		if (!id) {
-			Bluebird.resolve(images).map(function (img) {
+			Bluebird.resolve(images).bind(this).map(function (img) {
 				return img.prepare().thenReturn(img)
 			}).map(function (img) {
 				return img._blobs[0].blob._blobData
