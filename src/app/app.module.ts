@@ -22,6 +22,7 @@ import { PhotoViewer } from '@ionic-native/photo-viewer';
 import { ImagePicker } from '@ionic-native/image-picker';
 import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
+import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 
 (<any>window).startup = new Date().getTime();
 
@@ -40,6 +41,7 @@ import { Camera } from '@ionic-native/camera';
 	providers: [
 		{provide: ErrorHandler, useClass: IonicErrorHandler},
 		DatePipe,
+		BarcodeScanner,
 		SplashScreen,
 		StatusBar,
 		Globalization,
@@ -47,7 +49,7 @@ import { Camera } from '@ionic-native/camera';
 		PhotoViewer,
 		ImagePicker,
 		File,
-		Camera,
+		Camera
 	]
 })
 export class AppModule {

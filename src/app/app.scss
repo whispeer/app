@@ -29,6 +29,10 @@ ion-fab[fixed] {
 	position: fixed;
 }
 
+.has-main-menu .scroll-content {
+	padding-bottom: 100px;
+}
+
 ion-fab-list[side="top"] {
 	flex-direction: row;
 	margin-left: -21px;
@@ -195,9 +199,19 @@ ion-fab-list[side="top"] {
 	}
 }
 
+.ios .alert-head {
+	color: map-get($colors, dark);
+}
+
 .alert-button-danger {
 	color: map-get($colors, danger) !important;
 	font-weight: normal !important;
+}
+
+// action sheet cancel text color
+// there was no variable for this...
+.action-sheet-ios .action-sheet-cancel {
+	color: map-get($colors, dark);
 }
 
 // -----------------------------------------------------------
