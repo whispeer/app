@@ -1,3 +1,19 @@
+=== 0.2.9 ===
+- Scrolling auf iOS stark verbessert
+- Profil:
+ - Nutzer verifizieren
+ - Freundesanfragen stellen/annehmen/ablehnen
+ - Freund entfernen
+ - Profilbild hochladen und anzeigen
+- Bilder laden schneller
+- Eingabe wird beim Verlassen eines Chats Zwischengespeichert
+- Anfangsbildschirm für neue Nutzer
+- Ungelesene Chats werden besser angezeigt (mit Anzahl ungelesener Nachrichten)
+- Suchbutton im Menü
+- Animationen beim Viewwechsel korrigiert
+- Profilbilder werden nicht mehr schwarz
+- Loginseite verbessert (Scrolling, Größe, Zeilensprünge)
+
 === 0.2.8 ===
 - Autocomplete und Autocorrect funktionieren
 - Nachrichten werden nachgeladen wenn man hoch scrollt in einem Chat
