@@ -365,17 +365,21 @@ var Topic = function (data) {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
 		if (!id) {
-			messageSendCache.store(
-				messageObject.getID(),
-				{
-					topicID: this.getID(),
-					id: messageObject.getID(),
-					message: message
-				},
-				images.map(function (image) {
-					return image.getFile();
-				})
-			);
+			Bluebird.resolve(images).map(function (img) {
+				return img.prepare().thenReturn(img)
+			}).map(function (img) {
+				return img._blobs[0].blob._blobData
+			}).then(function (imagesBlobs) {
+				messageSendCache.store(
+					messageObject.getID(),
+					{
+						topicID: this.getID(),
+						id: messageObject.getID(),
+						message: message
+					},
+					imagesBlobs
+				);
+			})
 		}
 
 		var sendMessagePromise = messageObject.sendContinously();

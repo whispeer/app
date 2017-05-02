@@ -350,10 +350,14 @@ ImageUpload.prototype.prepare = function () {
 
 	var sizes = this._isGif ? this._options.gifSizes : this._options.sizes;
 
-	return Bluebird.resolve(sizes)
-		.bind(this)
-		.map(this._createSizeData)
-		.then(this._removeUnnededBlobs);
+	if (!this.preparePromise) {
+		this._preparePromise = Bluebird.resolve(sizes)
+			.bind(this)
+			.map(this._createSizeData)
+			.then(this._removeUnnededBlobs);
+	}
+
+	return this._preparePromise
 };
 
 ImageUpload.prototype._removeUnnededBlobs = function (blobs) {
