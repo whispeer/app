@@ -1,13 +1,9 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 const friendsService = require("../lib/services/friendsService");
-const userService = require("../lib/user/userService");
-const messageService = require("../lib/messages/messageService");
 
 import { ContactsWithSearch } from '../lib/contacts/contactsWithSearch'
-
-import * as Bluebird from 'bluebird';
 
 const h = require("whispeerHelper");
 
@@ -22,37 +18,12 @@ export class ChooseFriends extends ContactsWithSearch {
 	selectedUsers: any[] = [];
 
 	@Output() chooseReceivers = new EventEmitter();
-	@Input() receiverString;
 
 	constructor(public navCtrl: NavController) {
 		super()
 	}
 
-	hasReceiverParam() {
-		const type = typeof this.receiverString;
-
-		return ["number", "string"].indexOf(type) > -1;
-	}
-
-	getReceiverParam() {
-		if (typeof this.receiverString === "number") {
-			return [this.receiverString];
-		}
-
-		if (typeof this.receiverString === "string") {
-			return this.receiverString.split(",").map((r) => { return parseInt(r, 10) });
-		}
-
-		throw new Error("invalid receiver param");
-	}
-
 	ngOnInit() {
-		if (this.hasReceiverParam()) {
-			return userService.getMultipleFormatted(this.getReceiverParam()).then((users) => {
-				this.send(users);
-			})
-		}
-
 		friendsService.awaitLoading().then(() => {
 			friendsService.listen(this.loadContactsUsers);
 			this.loadContactsUsers();
@@ -97,27 +68,8 @@ export class ChooseFriends extends ContactsWithSearch {
 		return this.contactDividers(record, recordIndex - selectedLength, records.slice(selectedLength));
 	}
 
-	private sendToUserTopic(users) {
-		if (users.length > 1) {
-			return Bluebird.resolve();
-		}
-
-		return messageService.getUserTopic(users[0].id);
-
-	}
-
-	send = (users) => {
-		this.sendToUserTopic(users).then((topicId) => {
-			if (topicId) {
-				this.navCtrl.push("Messages", { topicId: topicId });
-			}
-
-			this.chooseReceivers.emit(users);
-		});
-	}
-
 	create = () => {
-		this.send(this.selectedUsers);
+		this.chooseReceivers.emit(this.selectedUsers);
 	}
 
 	close = () => {

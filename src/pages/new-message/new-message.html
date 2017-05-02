@@ -1,7 +1,11 @@
-<chooseFriends *ngIf="!receiversChosen" [receiverString]="receiverString" (chooseReceivers)="chooseReceivers($event)"></chooseFriends>
+<ion-content *ngIf="loading">
+	<ion-spinner text-center margin-vertical class="spinner--full"></ion-spinner>
+</ion-content>
+
+<chooseFriends *ngIf="!loading && !receiversChosen" (chooseReceivers)="send($event)"></chooseFriends>
 
 <topicWithBursts
-	*ngIf="receiversChosen"
+	*ngIf="!loading && receiversChosen"
 	[topic]="topic"
 	[messageBurstsFunction]="messageBursts"
 	[partners]="partners"
