@@ -69,7 +69,7 @@ export class TopicComponent {
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 
 		this.mutationObserver = new MutationObserver(this.mutationListener);
-		this.mutationObserver.observe(this.content.nativeElement, { attributes: true, characterData: true, childList: true, subtree: true });
+		this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true });
 	}
 
 	ngOnDestroy() {
