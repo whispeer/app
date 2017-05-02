@@ -12,7 +12,10 @@
 - Suchbutton im Menü
 - Animationen beim Viewwechsel korrigiert
 - Profilbilder werden nicht mehr schwarz
-- Loginseite verbessert (Scrolling, Größe, Zeilensprünge)
+- Loginseite verbessert
+ - Scrolling springt nicht
+ - Vollständig auf iPhone 5 darstellbar
+ - Kurze Passwörter werden abgelehnt
 
 === 0.2.8 ===
 - Autocomplete und Autocorrect funktionieren
