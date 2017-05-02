@@ -43,6 +43,8 @@ export class TopicComponent {
 
 	cameraOptions: CameraOptions
 
+	mutationObserver: MutationObserver
+
 	constructor(
 		public navCtrl: NavController,
 		private actionSheetCtrl: ActionSheetController,
@@ -65,16 +67,44 @@ export class TopicComponent {
 	ngAfterViewInit() {
 		window.addEventListener('resize', this.keyboardChange);
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
+
+		this.mutationObserver = new MutationObserver(this.mutationListener);
+		this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true });
 	}
 
 	ngOnDestroy() {
 		window.removeEventListener('resize', this.keyboardChange);
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
+
+		this.mutationObserver.disconnect()
 	}
 
+	mutationListener = (mutations) => {
+		const id = this.getFirstInViewMessageId()
+
+		if (!id) {
+			return this.stabilizeScroll()
+		}
+
+
+
+		const firstElement = document.querySelector(`[data-messageid="${id}"]`)
+
+		const updateScroll = mutations.some((mutation) => {
+			return [].slice.call(mutation.addedNodes).some((element) => {
+				const position = firstElement.compareDocumentPosition(element);
+
+				return position & 0x02
+			})
+		})
+
+		if (updateScroll) {
+			return this.stabilizeScroll()
+		}
+	}
 
 	keyboardChange = () => {
-		this.stabilizeScroll(this.oldScrollFromBottom)
+		this.stabilizeScroll()
 	}
 
 	sendMessageToTopic = () => {
@@ -202,9 +232,16 @@ export class TopicComponent {
 		return this.realScrollHeight(element) - element.scrollTop;
 	}
 
-	stabilizeScroll = (scrollFromBottom: number) => {
+	stabilizeScroll = () => {
 		const element = this.content.nativeElement
-		const newScrollTop = this.realScrollHeight(element) - scrollFromBottom
+
+		if (this.platform.is('ios')) {
+			element.style.display = "none"
+			element.offsetHeight
+			element.style.display = "";
+		}
+
+		const newScrollTop = this.realScrollHeight(element) - this.oldScrollFromBottom
 
 		element.scrollTop = newScrollTop
 	}
@@ -232,12 +269,7 @@ export class TopicComponent {
 	}
 
 	allBurstMessages() {
-		const { changed, bursts } = this.messageBurstsFunction();
-
-		if (changed) {
-			const scrollFromBottom = this.scrollFromBottom()
-			this.awaitRendering().then(() => this.stabilizeScroll(scrollFromBottom))
-		}
+		const { bursts } = this.messageBurstsFunction();
 
 		return bursts;
 	}
@@ -272,8 +304,6 @@ export class TopicComponent {
 				this.topic.newMessage = this.newMessageText
 			}
 
-			const scrollFromBottom = this.scrollFromBottom()
-
 			const fontSize = 16;
 			const maxSize = fontSize*7;
 
@@ -290,7 +320,7 @@ export class TopicComponent {
 			textarea.style.minHeight  = scroll_height + "px";
 			textarea.style.height     = scroll_height + "px";
 
-			this.stabilizeScroll(scrollFromBottom)
+			this.stabilizeScroll()
 		}, 100);
 	}
 
