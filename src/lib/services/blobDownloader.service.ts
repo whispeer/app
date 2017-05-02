@@ -46,7 +46,7 @@ export default class BlobDownloader extends Observer {
 
 	private concatParts() {
 		return Bluebird.resolve({
-			blob: new Blob(this.blobParts),
+			blob: new Blob(this.blobParts, { type: "image/png" }),
 			meta: this.meta
 		})
 	}
