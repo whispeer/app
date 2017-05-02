@@ -69,7 +69,7 @@ export class TopicComponent {
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 
 		this.mutationObserver = new MutationObserver(this.mutationListener);
-		this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true });
+		this.mutationObserver.observe(this.content.nativeElement, { attributes: true, characterData: true, childList: true, subtree: true });
 	}
 
 	ngOnDestroy() {
@@ -86,8 +86,6 @@ export class TopicComponent {
 			return this.stabilizeScroll()
 		}
 
-
-
 		const firstElement = document.querySelector(`[data-messageid="${id}"]`)
 
 		const updateScroll = mutations.some((mutation) => {
@@ -101,6 +99,8 @@ export class TopicComponent {
 		if (updateScroll) {
 			return this.stabilizeScroll()
 		}
+
+		console.warn("Only elements below newest messages have changed not updating viewport")
 	}
 
 	keyboardChange = () => {
@@ -178,10 +178,6 @@ export class TopicComponent {
 		actionSheet.present();
 	}
 
-	awaitRendering = () => {
-		return Bluebird.delay(0);
-	}
-
 	realScrollHeight(element) {
 		return element.scrollHeight - element.clientHeight
 	}
@@ -223,6 +219,7 @@ export class TopicComponent {
 
 	onScroll = () => {
 		this.oldScrollFromBottom = this.scrollFromBottom()
+
 		this.updateElementsInView()
 		this.checkLoadMoreMessages()
 	}
@@ -232,18 +229,42 @@ export class TopicComponent {
 		return this.realScrollHeight(element) - element.scrollTop;
 	}
 
+	stabilizeScrollIfHeightChanged = (height, scrollFromBottom) => {
+		const element = this.content.nativeElement
+
+		const newHeight = this.realScrollHeight(element)
+
+		if (newHeight !== height) {
+			console.warn(`Height changed from ${height} to ${newHeight}`)
+
+			this.oldScrollFromBottom = scrollFromBottom
+			this.stabilizeScroll()
+
+			return true
+		}
+
+		return false
+	}
+
+	checkHeightChange = (height, scrollFromBottom, maximumTime) => {
+		const delayTime = 25
+
+		Bluebird.delay(delayTime).then(() => {
+			if (!this.stabilizeScrollIfHeightChanged(height, scrollFromBottom) && maximumTime > 0) {
+				this.checkHeightChange(height, scrollFromBottom, maximumTime - delayTime)
+			}
+		})
+	}
+
 	stabilizeScroll = () => {
 		const element = this.content.nativeElement
 
-		if (this.platform.is('ios')) {
-			element.style.display = "none"
-			element.offsetHeight
-			element.style.display = "";
-		}
-
-		const newScrollTop = this.realScrollHeight(element) - this.oldScrollFromBottom
+		const height = this.realScrollHeight(element)
+		const newScrollTop = height - this.oldScrollFromBottom
 
 		element.scrollTop = newScrollTop
+
+		this.checkHeightChange(height, this.oldScrollFromBottom, this.platform.is('ios') ? 300 : 50)
 	}
 
 	getFirstInViewMessageId = () => {

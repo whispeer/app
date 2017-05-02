@@ -42,8 +42,6 @@ export class MessagesPage {
 			this.partners = topic.data.partners;
 
 			topic.loadInitialMessages().then(() => {
-				// this.content.scrollToBottom(0);
-
 				this.messagesLoading = false;
 				this.topicObject.markRead(errorService.criticalError)
 			});
