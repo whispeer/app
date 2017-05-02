@@ -43,6 +43,8 @@ export class TopicComponent {
 
 	cameraOptions: CameraOptions
 
+	mutationObserver: MutationObserver
+
 	constructor(
 		public navCtrl: NavController,
 		private actionSheetCtrl: ActionSheetController,
@@ -65,16 +67,44 @@ export class TopicComponent {
 	ngAfterViewInit() {
 		window.addEventListener('resize', this.keyboardChange);
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
+
+		this.mutationObserver = new MutationObserver(this.mutationListener);
+		this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true });
 	}
 
 	ngOnDestroy() {
 		window.removeEventListener('resize', this.keyboardChange);
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
+
+		this.mutationObserver.disconnect()
 	}
 
+	mutationListener = (mutations) => {
+		const id = this.getFirstInViewMessageId()
+
+		if (!id) {
+			return this.stabilizeScroll()
+		}
+
+		const firstElement = document.querySelector(`[data-messageid="${id}"]`)
+
+		const updateScroll = mutations.some((mutation) => {
+			return [].slice.call(mutation.addedNodes).some((element) => {
+				const position = firstElement.compareDocumentPosition(element);
+
+				return position & 0x02
+			})
+		})
+
+		if (updateScroll) {
+			return this.stabilizeScroll()
+		}
+
+		console.warn("Only elements below newest messages have changed not updating viewport")
+	}
 
 	keyboardChange = () => {
-		this.stabilizeScroll(this.oldScrollFromBottom)
+		this.stabilizeScroll()
 	}
 
 	sendMessageToTopic = () => {
@@ -151,10 +181,6 @@ export class TopicComponent {
 		actionSheet.present();
 	}
 
-	awaitRendering = () => {
-		return Bluebird.delay(0);
-	}
-
 	realScrollHeight(element) {
 		return element.scrollHeight - element.clientHeight
 	}
@@ -196,6 +222,7 @@ export class TopicComponent {
 
 	onScroll = () => {
 		this.oldScrollFromBottom = this.scrollFromBottom()
+
 		this.updateElementsInView()
 		this.checkLoadMoreMessages()
 	}
@@ -205,11 +232,42 @@ export class TopicComponent {
 		return this.realScrollHeight(element) - element.scrollTop;
 	}
 
-	stabilizeScroll = (scrollFromBottom: number) => {
+	stabilizeScrollIfHeightChanged = (height, scrollFromBottom) => {
 		const element = this.content.nativeElement
-		const newScrollTop = this.realScrollHeight(element) - scrollFromBottom
+
+		const newHeight = this.realScrollHeight(element)
+
+		if (newHeight !== height) {
+			console.warn(`Height changed from ${height} to ${newHeight}`)
+
+			this.oldScrollFromBottom = scrollFromBottom
+			this.stabilizeScroll()
+
+			return true
+		}
+
+		return false
+	}
+
+	checkHeightChange = (height, scrollFromBottom, maximumTime) => {
+		const delayTime = 25
+
+		Bluebird.delay(delayTime).then(() => {
+			if (!this.stabilizeScrollIfHeightChanged(height, scrollFromBottom) && maximumTime > 0) {
+				this.checkHeightChange(height, scrollFromBottom, maximumTime - delayTime)
+			}
+		})
+	}
+
+	stabilizeScroll = () => {
+		const element = this.content.nativeElement
+
+		const height = this.realScrollHeight(element)
+		const newScrollTop = height - this.oldScrollFromBottom
 
 		element.scrollTop = newScrollTop
+
+		this.checkHeightChange(height, this.oldScrollFromBottom, this.platform.is('ios') ? 300 : 50)
 	}
 
 	getFirstInViewMessageId = () => {
@@ -235,12 +293,7 @@ export class TopicComponent {
 	}
 
 	allBurstMessages() {
-		const { changed, bursts } = this.messageBurstsFunction();
-
-		if (changed) {
-			const scrollFromBottom = this.scrollFromBottom()
-			this.awaitRendering().then(() => this.stabilizeScroll(scrollFromBottom))
-		}
+		const { bursts } = this.messageBurstsFunction();
 
 		return bursts;
 	}
@@ -275,8 +328,6 @@ export class TopicComponent {
 				this.topic.newMessage = this.newMessageText
 			}
 
-			const scrollFromBottom = this.scrollFromBottom()
-
 			const fontSize = 16;
 			const maxSize = fontSize*7;
 
@@ -293,7 +344,7 @@ export class TopicComponent {
 			textarea.style.minHeight  = scroll_height + "px";
 			textarea.style.height     = scroll_height + "px";
 
-			this.stabilizeScroll(scrollFromBottom)
+			this.stabilizeScroll()
 		}, 100);
 	}
 

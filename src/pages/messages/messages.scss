@@ -15,6 +15,7 @@ topicWithBursts {
 		display: flex;
 
 		flex-direction: column;
+		padding: 0;
 	}
 
 	.messages__list {
@@ -38,7 +39,7 @@ topicWithBursts {
 	}
 
 	.messages_filler {
-		flex: 1;
+		flex: 1 0 auto;
 	}
 }
 

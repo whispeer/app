@@ -40,6 +40,11 @@ export class HomePage {
 	loadTopics = () => {
 		this.topics = messageService.data.latestTopics.data;
 
+		console.warn("load more topics?", this.topics.length)
+		if (this.topics.length >= 10) {
+			return
+		}
+
 		messageService.loadMoreLatest(() => {}).then(() => {
 			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
 			this.topicsLoading = false;
