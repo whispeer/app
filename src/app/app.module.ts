@@ -24,7 +24,17 @@ import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HttpModule, Http } from '@angular/http';
+
 (<any>window).startup = new Date().getTime();
+
+const createTranslateLoader = (http: Http) => {
+	return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+const DEFAULT_LANG = "en"
 
 @NgModule({
 	declarations: [
@@ -32,7 +42,15 @@ import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 	],
 	imports: [
 		IonicModule.forRoot(MyApp),
+		TranslateModule.forRoot({
+			loader: {
+				provide: TranslateLoader,
+				useFactory: (createTranslateLoader),
+				deps: [Http]
+			}
+		}),
 		BrowserModule,
+		HttpModule,
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
@@ -53,7 +71,19 @@ import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 	]
 })
 export class AppModule {
-	constructor(private zone: NgZone) {
+	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization) {
+		translate.setDefaultLang("en");
+
+		this.globalization.getPreferredLanguage().then(({ value }) => {
+			console.warn(`Language from device: ${value}`)
+			return DEFAULT_LANG
+		}).catch(() => {
+			console.warn('Cannot get language from device, remaining with default language');
+			return DEFAULT_LANG
+		}).then((lang) => {
+			translate.use(lang)
+		})
+
 		Bluebird.setScheduler((fn) => {
 			setTimeout(() => {
 				if((<any>this.zone).inner !== (<any>window).Zone.current) {
