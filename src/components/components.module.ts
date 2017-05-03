@@ -14,6 +14,8 @@ import { SyntaxifyDirective } from "./syntaxify"
 import { ChooseFriends } from "./chooseFriends"
 import { GalleryComponent } from "./gallery/gallery"
 
+import { TranslateModule } from '@ngx-translate/core';
+
 @NgModule({
 	declarations: [
 		ResponsiveDatePipe,
@@ -30,6 +32,7 @@ import { GalleryComponent } from "./gallery/gallery"
 		HexagonModule,
 		IonicModule,
 		CommonModule,
+		TranslateModule.forChild(),
 	],
 	exports: [
 		ResponsiveDatePipe,

@@ -1,6 +1,7 @@
 {
 	"general": {
-		"backButtonText": "Back"
+		"backButtonText": "Back",
+		"cancel": "Cancel"
 	},
 	"home": {
 		"title": "Messages",
@@ -36,5 +37,14 @@
 	},
 	"requests": {
 		"title": "Requests"
+	},
+	"topic": {
+		"takePhoto": "Take Photo",
+		"selectGallery": "Select from Gallery"
+	},
+	"chooseFriends": {
+		"title": "Select Contacts",
+		"selected": "Selected"
+
 	}
 }

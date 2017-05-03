@@ -4,6 +4,7 @@ import { NavController } from 'ionic-angular';
 const friendsService = require("../lib/services/friendsService");
 
 import { ContactsWithSearch } from '../lib/contacts/contactsWithSearch'
+import { TranslateService } from '@ngx-translate/core';
 
 const h = require("whispeerHelper");
 
@@ -19,7 +20,7 @@ export class ChooseFriends extends ContactsWithSearch {
 
 	@Output() chooseReceivers = new EventEmitter();
 
-	constructor(public navCtrl: NavController) {
+	constructor(public navCtrl: NavController, private translate: TranslateService) {
 		super()
 	}
 
@@ -59,7 +60,7 @@ export class ChooseFriends extends ContactsWithSearch {
 
 		if (recordIndex < selectedLength) {
 			if (recordIndex === 0) {
-				return "Selected";
+				return this.translate.instant("chooseFriends.selected");
 			}
 
 			return null;
