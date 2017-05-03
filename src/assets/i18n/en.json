@@ -45,6 +45,25 @@
 	"chooseFriends": {
 		"title": "Select Contacts",
 		"selected": "Selected"
+	},
+	"settings": {
+		"title": "Settings",
+		"header": "App settings",
+		"push": "Receive push notifications",
+		"tutorial": "Show tutorial again",
+		"about": "About whispeer",
+		"tos": "Terms of Service",
+		"privacy": "Privacy policy",
+		"contact": "Contact us",
+		"feedback": "Send Feedback",
+		"logout": "Logout",
+		"companyName": "whispeer by mindpost GmbH",
+		"madeInGermany": "Made in Germany with",
+		"humanRights": "for human rights",
+		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
+		"logoutWarning": "Do you want to log out from your account on this device?"
+	},
+	"profile": {
 
 	}
 }
