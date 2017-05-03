@@ -1,4 +1,7 @@
 {
+	"general": {
+		"backButtonText": "Back"
+	},
 	"home": {
 		"title": "Messages",
 		"newContact": {

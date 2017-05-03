@@ -5,8 +5,7 @@ require("services/trust.service");
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
 
-import { IonicApp, IonicErrorHandler } from 'ionic-angular';
-import { IonicModule } from 'ionic-angular';
+import { IonicApp, IonicErrorHandler, IonicModule, Config } from 'ionic-angular';
 
 import * as Bluebird from 'bluebird';
 
@@ -71,7 +70,7 @@ const DEFAULT_LANG = "en"
 	]
 })
 export class AppModule {
-	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization) {
+	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization, private config: Config) {
 		translate.setDefaultLang("en");
 
 		this.globalization.getPreferredLanguage().then(({ value }) => {
@@ -82,6 +81,10 @@ export class AppModule {
 			return DEFAULT_LANG
 		}).then((lang) => {
 			translate.use(lang)
+		})
+
+		translate.get('general.backButtonText').subscribe((val: string) => {
+			config.set('ios', 'backButtonText', val);
 		})
 
 		Bluebird.setScheduler((fn) => {
