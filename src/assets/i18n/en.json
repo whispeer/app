@@ -26,5 +26,12 @@
 			"passwordsDontMatch": "Your repeated password does not match",
 			"passwordTooShort": "Your password is too short. We require a minimum of 8 characters"
 		}
+	},
+	"contacts": {
+		"title": "Contacts",
+		"search": "Search"
+	},
+	"requests": {
+		"title": "Requests"
 	}
 }

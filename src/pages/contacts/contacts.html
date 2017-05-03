@@ -6,13 +6,13 @@
 -->
 <ion-header>
 	<ion-navbar [color]="'primary'">
-		<ion-title>Contacts</ion-title>
+		<ion-title>{{ contacts.title | translate }}</ion-title>
 	</ion-navbar>
 </ion-header>
 
 
 <ion-content>
-	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
+	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()" [placeholder]="'contacts.search' | translate"></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="goToRequests()">
 		<div class="badgeContainer">

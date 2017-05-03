@@ -4,6 +4,7 @@ import { NavController, NavParams, IonicPage, Searchbar } from 'ionic-angular';
 const contactsService = require("../../lib/services/friendsService");
 
 import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
+import { TranslateService } from '@ngx-translate/core';
 
 @IonicPage({
 	name: "Contacts",
@@ -19,7 +20,7 @@ export class ContactsPage extends ContactsWithSearch {
 
 	requests: any[] = [];
 
-	constructor(public navCtrl: NavController, public navParams: NavParams) {
+	constructor(public navCtrl: NavController, public navParams: NavParams, private translate: TranslateService) {
 		super()
 	}
 
@@ -44,7 +45,9 @@ export class ContactsPage extends ContactsWithSearch {
 	}
 
 	get requestsLabel() {
-		return this.requests.length > 1 ? 'New contact requests' : 'New contact request'
+		const count = this.requests.length > 1 ? "many" : "single"
+
+		return this.translate.instant(`home.newContact.${count}`)
 	}
 
 	goToUser(userId) {
