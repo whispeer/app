@@ -14,6 +14,8 @@ import { Camera } from "@ionic-native/camera";
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import { PhotoViewer } from '@ionic-native/photo-viewer';
 
+import { TranslateService } from '@ngx-translate/core';
+
 const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
@@ -85,6 +87,7 @@ export class ProfilePage {
 		private imagePicker: ImagePicker,
 		private barcodeScanner: BarcodeScanner,
 		private photoViewer: PhotoViewer,
+		private translate: TranslateService,
 	) {}
 
 	ngOnInit() {

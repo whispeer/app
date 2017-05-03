@@ -3,12 +3,8 @@ import { NavController, NavParams, AlertController, IonicPage } from "ionic-angu
 import sessionService from "../../lib/services/session.service";
 import Tutorial from "../../app/tutorial";
 
-/*
-	Generated class for the Settings page.
+import { TranslateService } from '@ngx-translate/core';
 
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
 @IonicPage({
 	name: "Settings",
 	segment: "settings"
@@ -35,7 +31,7 @@ export class SettingsPage {
 		}
 	}
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
