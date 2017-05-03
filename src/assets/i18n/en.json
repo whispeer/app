@@ -1,5 +1,30 @@
 {
 	"home": {
-		"title": "Messages"
+		"title": "Messages",
+		"newContact": {
+			"single": "New contact request",
+			"many": "New contact requests"
+		}
+	},
+	"login": {
+		"password2Placeholder": "please type your password again",
+		"passwordPlaceholder": "enter a password",
+		"identifierPlaceholder": "e.g. whispeerHQ",
+		"tos": "By signing up, you agree to our <strong>Terms of Service</strong> and our very strict <strong>Privacy Policy</strong>",
+		"header": "<strong>Hello</strong> and welcome to<br>the world of secure messaging!",
+		"messages": {
+			"invalidUsername": "Usernames should start with a letter and must not include special characters.",
+			"defaultCallToAction": "Create a new account or simply login...",
+			"ambiguousProcess": "This username exists. You can choose to continue login or register a unique name",
+			"loginSuccess": "Success! We'll log you in securely now...",
+			"registerMessage": "This username is free. You can continue to choose a secure password...",
+			"genericErrorMessage": "Something went wrong.",
+			"confirmPassword": "Great! Now verify your new password...",
+			"registerSuccess": "Welcome on board! We'll log you in now...",
+			"noConnection": "Could not connect to whispeer",
+			"incorrectPassword": "Your password is wrong. Please try again.",
+			"passwordsDontMatch": "Your repeated password does not match",
+			"passwordTooShort": "Your password is too short. We require a minimum of 8 characters"
+		}
 	}
 }
