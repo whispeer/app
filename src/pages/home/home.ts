@@ -16,7 +16,7 @@ const contactsService = require("../../lib/services/friendsService");
 export class HomePage {
 	@ViewChild(Content) content: Content;
 
-	topics: any[];
+	topics: any[] = [];
 	requests: any[] = [];
 	searchTerm: string = "";
 
@@ -49,6 +49,16 @@ export class HomePage {
 			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
 			this.topicsLoading = false;
 		});
+	}
+
+	getLoadedTopics = () => {
+		let loaded = true
+
+		return this.topics.filter((topic) => {
+			loaded = loaded && topic.loaded
+
+			return loaded
+		})
 	}
 
 	loadMoreTopics = (infiniteScroll) => {

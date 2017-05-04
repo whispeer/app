@@ -88,7 +88,7 @@ messageService = {
 				l.allTopicsLoaded = true;
 			}
 
-			return Topic.multipleFromData(latest.topics);
+			return Topic.loadInChunks(latest.topics, 4);
 		}).then(function (topics) {
 			topics.forEach(function (topic) {
 				topic.setIgnoreAsLastTopic(false);

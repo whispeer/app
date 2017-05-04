@@ -68,6 +68,10 @@ export class NewMessagePage {
 	hasReceiverParam() {
 		const type = typeof this.receiverString;
 
+		if (this.receiverString === ":receiverIds") {
+			return false
+		}
+
 		return ["number", "string"].indexOf(type) > -1;
 	}
 

@@ -14,7 +14,7 @@
 	</button>
 
 	<ion-list class="space-for-fab">
-		<ion-item *ngFor="let topic of topics; let i = index" class="topic" [ngClass]="{'topic--new': topic.unread}" (click)="openChat(topic.id)">
+		<ion-item *ngFor="let topic of getLoadedTopics(); let i = index" class="topic" [ngClass]="{'topic--new': topic.unread}" (click)="openChat(topic.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of topic.partnersDisplay"
