@@ -182,6 +182,7 @@ class SocketService extends Observer {
 		var timer = log.timer("request on " + channel);
 
 		request.version = APIVERSION;
+		request.clientInfo = CLIENT_INFO;
 
 		socketDebug("Request on " + channel);
 		socketDebug(request);
@@ -198,6 +199,10 @@ class SocketService extends Observer {
 		var resultPromise = this._emit(channel, request).timeout(SOCKET_TIMEOUT).then((response) => {
 			socketDebug("Answer on " + channel);
 			log.timerEnd(timer);
+
+			if (response.alert) {
+				alert(response.alert)
+			}
 
 			this._lastRequestTime = response.serverTime;
 

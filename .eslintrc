@@ -19,13 +19,14 @@
     "expect": true,
     "File": true,
     "indexedDB": true,
-    "WHISPEER_ENV": true,
     "process": true,
     "jQuery": true,
     "Uint8Array": true,
     "ArrayBuffer": true,
     "DataView": true,
-    "Uint32Array": true
+    "Uint32Array": true,
+    "WHISPEER_ENV": true,
+    "CLIENT_INFO": true
   },
   "rules": {
     "no-undef": 2,
