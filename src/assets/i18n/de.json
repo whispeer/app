@@ -67,6 +67,8 @@
 		"logoutWarning": "Account ausloggen auf diesem Gerät?"
 	},
 	"profile": {
+		"ownTitle": "Profil",
+		"otherTitle": "{{name}}'s Profil",
 		"profileSegment": "Profil",
 		"qrSegment": "QR-Code",
 		"birthday": "Geburtstag",
