@@ -87,7 +87,7 @@
 			"removeButtonText": "Remove from Contacts",
 			"removeTitle": "Remove Contact",
 			"removeQuestion": "Are you sure that you want to remove this Contact?",
-			"removeConfirmButtonTitle": "Remove",
+			"removeConfirmButtonText": "Remove",
 			"acceptedMessage": "{{name}} is now in your contacts.",
 			"requestSentMessage": "You've sent a contact request to {{name}}."
 		},
