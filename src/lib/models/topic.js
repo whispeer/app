@@ -455,24 +455,23 @@ var Topic = function (data) {
 	};
 
 	this.loadReceiverNames = function loadRNF(cb) {
-		return Bluebird.try(function () {
+		if (this._loadReceiverNamesPromise) {
+			return this._loadReceiverNamesPromise
+		}
+
+		this._loadReceiverNamesPromise = Bluebird.try(function () {
 			return userService.getMultipleFormatted(receiver);
 		}).then(function (receiverObjects) {
-			var partners = theTopic.data.partners;
-
-			if (partners.length > 0) {
-				return;
-			}
-
-			receiverObjects.forEach(function (receiverObject) {
-				if (!receiverObject.user.isOwn() || receiverObjects.length === 1) {
-					partners.push(receiverObject);
-				}
+			var partners = receiverObjects.filter(function (receiverObject) {
+				return !receiverObject.user.isOwn() || receiverObjects.length === 1
 			});
 
 			var maxDisplay = 3;
 			var displayCount = (partners.length > maxDisplay) ? 2 : partners.length;
+
 			theTopic.data.partnersDisplay = partners.slice(0, displayCount);
+			theTopic.data.partners = partners
+
 			if (partners.length > displayCount) {
 				theTopic.data.remainingUser = partners.length - displayCount;
 
@@ -485,6 +484,8 @@ var Topic = function (data) {
 				}
 			}
 		}).nodeify(cb);
+
+		return this._loadReceiverNamesPromise
 	};
 
 	this.getReceiver = function () {
