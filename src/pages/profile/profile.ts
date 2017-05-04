@@ -124,6 +124,14 @@ export class ProfilePage {
 		});
 	}
 
+	getTitle() {
+		if (this.isOwn) {
+			return this.translate.instant("profile.ownTitle")
+		}
+
+		return this.translate.instant("profile.otherTitle", { name: this.user.name })
+	}
+
 	attributeSet(val) {
 		if (Array.isArray(val)) {
 			return val.length > 0;

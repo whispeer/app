@@ -1,7 +1,7 @@
 <ion-header>
 
 	<ion-navbar [color]="'primary'">
-		<ion-title><span *ngIf="!isOwn">{{user.name}}'s</span> Profile</ion-title>
+		<ion-title>{{getTitle()}}</ion-title>
 	</ion-navbar>
 
 </ion-header>

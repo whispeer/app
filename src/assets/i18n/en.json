@@ -67,6 +67,8 @@
 		"logoutWarning": "Do you want to log out from your account on this device?"
 	},
 	"profile": {
+		"ownTitle": "Profile",
+		"otherTitle": "{{name}}'s Profile",
 		"profileSegment": "Profile",
 		"qrSegment": "QR-Code",
 		"birthday": "Birthday",
