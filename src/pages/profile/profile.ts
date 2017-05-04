@@ -63,7 +63,6 @@ export class ProfilePage {
 	};
 
 	userObject: any;
-	// this should be my own id by default @Nilos!
 	userId: number;
 
 	isRequest: boolean;
@@ -145,18 +144,18 @@ export class ProfilePage {
 		if (this.isRequest) {
 			return friendsService.acceptFriendShip(this.userId).then(() => {
 				this.alertCtrl.create({
-					title: "Accepted!",
-					message: `${this.user.name} is now in your contacts.`,
-					buttons: ["Ok"]
+					title: this.translate.instant("profile.contacts.accepted"),
+					message: this.translate.instant("profile.contacts.acceptedMessage", { name: this.user.name }),
+					buttons: [this.translate.instant("general.ok")]
 				}).present();
 			});
 		}
 
 		return friendsService.friendship(this.userId).then(() => {
 			this.alertCtrl.create({
-				title: "Request sent!",
-				message: `You've sent a contact request to ${this.user.name}.`,
-				buttons: ["Ok"]
+				title: this.translate.instant("profile.contacts.requestSent"),
+				message: this.translate.instant("profile.contacts.requestSentMessage", { name: this.user.name }),
+				buttons: [this.translate.instant("general.ok")]
 			}).present();
 		});
 	}
@@ -166,11 +165,11 @@ export class ProfilePage {
 
 		if(this.isRequest) {
 			addOrAcceptConfirm = this.alertCtrl.create({
-				title: 'Accept Request?',
-				message: 'Do you want to add this person as a contact?',
+				title: this.translate.instant("profile.contacts.acceptRequest"),
+				message: this.translate.instant("profile.contacts.acceptRequestQuestion"),
 				buttons: [
-					{ text: 'Decline', role: 'danger' },
-					{ text: 'Accept',
+					{ text: this.translate.instant("general.decline"), role: 'danger' },
+					{ text: this.translate.instant("general.accept"),
 						handler: () => {
 							this.doAdd();
 						}
@@ -180,11 +179,11 @@ export class ProfilePage {
 			addOrAcceptConfirm.setCssClass("profile__request-accept");
 		} else {
 			addOrAcceptConfirm = this.alertCtrl.create({
-				title: 'Send Request?',
-				message: 'Do you want to send a contact request to this person?',
+				title: this.translate.instant("profile.contacts.sendRequest"),
+				message: this.translate.instant("profile.contacts.sendRequestQuestion"),
 				buttons: [
-					{ text: 'Cancel', role: 'cancel' },
-					{ text: 'Send',
+					{ text: this.translate.instant("general.cancel"), role: 'cancel' },
+					{ text: this.translate.instant("profile.contacts.send"),
 						handler: () => {
 							this.doAdd();
 						}
@@ -238,23 +237,23 @@ export class ProfilePage {
 		this.actionSheetCtrl.create({
 			buttons: [{
 				icon: !this.platform.is("ios") ? "lock": null,
-				text: "Verify this Contact",
+				text: this.translate.instant("profile.verify"),
 				handler: () => {
 					this.verifyPerson();
 				}
 			}, {
-				text: "Remove from Contacts",
+				text: this.translate.instant("profile.contacts.removeButtonText"),
 				role: "destructive",
 				icon: !this.platform.is("ios") ? "trash" : null,
 				handler: () => {
 					this.alertCtrl.create(<AlertOptions>{
-						title: "Remove Contact",
-						message: "Are you sure that you want to remove this Contact?",
+						title: this.translate.instant("profile.contacts.removeTitle"),
+						message: this.translate.instant("profile.contacts.removeQuestion"),
 						buttons: [{
-							text: "Cancel",
+							text: this.translate.instant("general.cancel"),
 							role: "cancel"
 						}, {
-							text: "Remove",
+							text: this.translate.instant("profile.contacts.removeConfirmButtonText"),
 							role: "destructive",
 							cssClass: "alert-button-danger",
 							handler: () => {
@@ -264,7 +263,7 @@ export class ProfilePage {
 					}).present();
 				}
 			}, {
-				text: "Cancel",
+				text: this.translate.instant("general.cancel"),
 				role: "cancel",
 				icon: !this.platform.is("ios") ? "close" : null,
 			}]
@@ -325,7 +324,7 @@ export class ProfilePage {
 		this.actionSheetCtrl.create({
 			buttons: [{
 				icon: !this.platform.is("ios") ? "eye": null,
-				text: "View",
+				text: this.translate.instant("profile.image.view"),
 				handler: () => {
 					this.userObject.getProfileAttribute("imageBlob").then(({ blobid }) => {
 						return blobService.getBlob(blobid)
@@ -340,7 +339,7 @@ export class ProfilePage {
 				}
 			}, {
 				icon: !this.platform.is("ios") ? "camera": null,
-				text: "Take a Photo",
+				text: this.translate.instant("profile.image.takePhoto"),
 				handler: () => {
 					this.camera.getPicture(CameraOptions).then((url) => {
 						return this.uploadProfileImage(url)
@@ -348,25 +347,25 @@ export class ProfilePage {
 				}
 			}, {
 				icon: !this.platform.is("ios") ? "image": null,
-				text: "Select from Gallery",
+				text: this.translate.instant("profile.image.selectPhoto"),
 				handler: () => {
 					Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
 						return this.uploadProfileImage(result)
 					})
 				}
 			}, {
-				text: "Remove",
+				text: this.translate.instant("profile.image.removeButtonText"),
 				role: "destructive",
 				icon: !this.platform.is("ios") ? "trash" : null,
 				handler: () => {
 					this.alertCtrl.create({
-						title: "Remove Picture",
-						message: "Are you sure that you want to remove your Picture?",
+						title: this.translate.instant("profile.image.removeTitle"),
+						message: this.translate.instant("profile.image.removeQuestion"),
 						buttons: [{
-							text: "Cancel",
+							text: this.translate.instant("general.cancel"),
 							role: "cancel"
 						}, {
-							text: "Remove",
+							text: this.translate.instant("profile.image.removeConfirmButtonText"),
 							role: "destructive",
 							cssClass: "alert-button-danger",
 							handler: () => {
@@ -376,7 +375,7 @@ export class ProfilePage {
 					}).present();
 				}
 			}, {
-				text: "Cancel",
+				text: this.translate.instant("general.cancel"),
 				role: "cancel",
 				icon: !this.platform.is("ios") ? "close" : null
 			}]

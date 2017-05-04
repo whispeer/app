@@ -1,7 +1,10 @@
 {
 	"general": {
 		"backButtonText": "Back",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"ok": "Ok",
+		"accept": "Accept",
+		"decline": "Decline"
 	},
 	"home": {
 		"title": "Messages",
@@ -64,6 +67,38 @@
 		"logoutWarning": "Do you want to log out from your account on this device?"
 	},
 	"profile": {
-
+		"profileSegment": "Profile",
+		"qrSegment": "QR-Code",
+		"birthday": "Birthday",
+		"location": "Location",
+		"languages": "Languages",
+		"verify": "Verify this contact",
+		"idTitle": "Your ID<br/> as a text",
+		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with friends</span>—for extra security! They scan your ID, you scan their ID and both of you have easily increased your security measures. Cool, huh?",
+		"contacts": {
+			"accepted": "Accepted!",
+			"requestSent": "Request sent!",
+			"acceptRequest": "Accept Request?",
+			"declineRequest": "Decline this request",
+			"acceptRequestQuestion": "Do you want to add this person as a contact?",
+			"sendRequest": "Send Request?",
+			"sendRequestQuestion": "Do you want to send a contact request to this person?",
+			"send": "Send",
+			"removeButtonText": "Remove from Contacts",
+			"removeTitle": "Remove Contact",
+			"removeQuestion": "Are you sure that you want to remove this Contact?",
+			"removeConfirmButtonTitle": "Remove",
+			"acceptedMessage": "{{name}} is now in your contacts.",
+			"requestSentMessage": "You've sent a contact request to {{name}}."
+		},
+		"image": {
+			"view": "View",
+			"takePhoto": "Take a Photo",
+			"selectPhoto": "Select from Gallery",
+			"removeButtonText": "Remove",
+			"removeTitle": "Remove Picture",
+			"removeQuestion": "Are you sure that you want to remove your Picture?",
+			"removeConfirmButtonText": "Remove"
+		}
 	}
 }
