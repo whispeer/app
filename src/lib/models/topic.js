@@ -568,7 +568,7 @@ Topic.multipleFromData = function (topicsData) {
 	return Bluebird.resolve(topicsData).map(function (topicData) {
 		return Topic.createTopicAndAdd(topicData);
 	}).map(function (topic) {
-		return Topic.loadTopic(topic).thenReturn(topic);
+		return Topic.loadTopic(topic)
 	}).then(function (topics) {
 		return topics;
 	});
@@ -612,6 +612,7 @@ Topic.loadTopic = function (topic) {
 
 	return topic.loadAllData().thenReturn(topic).then(function (topic) {
 		topicDebug("Topic loaded (" + topic.getID() + "):" + (new Date().getTime() - startup));
+		return topic
 	});
 };
 
