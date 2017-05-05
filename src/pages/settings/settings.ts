@@ -3,12 +3,8 @@ import { NavController, NavParams, AlertController, IonicPage } from "ionic-angu
 import sessionService from "../../lib/services/session.service";
 import Tutorial from "../../app/tutorial";
 
-/*
-	Generated class for the Settings page.
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
-*/
 @IonicPage({
 	name: "Settings",
 	segment: "settings"
@@ -35,7 +31,7 @@ export class SettingsPage {
 		}
 	}
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private iab: InAppBrowser) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
@@ -77,15 +73,15 @@ export class SettingsPage {
 	}
 
 	tos() {
-		window.open("https://whispeer.de/en/agb", "_system");
+		this.iab.create("https://whispeer.de/en/agb", "_blank");
 	}
 
 	privacyPolicy() {
-		window.open("https://whispeer.de/en/privacyPolicy", "_system");
+		this.iab.create("https://whispeer.de/en/privacyPolicy", "_blank");
 	}
 
 	contactUs() {
-		window.open("https://whispeer.de/en/contact", "_system");
+		this.iab.create("https://whispeer.de/en/contact", "_blank");
 	}
 
 	close = () => {

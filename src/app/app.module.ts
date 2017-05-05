@@ -23,6 +23,7 @@ import { ImagePicker } from '@ionic-native/image-picker';
 import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 
 (<any>window).startup = new Date().getTime();
 
@@ -49,7 +50,8 @@ import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 		PhotoViewer,
 		ImagePicker,
 		File,
-		Camera
+		Camera,
+		InAppBrowser
 	]
 })
 export class AppModule {

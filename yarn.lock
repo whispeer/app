@@ -68,6 +68,10 @@
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@ionic-native/image-picker/-/image-picker-3.5.0.tgz#04b16a7fcccea9999fd9b5add937f2fd3c641182"
 
+"@ionic-native/in-app-browser@3.4.4":
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@ionic-native/in-app-browser/-/in-app-browser-3.4.4.tgz#f5f97b56d8ead2a8655743a9529a919143686e7e"
+
 "@ionic-native/photo-viewer@3.4.4":
   version "3.4.4"
   resolved "https://registry.yarnpkg.com/@ionic-native/photo-viewer/-/photo-viewer-3.4.4.tgz#dd4779f3061e8835bb0657ec4554aeb60f618c09"
