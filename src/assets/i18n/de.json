@@ -1,7 +1,7 @@
 {
 	"general": {
 		"backButtonText": "Zurück",
-		"cancel": "Löschen",
+		"cancel": "Abbrechen",
 		"ok": "Ok",
 		"accept": "Akzeptieren",
 		"decline": "Ablehnen"
@@ -20,18 +20,18 @@
 		"tos": "Mit der Anmeldung akzeptierst Du die <strong>Allgemeinen Geschäftsbedingungen</strong> und unsere <strong>Datenschutzbestimmungen</strong>",
 		"header": "<strong>Hallo</strong> und willkommen<br>in der Welt der sicheren Netzwerke!",
 		"messages": {
-			"invalidUsername": "Nutzernamen sollten mit einem Buchstaben beginnen und dürfen keine Sonderzeichen beinhalten.",
+			"invalidUsername": "Nutzernamen müssen mit einem Buchstaben beginnen und dürfen keine Sonderzeichen beinhalten.",
 			"defaultCallToAction": "Registrieren oder einfach einloggen...",
 			"ambiguousProcess": "Dieser Nutzername existiert bereits. Login fortsetzen oder neuen Namen zur Registrierung wählen",
-			"loginSuccess": "Richtig! Wir führen den sicheren Login jetzt aus...",
-			"registerMessage": "Dieser Nutzername ist frei. Weiter mit dem sicheren Passwort...",
-			"genericErrorMessage": "Etwas lief schief",
+			"loginSuccess": "Sicherer Login wird durchgeführt...",
+			"registerMessage": "Dieser Nutzername ist verfügbar. Weiter mit dem sicheren Passwort...",
+			"genericErrorMessage": "Etwas ist schief gegangen.",
 			"confirmPassword": "Gut! Bitte Passwort erneut eingeben...",
-			"registerSuccess": "Willkommen! Wir führen den Login jetzt aus...",
+			"registerSuccess": "Willkommen! Sicherer Login wird durchgeführt...",
 			"noConnection": "Keine Verbindung zu whispeer",
 			"incorrectPassword": "Das Passwort ist nicht korrekt. Bitte nochmals probieren.",
 			"passwordsDontMatch": "Die Passwörter stimmen nicht überein",
-			"passwordTooShort": "Das Passwort ist zu kurz. Es muss aus mindestens 8 Zeichen bestehen"
+			"passwordTooShort": "Das Passwort muss aus mindestens 8 Zeichen bestehen"
 		}
 	},
 	"contacts": {
@@ -51,7 +51,7 @@
 	},
 	"settings": {
 		"title": "Einstellungen",
-		"header": "App Menü",
+		"header": "App Einstellungen",
 		"push": "Benachrichtigungen",
 		"tutorial": "Tutorial noch einmal anzeigen",
 		"about": "Über whispeer",
@@ -59,12 +59,12 @@
 		"privacy": "Datenschutzbestimmungen",
 		"contact": "whispeer kontaktieren",
 		"feedback": "Feedback senden",
-		"logout": "Logout",
+		"logout": "Abmelden",
 		"companyName": "whispeer by mindpost GmbH",
 		"madeInGermany": "Made in Germany with",
 		"humanRights": "for human rights",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, doch wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Account ausloggen auf diesem Gerät?"
+		"logoutWarning": "Willst Du dich auf diesem Gerät abmelden?"
 	},
 	"profile": {
 		"ownTitle": "Profil",
