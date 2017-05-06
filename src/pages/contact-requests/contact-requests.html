@@ -21,6 +21,9 @@
 		</ion-item-divider>
 
 		<ion-item *virtualItem="let requester" (click)="checkRequest(requester.id)">
+			<ion-avatar class="hexagon--border" item-left>
+				<user-image [id]="requester.id" [image]="requester.basic.image"></user-image>
+			</ion-avatar>
 			<h2>{{requester.name}}</h2>
 		</ion-item>
 	</ion-list>
