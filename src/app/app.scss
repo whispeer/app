@@ -121,6 +121,12 @@ ion-fab-list[side="top"] {
 	}
 }
 
+.hexagon--border {
+	.border {
+		fill: map-get($colors, grey);
+	}
+}
+
 .hexagon__image--active .border {
 	fill: map-get($colors, primary);
 }
