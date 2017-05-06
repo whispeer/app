@@ -12,8 +12,6 @@
 
 
 <ion-content>
-	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
-	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="goToRequests()">
 		<div class="badgeContainer">
 			<span class="hexBadge">{{requests.length}}</span>
@@ -21,6 +19,8 @@
 		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
+	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()"></ion-searchbar>
+	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list [approxItemHeight]="'50px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
