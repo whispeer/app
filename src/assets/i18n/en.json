@@ -47,7 +47,8 @@
 	},
 	"chooseFriends": {
 		"title": "Select Contacts",
-		"selected": "Selected"
+		"selected": "Selected",
+		"search": "Search"
 	},
 	"settings": {
 		"title": "Settings",

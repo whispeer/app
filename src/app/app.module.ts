@@ -5,7 +5,7 @@ require("services/trust.service");
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
 
-import { IonicApp, IonicErrorHandler, IonicModule, Config } from 'ionic-angular';
+import { Platform, IonicApp, IonicErrorHandler, IonicModule, Config } from 'ionic-angular';
 
 import * as Bluebird from 'bluebird';
 
@@ -119,17 +119,19 @@ export class AppModule {
 		fn()
 	}
 
-	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization, private config: Config) {
+	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization, private config: Config, private platform: Platform) {
 		translate.setDefaultLang("en");
 
-		this.globalization.getPreferredLanguage().then(({ value }) => {
-			console.warn(`Language from device: ${value}`)
-			return value.split("-")[0].toLowerCase()
-		}).catch(() => {
-			console.warn('Cannot get language from device, remaining with default language');
-			return DEFAULT_LANG
-		}).then((lang) => {
-			translate.use(lang)
+		platform.ready().then(() => {
+			this.globalization.getPreferredLanguage().then(({ value }) => {
+				console.warn(`Language from device: ${value}`)
+				return value.split("-")[0].toLowerCase()
+			}).catch(() => {
+				console.warn('Cannot get language from device, remaining with default language');
+				return DEFAULT_LANG
+			}).then((lang) => {
+				translate.use(lang)
+			})
 		})
 
 		translate.get('general.backButtonText').subscribe((val: string) => {
