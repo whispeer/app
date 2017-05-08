@@ -4,6 +4,7 @@ import sessionService from "../../lib/services/session.service";
 import Tutorial from "../../app/tutorial";
 
 import { TranslateService } from '@ngx-translate/core';
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 
 @IonicPage({
 	name: "Settings",
@@ -31,7 +32,7 @@ export class SettingsPage {
 		}
 	}
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService, private iab: InAppBrowser) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
@@ -73,15 +74,15 @@ export class SettingsPage {
 	}
 
 	tos() {
-		window.open("https://whispeer.de/en/agb", "_system");
+		this.iab.create("https://whispeer.de/en/agb", "_blank");
 	}
 
 	privacyPolicy() {
-		window.open("https://whispeer.de/en/privacyPolicy", "_system");
+		this.iab.create("https://whispeer.de/en/privacyPolicy", "_blank");
 	}
 
 	contactUs() {
-		window.open("https://whispeer.de/en/contact", "_system");
+		this.iab.create("https://whispeer.de/en/contact", "_blank");
 	}
 
 	close = () => {

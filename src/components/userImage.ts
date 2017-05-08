@@ -1,11 +1,26 @@
 import { Component, Input } from "@angular/core";
 
+const DEFAULT_IMAGE = "assets/img/user.png"
+
 @Component({
 	selector: "user-image",
 	templateUrl: "userImage.svg"
 })
 export class UserImageComponent {
-	@Input() image: string = "assets/img/user.png";
+	private _image: string = DEFAULT_IMAGE
+
+	@Input()
+	set image(image: string) {
+		if (image) {
+			this._image = image
+			return
+		}
+
+		this._image = DEFAULT_IMAGE
+	}
+
+	get image(): string { return this._image; }
+
 	@Input() id: string;
 
 	randomId: string = Math.random().toString()

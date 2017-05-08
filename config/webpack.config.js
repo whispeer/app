@@ -8,6 +8,8 @@ var WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").We
 
 process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
 
+var data = require(path.resolve("package.json"))
+
 module.exports = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,
 	output: {
@@ -61,7 +63,11 @@ module.exports = {
 			}
 		}),
 		new webpack.DefinePlugin({
-			"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV)
+			"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV),
+			"CLIENT_INFO": JSON.stringify({
+				type: "messenger",
+				version: data.version
+			})
 		}),
 		new BundleAnalyzerPlugin({
 			analyzerMode: "static",
