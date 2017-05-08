@@ -1,0 +1,106 @@
+{
+	"general": {
+		"backButtonText": "Back",
+		"cancel": "Cancel",
+		"ok": "Ok",
+		"accept": "Accept",
+		"decline": "Decline"
+	},
+	"home": {
+		"title": "Messages",
+		"newContact": {
+			"single": "New contact request",
+			"many": "New contact requests"
+		}
+	},
+	"login": {
+		"password2Placeholder": "please type your password again",
+		"passwordPlaceholder": "enter a password",
+		"identifierPlaceholder": "e.g. whispeerHQ",
+		"tos": "By signing up, you agree to our <strong>Terms of Service</strong> and our very strict <strong>Privacy Policy</strong>",
+		"header": "<strong>Hello</strong> and welcome to<br>the world of secure messaging!",
+		"messages": {
+			"invalidUsername": "Usernames should start with a letter and must not include special characters.",
+			"defaultCallToAction": "Create a new account or simply login...",
+			"ambiguousProcess": "This username exists. You can choose to continue login or register a unique name",
+			"loginSuccess": "Success! We'll log you in securely now...",
+			"registerMessage": "This username is free. You can continue to choose a secure password...",
+			"genericErrorMessage": "Something went wrong.",
+			"confirmPassword": "Great! Now verify your new password...",
+			"registerSuccess": "Welcome on board! We'll log you in now...",
+			"noConnection": "Could not connect to whispeer",
+			"incorrectPassword": "Your password is wrong. Please try again.",
+			"passwordsDontMatch": "Your repeated password does not match",
+			"passwordTooShort": "Your password is too short. We require a minimum of 8 characters"
+		}
+	},
+	"contacts": {
+		"title": "Contacts",
+		"search": "Search"
+	},
+	"requests": {
+		"title": "Requests"
+	},
+	"topic": {
+		"takePhoto": "Take Photo",
+		"selectGallery": "Select from Gallery"
+	},
+	"chooseFriends": {
+		"title": "Select Contacts",
+		"selected": "Selected"
+	},
+	"settings": {
+		"title": "Settings",
+		"header": "App settings",
+		"push": "Receive push notifications",
+		"tutorial": "Show tutorial again",
+		"about": "About whispeer",
+		"tos": "Terms of Service",
+		"privacy": "Privacy policy",
+		"contact": "Contact us",
+		"feedback": "Send Feedback",
+		"logout": "Logout",
+		"companyName": "whispeer by mindpost GmbH",
+		"madeInGermany": "Made in Germany with",
+		"humanRights": "for human rights",
+		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
+		"logoutWarning": "Do you want to log out from your account on this device?"
+	},
+	"profile": {
+		"ownTitle": "Profile",
+		"otherTitle": "{{name}}'s Profile",
+		"profileSegment": "Profile",
+		"qrSegment": "QR-Code",
+		"birthday": "Birthday",
+		"location": "Location",
+		"languages": "Languages",
+		"verify": "Verify this contact",
+		"idTitle": "Your ID<br/> as a text",
+		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with friends</span>—for extra security! They scan your ID, you scan their ID and both of you have easily increased your security measures. Cool, huh?",
+		"contacts": {
+			"accepted": "Accepted!",
+			"requestSent": "Request sent!",
+			"acceptRequest": "Accept Request?",
+			"declineRequest": "Decline this request",
+			"acceptRequestQuestion": "Do you want to add this person as a contact?",
+			"sendRequest": "Send Request?",
+			"sendRequestQuestion": "Do you want to send a contact request to this person?",
+			"send": "Send",
+			"removeButtonText": "Remove from Contacts",
+			"removeTitle": "Remove Contact",
+			"removeQuestion": "Are you sure that you want to remove this Contact?",
+			"removeConfirmButtonText": "Remove",
+			"acceptedMessage": "{{name}} is now in your contacts.",
+			"requestSentMessage": "You've sent a contact request to {{name}}."
+		},
+		"image": {
+			"view": "View",
+			"takePhoto": "Take a Photo",
+			"selectPhoto": "Select from Gallery",
+			"removeButtonText": "Remove",
+			"removeTitle": "Remove Picture",
+			"removeQuestion": "Are you sure that you want to remove your Picture?",
+			"removeConfirmButtonText": "Remove"
+		}
+	}
+}

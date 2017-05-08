@@ -5,8 +5,7 @@ require("services/trust.service");
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
 
-import { IonicApp, IonicErrorHandler } from 'ionic-angular';
-import { IonicModule } from 'ionic-angular';
+import { IonicApp, IonicErrorHandler, IonicModule, Config } from 'ionic-angular';
 
 import * as Bluebird from 'bluebird';
 
@@ -25,7 +24,17 @@ import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HttpModule, Http } from '@angular/http';
+
 (<any>window).startup = new Date().getTime();
+
+const createTranslateLoader = (http: Http) => {
+	return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+const DEFAULT_LANG = "en"
 
 @NgModule({
 	declarations: [
@@ -33,7 +42,15 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
 	],
 	imports: [
 		IonicModule.forRoot(MyApp),
+		TranslateModule.forRoot({
+			loader: {
+				provide: TranslateLoader,
+				useFactory: (createTranslateLoader),
+				deps: [Http]
+			}
+		}),
 		BrowserModule,
+		HttpModule,
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
@@ -55,6 +72,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
 	]
 })
 export class AppModule {
+
 	tasks: any[] = []
 	taskRunnerStarted: Boolean = false
 
@@ -101,7 +119,23 @@ export class AppModule {
 		fn()
 	}
 
-	constructor(private zone: NgZone) {
+	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization, private config: Config) {
+		translate.setDefaultLang("en");
+
+		this.globalization.getPreferredLanguage().then(({ value }) => {
+			console.warn(`Language from device: ${value}`)
+			return DEFAULT_LANG
+		}).catch(() => {
+			console.warn('Cannot get language from device, remaining with default language');
+			return DEFAULT_LANG
+		}).then((lang) => {
+			translate.use(lang)
+		})
+
+		translate.get('general.backButtonText').subscribe((val: string) => {
+			config.set('ios', 'backButtonText', val);
+		})
+
 		Bluebird.setScheduler((fn) => {
 			this.tasks.push(fn)
 

@@ -4,17 +4,19 @@ import { IonicPageModule } from 'ionic-angular';
 import { MessagesPage } from './messages'
 
 import { ComponentsModule } from "../../components/components.module";
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-  declarations: [
-    MessagesPage
-  ],
-  imports: [
-    IonicPageModule.forChild(MessagesPage),
+	declarations: [
+		MessagesPage
+	],
+	imports: [
+		IonicPageModule.forChild(MessagesPage),
 		ComponentsModule,
-  ],
-  entryComponents: [
-    MessagesPage
-  ]
+		TranslateModule.forChild(),
+	],
+	entryComponents: [
+		MessagesPage
+	]
 })
 export class MessagesPageModule {}

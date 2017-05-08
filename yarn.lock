@@ -130,6 +130,14 @@
     localforage "~1.4.2"
     localforage-cordovasqlitedriver "~1.5.0"
 
+"@ngx-translate/core@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@ngx-translate/core/-/core-6.0.1.tgz#7c7a80077feb994fc815b67a72065af04d394efe"
+
+"@ngx-translate/http-loader@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@ngx-translate/http-loader/-/http-loader-0.0.3.tgz#8346c8d2d6f630254601029668f17abe2afe8a9b"
+
 "@types/bluebird@^3.0.36":
   version "3.0.37"
   resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.0.37.tgz#2e76b394aa9bea40d04241a31c0887a260283388"
@@ -281,6 +289,10 @@ array-find-index@^1.0.1:
 array-flatten@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/array-flatten/-/array-flatten-1.1.1.tgz#9a5f699051b1e7073328f2a008968b64ea2955d2"
+
+array-flatten@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/array-flatten/-/array-flatten-2.1.1.tgz#426bb9da84090c1838d812c8150af20a8331e296"
 
 array-unique@^0.2.1:
   version "0.2.1"

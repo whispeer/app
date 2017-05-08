@@ -4,6 +4,7 @@ import { IonicPageModule } from 'ionic-angular';
 import { HomePage } from './home'
 
 import { ComponentsModule } from "../../components/components.module";
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
 	declarations: [
@@ -12,6 +13,7 @@ import { ComponentsModule } from "../../components/components.module";
 	imports: [
 		IonicPageModule.forChild(HomePage),
 		ComponentsModule,
+		TranslateModule.forChild(),
 	],
 	entryComponents: [
 		HomePage,

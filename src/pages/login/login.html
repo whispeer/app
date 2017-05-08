@@ -5,9 +5,7 @@
 		</div>
 
 		<div class="login__welcome-text">
-			<p class="login__paragraph login__paragraph--primary">
-				<strong>Hello</strong> and welcome to<br>the world of secure messaging!
-			</p>
+			<p class="login__paragraph login__paragraph--primary" [innerHTML]="'login.header' | translate"></p>
 		</div>
 
 		<form (ngSubmit)="loginOrRegister()">
@@ -21,7 +19,7 @@
 					<ion-input id="mail"
 						class="login__input"
 						type="text"
-						placeholder="e.g. whispeerHQ"
+						[placeholder]="'login.identifierPlaceholder' | translate"
 						name="identifier"
 						[disabled]="register"
 						[(ngModel)]="login.identifier"
@@ -42,7 +40,7 @@
 					<ion-input id="password"
 						class="login__input"
 						type="password"
-						placeholder="enter a password"
+						[placeholder]="'login.passwordPlaceholder' | translate"
 						name="password"
 						[(ngModel)]="login.password" >
 					</ion-input>
@@ -55,17 +53,14 @@
 					<ion-input id="password2"
 						class="login__input"
 						type="password"
-						placeholder="please type your password again"
+						[placeholder]="'login.password2Placeholder' | translate"
 						name="password2"
 						[(ngModel)]="passwordRepeat">
 					</ion-input>
 
 				</ion-item>
 
-				<p class="login__paragraph login__paragraph--detail">
-					By signing up, you agree to our <strong>Terms of Service</strong> and
-					our very strict <strong>Privacy Policy</strong>
-				</p>
+				<p class="login__paragraph login__paragraph--detail" [innerHTML]="'login.tos' | translate"></p>
 				<div text-center padding>
 					<div class="hexagon-wrap">
 						<hexagon class="hexagon"></hexagon>
