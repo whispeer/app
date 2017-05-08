@@ -85,7 +85,7 @@ export class TopicComponent {
 	mutationListener = (mutations) => {
 		const id = this.getFirstInViewMessageId()
 
-		if (!id) {
+		if (!id || this.oldScrollFromBottom < 15) {
 			return this.stabilizeScroll()
 		}
 
@@ -102,6 +102,7 @@ export class TopicComponent {
 		if (updateScroll) {
 			return this.stabilizeScroll()
 		}
+
 		console.warn("Only elements below newest messages have changed not updating viewport")
 	}
 
