@@ -30,7 +30,7 @@ import { HttpModule, Http } from '@angular/http';
 
 (<any>window).startup = new Date().getTime();
 
-const createTranslateLoader = (http: Http) => {
+export function createTranslateLoader(http: Http) {
 	return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
@@ -45,7 +45,7 @@ const DEFAULT_LANG = "en"
 		TranslateModule.forRoot({
 			loader: {
 				provide: TranslateLoader,
-				useFactory: (createTranslateLoader),
+				useFactory: createTranslateLoader,
 				deps: [Http]
 			}
 		}),
