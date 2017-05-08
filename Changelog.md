@@ -1,3 +1,8 @@
+=== 0.2.11 ===
+- Chatübersicht lädt schneller und stabiler
+- Deutsche Übersetzung der App
+- Geschwindigkeitsoptimierungen
+
 === 0.2.9 ===
 - Scrolling auf iOS stark verbessert
 - Profil:

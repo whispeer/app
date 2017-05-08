@@ -124,7 +124,7 @@ export class AppModule {
 
 		this.globalization.getPreferredLanguage().then(({ value }) => {
 			console.warn(`Language from device: ${value}`)
-			return DEFAULT_LANG
+			return value.split("-")[0].toLowerCase()
 		}).catch(() => {
 			console.warn('Cannot get language from device, remaining with default language');
 			return DEFAULT_LANG
