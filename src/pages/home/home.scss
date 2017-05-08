@@ -76,7 +76,7 @@ page-home {
 		position: absolute;
 		left: 0;
 		top: 50%;
-		margin-top: -13.5px;
+		transform: translateY(-50%);
 		width: 86px;
 		.platform-android & { width: 78px; }
 	}

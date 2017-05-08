@@ -54,7 +54,7 @@ topicWithBursts {
 		position: absolute;
 		top: 50%;
 		left: 0;
-		margin-top: -13px;
+		transform: translateY(-50%);
 	}
 	.messages__header__username {
 		padding-left: 24px;
@@ -84,7 +84,7 @@ topicWithBursts {
 		position: absolute;
 		top: 50%;
 		right: 1em;
-		margin-top: -13px;
+		transform: translateY(-50%);
 	}
 }
 .messages__message {
