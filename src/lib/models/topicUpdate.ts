@@ -1,9 +1,10 @@
-var Bluebird = require("bluebird");
 var SecuredData = require("asset/securedDataWithMetaData");
 var h = require("whispeerHelper");
 
 var userService = require("user/userService");
 var socket = require("services/socket.service").default;
+
+import * as Bluebird from "bluebird"
 
 interface stateInterface {
 	title?: string,
@@ -12,12 +13,11 @@ interface stateInterface {
 	sender?: any
 }
 
-class TopicUpdate {
+export default class TopicUpdate {
 	state: stateInterface
 	private _id: any
 	private _securedData: any
 	private _userID: any
-	private _loadPromise: any
 
 	constructor(updateData) {
 		var content = updateData.content,
@@ -57,29 +57,27 @@ class TopicUpdate {
 		return topicUpdate.getTime() < this.getTime();
 	};
 
-	load = () => {
-		if (!this._loadPromise) {
-			this._loadPromise = this.getUser().bind(this).then((user) => {
-				this.setState({
-					sender: user
-				});
+	load = h.ensurePromise(Bluebird, h.executeOnce(async () => {
+		const user = await this.getUser()
 
-				return Bluebird.all([
-					this._securedData.decrypt(),
-					this._securedData.verify(user.getSignKey())
-				]);
-			}).spread((content: { title: string }) => {
-				this.setState({
-					title: content.title,
-					loading: false
-				});
+		this.setState({
+			sender: user
+		});
 
-				return content;
-			});
-		}
+		const decryptPromise = this._securedData.decrypt()
+		const verifyPromise = this._securedData.verify(user.getSignKey())
 
-		return this._loadPromise;
-	};
+		await verifyPromise
+
+		const content = await decryptPromise
+
+		this.setState({
+			title: content.title,
+			loading: false
+		});
+
+		return content;
+	}));
 
 	ensureParent = (topic) => {
 		this._securedData.checkParent(topic.getSecuredData());
@@ -134,5 +132,3 @@ class TopicUpdate {
 		});
 	};
 }
-
-module.exports = TopicUpdate;

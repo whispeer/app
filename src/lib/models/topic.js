@@ -15,7 +15,7 @@ var initService = require("services/initService");
 var Cache = require("services/Cache.ts").default;
 
 var Message = require("models/message");
-var TopicUpdate = require("models/topicUpdate");
+var TopicUpdate = require("models/topicUpdate").default;
 
 var ImageUpload = require("services/imageUploadService");
 
