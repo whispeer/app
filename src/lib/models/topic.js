@@ -745,10 +745,9 @@ Topic.createData = function (receiver, message, images, cb) {
 		}));
 	}
 
-	var createRawTopicData = Bluebird.promisify(Topic.createRawData.bind(Topic));
 	var createRawMessageData = Bluebird.promisify(Message.createRawData.bind(Message));
 
-	var resultPromise = Bluebird.all([createRawTopicData(receiver), imagePreparation]).spread(function (topicData, imagesMeta) {
+	var resultPromise = Bluebird.all([Topic.createRawData(receiver), imagePreparation]).spread(function (topicData, imagesMeta) {
 		var topic = new Topic({
 			meta: topicData.topic,
 			unread: []
