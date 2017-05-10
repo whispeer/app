@@ -1,7 +1,7 @@
 import { Component, ElementRef } from "@angular/core";
 import { NavParams, IonicPage } from "ionic-angular";
 
-import TopicUpdate from "../../lib/models/topicUpdate";
+import TopicUpdate from "../../lib/messages/topicTitleUpdate";
 import errorService from "../../lib/services/error.service";
 
 const messageService = require("../../lib/messages/messageService");

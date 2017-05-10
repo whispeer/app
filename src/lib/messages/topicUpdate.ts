@@ -6,15 +6,8 @@ var socket = require("services/socket.service").default;
 
 import * as Bluebird from "bluebird"
 
-interface stateInterface {
-	title?: string,
-	loading?: boolean,
-	timestamp?: number,
-	sender?: any
-}
-
 export default class TopicUpdate {
-	state: stateInterface
+	state: any
 	private _id: any
 	private _securedData: any
 	private _userID: any
@@ -23,21 +16,20 @@ export default class TopicUpdate {
 		var content = updateData.content,
 			meta = updateData.meta;
 
-		this.state = {
-			title: "",
-			loading: true,
-			timestamp: h.parseDecimal(meta.time)
-		};
-
 		this._id = updateData.id;
 		this._securedData = SecuredData.load(content, meta, { type: "topicUpdate" });
 		this._userID = meta.userID;
+
+		this.state = {
+			loading: true,
+			timestamp: h.parseDecimal(updateData.meta.time)
+		};
 	}
 
-	setState = (newState: stateInterface) => {
+	setState = (newState) => {
 		this.state = {
 			...this.state,
-			newState
+			...newState
 		};
 	};
 
@@ -57,27 +49,26 @@ export default class TopicUpdate {
 		return topicUpdate.getTime() < this.getTime();
 	};
 
-	load = h.ensurePromise(Bluebird, h.executeOnce(async () => {
-		const user = await this.getUser()
+	protected decryptAndVerify = h.executeOnce(() => {
+		return Bluebird.try(async () => {
+			const user = await this.getUser()
 
-		this.setState({
-			sender: user
-		});
+			this.setState({
+				sender: user
+			});
 
-		const decryptPromise = this._securedData.decrypt()
-		const verifyPromise = this._securedData.verify(user.getSignKey())
+			const decryptPromise = this._securedData.decrypt()
+			const verifyPromise = this._securedData.verify(user.getSignKey())
 
-		await verifyPromise
+			await verifyPromise
 
-		const content = await decryptPromise
+			return await decryptPromise
+		})
+	});
 
-		this.setState({
-			title: content.title,
-			loading: false
-		});
-
-		return content;
-	}));
+	protected load() {
+		return this.decryptAndVerify()
+	}
 
 	ensureParent = (topic) => {
 		this._securedData.checkParent(topic.getSecuredData());
@@ -85,12 +76,6 @@ export default class TopicUpdate {
 
 	ensureIsAfterTopicUpdate = (topicUpdate) => {
 		this._securedData.checkAfter(topicUpdate.getSecuredData());
-	};
-
-	getTitle = () => {
-		return this.load().then(function(content) {
-			return content.title;
-		});
 	};
 
 	getUserID = () => {
@@ -105,19 +90,22 @@ export default class TopicUpdate {
 		return this._securedData;
 	};
 
-	static create(topic, options) {
+	getMetaUpdate = () => {
+		return this._securedData.metaAttr("metaUpdate")
+	}
+
+	static create(topic, previousTopicUpdate, { meta, content }: { meta?, content? }) {
 		var topicContainer = topic.getSecuredData();
-		var topicUpdatePromisified = SecuredData.createPromisified({
-			title: options.title || ""
-		}, {
+		var topicUpdatePromisified = SecuredData.createPromisified(content, {
 				userID: userService.getown().getID(),
-				time: new Date().getTime()
+				time: new Date().getTime(),
+				metaUpdate: meta
 			}, { type: "topicUpdate" }, userService.getown().getSignKey(), topicContainer.getKey());
 
 		topicUpdatePromisified.data.setParent(topicContainer);
 
-		if (options.previousTopicUpdate) {
-			topicUpdatePromisified.data.setAfterRelationShip(options.previousTopicUpdate.getSecuredData());
+		if (previousTopicUpdate) {
+			topicUpdatePromisified.data.setAfterRelationShip(previousTopicUpdate.getSecuredData());
 		}
 
 		return topicUpdatePromisified.promise.then(function(topicUpdateData) {
