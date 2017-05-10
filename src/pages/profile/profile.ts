@@ -241,40 +241,50 @@ export class ProfilePage {
 		});
 	}
 
-	contactOptions() {
-		this.actionSheetCtrl.create({
+	removeFriendClick = () => {
+		this.alertCtrl.create(<AlertOptions>{
+			title: this.translate.instant("profile.contacts.removeTitle"),
+			message: this.translate.instant("profile.contacts.removeQuestion"),
 			buttons: [{
-				icon: !this.platform.is("ios") ? "lock": null,
-				text: this.translate.instant("profile.verify"),
-				handler: () => {
-					this.verifyPerson();
-				}
-			}, {
-				text: this.translate.instant("profile.contacts.removeButtonText"),
-				role: "destructive",
-				icon: !this.platform.is("ios") ? "trash" : null,
-				handler: () => {
-					this.alertCtrl.create(<AlertOptions>{
-						title: this.translate.instant("profile.contacts.removeTitle"),
-						message: this.translate.instant("profile.contacts.removeQuestion"),
-						buttons: [{
-							text: this.translate.instant("general.cancel"),
-							role: "cancel"
-						}, {
-							text: this.translate.instant("profile.contacts.removeConfirmButtonText"),
-							role: "destructive",
-							cssClass: "alert-button-danger",
-							handler: () => {
-								this.user.user.removeAsFriend();
-							}
-						}]
-					}).present();
-				}
-			}, {
 				text: this.translate.instant("general.cancel"),
-				role: "cancel",
-				icon: !this.platform.is("ios") ? "close" : null,
+				role: "cancel"
+			}, {
+				text: this.translate.instant("profile.contacts.removeConfirmButtonText"),
+				role: "destructive",
+				cssClass: "alert-button-danger",
+				handler: () => {
+					this.user.user.removeAsFriend();
+				}
 			}]
+		}).present();
+	}
+
+	contactOptions() {
+		const verifyButton = {
+			icon: !this.platform.is("ios") ? "lock": null,
+			text: this.translate.instant("profile.verify"),
+			handler: () => {
+				this.verifyPerson();
+			}
+		}
+
+		const removeFriendButton = {
+			text: this.translate.instant("profile.contacts.removeButtonText"),
+			role: "destructive",
+			icon: !this.platform.is("ios") ? "trash" : null,
+			handler: this.removeFriendClick
+		}
+
+		const cancelButton = {
+			text: this.translate.instant("general.cancel"),
+			role: "cancel",
+			icon: !this.platform.is("ios") ? "close" : null,
+		}
+
+		const buttons = this.user.trustLevel < 2 ? [verifyButton, removeFriendButton, cancelButton] : [removeFriendButton, cancelButton]
+
+		this.actionSheetCtrl.create({
+			buttons
 		}).present();
 	}
 
