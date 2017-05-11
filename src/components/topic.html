@@ -32,7 +32,7 @@
 		<ion-list no-lines>
 			<ion-item class="messages__burst" *ngFor="let burst of messageBursts(); let $index=index" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 				<div class="messages_message" *ngIf="!burst.sameDay(bursts[$index - 1])">
-					<div class="burst-date-text">
+					<div class="burst-seperator burst-seperator-date">
 						<span>
 							{{burst.firstItem().getTime()|date}}
 						</span>
@@ -49,9 +49,9 @@
 					</div>
 				</span>
 				<div class="messages_message" *ngIf="burst.isTopicUpdate()">
-					<div class="burst-date-text">
+					<div class="burst-seperator burst-seperator-update">
 						<span>
-							{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}"
+							{{ burst.firstItem().state.sender.data.name }} changed the title to "<strong>{{ burst.firstItem().state.title }}</strong>"
 						</span>
 					</div>
 				</div>

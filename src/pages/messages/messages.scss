@@ -42,24 +42,32 @@ topicWithBursts {
 		flex: 1 0 auto;
 	}
 
-	.burst-date-text {
+	.burst-seperator-date {
+		color: #a0a7aa;
+	}
+
+	.burst-seperator-update {
+		color: #788286;
+	}
+
+	.burst-seperator {
 		text-align: center;
 
 		span {
 			display: inline;
 			position: relative;
 			white-space: normal;
-			color: #788286;
+			font-size: 0.85em;
 
 			&:before,
 			&:after {
 				content: "";
 				position: absolute;
-				height: 2.5px;
-				background-color: #788286;
+				height: 1.5px;
+				background-color: #ebeced;
 				top: 50%;
 				transform: translateY(-50%);
-				width: 600px;
+				width: 5000px;
 			}
 
 			&:before {
