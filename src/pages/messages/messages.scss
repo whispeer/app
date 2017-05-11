@@ -41,6 +41,38 @@ topicWithBursts {
 	.messages_filler {
 		flex: 1 0 auto;
 	}
+
+	.burst-date-text {
+		text-align: center;
+
+		span {
+			display: inline;
+			position: relative;
+			white-space: normal;
+			color: #788286;
+
+			&:before,
+			&:after {
+				content: "";
+				position: absolute;
+				height: 2.5px;
+				background-color: #788286;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 600px;
+			}
+
+			&:before {
+				right: 100%;
+				margin-right: 5px;
+			}
+
+			&:after {
+				left: 100%;
+				margin-left: 5px;
+			}
+		}
+	}
 }
 
 .md {

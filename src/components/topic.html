@@ -30,7 +30,14 @@
 		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 		<div class="messages_filler"></div>
 		<ion-list no-lines>
-			<ion-item class="messages__burst" *ngFor="let burst of messageBursts()" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
+			<ion-item class="messages__burst" *ngFor="let burst of messageBursts(); let $index=index" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
+				<div class="messages_message" *ngIf="!burst.sameDay(bursts[$index - 1])">
+					<div class="burst-date-text">
+						<span>
+							{{burst.firstItem().getTime()|date}}
+						</span>
+					</div>
+				</div>
 				<span *ngIf="burst.isMessageBurst()">
 					<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
 					<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
@@ -41,11 +48,12 @@
 						<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 					</div>
 				</span>
-				<div class="messages_message" *ngIf="burst.isTopicUpdate() && false">
-					<!--<span class="burst-date-text">
-						{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}" -
-						{{burst.firstItem().state.timestamp}}
-					</span>-->
+				<div class="messages_message" *ngIf="burst.isTopicUpdate()">
+					<div class="burst-date-text">
+						<span>
+							{{ burst.firstItem().state.sender.data.name }} changed the title to "{{ burst.firstItem().state.title }}"
+						</span>
+					</div>
 				</div>
 			</ion-item>
 		</ion-list>
