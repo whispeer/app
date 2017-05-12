@@ -6,6 +6,10 @@
 		"accept": "Accept",
 		"decline": "Decline"
 	},
+	"time": {
+		"today": "Today",
+		"tomorrow": "Tomorrow"
+	},
 	"home": {
 		"title": "Messages",
 		"newContact": {

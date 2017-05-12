@@ -6,6 +6,10 @@
 		"accept": "Akzeptieren",
 		"decline": "Ablehnen"
 	},
+	"time": {
+		"today": "Heute",
+		"tomorrow": "Morgen"
+	},
 	"home": {
 		"title": "Nachrichten",
 		"newContact": {

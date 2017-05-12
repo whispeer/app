@@ -34,7 +34,7 @@
 				<div class="messages_message" *ngIf="!burst.sameDay(bursts[$index - 1])">
 					<div class="burst-seperator burst-seperator-date">
 						<span>
-							{{burst.firstItem().getTime()|date}}
+							{{burst.firstItem().getTime()|seperatorDate}}
 						</span>
 					</div>
 				</div>
