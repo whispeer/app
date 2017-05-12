@@ -51,7 +51,7 @@
 				<div class="messages_message" *ngIf="burst.isTopicUpdate()">
 					<div class="burst-seperator burst-seperator-update">
 						<span>
-							{{ burst.firstItem().state.sender.data.name }} changed the title to "<strong>{{ burst.firstItem().state.title }}</strong>"
+							{{ burst.firstItem().state.sender.data.name }} {{ 'topic.changed' | translate }} "<strong>{{ burst.firstItem().state.title }}</strong>"
 						</span>
 					</div>
 				</div>

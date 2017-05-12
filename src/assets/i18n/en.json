@@ -47,7 +47,8 @@
 	},
 	"topic": {
 		"takePhoto": "Take Photo",
-		"selectGallery": "Select from Gallery"
+		"selectGallery": "Select from Gallery",
+		"changed": "changed the title to"
 	},
 	"chooseFriends": {
 		"title": "Select Contacts",
