@@ -5,14 +5,14 @@
 		</div>
 
 		<div class="login__welcome-text">
-			<p class="login__paragraph login__paragraph--primary" [innerHTML]="'login.header' | translate"></p>
+			<p [innerHTML]="'login.header' | translate"></p>
 		</div>
 
 		<form (ngSubmit)="loginOrRegister()">
 			<div class="login__form">
 
 				<div class="login__paragraph login__paragraph--primary">
-					<p>{{ getMessage() }}</p>
+					<p [innerHTML]="getMessage()">{{ getMessage() }}</p>
 				</div>
 
 				<ion-item class="clean-input-wrap login__input-wrap">

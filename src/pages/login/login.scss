@@ -32,19 +32,38 @@ page-login {
 }
 
 .login__paragraph {
+	min-height: 2.4em;
+	line-height: 1.2em;
+	font-size: 14px;
+	margin: 12px 0;
+	position: relative;
+	color: map-get($colors, grey);
 	text-align: center;
+
+	> p {
+		width: 100%;
+		position: absolute;
+		bottom: 0;
+		margin: 0;
+	}
+
+	&.login__paragraph--detail {
+		margin-top: 0;
+		font-size: 12px;
+		strong { font-weight: 500; }
+	}
 }
 
 .login__paragraph--primary {
-	color: map-get($colors, primary);
+	em {
+		font-style: normal;
+		color: map-get($colors, primary);
+	}
 }
 
-.login__paragraph--detail {
-	margin-top: 0;
-	color: #c6cbcc;
-}
 
 .login__welcome-text {
+	color: map-get($colors, primary);
 	font-size: 20px;
 	text-align: center;
 }
@@ -57,19 +76,6 @@ page-login {
 
 	padding: 0 2em;
 
-	.login__paragraph {
-		min-height: 2.4em;
-		line-height: 1.2em;
-		font-size: 14px;
-		margin: 12px 0;
-		position: relative;
-		> p {
-			width: 100%;
-			position: absolute;
-			bottom: 0;
-			margin: 0;
-		}
-	}
 }
 
 .login__input-wrap {

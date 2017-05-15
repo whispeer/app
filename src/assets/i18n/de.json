@@ -20,16 +20,18 @@
 		"tos": "Mit der Anmeldung akzeptierst Du die <strong>Allgemeinen Geschäftsbedingungen</strong> und unsere <strong>Datenschutzbestimmungen</strong>",
 		"header": "<strong>Hallo</strong> und willkommen<br>in der Welt der sicheren Netzwerke!",
 		"messages": {
+
+			"defaultCallToAction": "<em>Registrieren</em> oder <em>einfach einloggen...</em>",
+			"loginSuccess": "<em>Yeah!</em> Sicherer Login wird durchgeführt...",
+			"ambiguousProcess": "Dieser Nutzername existiert bereits. <em>Login fortsetzen</em> oder <em>neuen Namen zur Registrierung wählen</em>",
+			"incorrectPassword": "<em>Dein Passwort</em> ist nicht korrekt. Bitte nochmals probieren.",
+
 			"invalidUsername": "Nutzernamen müssen mit einem Buchstaben beginnen und dürfen keine Sonderzeichen beinhalten.",
-			"defaultCallToAction": "Registrieren oder einfach einloggen...",
-			"ambiguousProcess": "Dieser Nutzername existiert bereits. Login fortsetzen oder neuen Namen zur Registrierung wählen",
-			"loginSuccess": "Sicherer Login wird durchgeführt...",
 			"registerMessage": "Dieser Nutzername ist verfügbar. Weiter mit dem sicheren Passwort...",
 			"genericErrorMessage": "Etwas ist schief gegangen.",
 			"confirmPassword": "Gut! Bitte Passwort erneut eingeben...",
 			"registerSuccess": "Willkommen! Sicherer Login wird durchgeführt...",
 			"noConnection": "Keine Verbindung zu whispeer",
-			"incorrectPassword": "Das Passwort ist nicht korrekt. Bitte nochmals probieren.",
 			"passwordsDontMatch": "Die Passwörter stimmen nicht überein",
 			"passwordTooShort": "Das Passwort muss aus mindestens 8 Zeichen bestehen"
 		}
