@@ -16,7 +16,7 @@
 	"login": {
 		"password2Placeholder": "please type your password again",
 		"passwordPlaceholder": "enter a password",
-		"identifierPlaceholder": "e.g. whispeerHQ",
+		"identifierPlaceholder": "enter a username",
 		"tos": "By signing up, you agree to our <strong>Terms of Service</strong> and our very strict <strong>Privacy Policy</strong>",
 		"header": "<strong>Hello</strong> and welcome to<br>the world of secure messaging!",
 		"messages": {

@@ -16,7 +16,7 @@
 	"login": {
 		"password2Placeholder": "Bitte Passwort erneut eingeben",
 		"passwordPlaceholder": "Bitte Passwort eingeben",
-		"identifierPlaceholder": "z.B. whispeerHQ",
+		"identifierPlaceholder": "Bitte Nutzernamen eingeben",
 		"tos": "Mit der Anmeldung akzeptierst Du die <strong>Allgemeinen Geschäftsbedingungen</strong> und unsere <strong>Datenschutzbestimmungen</strong>",
 		"header": "<strong>Hallo</strong> und willkommen<br>in der Welt der sicheren Netzwerke!",
 		"messages": {
