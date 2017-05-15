@@ -504,7 +504,7 @@ var Topic = function (data) {
 					topic.getSecuredData().checkParent(this.getSecuredData())
 					this.setSuccessor(topic.getID());
 				}
-			})
+			}, this)
 
 			var predecessorID = this.getPredecessorID()
 
