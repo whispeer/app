@@ -82,24 +82,48 @@ page-login {
 	margin-bottom: 1em;
 }
 
+@mixin placeholder-color($color) {
+	&::-webkit-input-placeholder { /* WebKit browsers */
+		color: $color;
+	}
+	&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+		color: $color;
+	}
+	&::-moz-placeholder { /* Mozilla Firefox 19+ */
+		color: $color;
+	}
+	&:-ms-input-placeholder { /* Internet Explorer 10+ */
+		color: $color;
+	}
+}
+
 .login__input {
 	display: block;
 	width: 100%;
 
 	padding: 0;
 
-	background-color: #e9eaeb;
-	color: #b6bbbd;
+	background-color: map-get($colors, light_grey);
+	color: map-get($colors, grey);
 
 	border: none !important;
 	border-radius: 5px;
+	overflow: hidden;
 
 	font-size: 14px;
 
 	input {
 		padding: 1em;
 		margin: 0;
+		width: 100%;
+		@include placeholder-color(map-get($colors, other_grey));
+		&:focus {
+			background-color: map-get($colors, other_grey);
+			@include placeholder-color(map-get($colors, grey));
+		}
 	}
+
+
 
 	&[disabled="true"], &[ng-reflect-disabled="true"] {
 		background-color: #f5f6f6;
