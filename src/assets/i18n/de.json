@@ -20,20 +20,18 @@
 		"tos": "Mit der Anmeldung akzeptierst Du die <strong>Allgemeinen Geschäftsbedingungen</strong> und unsere <strong>Datenschutzbestimmungen</strong>",
 		"header": "<strong>Hallo</strong> und willkommen<br>in der Welt der sicheren Netzwerke!",
 		"messages": {
-
 			"defaultCallToAction": "<em>Registrieren</em> oder <em>einfach einloggen...</em>",
 			"loginSuccess": "<em>Yeah!</em> Sicherer Login wird durchgeführt...",
-			"ambiguousProcess": "Dieser Nutzername existiert bereits. <em>Login fortsetzen</em> oder <em>neuen Namen zur Registrierung wählen</em>",
+			"ambiguousProcess": "Dieser Nutzername existiert bereits. <em>Login fortsetzen</em> oder <em>neuen Namen zur Registrierung wählen.</em>",
 			"incorrectPassword": "<em>Dein Passwort</em> ist nicht korrekt. Bitte nochmals probieren.",
-
-			"invalidUsername": "Nutzernamen müssen mit einem Buchstaben beginnen und dürfen keine Sonderzeichen beinhalten.",
-			"registerMessage": "Dieser Nutzername ist verfügbar. Weiter mit dem sicheren Passwort...",
-			"genericErrorMessage": "Etwas ist schief gegangen.",
-			"confirmPassword": "Gut! Bitte Passwort erneut eingeben...",
-			"registerSuccess": "Willkommen! Sicherer Login wird durchgeführt...",
-			"noConnection": "Keine Verbindung zu whispeer",
-			"passwordsDontMatch": "Die Passwörter stimmen nicht überein",
-			"passwordTooShort": "Das Passwort muss aus mindestens 8 Zeichen bestehen"
+			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> Weiter mit dem sicheren Passwort...",
+			"confirmPassword": "<em>Gut!</em> Bitte Passwort erneut eingeben...",
+			"registerSuccess": "<em>Willkommen!</em> Sicherer Login wird durchgeführt...",
+			"invalidUsername": "<em>A-Z a-z 0-9</em> sind in Nutzernamen erlaubt. Sonder- und Leerzeichen sind es nicht.",
+			"passwordsDontMatch": "<em>Die Passwörter</em> stimmen nicht überein.",
+			"genericErrorMessage": "Etwas ist schief gelaufen.",
+			"noConnection": "Keine Verbindung zu whispeer.",
+			"passwordTooShort": "Das Passwort muss aus mindestens 8 Zeichen bestehen."
 		}
 	},
 	"contacts": {
