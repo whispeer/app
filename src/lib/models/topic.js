@@ -489,7 +489,7 @@ var Topic = function (data) {
 		return receiver;
 	};
 
-	this.loadAllData = function loadAllDataF(cb) {
+	this.loadAllData = function () {
 		return Bluebird.all([
 			this.verify(),
 			this.loadNewest(),
@@ -497,9 +497,105 @@ var Topic = function (data) {
 		]).bind(this).then(function () {
 			return this._addTopicUpdates(data.latestTopicUpdates);
 		}).then(function () {
+			Object.keys(topics).forEach(function (topicID) {
+				var topic = topics[topicID]
+
+				if (topic.data.loaded && topic.getPredecessorID() === this.getID()) {
+					this.setSuccessor(topic.getID());
+				}
+			})
+
+			var predecessorID = this.getPredecessorID()
+
+			if (predecessorID && topics[predecessorID]) {
+				topics[predecessorID].setSuccessor(this.getID())
+			}
+
 			this.data.loaded = true;
-		}).nodeify(cb);
+		})
 	};
+
+
+		this.isAdmin = function (user) {
+			return this.getCreator() === user.getID()
+		}
+
+		this.amIAdmin = function () {
+			return this.isAdmin(userService.getown())
+		}
+
+		this.getCreator = function () {
+			return h.parseDecimal(meta.metaAttr("creator"))
+		}
+
+		this.addReceivers = function (newReceivers) {
+			var oldReceivers = this.getReceiver()
+
+			return this.setReceivers(oldReceivers.concat(newReceivers))
+		}
+
+		this.setReceivers = function (receivers, canReadOldMessages) {
+			if (!this.amIAdmin()) {
+				throw new Error("Not an admin of this topic")
+			}
+
+			return this.getSuccessor().bind(this).then(function (successor) {
+				if (successor) {
+					throw new Error("TODO: Topic has a successor. Redirecting and try again?")
+				}
+
+				return Topic.createRawData(receivers, this)
+			}).then(function (topicData) {
+				if (!canReadOldMessages) {
+					return topicData
+				}
+
+				// TODO:  encrypt this topics key with new topics key
+
+				throw new Error("not yet implemented")
+			}).then(function (topicData) {
+				return socket.emit("topic.createSuccessor", { topicId: this.getID(), successor: topicData })
+			})
+		}
+
+		this.hasPredecessor = function () {
+			return !!meta.metaAttr("predecessor")
+		}
+
+		this.getPredecessorID = function () {
+			if (!this.hasPredecessor()) {
+				return null
+			}
+
+			return h.parseDecimal(meta.metaAttr("predecessor"))
+		}
+
+		this.getPredecessor = function () {
+			if (!this.hasPredecessor()) {
+				return Bluebird.resolve(null)
+			}
+
+			return Topic.get(this.getPredecessorID())
+		}
+
+		this.setSuccessor = function (successorID) {
+			this.successorID = successorID
+		}
+
+		this.getSuccessor = function () {
+			if (this.sucessorID) {
+				return Topic.get(this.sucessorID)
+			}
+
+			return socket.emit("topic.successor", { topicId: this.getID() }).then(function (response) {
+				return Topic.fromData(response.topic);
+			}).then(function (successorTopic) {
+				//TODO: check topic is actually my successor otherwise throw
+
+				return successorTopic
+			})
+		}
+
 
 	this.loadInitialMessages = function loadInitialMessages(cb) {
 		return Bluebird.try(function () {
@@ -607,10 +703,9 @@ Topic.loadTopic = function (topic) {
 		return Bluebird.resolve(topic);
 	}
 
-	return topic.loadAllData().thenReturn(topic).then(function (topic) {
+	return topic.loadAllData().then(function () {
 		topicDebug("Topic loaded (" + topic.getID() + "):" + (new Date().getTime() - startup));
-		return topic
-	});
+	}).thenReturn(topic)
 };
 
 Topic.fromData = function (topicData) {
@@ -620,14 +715,12 @@ Topic.fromData = function (topicData) {
 	});
 };
 
-Topic.messageFromData = function (data, cb) {
+Topic.messageFromData = function (data) {
 	var messageToAdd = new Message(data), theTopic;
 	var id = messageToAdd.getID();
 
-	cb = cb || h.nop;
-
 	if (messagesByID[id]) {
-		return Bluebird.resolve(messagesByID[id]).nodeify(cb);
+		return Bluebird.resolve(messagesByID[id])
 	}
 
 	messagesByID[id] = messageToAdd;
@@ -639,12 +732,12 @@ Topic.messageFromData = function (data, cb) {
 
 		messageToAdd.verifyParent(theTopic);
 		return messageToAdd.loadFullData().thenReturn(messageToAdd);
-	}).nodeify(cb);
+	})
 };
 
-Topic.get = function (topicid, cb) {
+Topic.get = function (topicid) {
 	if (topics[topicid]) {
-		return Bluebird.resolve(topics[topicid]).nodeify(cb);
+		return Bluebird.resolve(topics[topicid])
 	}
 
 	return initService.awaitLoading().then(function () {
@@ -656,10 +749,10 @@ Topic.get = function (topicid, cb) {
 	}).then(function (theTopic) {
 		theTopic.setIgnoreAsLastTopic(true);
 		return theTopic;
-	}).nodeify(cb);
+	})
 };
 
-Topic.createRawData = function (receiver, cb) {
+Topic.createRawData = function (receiver, predecessorTopic) {
 	var receiverObjects, topicKey, topicData;
 	return Bluebird.try(function () {
 		//load receiver
@@ -710,18 +803,28 @@ Topic.createRawData = function (receiver, cb) {
 			creator: userService.getown().getID()
 		};
 
+		if (predecessorTopic) {
+			topicMeta.predecessor = predecessorTopic.getID()
+		}
+
 		//create data
 		topicData = {
 			keys: cryptKeysData.concat([keyStore.upload.getKey(topicKey)]),
 			receiverKeys: receiverKeys
 		};
 
-		return SecuredData.createAsync({}, topicMeta, { type: "topic" }, userService.getown().getSignKey(), topicKey);
+		var secured = SecuredData.createRaw({}, topicMeta, { type: "topic" })
+
+		if (predecessorTopic) {
+			secured.setParent(predecessorTopic.getSecuredData())
+		}
+
+		return secured.signAndEncrypt(userService.getown().getSignKey(), topicKey);
 	}).then(function (tData) {
 		topicData.topic = tData.meta;
 
 		return topicData;
-	}).nodeify(cb);
+	})
 };
 
 Topic.reset = function () {
@@ -745,8 +848,6 @@ Topic.createData = function (receiver, message, images, cb) {
 		}));
 	}
 
-	var createRawMessageData = Bluebird.promisify(Message.createRawData.bind(Message));
-
 	var resultPromise = Bluebird.all([Topic.createRawData(receiver), imagePreparation]).spread(function (topicData, imagesMeta) {
 		var topic = new Topic({
 			meta: topicData.topic,
@@ -760,7 +861,7 @@ Topic.createData = function (receiver, message, images, cb) {
 
 		return Bluebird.all([
 			topicData,
-			createRawMessageData(topic, message, messageMeta),
+			Message.createRawData(topic, message, messageMeta),
 			uploadImages(topic.getKey())
 		]);
 	}).spread(function (topicData, messageData, imageKeys) {

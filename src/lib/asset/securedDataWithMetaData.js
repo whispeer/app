@@ -145,6 +145,10 @@ define(["whispeerHelper", "crypto/keyStore", "asset/errors", "config", "bluebird
 		}).nodeify(cb);
 	};
 
+	SecuredDataWithMetaData.prototype.signAndEncrypt = function (signKey, cryptKey) {
+		return this._signAndEncrypt(signKey, cryptKey)
+	};
+
 	/** verify the decrypted data
 		decrypts data if necessary
 		@param signKey key to check signature against

@@ -293,9 +293,9 @@ Message.createRawSecuredData = function (topic, message, meta) {
 	return secured;
 };
 
-Message.createRawData = function (topic, message, meta, cb) {
+Message.createRawData = function (topic, message, meta) {
 	var secured = Message.createRawSecuredData(topic, message, meta);
-	secured._signAndEncrypt(userService.getown().getSignKey(), topic.getKey(), cb);
+	return secured._signAndEncrypt(userService.getown().getSignKey(), topic.getKey());
 };
 
 module.exports = Message;
