@@ -25,18 +25,10 @@
 						[(ngModel)]="login.identifier"
 						(ngModelChange)="checkUserNameExistance()" >
 					</ion-input>
-
-					<!--ion-label class="login__icon-label"
-						[hidden]="!register || usernameUsed"
-						fixed>
-						<ion-icon name="checkmark" />
-					</ion-label-->
-
 				</ion-item>
 
 				<ion-item *ngIf="showPasswordFeld()"
 					class="clean-input-wrap login__input-wrap">
-
 					<ion-input id="password"
 						class="login__input"
 						type="password"
@@ -44,12 +36,10 @@
 						name="password"
 						[(ngModel)]="login.password" >
 					</ion-input>
-
 				</ion-item>
 
 				<ion-item *ngIf="showPasswordConfirmationField()"
 					class="clean-input-wrap login__input-wrap">
-
 					<ion-input id="password2"
 						class="login__input"
 						type="password"
@@ -57,7 +47,6 @@
 						name="password2"
 						[(ngModel)]="passwordRepeat">
 					</ion-input>
-
 				</ion-item>
 
 				<p class="login__paragraph login__paragraph--detail" [innerHTML]="'login.tos' | translate"></p>
