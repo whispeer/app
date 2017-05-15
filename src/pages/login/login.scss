@@ -1,5 +1,8 @@
 page-login {
 	display: flex;
+	strong {
+		font-weight: 500;
+	}
 }
 
 .login__scroll {
@@ -50,7 +53,6 @@ page-login {
 	&.login__paragraph--detail {
 		margin-top: 0;
 		font-size: 12px;
-		strong { font-weight: 500; }
 	}
 }
 
