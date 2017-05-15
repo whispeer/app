@@ -92,7 +92,7 @@ export class MyApp {
 			pushService.register();
 
 			sessionService.loadLogin().then((loggedin) => {
-				if (!loggedin) {
+				if (!loggedin && this.nav.length() > 0) {
 					this.nav.remove(0, this.nav.length() - 1)
 					this.nav.setRoot("Login")
 				}
