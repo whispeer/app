@@ -501,6 +501,7 @@ var Topic = function (data) {
 				var topic = topics[topicID]
 
 				if (topic.data.loaded && topic.getPredecessorID() === this.getID()) {
+					topic.getSecuredData().checkParent(this.getSecuredData())
 					this.setSuccessor(topic.getID());
 				}
 			})
