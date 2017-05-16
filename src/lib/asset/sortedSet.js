@@ -13,6 +13,14 @@ define ([], function () {
 			this.resort();
 		};
 
+		arr.remove = function (element) {
+			var index = Array.prototype.indexOf.call(this, element);
+
+			if (index > -1) {
+			    Array.prototype.splice.call(this, index, 1);
+			}
+		};
+
 		arr.join = function (elements) {
 			Array.prototype.push.apply(this, elements);
 			this.resort();

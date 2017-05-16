@@ -60,10 +60,16 @@ Burst.prototype.fitsItem = function (item) {
 		return false;
 	}
 
-	return this.sameSender(item) &&
+	return this.sameTopic(item) &&
+		this.sameSender(item) &&
 		this.sameDay(item) &&
 		this.timeDifference(item) < MINUTE * 10;
 
+};
+
+Burst.prototype.sameTopic = function (message) {
+	console.warn(this.firstItem().getTopicID() + "===" + message.getTopicID())
+	return this.firstItem().getTopicID() === message.getTopicID();
 };
 
 Burst.prototype.sameSender = function (message) {

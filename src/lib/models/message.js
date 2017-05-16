@@ -190,9 +190,13 @@ Message.prototype.getID = function getIDF() {
 	return this._messageID;
 };
 
-Message.prototype.getTopicID = function getTopicIDF() {
+Message.prototype.getTopicID = function () {
+	if (this._topic) {
+		return this._topic.getID()
+	}
+
 	return this._securedData.metaAttr("topicid");
-};
+}
 
 Message.prototype.getTime = function getTimeF() {
 	if (this.getServerID()) {

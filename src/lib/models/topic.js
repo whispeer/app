@@ -400,18 +400,25 @@ var Topic = function (data) {
 	}
 
 	this.addMessages = function (messages, addUnread) {
+		console.warn("Has no successor: ", this.getID())
+
 		messages.forEach(function (message) {
 			var id = message.getID();
 			data.newestTime = Math.max(message.getTime(), data.newestTime || 0);
 
-			message.verifyParent(theTopic);
+			if (message.getTopicID() !== this.getID()) {
+				var successor = topics[message.getTopicID()]
+				// TODO: check this message is in a successor chain for this topic but maybe earlier?
+			} else {
+				message.verifyParent(theTopic);
+			}
 
 			if (addUnread && !theTopic.messageUnread(id) && !message.isOwn()) {
 				setUnread(unreadMessages.concat([id]));
 			}
 
 			message.unread = theTopic.messageUnread(id);
-		});
+		}, this);
 
 		addMessagesToList(messages);
 
@@ -499,15 +506,6 @@ var Topic = function (data) {
 		]).bind(this).then(function () {
 			return this._addTopicUpdates(data.latestTopicUpdates);
 		}).then(function () {
-			Object.keys(topics).forEach(function (topicID) {
-				var topic = topics[topicID]
-
-				if (topic.data.loaded && topic.getPredecessorID() === this.getID()) {
-					topic.getSecuredData().checkParent(this.getSecuredData())
-					this.setSuccessor(topic.getID());
-				}
-			}, this)
-
 			var predecessorID = this.getPredecessorID()
 
 			if (predecessorID && topics[predecessorID]) {
@@ -518,6 +516,16 @@ var Topic = function (data) {
 		})
 	};
 
+	this.findSuccessor = function () {
+		Object.keys(topics).forEach(function (topicID) {
+			var topic = topics[topicID]
+
+			if (topic.data.loaded && topic.getPredecessorID() === this.getID()) {
+				topic.getSecuredData().checkParent(this.getSecuredData())
+				this.setSuccessor(topic.getID());
+			}
+		}, this)
+	}
 
 		this.isAdmin = function (user) {
 			return this.getCreator() === user.getID()
@@ -606,6 +614,22 @@ var Topic = function (data) {
 
 		this.setSuccessor = function (successorID) {
 			this.successorID = successorID
+
+			console.warn("Set successor of topic " , this.getID(), " succ: ", successorID)
+
+			topicArray.remove(this.data)
+		}
+
+		this.hasKnownSuccessor = function () {
+			return !!this.successorID
+		}
+
+		this.getLoadedSuccessor = function () {
+			if (!this.hasKnownSuccessor()) {
+				return
+			}
+
+			return topics[this.successorID]
 		}
 
 		this.getSuccessor = function () {
@@ -627,7 +651,6 @@ var Topic = function (data) {
 				})
 			})
 		}
-
 
 	this.loadInitialMessages = function loadInitialMessages(cb) {
 		return Bluebird.try(function () {
@@ -723,9 +746,13 @@ Topic.createTopicAndAdd = function (topicData) {
 		return topics[id];
 	}
 
-	topics[id] = topic;
+	topic.findSuccessor()
 
-	topicArray.push(topic.data);
+	topics[id] = topic
+
+	if (!topic.hasKnownSuccessor()) {
+		topicArray.push(topic.data);
+	}
 
 	return topic;
 };
@@ -866,7 +893,7 @@ Topic.reset = function () {
 };
 
 Topic.all = function () {
-	return topicArray;
+	return topicArray
 };
 
 Topic.createData = function (receiver, message, images, cb) {

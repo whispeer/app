@@ -78,7 +78,8 @@ messageService = {
 			}
 
 			return socket.definitlyEmit("messages.getTopics", {
-				afterTopic: last
+				afterTopic: last,
+				noPredecessors: true
 			});
 		}).then(function (latest) {
 			l.loaded = true;
