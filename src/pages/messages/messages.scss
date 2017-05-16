@@ -41,6 +41,47 @@ topicWithBursts {
 	.messages_filler {
 		flex: 1 0 auto;
 	}
+
+	.burst-seperator-date {
+		color: #a0a7aa;
+		margin-bottom: 22px;
+	}
+
+	.burst-seperator-update {
+		color: #788286;
+	}
+
+	.burst-seperator {
+		text-align: center;
+
+		span {
+			display: inline;
+			position: relative;
+			white-space: normal;
+			font-size: 0.85em;
+
+			&:before,
+			&:after {
+				content: "";
+				position: absolute;
+				height: 1.5px;
+				background-color: #ebeced;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 5000px;
+			}
+
+			&:before {
+				right: 100%;
+				margin-right: 5px;
+			}
+
+			&:after {
+				left: 100%;
+				margin-left: 5px;
+			}
+		}
+	}
 }
 
 .md {

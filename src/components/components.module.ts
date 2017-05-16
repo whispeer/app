@@ -4,6 +4,7 @@ import { IonicModule } from 'ionic-angular';
 
 import { SafeUrl } from "../lib/pipes/safeStyle";
 import { ResponsiveDatePipe } from "../lib/pipes/responsiveDate";
+import { SeperatorDatePipe } from "../lib/pipes/seperatorDate";
 import { MaxValuePipe } from "../lib/pipes/maxValue";
 
 import { UserImageComponent } from "./userImage";
@@ -19,6 +20,7 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
 	declarations: [
 		ResponsiveDatePipe,
+		SeperatorDatePipe,
 		SafeUrl,
 		MaxValuePipe,
 		MainMenu,
@@ -36,6 +38,7 @@ import { TranslateModule } from '@ngx-translate/core';
 	],
 	exports: [
 		ResponsiveDatePipe,
+		SeperatorDatePipe,
 		SafeUrl,
 		MaxValuePipe,
 		MainMenu,
