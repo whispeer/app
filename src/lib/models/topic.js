@@ -529,10 +529,10 @@ var Topic = function (data) {
 			return h.parseDecimal(meta.metaAttr("creator"))
 		}
 
-		this.addReceivers = function (newReceivers) {
+		this.addReceivers = function (newReceiverIDs, canReadOldMessages) {
 			var oldReceivers = this.getReceiver()
 
-			return this.setReceivers(oldReceivers.concat(newReceivers))
+			return this.setReceivers(oldReceivers.concat(newReceiverIDs), canReadOldMessages)
 		}
 
 		this.setReceivers = function (receivers, canReadOldMessages) {
@@ -555,7 +555,14 @@ var Topic = function (data) {
 
 				throw new Error("not yet implemented")
 			}).then(function (topicData) {
-				return socket.emit("topic.createSuccessor", { topicId: this.getID(), successor: topicData })
+				return socket.emit("messages.topic.createSuccessor", {
+					topicID: this.getID(),
+					successor: topicData.topic,
+					keys: topicData.keys,
+					receiverKeys: topicData.receiverKeys
+				})
+			}).then(function (response) {
+				return response.successorID
 			})
 		}
 
@@ -588,12 +595,18 @@ var Topic = function (data) {
 				return Topic.get(this.sucessorID)
 			}
 
-			return socket.emit("topic.successor", { topicId: this.getID() }).then(function (response) {
-				return Topic.fromData(response.topic);
-			}).then(function (successorTopic) {
-				//TODO: check topic is actually my successor otherwise throw
+			return socket.emit("messages.topic.successor", { topicID: this.getID() }).bind(this).then(function (response) {
+				if (!response.topic) {
+					return
+				}
 
-				return successorTopic
+				return Topic.fromData(response.topic).then(function (successorTopic) {
+					if (successorTopic.getPredecessorID() !== this.getID()) {
+						throw new Error("server returned invalid successor topic")
+					}
+
+					return successorTopic
+				})
 			})
 		}
 
