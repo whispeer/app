@@ -604,14 +604,6 @@ var Topic = function (data) {
 			return h.parseDecimal(meta.metaAttr("predecessor"))
 		}
 
-		this.getPredecessor = function () {
-			if (!this.hasPredecessor()) {
-				return Bluebird.resolve(null)
-			}
-
-			return Topic.get(this.getPredecessorID())
-		}
-
 		this.setSuccessor = function (successorID) {
 			this.successorID = successorID
 
