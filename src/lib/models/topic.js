@@ -477,6 +477,7 @@ var Topic = function (data) {
 
 			theTopic.data.partnersDisplay = partners.slice(0, displayCount);
 			theTopic.data.partners = partners
+			theTopic.data.receivers = receiverObjects
 
 			if (partners.length > displayCount) {
 				theTopic.data.remainingUser = partners.length - displayCount;
@@ -785,6 +786,10 @@ Topic.messageFromData = function (data) {
 		return messageToAdd.loadFullData().thenReturn(messageToAdd);
 	})
 };
+
+Topic.getLoadedTopic = function (topicid) {
+	return topics[topicid]
+}
 
 Topic.get = function (topicid) {
 	if (topics[topicid]) {

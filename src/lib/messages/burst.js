@@ -1,6 +1,8 @@
 var h = require("whispeerHelper");
 var MINUTE = 60 * 1000;
 
+var Topic = require("../models/topic")
+
 function Burst(TopicUpdate) {
 	this.items = [];
 
@@ -67,8 +69,28 @@ Burst.prototype.fitsItem = function (item) {
 
 };
 
+Burst.prototype.newPersons = function (burst) {
+	var myTopic = Topic.getLoadedTopic(this.firstItem().getTopicID())
+	var otherTopic = Topic.getLoadedTopic(burst.firstItem().getTopicID())
+
+	if (!myTopic || !otherTopic) {
+		return []
+	}
+
+	var newUsers = h.arraySubtract(myTopic.data.receivers, otherTopic.data.receivers)
+
+	return newUsers
+}
+
 Burst.prototype.sameTopic = function (message) {
-	console.warn(this.firstItem().getTopicID() + "===" + message.getTopicID())
+	if (!message) {
+		return true;
+	}
+
+	if (message instanceof Burst) {
+		message = message.firstItem()
+	}
+
 	return this.firstItem().getTopicID() === message.getTopicID();
 };
 

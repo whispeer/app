@@ -33,8 +33,18 @@
 			<ion-item class="messages__burst" *ngFor="let burst of messageBursts(); let $index=index" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 				<div class="messages_message" *ngIf="!burst.sameDay(bursts[$index - 1])">
 					<div class="burst-seperator burst-seperator-date">
-						<span>
+						<span class="burst-seperator-text">
 							{{burst.firstItem().getTime()|seperatorDate}}
+						</span>
+					</div>
+				</div>
+				<div class="messages_message" *ngIf="!burst.sameTopic(bursts[$index - 1])">
+					<div class="burst-seperator burst-seperator-date">
+						<span class="burst-seperator-text">
+							Nutzer hinzugefügt:
+							<span *ngFor="let user of burst.newPersons(bursts[$index - 1])">
+								{{ user.name }}
+							</span>
 						</span>
 					</div>
 				</div>
@@ -50,7 +60,7 @@
 				</span>
 				<div class="messages_message" *ngIf="burst.isTopicUpdate()">
 					<div class="burst-seperator burst-seperator-update">
-						<span>
+						<span class="burst-seperator-text">
 							{{ burst.firstItem().state.sender.data.name }} {{ 'topic.changed' | translate }} "<strong>{{ burst.firstItem().state.title }}</strong>"
 						</span>
 					</div>
