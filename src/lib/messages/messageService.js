@@ -163,11 +163,9 @@ messageService = {
 		});
 	},
 	sendMessage: function (topicID, message, images, cb) {
-		var getTopic = Bluebird.promisify(Topic.get.bind(Topic));
-
 		var resultPromise = Bluebird.resolve(topicID).then(function (topic) {
 			if (typeof topic !== "object") {
-				return getTopic(topic);
+				return Topic.get(topic);
 			} else {
 				return topic;
 			}

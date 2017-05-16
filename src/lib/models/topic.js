@@ -22,6 +22,8 @@ var ImageUpload = require("services/imageUploadService");
 var windowService = require("services/windowService");
 
 
+var UPDATE_WHISPEER_TEXT = "Du verwendest eine alte Version von whispeer die zusammenhängende Chats nicht darstellen kann. Bitte aktualisiere whispeer!"
+
 var debugName = "whispeer:topic";
 var topicDebug = debug(debugName);
 
@@ -555,14 +557,30 @@ var Topic = function (data) {
 
 				throw new Error("not yet implemented")
 			}).then(function (topicData) {
+				var topic = new Topic({
+					meta: topicData.topic,
+					unread: []
+				});
+
+				var messageMeta = {
+					createTime: new Date().getTime(),
+					hidden: true
+				};
+
+				return Message.createRawData(topic, UPDATE_WHISPEER_TEXT, messageMeta).then(function (message) {
+					topicData.message = message
+					return topicData
+				})
+			}).then(function (topicData) {
 				return socket.emit("messages.topic.createSuccessor", {
 					topicID: this.getID(),
 					successor: topicData.topic,
+					updateMessage: topicData.message,
 					keys: topicData.keys,
 					receiverKeys: topicData.receiverKeys
 				})
 			}).then(function (response) {
-				return response.successorID
+				return Topic.fromData(response.successorTopic)
 			})
 		}
 
