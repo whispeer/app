@@ -2,6 +2,8 @@ require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
+import * as moment from 'moment';
+
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
 
@@ -34,7 +36,9 @@ export function createTranslateLoader(http: Http) {
 	return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
-const DEFAULT_LANG = "en"
+import 'moment/locale/de';
+
+const DEFAULT_LANG = "de"
 
 @NgModule({
 	declarations: [
@@ -131,6 +135,7 @@ export class AppModule {
 				return DEFAULT_LANG
 			}).then((lang) => {
 				translate.use(lang)
+				moment.locale(lang);
 			})
 		})
 

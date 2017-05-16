@@ -47,6 +47,8 @@ export class TopicComponent {
 
 	mutationObserver: MutationObserver
 
+	bursts: any[]
+
 	constructor(
 		public navCtrl: NavController,
 		private actionSheetCtrl: ActionSheetController,
@@ -305,11 +307,13 @@ export class TopicComponent {
 			const { changed, bursts } = this.afterViewBurstMessages()
 
 			if (changed) {
+				this.bursts = bursts
 				return bursts
 			}
 		}
 
-		return this.allBurstMessages()
+		this.bursts = this.allBurstMessages()
+		return this.bursts
 	}
 
 	ngOnChanges(changes: SimpleChanges) {

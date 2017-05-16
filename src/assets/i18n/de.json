@@ -6,6 +6,10 @@
 		"accept": "Akzeptieren",
 		"decline": "Ablehnen"
 	},
+	"time": {
+		"today": "Heute",
+		"tomorrow": "Morgen"
+	},
 	"home": {
 		"title": "Nachrichten",
 		"newContact": {
@@ -43,7 +47,8 @@
 	},
 	"topic": {
 		"takePhoto": "Foto aufnehmen",
-		"selectGallery": "Aus Galerie auswählen"
+		"selectGallery": "Aus Galerie auswählen",
+		"changed": "hat den Titel geändert zu"
 	},
 	"chooseFriends": {
 		"title": "Kontakte auswählen",
