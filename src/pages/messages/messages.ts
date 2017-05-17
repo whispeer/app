@@ -1,5 +1,5 @@
 import { Component, ElementRef } from "@angular/core";
-import { NavParams, IonicPage } from "ionic-angular";
+import { NavController, NavParams, IonicPage } from "ionic-angular";
 
 import TopicUpdate from "../../lib/messages/topicTitleUpdate";
 import errorService from "../../lib/services/error.service";
@@ -31,7 +31,7 @@ export class MessagesPage {
 	lastMessageElement: any;
 
 	messages: any[];
-	constructor(public navParams: NavParams, private element: ElementRef) {
+	constructor(public navParams: NavParams, private element: ElementRef, private navCtrl: NavController) {
 	}
 
 	ngOnInit() {
@@ -237,11 +237,20 @@ export class MessagesPage {
 			return;
 		}
 
-		console.log(images);
-
 		messageService.sendMessage(this.topic.id, text, images).then(() => {
 			this.topic.newMessage = "";
 			this.markRead();
 		});
+	}
+
+	addReceiver = (receiverToAddId) => {
+		this.topic.obj.addReceivers(receiverToAddId).then((successorTopic) => {
+			this.topic = successorTopic.data
+			this.topicObject = successorTopic
+			this.topicId = successorTopic.getID()
+			this.partners = successorTopic.data.partners;
+
+			this.navCtrl.push("Messages", { topicId: successorTopic.getID() }, { animate: false })
+		})
 	}
 }

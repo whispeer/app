@@ -22,7 +22,8 @@ var ImageUpload = require("services/imageUploadService");
 var windowService = require("services/windowService");
 
 
-var UPDATE_WHISPEER_TEXT = "Du verwendest eine alte Version von whispeer die zusammenhängende Chats nicht darstellen kann. Bitte aktualisiere whispeer!"
+var UPDATE_WHISPEER_NEW_CHAT = "Du verwendest eine alte Version von whispeer die zusammenhängende Chats nicht darstellen kann. \n Bitte aktualisiere whispeer!"
+var UPDATE_WHISPEER_OLD_CHAT = "Du verwendest eine alte Version von whispeer die zusammenhängende Chats nicht darstellen kann. \n Dieser Chat ist beendet. \n Bitte aktualisiere whispeer!"
 
 var debugName = "whispeer:topic";
 var topicDebug = debug(debugName);
@@ -576,15 +577,21 @@ var Topic = function (data) {
 					hidden: true
 				};
 
-				return Message.createRawData(topic, UPDATE_WHISPEER_TEXT, messageMeta).then(function (message) {
-					topicData.message = message
+
+				return Bluebird.all([
+					Message.createRawData(topic, UPDATE_WHISPEER_OLD_CHAT, messageMeta),
+					Message.createRawData(this, UPDATE_WHISPEER_NEW_CHAT, messageMeta),
+				]).spread(function (oldMessage, newMessage) {
+					topicData.oldChatMessage = oldMessage
+					topicData.newChatMessage = newMessage
 					return topicData
 				})
 			}).then(function (topicData) {
 				return socket.emit("messages.topic.createSuccessor", {
 					topicID: this.getID(),
 					successor: topicData.topic,
-					updateMessage: topicData.message,
+					oldChatMessage: topicData.oldChatMessage,
+					newChatMessage: topicData.newChatMessage,
 					keys: topicData.keys,
 					receiverKeys: topicData.receiverKeys
 				})
