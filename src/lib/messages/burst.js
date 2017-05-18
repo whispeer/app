@@ -69,22 +69,29 @@ Burst.prototype.fitsItem = function (item) {
 
 };
 
-Burst.prototype.newPersons = function (burst) {
+Burst.prototype.newPersons = function () {
 	var myTopic = Topic.getLoadedTopic(this.firstItem().getTopicID())
-	var otherTopic = Topic.getLoadedTopic(burst.firstItem().getTopicID())
 
-	if (!myTopic || !otherTopic) {
+	if (!myTopic) {
 		return []
 	}
 
-	var newUsers = h.arraySubtract(myTopic.data.receivers, otherTopic.data.receivers)
-
-	return newUsers
+	return myTopic.data.addedReceivers
 }
+
+Burst.prototype.personsAdded = function () {
+	var myTopic = Topic.getLoadedTopic(this.firstItem().getTopicID())
+
+	if (!myTopic) {
+		return false
+	}
+
+	return myTopic.data.addedReceivers.length > 0
+};
 
 Burst.prototype.sameTopic = function (message) {
 	if (!message) {
-		return true;
+		return false;
 	}
 
 	if (message instanceof Burst) {

@@ -38,11 +38,18 @@
 						</span>
 					</div>
 				</div>
-				<div class="messages_message" *ngIf="!burst.sameTopic(bursts[$index - 1])">
+				<div class="messages_message" *ngIf="false">
+					<div class="burst-seperator burst-seperator-date">
+						<span class="burst-seperator-text">
+							Du wurdest dem Chat hinzugefügt!
+						</span>
+					</div>
+				</div>
+				<div class="messages_message" *ngIf="burst.personsAdded() && !burst.sameTopic(bursts[$index - 1])">
 					<div class="burst-seperator burst-seperator-date">
 						<span class="burst-seperator-text">
 							Nutzer hinzugefügt:
-							<span *ngFor="let user of burst.newPersons(bursts[$index - 1])">
+							<span *ngFor="let user of burst.newPersons()">
 								{{ user.name }}
 							</span>
 						</span>

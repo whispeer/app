@@ -313,6 +313,7 @@ export class TopicComponent {
 		}
 
 		this.bursts = this.allBurstMessages()
+
 		return this.bursts
 	}
 

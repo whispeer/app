@@ -83,6 +83,7 @@ var Topic = function (data) {
 	}
 
 	var receiver = meta.metaAttr("receiver");
+	var addedReceivers = meta.metaAttr("addedReceivers") || []
 
 	this.data = {
 		loaded: false,
@@ -411,8 +412,6 @@ var Topic = function (data) {
 	}
 
 	this.addMessages = function (messages, addUnread) {
-		console.warn("Has no successor: ", this.getID())
-
 		messages.forEach(function (message) {
 			var id = message.getID();
 			data.newestTime = Math.max(message.getTime(), data.newestTime || 0);
@@ -476,8 +475,11 @@ var Topic = function (data) {
 		}
 
 		this._loadReceiverNamesPromise = Bluebird.try(function () {
-			return userService.getMultipleFormatted(receiver);
-		}).then(function (receiverObjects) {
+			return Bluebird.all([
+				userService.getMultipleFormatted(receiver),
+				userService.getMultipleFormatted(addedReceivers)
+			])
+		}).spread(function (receiverObjects, addedReceivers) {
 			var partners = receiverObjects.filter(function (receiverObject) {
 				return !receiverObject.user.isOwn() || receiverObjects.length === 1
 			});
@@ -488,6 +490,8 @@ var Topic = function (data) {
 			theTopic.data.partnersDisplay = partners.slice(0, displayCount);
 			theTopic.data.partners = partners
 			theTopic.data.receivers = receiverObjects
+
+			theTopic.data.addedReceivers = addedReceivers
 
 			if (partners.length > displayCount) {
 				theTopic.data.remainingUser = partners.length - displayCount;
@@ -554,7 +558,7 @@ var Topic = function (data) {
 			var oldReceivers = this.getReceiver()
 
 			return this.setReceivers(oldReceivers.concat(newReceiverIDs), {
-				addedReceivers: newReceiverIDs
+				addedReceivers: [].concat(newReceiverIDs)
 			}, canReadOldMessages)
 		}
 
@@ -568,7 +572,7 @@ var Topic = function (data) {
 					throw new Error("TODO: Topic has a successor. Redirecting and try again?")
 				}
 
-				return Topic.createRawData(receivers, this)
+				return Topic.createRawData(receivers, this, extraMeta)
 			}).then(function (topicData) {
 				if (!canReadOldMessages) {
 					return topicData
@@ -578,8 +582,6 @@ var Topic = function (data) {
 
 				throw new Error("not yet implemented")
 			}).then(function (topicData) {
-				topicData.topic = Object.assign({}, topicData.topic, extraMeta)
-
 				var topic = new Topic({
 					meta: topicData.topic,
 					unread: []
@@ -828,7 +830,7 @@ Topic.messageFromData = function (data, topicToAdd) {
 	return Bluebird.try(function () {
 		return Topic.get(messageToAdd.getTopicID());
 	}).then(function (theTopic) {
-		if (theTopic.getID() !== topicToAdd.getID()) {
+		if (topicToAdd && theTopic.getID() !== topicToAdd.getID()) {
 			return Topic.loadTopicChain(topicToAdd, theTopic).thenReturn(theTopic)
 		}
 
@@ -860,7 +862,7 @@ Topic.get = function (topicid) {
 	})
 };
 
-Topic.createRawData = function (receiver, predecessorTopic) {
+Topic.createRawData = function (receiver, predecessorTopic, extraMeta) {
 	var receiverObjects, topicKey, topicData;
 	return Bluebird.try(function () {
 		//load receiver
@@ -905,11 +907,11 @@ Topic.createRawData = function (receiver, predecessorTopic) {
 		receiverIDs.sort();
 
 		// topic hashable data.
-		var topicMeta = {
+		var topicMeta = Object.assign({
 			createTime: new Date().getTime(),
 			receiver: receiverIDs,
 			creator: userService.getown().getID()
-		};
+		}, extraMeta || {});
 
 		if (predecessorTopic) {
 			topicMeta.predecessor = predecessorTopic.getID()
