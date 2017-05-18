@@ -6,13 +6,5 @@
    </rdf:RDF>
 </x:xmpmeta>
 <?xpacket end="w"?></metadata>
-<defs>
-    <style>
-      .cls-1 {
-        fill: #5ab70d;
-        fill-rule: evenodd;
-      }
-    </style>
-  </defs>
-  <path id="added" class="cls-1" d="M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25Zm18.5-61.23-24.725,24.24-12.291-12.032,4.869-4.753,7.422,7.278,19.855-19.487Z" transform="translate(-436 -777)"/>
+  <path id="added" class="fill-primary" d="M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25Zm18.5-61.23-24.725,24.24-12.291-12.032,4.869-4.753,7.422,7.278,19.855-19.487Z" transform="translate(-436 -777)"/>
 </svg>
