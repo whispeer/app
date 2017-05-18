@@ -183,7 +183,7 @@ topicWithBursts {
 		margin: auto 5px 1px 10px;
 		order: 2;
 
-		background: map-get($colors, primary);
+		background: $message-bubble-color;
 		color: #fff;
 	}
 
@@ -196,7 +196,7 @@ topicWithBursts {
 				bottom: -2px;
 				right: -7px;
 				height: 20px;
-				border-right: 20px solid map-get($colors, primary);
+				border-right: 20px solid $message-bubble-color;
 				border-bottom-left-radius: 16px 14px;
 				transform: translate(0, -2px);
 			}

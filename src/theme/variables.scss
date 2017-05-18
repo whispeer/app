@@ -60,6 +60,8 @@ $colors: $colors_business;
 $login-background: map-get($colors, primary); // private: #fff
 $login-input-color: #ebe9ec; // private: #b6bbbd
 
+$message-bubble-color: map-get($colors, grey); // private: primary
+
 // $primary: #3a8100;
 // $primary_light: #54ab0c;
 // $primary_lighter: #76a424;
