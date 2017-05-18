@@ -15,6 +15,22 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
+.fill-primary, .fill-primaryDark, .fill-grey {
+	fill-rule: evenodd;
+}
+
+.fill-primary {
+	fill: $svg-fill-primary;
+}
+
+.fill-primaryDark {
+	fill: $svg-fill-primaryDark;
+}
+
+.fill-grey {
+	fill: $svg-fill-grey;
+}
+
 main-menu[ion-fixed] {
 	position: fixed;
 	bottom: 0;

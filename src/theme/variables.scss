@@ -62,6 +62,10 @@ $login-input-color: #ebe9ec; // private: #b6bbbd
 
 $message-bubble-color: map-get($colors, grey); // private: primary
 
+$svg-fill-primary: map-get($colors, primary);
+$svg-fill-primaryDark: map-get($colors, primary); // private: primaryDarker
+$svg-fill-grey: map-get($colors, grey);
+
 // $primary: #3a8100;
 // $primary_light: #54ab0c;
 // $primary_lighter: #76a424;
