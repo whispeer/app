@@ -519,8 +519,6 @@ var Topic = function (data) {
 			this.verify(),
 			this.loadReceiverNames(),
 		]).bind(this).then(function () {
-			this.data.verified = true;
-
 			return this._addTopicUpdates(data.latestTopicUpdates);
 		}).then(function () {
 			var predecessorID = this.getPredecessorID()
@@ -529,7 +527,7 @@ var Topic = function (data) {
 				topics[predecessorID].setSuccessor(this.getID())
 			}
 
-			this.data.loaded = true;
+			this.data.verified = true;
 		})
 	};
 
@@ -699,7 +697,8 @@ var Topic = function (data) {
 		return socket.emit("messages.getTopicMessages", {
 			topicid: theTopic.getID(),
 			afterMessage: theTopic.getOldestID(),
-			maximum: max
+			maximum: max,
+			includePredecessors: true
 		}).bind(this).then(function (data) {
 			topicDebug("Message server took: " + (new Date().getTime() - loadMore));
 
@@ -725,7 +724,12 @@ var Topic = function (data) {
 	};
 
 	this.loadNewest = function(cb) {
+		if (!this.data.verified) {
+			throw new Error("topic needs to be verified first")
+		}
+
 		if (!data.newest) {
+			theTopic.data.loaded = true;
 			return Bluebird.resolve().nodeify(cb);
 		}
 
@@ -733,6 +737,7 @@ var Topic = function (data) {
 			return Topic.messageFromData(data.newest, theTopic);
 		}).then(function (message) {
 			theTopic.addMessage(message, false);
+			theTopic.data.loaded = true;
 		}).nodeify(cb);
 	};
 
@@ -743,10 +748,10 @@ Topic.multipleFromData = function (topicsData) {
 	return Bluebird.resolve(topicsData).map(function (topicData) {
 		return Topic.createTopicAndAdd(topicData);
 	}).map(function (topic) {
-		return Topic.loadTopic(topic)
-	}).then(function (topics) {
-		return topics;
-	});
+		return Topic.loadTopic(topic).then(function () {
+			return topic.loadNewest()
+		}).thenReturn(topic)
+	})
 };
 
 Topic.loadInChunks = function (topicsData, count) {
@@ -785,7 +790,7 @@ Topic.createTopicAndAdd = function (topicData) {
 };
 
 Topic.loadTopic = function (topic) {
-	if (topic.data.loaded) {
+	if (topic.data.verified) {
 		return Bluebird.resolve(topic);
 	}
 

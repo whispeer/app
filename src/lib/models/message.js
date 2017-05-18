@@ -161,7 +161,10 @@ Message.prototype.send = function () {
 		var topicKey = this._topic.getKey();
 		var newest = this._topic.getNewest();
 
-		this._securedData.setAfterRelationShip(newest.getSecuredData());
+		if (newest && newest.getTopicID() === this._topic.getID()) {
+			this._securedData.setAfterRelationShip(newest.getSecuredData());
+		}
+
 		var signAndEncrypt = Bluebird.promisify(this._securedData._signAndEncrypt.bind(this._securedData));
 		var signAndEncryptPromise = signAndEncrypt(userService.getown().getSignKey(), topicKey);
 
