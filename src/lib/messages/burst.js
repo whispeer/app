@@ -70,6 +70,12 @@ Burst.prototype.fitsItem = function (item) {
 };
 
 Burst.prototype.newPersons = function () {
+	return this.getAddedReceivers().filter(function (u) {
+		return !u.me
+	})
+}
+
+Burst.prototype.getAddedReceivers = function () {
 	var myTopic = Topic.getLoadedTopic(this.firstItem().getTopicID())
 
 	if (!myTopic) {
@@ -80,14 +86,16 @@ Burst.prototype.newPersons = function () {
 }
 
 Burst.prototype.personsAdded = function () {
-	var myTopic = Topic.getLoadedTopic(this.firstItem().getTopicID())
-
-	if (!myTopic) {
-		return false
-	}
-
-	return myTopic.data.addedReceivers.length > 0
+	return this.getAddedReceivers().filter(function (u) {
+		return !u.me
+	}).length > 0
 };
+
+Burst.prototype.wasIAdded = function () {
+	return this.getAddedReceivers().some(function (u) {
+		return u.me
+	})
+}
 
 Burst.prototype.sameTopic = function (message) {
 	if (!message) {

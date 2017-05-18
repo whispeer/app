@@ -38,7 +38,7 @@
 						</span>
 					</div>
 				</div>
-				<div class="messages_message" *ngIf="false">
+				<div class="messages_message" *ngIf="burst.wasIAdded() && !burst.sameTopic(bursts[$index - 1])">
 					<div class="burst-seperator burst-seperator-date">
 						<span class="burst-seperator-text">
 							Du wurdest dem Chat hinzugefügt!
