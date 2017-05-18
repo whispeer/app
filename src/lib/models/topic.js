@@ -553,10 +553,12 @@ var Topic = function (data) {
 		this.addReceivers = function (newReceiverIDs, canReadOldMessages) {
 			var oldReceivers = this.getReceiver()
 
-			return this.setReceivers(oldReceivers.concat(newReceiverIDs), canReadOldMessages)
+			return this.setReceivers(oldReceivers.concat(newReceiverIDs), {
+				addedReceivers: newReceiverIDs
+			}, canReadOldMessages)
 		}
 
-		this.setReceivers = function (receivers, canReadOldMessages) {
+		this.setReceivers = function (receivers, extraMeta, canReadOldMessages) {
 			if (!this.amIAdmin()) {
 				throw new Error("Not an admin of this topic")
 			}
@@ -576,6 +578,8 @@ var Topic = function (data) {
 
 				throw new Error("not yet implemented")
 			}).then(function (topicData) {
+				topicData.topic = Object.assign({}, topicData.topic, extraMeta)
+
 				var topic = new Topic({
 					meta: topicData.topic,
 					unread: []
