@@ -87,6 +87,7 @@ var Topic = function (data) {
 
 	this.data = {
 		loaded: false,
+		verified: false,
 		remaining: 1,
 
 		messagesAndUpdates: messagesAndUpdates,
@@ -124,7 +125,7 @@ var Topic = function (data) {
 				return Bluebird.resolve();
 			}
 
-			var topicUpdateObject = new TopicTitleUpdate(topicUpdateData);
+			var topicUpdateObject = new TopicTitleUpdate(topicUpdateData, this);
 
 			topicUpdatesById[topicUpdateData.id] = topicUpdateObject;
 
@@ -516,9 +517,10 @@ var Topic = function (data) {
 	this.loadAllData = function () {
 		return Bluebird.all([
 			this.verify(),
-			this.loadNewest(),
 			this.loadReceiverNames(),
 		]).bind(this).then(function () {
+			this.data.verified = true;
+
 			return this._addTopicUpdates(data.latestTopicUpdates);
 		}).then(function () {
 			var predecessorID = this.getPredecessorID()
@@ -535,7 +537,7 @@ var Topic = function (data) {
 		Object.keys(topics).forEach(function (topicID) {
 			var topic = topics[topicID]
 
-			if (topic.data.loaded && topic.getPredecessorID() === this.getID()) {
+			if (topic.data.verified && topic.getPredecessorID() === this.getID()) {
 				topic.getSecuredData().checkParent(this.getSecuredData())
 				this.setSuccessor(topic.getID());
 			}
@@ -818,17 +820,14 @@ Topic.loadTopicChain = function (newTopic, oldTopic) {
 }
 
 Topic.messageFromData = function (data, topicToAdd) {
-	var messageToAdd = new Message(data);
-	var id = messageToAdd.getID();
+	var id = Message.idFromData(data).messageID
 
 	if (messagesByID[id]) {
 		return Bluebird.resolve(messagesByID[id])
 	}
 
-	messagesByID[id] = messageToAdd;
-
-	return Bluebird.try(function () {
-		return Topic.get(messageToAdd.getTopicID());
+	messagesByID[id] = Bluebird.try(function () {
+		return Topic.get(data.meta.topicid);
 	}).then(function (theTopic) {
 		if (topicToAdd && theTopic.getID() !== topicToAdd.getID()) {
 			return Topic.loadTopicChain(topicToAdd, theTopic).thenReturn(theTopic)
@@ -836,9 +835,14 @@ Topic.messageFromData = function (data, topicToAdd) {
 
 		return theTopic
 	}).then(function (theTopic) {
+		var messageToAdd = new Message(theTopic, data);
+		messagesByID[messageToAdd.getID()] = messageToAdd;
+
 		messageToAdd.verifyParent(theTopic);
 		return messageToAdd.loadFullData().thenReturn(messageToAdd);
 	})
+
+	return messagesByID[id]
 };
 
 Topic.getLoadedTopic = function (topicid) {

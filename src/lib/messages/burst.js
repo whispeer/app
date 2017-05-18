@@ -1,10 +1,9 @@
 var h = require("whispeerHelper");
 var MINUTE = 60 * 1000;
 
-var Topic = require("../models/topic")
-
-function Burst(TopicUpdate) {
-	this.items = [];
+function Burst(topic, TopicUpdate) {
+	this.items = []
+	this.topic = topic
 
 	this._TopicUpdate = TopicUpdate;
 }
@@ -76,13 +75,7 @@ Burst.prototype.newPersons = function () {
 }
 
 Burst.prototype.getAddedReceivers = function () {
-	var myTopic = Topic.getLoadedTopic(this.firstItem().getTopicID())
-
-	if (!myTopic) {
-		return []
-	}
-
-	return myTopic.data.addedReceivers
+	return this.getTopic().data.addedReceivers
 }
 
 Burst.prototype.personsAdded = function () {
@@ -97,16 +90,20 @@ Burst.prototype.wasIAdded = function () {
 	})
 }
 
-Burst.prototype.sameTopic = function (message) {
-	if (!message) {
+Burst.prototype.getTopic = function () {
+	return this.topic
+}
+
+Burst.prototype.getTopicID = function () {
+	return this.getTopic().getID()
+}
+
+Burst.prototype.sameTopic = function (burst) {
+	if (!burst) {
 		return false;
 	}
 
-	if (message instanceof Burst) {
-		message = message.firstItem()
-	}
-
-	return this.firstItem().getTopicID() === message.getTopicID();
+	return this.getTopicID() === burst.getTopicID();
 };
 
 Burst.prototype.sameSender = function (message) {

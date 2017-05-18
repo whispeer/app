@@ -1,7 +1,7 @@
 import { Component, ElementRef } from "@angular/core";
 import { NavController, NavParams, IonicPage } from "ionic-angular";
 
-import TopicUpdate from "../../lib/messages/topicTitleUpdate";
+import TopicTitleUpdate from "../../lib/messages/topicTitleUpdate";
 import errorService from "../../lib/services/error.service";
 
 const messageService = require("../../lib/messages/messageService");
@@ -60,7 +60,7 @@ export class MessagesPage {
 	}
 
 	private calculateBursts(messages) {
-		var bursts = [new Burst(TopicUpdate)];
+		var bursts = [new Burst(this.topicObject, TopicTitleUpdate)];
 		var currentBurst = bursts[0];
 
 		messages.sort((m1, m2) => {
@@ -69,7 +69,7 @@ export class MessagesPage {
 
 		messages.forEach((messageOrUpdate) => {
 			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst(TopicUpdate);
+				currentBurst = new Burst(messageOrUpdate.getTopic(), TopicTitleUpdate);
 				bursts.push(currentBurst);
 			}
 

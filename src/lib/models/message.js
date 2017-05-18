@@ -9,19 +9,33 @@ var Bluebird = require("bluebird");
 var notVerified = ["sendTime", "sender", "topicid", "messageid"];
 
 var Message = function (topic, message, images, id) {
-	if (arguments.length === 1) {
-		this.fromSecuredData(topic);
+	if (arguments.length === 2) {
+		this.fromSecuredData(topic, message);
 	} else {
 		this.fromDecryptedData(topic, message, images, id);
 	}
 };
 
-Message.prototype.fromSecuredData = function (data) {
+Message.idFromData = function (data) {
+	var serverID = h.parseDecimal(data.meta.messageid || data.messageid);
+	var messageID = data.meta.messageUUID || serverID;
+
+	return {
+		serverID: serverID,
+		messageID: messageID
+	}
+}
+
+Message.prototype.fromSecuredData = function (topic, data) {
 	this._hasBeenSent = true;
 	this._isDecrypted = false;
 
-	this._serverID = h.parseDecimal(data.meta.messageid || data.messageid);
-	this._messageID = data.meta.messageUUID || this._serverID;
+	this._topic = topic
+
+	var id = Message.idFromData(data)
+
+	this._serverID = id.serverID
+	this._messageID = id.messageID
 
 	var metaCopy = h.deepCopyObj(data.meta);
 	this._securedData = SecuredData.load(data.content, metaCopy, {
@@ -191,11 +205,11 @@ Message.prototype.getID = function getIDF() {
 };
 
 Message.prototype.getTopicID = function () {
-	if (this._topic) {
-		return this._topic.getID()
-	}
+	return this._topic.getID()
+}
 
-	return this._securedData.metaAttr("topicid");
+Message.prototype.getTopic = function () {
+	return this._topic
 }
 
 Message.prototype.getTime = function getTimeF() {

@@ -7,12 +7,13 @@ var socket = require("services/socket.service").default;
 import * as Bluebird from "bluebird"
 
 export default class TopicUpdate {
-	state: any
-	private _id: any
-	private _securedData: any
-	private _userID: any
+	state
+	private _id
+	private _securedData
+	private _userID
+	private topic
 
-	constructor(updateData) {
+	constructor(updateData, topic) {
 		var content = updateData.content,
 			meta = updateData.meta;
 
@@ -24,6 +25,8 @@ export default class TopicUpdate {
 			loading: true,
 			timestamp: h.parseDecimal(updateData.meta.time)
 		};
+
+		this.topic = topic
 	}
 
 	setState = (newState) => {
@@ -40,6 +43,10 @@ export default class TopicUpdate {
 	getTime = () => {
 		return h.parseDecimal(this._securedData.metaAttr("time"));
 	};
+
+	getTopic = () => {
+		return this.topic
+	}
 
 	isAfter = (topicUpdate) => {
 		if (!topicUpdate) {

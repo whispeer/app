@@ -64,6 +64,11 @@ export class HomePage {
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
+		if (this.topicsLoading) {
+			infiniteScroll.complete();
+			return
+		}
+
 		messageService.loadMoreLatest(() => {}).then(() => {
 			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
 			infiniteScroll.complete();
