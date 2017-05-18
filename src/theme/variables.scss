@@ -90,7 +90,7 @@ $list-border-color: map-get($colors, other_grey);
 $list-ios-activated-background-color: #efeff4;
 $alert-ios-message-text-color: map-get($colors, dark);
 
-$action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
+$action-sheet-ios-button-text-color: map-get($colors, primary); // private: primaryDarker
 
 
 // App Material Design Variables
