@@ -46,10 +46,10 @@
 					</div>
 				</h2>
 				<div>
-					<ion-note item-right>{{topic.latestMessage.data.timestamp | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
+					<ion-note item-right>{{topic.obj.getTime() | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 				</div>
 			</div>
-			<p>{{topic.latestMessage.data.text}}</p>
+			<p *ngIf="topic.latestMessage">{{topic.latestMessage.data.text}}</p>
 		</ion-item>
 	</ion-list>
 

@@ -36,20 +36,8 @@ function sortObjGetTimeInv(a, b) {
 	return (b.obj.getTime() - a.obj.getTime());
 }
 
-function sortUnreadOrTime(a, b) {
-	if (a.unread && !b.unread) {
-		return -1;
-	}
-
-	if (!a.unread && b.unread) {
-		return 1;
-	}
-
-	return sortObjGetTimeInv(a, b);
-}
-
 var topics = {}, messagesByID = {};
-var topicArray = sortedSet(sortUnreadOrTime);
+var topicArray = sortedSet(sortObjGetTimeInv);
 
 var Topic = function (data) {
 	var messages = sortedSet(sortGetTime),
@@ -219,7 +207,7 @@ var Topic = function (data) {
 
 			return response.messages;
 		}).map(function (messageData) {
-			return Topic.messageFromData(messageData);
+			return Topic.messageFromData(messageData, theTopic);
 		}).then(function (messages) {
 			theTopic.addMessages(messages, false);
 		}).finally(function () {
@@ -265,8 +253,16 @@ var Topic = function (data) {
 		return h.parseDecimal(data.topicid);
 	};
 
-	this.getTime = function getTimeF() {
-		return data.newestTime;
+	this.getTime = function () {
+		if (data.newestTime) {
+			return data.newestTime
+		}
+
+		if (data.createServerTime) {
+			return data.createServerTime
+		}
+
+		return this.getSecuredData().metaAttr("createTime");
 	};
 
 	this.getKey = function getKeyF() {
@@ -400,6 +396,20 @@ var Topic = function (data) {
 		return unreadMessages.length
 	}
 
+	this.ensureTopicChain = function (predecessor) {
+		var predecessorID = this.getPredecessorID()
+
+		if (predecessorID === predecessor) {
+			return
+		}
+
+		if (!predecessorID || !topics[predecessorID]) {
+			throw new Error()
+		}
+
+		topics[predecessorID].ensureTopicChain(predecessor)
+	}
+
 	this.addMessages = function (messages, addUnread) {
 		console.warn("Has no successor: ", this.getID())
 
@@ -408,8 +418,7 @@ var Topic = function (data) {
 			data.newestTime = Math.max(message.getTime(), data.newestTime || 0);
 
 			if (message.getTopicID() !== this.getID()) {
-				var successor = topics[message.getTopicID()]
-				// TODO: check this message is in a successor chain for this topic but maybe earlier?
+				this.ensureTopicChain(message.getTopicID())
 			} else {
 				message.verifyParent(theTopic);
 			}
@@ -577,7 +586,6 @@ var Topic = function (data) {
 					hidden: true
 				};
 
-
 				return Bluebird.all([
 					Message.createRawData(topic, UPDATE_WHISPEER_OLD_CHAT, messageMeta),
 					Message.createRawData(this, UPDATE_WHISPEER_NEW_CHAT, messageMeta),
@@ -610,6 +618,17 @@ var Topic = function (data) {
 			}
 
 			return h.parseDecimal(meta.metaAttr("predecessor"))
+		}
+
+		this.getPredecessor = function () {
+			if (!this.hasPredecessor()) {
+				return null
+			}
+
+			return Topic.get(this.getPredecessorID()).catch(function (err) {
+				console.log(err)
+				return null
+			}, socket.errors.Server)
 		}
 
 		this.setSuccessor = function (successorID) {
@@ -685,7 +704,7 @@ var Topic = function (data) {
 			var messages = data.messages || [];
 
 			return Bluebird.all(messages.map(function (messageData) {
-				return Topic.messageFromData(messageData);
+				return Topic.messageFromData(messageData, theTopic);
 			}));
 		}).then(function (messages) {
 			theTopic.addMessages(messages, false);
@@ -703,7 +722,7 @@ var Topic = function (data) {
 		}
 
 		return Bluebird.try(function () {
-			return Topic.messageFromData(data.newest);
+			return Topic.messageFromData(data.newest, theTopic);
 		}).then(function (message) {
 			theTopic.addMessage(message, false);
 		}).nodeify(cb);
@@ -774,8 +793,26 @@ Topic.fromData = function (topicData) {
 	});
 };
 
-Topic.messageFromData = function (data) {
-	var messageToAdd = new Message(data), theTopic;
+Topic.loadTopicChain = function (newTopic, oldTopic) {
+	if (newTopic.getPredecessorID() === oldTopic.getID()) {
+		return Bluebird.resolve()
+	}
+
+	return newTopic.getPredecessor().then(function (pred) {
+		if (!pred) {
+			return
+		}
+
+		if (pred.getID() === oldTopic.getID()) {
+			return
+		}
+
+		return Topic.loadTopicChain(newTopic, pred)
+	})
+}
+
+Topic.messageFromData = function (data, topicToAdd) {
+	var messageToAdd = new Message(data);
 	var id = messageToAdd.getID();
 
 	if (messagesByID[id]) {
@@ -786,9 +823,13 @@ Topic.messageFromData = function (data) {
 
 	return Bluebird.try(function () {
 		return Topic.get(messageToAdd.getTopicID());
-	}).then(function (_theTopic) {
-		theTopic = _theTopic;
+	}).then(function (theTopic) {
+		if (theTopic.getID() !== topicToAdd.getID()) {
+			return Topic.loadTopicChain(topicToAdd, theTopic).thenReturn(theTopic)
+		}
 
+		return theTopic
+	}).then(function (theTopic) {
 		messageToAdd.verifyParent(theTopic);
 		return messageToAdd.loadFullData().thenReturn(messageToAdd);
 	})
@@ -893,7 +934,7 @@ Topic.createRawData = function (receiver, predecessorTopic) {
 Topic.reset = function () {
 	messagesByID = {};
 	topics = {};
-	topicArray = sortedSet(sortUnreadOrTime);
+	topicArray = sortedSet(sortObjGetTimeInv);
 };
 
 Topic.all = function () {
