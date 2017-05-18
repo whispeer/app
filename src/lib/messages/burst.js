@@ -17,6 +17,10 @@ Burst.prototype.hasItem = function (item) {
 };
 
 Burst.prototype.addItem = function (item) {
+	if (!this.hasItems()) {
+		this.topic = item.getTopic()
+	}
+
 	this.items.push(item);
 
 	this.items.sort(function (m1, m2) {
@@ -67,28 +71,6 @@ Burst.prototype.fitsItem = function (item) {
 		this.timeDifference(item) < MINUTE * 10;
 
 };
-
-Burst.prototype.newPersons = function () {
-	return this.getAddedReceivers().filter(function (u) {
-		return !u.me
-	})
-}
-
-Burst.prototype.getAddedReceivers = function () {
-	return this.getTopic().data.addedReceivers
-}
-
-Burst.prototype.personsAdded = function () {
-	return this.getAddedReceivers().filter(function (u) {
-		return !u.me
-	}).length > 0
-};
-
-Burst.prototype.wasIAdded = function () {
-	return this.getAddedReceivers().some(function (u) {
-		return u.me
-	})
-}
 
 Burst.prototype.getTopic = function () {
 	return this.topic

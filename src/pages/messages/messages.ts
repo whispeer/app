@@ -42,6 +42,8 @@ export class MessagesPage {
 			this.topicObject = topic;
 			this.partners = topic.data.partners;
 
+			topic.listen(this.onSuccessor, "successor")
+
 			topic.loadInitialMessages().then(() => {
 				this.messagesLoading = false;
 				this.topicObject.markRead(errorService.criticalError)
@@ -243,14 +245,18 @@ export class MessagesPage {
 		});
 	}
 
-	addReceiver = (receiverToAddId) => {
-		this.topic.obj.addReceivers(receiverToAddId).then((successorTopic) => {
-			this.topic = successorTopic.data
-			this.topicObject = successorTopic
-			this.topicId = successorTopic.getID()
-			this.partners = successorTopic.data.partners;
+	onSuccessor = () => {
+		const successorTopic = this.topicObject.getLoadedSuccessor()
 
-			this.navCtrl.push("Messages", { topicId: successorTopic.getID() }, { animate: false })
-		})
+		this.topic = successorTopic.data
+		this.topicObject = successorTopic
+		this.topicId = successorTopic.getID()
+		this.partners = successorTopic.data.partners;
+
+		// this.navCtrl.push("Messages", { topicId: successorTopic.getID() }, { animate: false })
+	}
+
+	addReceiver = (receiverToAddId) => {
+		this.topic.obj.addReceivers(receiverToAddId)
 	}
 }

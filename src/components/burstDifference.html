@@ -1,0 +1,28 @@
+<div class="messages_message">
+	<div class="burst-seperator burst-seperator-date" *ngIf="differentDay()">
+		<span class="burst-seperator-text">
+			{{getTime()|seperatorDate}}
+		</span>
+	</div>
+</div>
+<div *ngIf="differentTopic()">
+	<div *ngFor="let topic of getTopicsOfInterest()">
+		<div class="messages_message" *ngIf="wasIAdded(topic)">
+			<div class="burst-seperator burst-seperator-date">
+				<span class="burst-seperator-text">
+					Du wurdest dem Chat hinzugefügt!
+				</span>
+			</div>
+		</div>
+		<div class="messages_message" *ngIf="personsAdded(topic)">
+			<div class="burst-seperator burst-seperator-date">
+				<span class="burst-seperator-text">
+					Nutzer hinzugefügt:
+					<span *ngFor="let user of newPersons(topic)">
+						{{ user.name }}
+					</span>
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

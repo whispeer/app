@@ -30,31 +30,12 @@
 		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 		<div class="messages_filler"></div>
 		<ion-list no-lines>
-			<ion-item class="messages__burst" *ngFor="let burst of messageBursts(); let $index=index" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-				<div class="messages_message" *ngIf="!burst.sameDay(bursts[$index - 1])">
-					<div class="burst-seperator burst-seperator-date">
-						<span class="burst-seperator-text">
-							{{burst.firstItem().getTime()|seperatorDate}}
-						</span>
-					</div>
-				</div>
-				<div class="messages_message" *ngIf="burst.wasIAdded() && !burst.sameTopic(bursts[$index - 1])">
-					<div class="burst-seperator burst-seperator-date">
-						<span class="burst-seperator-text">
-							Du wurdest dem Chat hinzugefügt!
-						</span>
-					</div>
-				</div>
-				<div class="messages_message" *ngIf="burst.personsAdded() && !burst.sameTopic(bursts[$index - 1])">
-					<div class="burst-seperator burst-seperator-date">
-						<span class="burst-seperator-text">
-							Nutzer hinzugefügt:
-							<span *ngFor="let user of burst.newPersons()">
-								{{ user.name }}
-							</span>
-						</span>
-					</div>
-				</div>
+			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">
+				<BurstDifference [topic]="topic && topic.obj" [burst]="bursts[0]"></BurstDifference>
+			</ion-item>
+			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
+				<BurstDifference [topic]="topic && topic.obj" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>
+
 				<span *ngIf="burst.isMessageBurst()">
 					<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
 					<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
@@ -72,6 +53,9 @@
 						</span>
 					</div>
 				</div>
+			</ion-item>
+			<ion-item class="messages__burst" *ngIf="bursts && bursts.length > 0">
+				<BurstDifference [topic]="topic && topic.obj" [previousBurst]="bursts[bursts.length - 1]" [noDates]="true"></BurstDifference>
 			</ion-item>
 		</ion-list>
 	</div>

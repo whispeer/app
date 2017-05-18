@@ -637,7 +637,7 @@ var Topic = function (data) {
 				return null
 			}
 
-			return Topic.get(this.getPredecessorID()).catch(function (err) {
+			return Topic.get(this.getPredecessorID(), true).catch(function (err) {
 				console.log(err)
 				return null
 			}, socket.errors.Server)
@@ -649,6 +649,8 @@ var Topic = function (data) {
 			console.warn("Set successor of topic " , this.getID(), " succ: ", successorID)
 
 			topicArray.remove(this.data)
+
+			this.notify({ successorID: successorID }, "successor")
 		}
 
 		this.hasKnownSuccessor = function () {
@@ -731,14 +733,14 @@ var Topic = function (data) {
 		//load more messages and decrypt them.
 	};
 
-	this.loadNewest = function(cb) {
+	this.loadNewest = function() {
 		if (!this.data.verified) {
 			throw new Error("topic needs to be verified first")
 		}
 
-		if (!data.newest) {
-			theTopic.data.loaded = true;
-			return Bluebird.resolve().nodeify(cb);
+		if (!data.newest || this.data.loaded) {
+			this.data.loaded = true;
+			return Bluebird.resolve()
 		}
 
 		return Bluebird.try(function () {
@@ -746,7 +748,7 @@ var Topic = function (data) {
 		}).then(function (message) {
 			theTopic.addMessage(message, false);
 			theTopic.data.loaded = true;
-		}).nodeify(cb);
+		})
 	};
 
 	Observer.extend(theTopic);
@@ -807,10 +809,16 @@ Topic.loadTopic = function (topic) {
 	}).thenReturn(topic)
 };
 
-Topic.fromData = function (topicData) {
+Topic.fromData = function (topicData, noAutoLoad) {
 	return Bluebird.resolve(topicData).then(function (topicData) {
 		var topic = Topic.createTopicAndAdd(topicData);
 		return Topic.loadTopic(topic);
+	}).then(function (topic) {
+		if (!noAutoLoad) {
+			return topic.loadNewest().thenReturn(topic)
+		}
+
+		return topic
 	});
 };
 
@@ -828,7 +836,7 @@ Topic.loadTopicChain = function (newTopic, oldTopic) {
 			return
 		}
 
-		return Topic.loadTopicChain(newTopic, pred)
+		return Topic.loadTopicChain(pred, oldTopic)
 	})
 }
 
@@ -840,7 +848,7 @@ Topic.messageFromData = function (data, topicToAdd) {
 	}
 
 	messagesByID[id] = Bluebird.try(function () {
-		return Topic.get(data.meta.topicid);
+		return Topic.get(data.meta.topicid, true);
 	}).then(function (theTopic) {
 		if (topicToAdd && theTopic.getID() !== topicToAdd.getID()) {
 			return Topic.loadTopicChain(topicToAdd, theTopic).thenReturn(theTopic)
@@ -862,7 +870,7 @@ Topic.getLoadedTopic = function (topicid) {
 	return topics[topicid]
 }
 
-Topic.get = function (topicid) {
+Topic.get = function (topicid, noAutoLoadNewest) {
 	if (topics[topicid]) {
 		return Bluebird.resolve(topics[topicid])
 	}
@@ -872,7 +880,7 @@ Topic.get = function (topicid) {
 			topicid: topicid
 		});
 	}).then(function (data) {
-		return Topic.fromData(data.topic);
+		return Topic.fromData(data.topic, noAutoLoadNewest);
 	}).then(function (theTopic) {
 		theTopic.setIgnoreAsLastTopic(true);
 		return theTopic;
