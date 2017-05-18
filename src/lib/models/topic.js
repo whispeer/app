@@ -239,11 +239,17 @@ var Topic = function (data) {
 		return unreadMessages.indexOf(mid) > -1;
 	};
 
-	this.getOldestID = function getOldestIDF() {
+	this.getOldestIDs = function () {
 		if (messages.length === 0) {
-			return 0;
+			return {
+				topicID: theTopic.getID(),
+				oldestID: 0
+			}
 		} else {
-			return messages[0].getServerID();
+			return {
+				topicID: messages[0].getTopicID(),
+				oldestID: messages[0].getServerID()
+			}
 		}
 	};
 
@@ -694,9 +700,11 @@ var Topic = function (data) {
 			return Bluebird.resolve().nodeify(cb);
 		}
 
+		var requestIDs = theTopic.getOldestIDs()
+
 		return socket.emit("messages.getTopicMessages", {
-			topicid: theTopic.getID(),
-			afterMessage: theTopic.getOldestID(),
+			topicid: requestIDs.topicID,
+			afterMessage: requestIDs.oldestID,
 			maximum: max,
 			includePredecessors: true
 		}).bind(this).then(function (data) {
