@@ -93,6 +93,10 @@ export class BurstDifferenceComponent {
 	}
 
 	getAddedReceivers = (topic) => {
+		if (!topic.data.loaded) {
+			return []
+		}
+
 		return topic.data.addedReceivers
 	}
 

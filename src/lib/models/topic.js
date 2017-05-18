@@ -336,6 +336,14 @@ var Topic = function (data) {
 		theTopic.data.latestMessage = messages[messages.length - 1];
 	}
 
+	this.getMessages = function () {
+		return messages
+	}
+
+	this.getTopicUpdates = function () {
+		return sortedTopicUpdates
+	}
+
 	this.getSentMessages = function () {
 		return messages.filter(function (m) {
 			return m.hasBeenSent();
@@ -528,9 +536,13 @@ var Topic = function (data) {
 			return this._addTopicUpdates(data.latestTopicUpdates);
 		}).then(function () {
 			var predecessorID = this.getPredecessorID()
+			var predecessor = topics[predecessorID]
 
-			if (predecessorID && topics[predecessorID]) {
-				topics[predecessorID].setSuccessor(this.getID())
+			if (predecessorID && predecessor) {
+				predecessor.setSuccessor(this.getID())
+
+				this.addMessages(predecessor.getMessages())
+				// TODO: this._addTopicUpdates(predecessor.getTopicUpdates())
 			}
 
 			this.data.verified = true;
