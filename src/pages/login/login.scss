@@ -9,7 +9,7 @@ page-login {
 	width: 100%;
 
 	color: #000;
-	background-color: #fff;
+	background-color: $login-background;
 }
 
 .login__wrap {
@@ -36,7 +36,7 @@ page-login {
 }
 
 .login__paragraph--primary {
-	color: map-get($colors, primary);
+	color: map-get($colors, green);
 }
 
 .login__paragraph--detail {
@@ -82,8 +82,8 @@ page-login {
 
 	padding: 0;
 
-	background-color: #e9eaeb;
-	color: #b6bbbd;
+	background-color: rgba(247, 244, 240, 0.09766);
+	color: $login-input-color;
 
 	border: none !important;
 	border-radius: 5px;

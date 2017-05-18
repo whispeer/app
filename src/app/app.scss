@@ -66,6 +66,10 @@ ion-fab-list[side="top"] {
 	}
 }
 
+.hexagon--green .border {
+	fill: map-get($colors, green) !important;
+}
+
 .hexagon__button {
 	position: absolute;
 	top: 50%;
@@ -212,6 +216,10 @@ ion-fab-list[side="top"] {
 // there was no variable for this...
 .action-sheet-ios .action-sheet-cancel {
 	color: map-get($colors, dark);
+}
+
+.item-ios {
+	background: transparent !important;
 }
 
 // -----------------------------------------------------------
