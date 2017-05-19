@@ -1,3 +1,6 @@
+// Business Colors?
+$business: 1;
+
 // Ionic Variables and Theming. For more info, please see:
 // http://ionicframework.com/docs/v2/theming/
 $font-path: "../assets/fonts";
@@ -54,8 +57,6 @@ $colors_business: (
 	green: #5ab70d,
 	greenDarker: #3a8100,
 );
-
-$business: 1;
 
 $colors: $colors_private;
 
