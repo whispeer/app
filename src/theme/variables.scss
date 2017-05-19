@@ -55,30 +55,18 @@ $colors_business: (
 	greenDarker: #3a8100,
 );
 
-$colors: $colors_business;
+$business: 1;
 
-$login-background: map-get($colors, primary); // private: #fff
-$login-input-color: #ebe9ec; // private: #b6bbbd
+$colors: $colors_private;
 
-$message-bubble-color: map-get($colors, grey); // private: primary
+$login-background: #fff;
+$login-input-color: #b6bbbd;
+
+$message-bubble-color: map-get($colors, primary);
 
 $svg-fill-primary: map-get($colors, primary);
-$svg-fill-primaryDark: map-get($colors, primary); // private: primaryDarker
+$svg-fill-primaryDark: map-get($colors, primaryDarker);
 $svg-fill-grey: map-get($colors, grey);
-
-// $primary: #3a8100;
-// $primary_light: #54ab0c;
-// $primary_lighter: #76a424;
-// $primary_dark: #3b7b06;
-
-// $accent: #ffeda5;
-
-// $complementary: #788286;
-// $complementary_blue: #013c4c;
-// $complementary_accent: #1b676b;
-
-// $light_grey: #f9f9f9;
-// $blue_grey: #d8dfe2;
 
 $list-text-color: map-get($colors, dark);
 $list-border-color: map-get($colors, other_grey);
@@ -90,7 +78,32 @@ $list-border-color: map-get($colors, other_grey);
 $list-ios-activated-background-color: #efeff4;
 $alert-ios-message-text-color: map-get($colors, dark);
 
-$action-sheet-ios-button-text-color: map-get($colors, primary); // private: primaryDarker
+$action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
+
+@if $business == 1 {
+	$colors: $colors_business;
+
+	$login-background: map-get($colors, primary);
+	$login-input-color: #ebe9ec;
+
+	$message-bubble-color: map-get($colors, grey);
+
+	$svg-fill-primary: map-get($colors, primary);
+	$svg-fill-primaryDark: map-get($colors, primary);
+	$svg-fill-grey: map-get($colors, grey);
+
+	$list-text-color: map-get($colors, dark);
+	$list-border-color: map-get($colors, other_grey);
+
+	// App iOS Variables
+	// --------------------------------------------------
+	// iOS only Sass variables can go here
+
+	$list-ios-activated-background-color: #efeff4;
+	$alert-ios-message-text-color: map-get($colors, dark);
+
+	$action-sheet-ios-button-text-color: map-get($colors, primary);
+}
 
 
 // App Material Design Variables
