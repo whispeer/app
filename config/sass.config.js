@@ -1,6 +1,8 @@
 // https://www.npmjs.com/package/node-sass
 
-module.exports = {
+/* eslint-disable quotes */
+
+var sassConfig = {
 
   /**
    * outputFilename: The filename of the saved CSS file
@@ -102,3 +104,11 @@ module.exports = {
   ]
 
 };
+
+sassConfig.file = 'src/main-private.scss'
+
+if (process.env.WHISPEER_BUSINESS) {
+	sassConfig.file = 'src/main-business.scss'
+}
+
+module.exports = sassConfig
