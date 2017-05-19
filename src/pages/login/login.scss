@@ -1,5 +1,9 @@
 page-login {
 	display: flex;
+
+	.item-ios {
+		background: transparent !important;
+	}
 }
 
 .login__scroll {

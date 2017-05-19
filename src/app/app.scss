@@ -234,10 +234,6 @@ ion-fab-list[side="top"] {
 	color: map-get($colors, dark);
 }
 
-.item-ios {
-	background: transparent !important;
-}
-
 // -----------------------------------------------------------
 // The following is a bugfix for headers inside of components on ios
 // This is a copy of a code snippet from the ionic code, but removing a >
