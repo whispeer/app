@@ -1,5 +1,8 @@
 page-login {
 	display: flex;
+	strong {
+		font-weight: 500;
+	}
 }
 
 .login__scroll {
@@ -32,19 +35,37 @@ page-login {
 }
 
 .login__paragraph {
+	min-height: 2.4em;
+	line-height: 1.2em;
+	font-size: 14px;
+	margin: 12px 0;
+	position: relative;
+	color: map-get($colors, grey);
 	text-align: center;
+
+	> p {
+		width: 100%;
+		position: absolute;
+		bottom: 0;
+		margin: 0;
+	}
+
+	&.login__paragraph--detail {
+		margin-top: 0;
+		font-size: 12px;
+	}
 }
 
 .login__paragraph--primary {
-	color: map-get($colors, primary);
+	em {
+		font-style: normal;
+		color: map-get($colors, primary);
+	}
 }
 
-.login__paragraph--detail {
-	margin-top: 0;
-	color: #c6cbcc;
-}
 
 .login__welcome-text {
+	color: map-get($colors, primary);
 	font-size: 20px;
 	text-align: center;
 }
@@ -57,23 +78,25 @@ page-login {
 
 	padding: 0 2em;
 
-	.login__paragraph {
-		min-height: 2.4em;
-		line-height: 1.2em;
-		font-size: 14px;
-		margin: 12px 0;
-		position: relative;
-		> p {
-			width: 100%;
-			position: absolute;
-			bottom: 0;
-			margin: 0;
-		}
-	}
 }
 
 .login__input-wrap {
 	margin-bottom: 1em;
+}
+
+@mixin placeholder-color($color) {
+	&::-webkit-input-placeholder { /* WebKit browsers */
+		color: $color;
+	}
+	&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+		color: $color;
+	}
+	&::-moz-placeholder { /* Mozilla Firefox 19+ */
+		color: $color;
+	}
+	&:-ms-input-placeholder { /* Internet Explorer 10+ */
+		color: $color;
+	}
 }
 
 .login__input {
@@ -82,18 +105,27 @@ page-login {
 
 	padding: 0;
 
-	background-color: #e9eaeb;
-	color: #b6bbbd;
+	background-color: map-get($colors, light_grey);
+	color: map-get($colors, grey);
 
 	border: none !important;
 	border-radius: 5px;
+	overflow: hidden;
 
 	font-size: 14px;
 
 	input {
 		padding: 1em;
 		margin: 0;
+		width: 100%;
+		@include placeholder-color(map-get($colors, other_grey));
+		&:focus {
+			background-color: map-get($colors, other_grey);
+			@include placeholder-color(map-get($colors, grey));
+		}
 	}
+
+
 
 	&[disabled="true"], &[ng-reflect-disabled="true"] {
 		background-color: #f5f6f6;
