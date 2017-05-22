@@ -78,7 +78,11 @@ export default class TopicUpdate {
 	}
 
 	ensureParent = (topic) => {
-		this._securedData.checkParent(topic.getSecuredData());
+		this._securedData.checkParent(this.topic.getSecuredData());
+
+		if (topic !== this.topic) {
+			topic.ensureTopicChain(this.topic.getID())
+		}
 	};
 
 	ensureIsAfterTopicUpdate = (topicUpdate) => {

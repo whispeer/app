@@ -125,11 +125,13 @@ var Topic = function (data) {
 				return Bluebird.resolve();
 			}
 
-			var topicUpdateObject = new TopicTitleUpdate(topicUpdateData, this);
+			return Topic.get(topicUpdateData.topicID).then(function (topicUpdateTopic) {
+				var topicUpdateObject = new TopicTitleUpdate(topicUpdateData, topicUpdateTopic);
 
-			topicUpdatesById[topicUpdateData.id] = topicUpdateObject;
+				topicUpdatesById[topicUpdateData.id] = topicUpdateObject;
 
-			return topicUpdateObject.load().thenReturn(topicUpdateObject);
+				return topicUpdateObject.load().thenReturn(topicUpdateObject);
+			})
 		}).map(function (topicUpdate) {
 			topicUpdate.ensureParent(this);
 
