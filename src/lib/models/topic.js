@@ -36,7 +36,7 @@ function sortObjGetTimeInv(a, b) {
 	return (b.obj.getTime() - a.obj.getTime());
 }
 
-var topics = {}, messagesByID = {};
+var topics = {}, messagesByID = {}, topicsLoading = {};
 var topicArray = sortedSet(sortObjGetTimeInv);
 
 var Topic = function (data) {
@@ -112,9 +112,7 @@ var Topic = function (data) {
 	setUnread(data.unread);
 
 	socket.on("connect", function () {
-		window.setTimeout(function () {
-			theTopic.refetchMessages();
-		}, h.randomIntFromInterval(500, 5000));
+		theTopic.refetchMessages()
 	});
 
 	this._addTopicUpdates = function (topicUpdatesData) {
@@ -163,6 +161,10 @@ var Topic = function (data) {
 	this.refetchMessages = function () {
 		if (this.fetchingMessages) {
 			return this.refetchPromise;
+		}
+
+		if (this.hasKnownSuccessor()) {
+			return Bluebird.resolve()
 		}
 
 		this.fetchingMessages = true;
@@ -794,17 +796,19 @@ Topic.loadInChunks = function (topicsData, count) {
 }
 
 Topic.createTopicAndAdd = function (topicData) {
-	var topic = new Topic(topicData);
+	var topicID = h.parseDecimal(topicData.topicid)
 
-	var id = topic.getID();
-
-	if (topics[id]) {
-		return topics[id];
+	if (topics[topicID]) {
+		return topics[topicID]
 	}
+
+	var topic = new Topic(topicData);
 
 	topic.findSuccessor()
 
-	topics[id] = topic
+	topics[topicID] = topic
+
+	delete topicsLoading[topicID]
 
 	if (!topic.hasKnownSuccessor()) {
 		topicArray.push(topic.data);
@@ -884,14 +888,18 @@ Topic.getLoadedTopic = function (topicid) {
 	return topics[topicid]
 }
 
-Topic.get = function (topicid, noAutoLoadNewest) {
-	if (topics[topicid]) {
-		return Bluebird.resolve(topics[topicid])
+Topic.get = function (topicID, noAutoLoadNewest) {
+	if (topics[topicID]) {
+		return Bluebird.resolve(topics[topicID])
 	}
 
-	return initService.awaitLoading().then(function () {
+	if (topicsLoading[topicID]) {
+		return topicsLoading[topicID]
+	}
+
+	topicsLoading[topicID] = initService.awaitLoading().then(function () {
 		return socket.definitlyEmit("messages.getTopic", {
-			topicid: topicid
+			topicid: topicID
 		});
 	}).then(function (data) {
 		return Topic.fromData(data.topic, noAutoLoadNewest);
@@ -899,6 +907,8 @@ Topic.get = function (topicid, noAutoLoadNewest) {
 		theTopic.setIgnoreAsLastTopic(true);
 		return theTopic;
 	})
+
+	return topicsLoading[topicID]
 };
 
 Topic.createRawData = function (receiver, predecessorTopic, extraMeta) {
