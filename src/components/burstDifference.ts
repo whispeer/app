@@ -93,7 +93,7 @@ export class BurstDifferenceComponent {
 	}
 
 	getAddedReceivers = (topic) => {
-		if (!topic.data.loaded) {
+		if (!topic.data.verified) {
 			return []
 		}
 
