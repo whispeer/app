@@ -21,43 +21,65 @@ $fab-size: 76px;
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
 
+
+$kelly_green: #5ab70d;
+$napier_green: #3a8100;
+
+$prussian_blue: #124958;
+$dark_cerulean: #1b5c6d;
+
+$red: #ffedec;
+$deep_coffee: #673c41;
+
+$white: #fff;
+$davys_grey: #545b5e;
+$grey: #788286;
+$ghost_white: #f9f9fa;
+$border_grey: #d5d8da;
+$dark_grey: #a0a7aa;
+$isabelline: #ebeced;
+
+$champagne: #ffeda5;
+
 $colors_private: (
-	primary: #5ab70d,
-	primaryDarker: #3a8100,
-	secondary: #013c4c,
-	danger: #f53d3d,
-	light: #fff,
-	dark: #545b5e,
-	grey: #788286,
-	light_grey: #f9f9f9,
-	other_grey: #e5e5e5,
-	blue_grey: #d8dfe2,
-	more_grey: #efeff4,
-	highlight: #ffeda5,
-	green: #5ab70d,
-	greenDarker: #3a8100,
+	primary: $kelly_green,
+	primaryDarker: $napier_green,
+
+	green: $kelly_green,
+	greenDarker: $napier_green,
+
+	secondary: $prussian_blue,
+	danger: $red,
+
+	light: $white,
+	dark: $davys_grey,
+	grey: $grey,
+	light_grey: $ghost_white,
+	other_grey: $isabelline,
+	highlight: $champagne,
 );
 
 $colors_business: (
-	primary: #013c4c,
-	primaryDarker: #3a8100,
-	secondary: #013c4c,
-	danger: #f53d3d,
-	light: #fff,
-	dark: #545b5e,
-	grey: #788286,
-	light_grey: #f9f9f9,
-	other_grey: #e5e5e5,
-	blue_grey: #d8dfe2,
-	more_grey: #efeff4,
-	highlight: #ffeda5,
-	green: #5ab70d,
-	greenDarker: #3a8100,
+	primary: $prussian_blue,
+	primaryDarker: $napier_green,
+
+	green: $kelly_green,
+	greenDarker: $napier_green,
+
+	secondary: $prussian_blue,
+	danger: $red,
+
+	light: $white,
+	dark: $davys_grey,
+	grey: $grey,
+	light_grey: $ghost_white,
+	other_grey: $isabelline,
+	highlight: $champagne,
 );
 
 $colors: $colors_private;
 
-$login-background: #fff;
+$login-background: $white;
 $login-input-color: #b6bbbd;
 
 $message-bubble-color: map-get($colors, primary);
@@ -69,11 +91,7 @@ $svg-fill-grey: map-get($colors, grey);
 $list-text-color: map-get($colors, dark);
 $list-border-color: map-get($colors, other_grey);
 
-// App iOS Variables
-// --------------------------------------------------
-// iOS only Sass variables can go here
-
-$list-ios-activated-background-color: #efeff4;
+$list-ios-activated-background-color: $isabelline;
 $alert-ios-message-text-color: map-get($colors, dark);
 
 $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
@@ -86,19 +104,10 @@ $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
 
 	$message-bubble-color: map-get($colors, grey);
 
-	$svg-fill-primary: map-get($colors, primary);
 	$svg-fill-primaryDark: map-get($colors, primary);
-	$svg-fill-grey: map-get($colors, grey);
 
 	$list-text-color: map-get($colors, dark);
 	$list-border-color: map-get($colors, other_grey);
-
-	// App iOS Variables
-	// --------------------------------------------------
-	// iOS only Sass variables can go here
-
-	$list-ios-activated-background-color: #efeff4;
-	$alert-ios-message-text-color: map-get($colors, dark);
 
 	$action-sheet-ios-button-text-color: map-get($colors, primary);
 }
