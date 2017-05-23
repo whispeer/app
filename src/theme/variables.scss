@@ -21,11 +21,11 @@ $fab-size: 76px;
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
 
-
 $kelly_green: #5ab70d;
 $napier_green: #3a8100;
 
-$prussian_blue: #124958;
+$prussian_blue: #003b4c;
+$prussian_blue_highlight: #124958;
 $dark_cerulean: #1b5c6d;
 
 $red: #ffedec;
@@ -48,7 +48,7 @@ $colors_private: (
 	green: $kelly_green,
 	greenDarker: $napier_green,
 
-	secondary: $prussian_blue,
+	secondary: $prussian_blue_highlight,
 	danger: $red,
 
 	light: $white,
@@ -66,7 +66,7 @@ $colors_business: (
 	green: $kelly_green,
 	greenDarker: $napier_green,
 
-	secondary: $prussian_blue,
+	secondary: $prussian_blue_highlight,
 	danger: $red,
 
 	light: $white,
@@ -80,7 +80,12 @@ $colors_business: (
 $colors: $colors_private;
 
 $login-background: $white;
-$login-input-color: #b6bbbd;
+$login-paragraph-color: $grey;
+$login-input-background: $isabelline;
+$login-input-background-focused: $border_grey;
+$login-input-error: $red;
+$login-input-placeholder-color: $dark_grey;
+$login-input-color: $davys_grey;
 
 $message-bubble-color: map-get($colors, primary);
 
@@ -100,7 +105,12 @@ $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
 	$colors: $colors_business;
 
 	$login-background: map-get($colors, primary);
-	$login-input-color: #ebe9ec;
+	$login-paragraph-color: $white;
+	$login-input-background: $prussian_blue_highlight;
+	$login-input-background-focused: $dark_cerulean;
+	$login-input-error: $deep_coffee;
+	$login-input-placeholder-color: $grey;
+	$login-input-color: $white;
 
 	$message-bubble-color: map-get($colors, grey);
 
