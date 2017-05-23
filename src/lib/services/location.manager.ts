@@ -8,7 +8,7 @@ const loginStorage: Storage = StorageService.withPrefix("whispeer.login");
 const blockedReturnUrls: string[] = ["/b2c", "/recovery"];
 
 const basePath = window.top.location.href.match(/([^?#]*)/)[0]
-const basePathname = basePath.match(/(.*\/).*/)[1]
+const basePathname = basePath.match(/(.*)\/.*/)[1]
 
 const removeOther = (ele: JQuery) => {
 	ele.siblings().remove();
