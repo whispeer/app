@@ -1,7 +1,8 @@
 <div class="login__scroll">
 	<div class="login__wrap">
 		<div class="login__logo-wrap">
-			<img class="login__logo" src="assets/images/logo_grey.svg">
+			<img class="login__logo" src="assets/images/logo_grey.svg" *ngIf="!business">
+			<img class="login__logo" src="assets/images/logo_white.svg" *ngIf="business">
 		</div>
 
 		<div class="login__welcome-text">

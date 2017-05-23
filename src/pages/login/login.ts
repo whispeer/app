@@ -13,6 +13,8 @@ const whispeerHelper = require('whispeerHelper')
 
 import { TranslateService } from '@ngx-translate/core';
 
+import { isBusinessVersion } from '../../lib/services/location.manager'
+
 @IonicPage({
 	name: "Login",
 	segment: "login"
@@ -29,6 +31,8 @@ export class LoginPage {
 	usernameState: number = USERNAME_UNKNOWN;
 
 	tutorialDisabled = true;
+
+	business = isBusinessVersion();
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, private statusBar: StatusBar, private translate: TranslateService) {
 		this.statusBar.styleDefault();
