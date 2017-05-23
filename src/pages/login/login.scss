@@ -12,7 +12,7 @@ page-login {
 	width: 100%;
 
 	color: #000;
-	background-color: #fff;
+	background-color: $login-background;
 }
 
 .login__wrap {
@@ -57,15 +57,17 @@ page-login {
 }
 
 .login__paragraph--primary {
+	color: $login-paragraph-color;
+
 	em {
 		font-style: normal;
-		color: map-get($colors, primary);
+		color: $kelly_green;
 	}
 }
 
 
 .login__welcome-text {
-	color: map-get($colors, primary);
+	color: $kelly_green;
 	font-size: 20px;
 	text-align: center;
 }
@@ -82,6 +84,7 @@ page-login {
 
 .login__input-wrap {
 	margin-bottom: 1em;
+	background: transparent !important;
 }
 
 @mixin placeholder-color($color) {
@@ -105,30 +108,39 @@ page-login {
 
 	padding: 0;
 
-	background-color: map-get($colors, light_grey);
-	color: map-get($colors, grey);
-
 	border: none !important;
 	border-radius: 5px;
 	overflow: hidden;
 
 	font-size: 14px;
 
+	background-color: $login-input-background;
+	color: $login-input-color;
+
 	input {
 		padding: 1em;
 		margin: 0;
 		width: 100%;
-		@include placeholder-color(map-get($colors, other_grey));
+
+		@include placeholder-color($login-input-placeholder-color);
 		&:focus {
-			background-color: map-get($colors, other_grey);
-			@include placeholder-color(map-get($colors, grey));
+			background-color: $login-input-background-focused;
+			@include placeholder-color($login-input-placeholder-color);
 		}
 	}
 
-
-
 	&[disabled="true"], &[ng-reflect-disabled="true"] {
 		background-color: #f5f6f6;
+	}
+}
+
+.login__input-error {
+	background-color: $login-input-error;
+
+	input {
+		&:focus {
+			background-color: $login-input-error;
+		}
 	}
 }
 

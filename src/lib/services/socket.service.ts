@@ -9,6 +9,8 @@ import * as Bluebird from "bluebird";
 import Observer from "../asset/observer";
 import BlobUploader from "./blobUploader.service"
 
+import { goToBusinessVersion, goToSalesPage, isBusinessVersion } from "./location.manager";
+
 const socketDebug = debug("whispeer:socket");
 const socketError = debug("whispeer:socket:error");
 
@@ -209,6 +211,18 @@ class SocketService extends Observer {
 			if (response.error) {
 				socketError(response);
 				throw new ServerError("server returned an error!");
+			}
+
+			if (!isBusinessVersion()) {
+				if (response.isBusiness) {
+					goToBusinessVersion()
+				}
+			}
+
+			if (isBusinessVersion()) {
+				if (response.logedin && !response.isBusiness) {
+					goToSalesPage()
+				}
 			}
 
 			socketDebug(response);

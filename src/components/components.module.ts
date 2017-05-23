@@ -14,6 +14,7 @@ import { TopicComponent } from "./topicDisplay"
 import { SyntaxifyDirective } from "./syntaxify"
 import { ChooseFriends } from "./chooseFriends"
 import { GalleryComponent } from "./gallery/gallery"
+import { LoadComponent } from "./load"
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -29,6 +30,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		SyntaxifyDirective,
 		GalleryComponent,
 		ChooseFriends,
+		LoadComponent,
 	],
 	imports: [
 		HexagonModule,
@@ -47,6 +49,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		SyntaxifyDirective,
 		GalleryComponent,
 		ChooseFriends,
+		LoadComponent,
 
 		HexagonModule,
 		CommonModule,
