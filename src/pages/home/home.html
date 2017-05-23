@@ -18,8 +18,8 @@
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of topic.partnersDisplay"
-					class="hexagon__image"
-					[ngClass]="{'hexagon__image--active': true, 'hexagon__image--medium': topic.partnersDisplay.length > 1}"
+					class="hexagon__image hexagon__image--active"
+					[ngClass]="{'hexagon__image--medium': topic.partnersDisplay.length > 1}"
 				>
 					<user-image [id]="partner.id" [image]="partner.basic.image"></user-image>
 				</ion-avatar>
