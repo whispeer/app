@@ -28,7 +28,7 @@ $prussian_blue: #003b4c;
 $prussian_blue_highlight: #124958;
 $dark_cerulean: #1b5c6d;
 
-$red: #ffedec;
+$red: #fe2824;
 $deep_coffee: #673c41;
 
 $white: #fff;
@@ -101,6 +101,8 @@ $alert-ios-message-text-color: map-get($colors, dark);
 
 $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
 
+$toggle-ios-background-color-on: $kelly_green;
+
 @if $business == 1 {
 	$colors: $colors_business;
 
@@ -114,6 +116,7 @@ $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
 
 	$message-bubble-color: map-get($colors, grey);
 
+	$svg-fill-primary: map-get($colors, primary);
 	$svg-fill-primaryDark: map-get($colors, primary);
 
 	$list-text-color: map-get($colors, dark);
