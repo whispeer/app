@@ -431,6 +431,11 @@ var Topic = function (data) {
 	}
 
 	this.addMessages = function (messages, addUnread) {
+		if (this.hasKnownSuccessor()) {
+			this.getLoadedSuccessor().addMessages(messages, addUnread)
+			return
+		}
+
 		messages.forEach(function (message) {
 			var id = message.getID();
 			data.newestTime = Math.max(message.getTime(), data.newestTime || 0);
