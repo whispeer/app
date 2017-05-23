@@ -26,7 +26,7 @@
 					<load *ngIf="isRequest || isRequestable" [src]="'assets/images/icons/add.svg'" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()"></load>
 					<load *ngIf="!(isRequest || isRequestable)" [src]="'assets/images/icons/added.svg'" class="profile__request-button" id="request__accept__button" (click)="contactOptions()"></load>
 				</div>
-				<ion-avatar class="hexagon__image hexagon--green hexagon__image--active hexagon__image--large profile__image">
+				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 				</ion-avatar>
 				<div class="profile__request-hex" id="request__decline">
@@ -34,7 +34,7 @@
 				</div>
 			</div>
 			<div *ngIf="isOwn" class="profile__avatar-row">
-				<ion-avatar class="hexagon__image hexagon--green hexagon__image--active hexagon__image--large profile__image" (click)="avatarClicked()">
+				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image" (click)="avatarClicked()">
 					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 				</ion-avatar>
 			</div>

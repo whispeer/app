@@ -19,7 +19,7 @@
 				<ion-avatar
 					*ngFor="let partner of topic.partnersDisplay"
 					class="hexagon__image"
-					[ngClass]="{'hexagon__image--active': partner.online, 'hexagon__image--medium': topic.partnersDisplay.length > 1}"
+					[ngClass]="{'hexagon__image--active': true, 'hexagon__image--medium': topic.partnersDisplay.length > 1}"
 				>
 					<user-image [id]="partner.id" [image]="partner.basic.image"></user-image>
 				</ion-avatar>
