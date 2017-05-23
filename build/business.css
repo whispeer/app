@@ -46036,7 +46036,7 @@ ion-fab-list[side="top"] button:last-child {
 }
 
 .hexagon__image--active .border {
-  fill: #003b4c;
+  fill: #5ab70d;
 }
 
 .hexagon__image--large {
@@ -46640,6 +46640,10 @@ page-login strong {
 }
 
 .login__input-error {
+  background-color: #673c41;
+}
+
+.login__input-error input:focus {
   background-color: #673c41;
 }
 
