@@ -129,8 +129,6 @@ page-login {
 		}
 	}
 
-
-
 	&[disabled="true"], &[ng-reflect-disabled="true"] {
 		background-color: #f5f6f6;
 	}
@@ -138,6 +136,12 @@ page-login {
 
 .login__input-error {
 	background-color: $login-input-error;
+
+	input {
+		&:focus {
+			background-color: $login-input-error;
+		}
+	}
 }
 
 .login__icon-label {
