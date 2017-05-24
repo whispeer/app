@@ -108,5 +108,12 @@
 			"removeQuestion": "Are you sure that you want to remove your Picture?",
 			"removeConfirmButtonText": "Remove"
 		}
+	},
+	"sales": {
+		"title": "Hey! It seems like you aren't a business user yet...",
+		"text": "whispeer brings the most secure way of encrypted communication to the professional world - for you and your comapny. Try it now!",
+		"callToAction": "For more details please call:",
+		"finePrint": "German landline. Charges may apply.",
+		"privateUser": "Not a business user? Switch to private"
 	}
 }

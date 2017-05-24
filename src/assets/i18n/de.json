@@ -108,5 +108,12 @@
 			"removeQuestion": "Möchtest Du dieses Bild wirklich entfernen",
 			"removeConfirmButtonText": "Entfernen"
 		}
+	},
+	"sales": {
+		"title": "Hey! Sie scheinen noch kein Geschäftskunde zu sein...",
+		"text": "whispeer bringt die sicherste Art verschlüsselter Kommunikation in die professionelle Welt - für Sie und Ihr Unternehmen. Jetzt testen!",
+		"callToAction": "Rufen Sie uns gerne an:",
+		"finePrint": "Deutsche Festnetznummer. Es können Anrufgebühren anfallen.",
+		"privateUser": "Doch kein Geschäftskunde? Hier zur Privatnutzer wechseln"
 	}
 }

@@ -1,0 +1,159 @@
+page-login {
+	display: flex;
+	strong {
+		font-weight: 500;
+	}
+}
+
+.login__scroll {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	height: 100%;
+	width: 100%;
+
+	color: #000;
+	background-color: $login-background;
+}
+
+.login__wrap {
+	display: flex;
+	flex-direction: column;
+
+	height: 100%;
+	width: 100%;
+}
+
+.login__logo-wrap {
+	text-align: center;
+
+	margin: auto;
+	margin-bottom: 0;
+}
+
+.login__logo {
+	width: 80%;
+}
+
+.login__paragraph {
+	min-height: 2.4em;
+	line-height: 1.2em;
+	font-size: 14px;
+	margin: 12px 0;
+	position: relative;
+	color: map-get($colors, grey);
+	text-align: center;
+
+	> p {
+		width: 100%;
+		position: absolute;
+		bottom: 0;
+		margin: 0;
+	}
+
+	&.login__paragraph--detail {
+		margin-top: 0;
+		font-size: 12px;
+	}
+}
+
+.login__paragraph--primary {
+	color: $login-paragraph-color;
+
+	em {
+		font-style: normal;
+		color: $kelly_green;
+	}
+}
+
+
+.login__welcome-text {
+	color: $kelly_green;
+	font-size: 20px;
+	text-align: center;
+}
+
+.login__form {
+	align-self: flex-end;
+	margin: auto auto 0;
+
+	width: 100%;
+
+	padding: 0 2em;
+
+}
+
+.login__input-wrap {
+	margin-bottom: 1em;
+	background: transparent !important;
+}
+
+@mixin placeholder-color($color) {
+	&::-webkit-input-placeholder { /* WebKit browsers */
+		color: $color;
+	}
+	&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+		color: $color;
+	}
+	&::-moz-placeholder { /* Mozilla Firefox 19+ */
+		color: $color;
+	}
+	&:-ms-input-placeholder { /* Internet Explorer 10+ */
+		color: $color;
+	}
+}
+
+.login__input {
+	display: block;
+	width: 100%;
+
+	padding: 0;
+
+	border: none !important;
+	border-radius: 5px;
+	overflow: hidden;
+
+	font-size: 14px;
+
+	background-color: $login-input-background;
+	color: $login-input-color;
+
+	input {
+		padding: 1em;
+		margin: 0;
+		width: 100%;
+
+		@include placeholder-color($login-input-placeholder-color);
+		&:focus {
+			background-color: $login-input-background-focused;
+			@include placeholder-color($login-input-placeholder-color);
+		}
+	}
+
+	&[disabled="true"], &[ng-reflect-disabled="true"] {
+		background-color: #f5f6f6;
+	}
+}
+
+.login__input-error {
+	background-color: $login-input-error;
+
+	input {
+		&:focus {
+			background-color: $login-input-error;
+		}
+	}
+}
+
+.login__icon-label {
+	position: absolute;
+	top: 50%;
+	right: 0;
+
+	width: 1em !important;
+	height: 1em;
+
+	min-width: 0 !important;
+	margin-top: -0.5em;
+
+	font-size: 1.3em;
+}
