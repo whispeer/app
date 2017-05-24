@@ -36,7 +36,9 @@
 			"genericErrorMessage": "Etwas ist schief gelaufen.",
 			"noConnection": "Keine Verbindung zu whispeer.",
 			"passwordTooShort": "Das Passwort muss aus mindestens 8 Zeichen bestehen."
-		}
+		},
+		"privateUser": "Doch kein Geschäftskunde? <em>Hier wechseln</em>",
+		"businessUser": "Doch kein Privatnutzer? <em>Hier wechseln</em>"
 	},
 	"contacts": {
 		"title": "Kontakte",
@@ -113,7 +115,6 @@
 		"title": "Hey! Sie scheinen noch kein Geschäftskunde zu sein...",
 		"text": "whispeer bringt die sicherste Art verschlüsselter Kommunikation in die professionelle Welt - für Sie und Ihr Unternehmen. Jetzt testen!",
 		"callToAction": "Rufen Sie uns gerne an:",
-		"finePrint": "Deutsche Festnetznummer. Es können Anrufgebühren anfallen.",
-		"privateUser": "Doch kein Geschäftskunde? <em>Hier zur Privatnutzer wechseln</em>"
+		"finePrint": "Deutsche Festnetznummer. Es können Anrufgebühren anfallen."
 	}
 }

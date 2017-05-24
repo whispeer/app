@@ -3,6 +3,13 @@ page-login {
 	strong {
 		font-weight: 500;
 	}
+
+	.sales__private {
+		em {
+			color: $login-business-switch-highlight-color;
+		}
+	}
+
 }
 
 .login__scroll {

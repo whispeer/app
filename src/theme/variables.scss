@@ -86,6 +86,7 @@ $login-input-background-focused: $border_grey;
 $login-input-error: $red;
 $login-input-placeholder-color: $dark_grey;
 $login-input-color: $davys_grey;
+$login-business-switch-highlight-color: $prussian_blue;
 
 $message-bubble-color: map-get($colors, primary);
 
@@ -113,6 +114,7 @@ $toggle-ios-background-color-on: $kelly_green;
 	$login-input-error: $deep_coffee;
 	$login-input-placeholder-color: $grey;
 	$login-input-color: $white;
+	$login-business-switch-highlight-color: $isabelline;
 
 	$message-bubble-color: map-get($colors, grey);
 

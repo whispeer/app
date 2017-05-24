@@ -13,7 +13,7 @@ const whispeerHelper = require('whispeerHelper')
 
 import { TranslateService } from '@ngx-translate/core';
 
-import { isBusinessVersion } from '../../lib/services/location.manager'
+import { isBusinessVersion, goToPrivateHome, goToBusinessVersion } from '../../lib/services/location.manager'
 
 @IonicPage({
 	name: "Login",
@@ -44,6 +44,14 @@ export class LoginPage {
 				? jQuery("#password input")
 				: jQuery("#mail input")).focus();
 		});
+	}
+
+	goToOtherHome() {
+		if (this.business) {
+			goToPrivateHome()
+		} else {
+			goToBusinessVersion()
+		}
 	}
 
 	ionViewCanEnter(): boolean {

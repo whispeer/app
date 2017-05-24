@@ -61,5 +61,10 @@
 				</div>
 			</div>
 		</form>
+		<div class="sales__private" (click)="goToOtherHome()">
+			<span [innerHtml]="'login.privateUser' | translate" *ngIf="business">></span>
+			<span [innerHtml]="'login.businessUser' | translate" *ngIf="!business">></span>
+			<ion-icon ios="ios-arrow-forward-outline"></ion-icon>
+		</div>
 	</div>
 </div>

@@ -36,7 +36,9 @@
 			"genericErrorMessage": "Something went wrong.",
 			"noConnection": "Could not connect to whispeer",
 			"passwordTooShort": "Your password is too short. We require a minimum of 8 characters"
-		}
+		},
+		"privateUser": "Not a business user? <em>Switch to private</em>",
+		"businessUser": "Not a private user? <em>Switch to business</em>"
 	},
 	"contacts": {
 		"title": "Contacts",
