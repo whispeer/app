@@ -2,91 +2,91 @@
 # yarn lockfile v1
 
 
-"@angular/common@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/common/-/common-4.0.0.tgz#ca18983222fdab4ecaa7a8b99eda6ff661e6dc92"
+"@angular/common@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/common/-/common-4.1.2.tgz#8f6d0496c204210bfe255feb437a72253f06984d"
 
-"@angular/compiler-cli@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-4.0.0.tgz#35b2d40cd35135aecec4be659532148f5ac67da6"
+"@angular/compiler-cli@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-4.1.2.tgz#b65ba8980330c048702aed242a956daf0251f02a"
   dependencies:
-    "@angular/tsc-wrapped" "4.0.0"
+    "@angular/tsc-wrapped" "4.1.2"
     minimist "^1.2.0"
     reflect-metadata "^0.1.2"
 
-"@angular/compiler@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-4.0.0.tgz#e1aa061a6f8ef269f9748af1a7bc290f9d37ed6c"
+"@angular/compiler@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-4.1.2.tgz#09542381162fd8dd962d84559498ce69a05071ea"
 
-"@angular/core@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-4.0.0.tgz#fd877e074b29dfa9c63b96a21995fc7556d423a3"
+"@angular/core@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-4.1.2.tgz#37b5c040b9dd37003499aea04319d699e3870596"
 
-"@angular/forms@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-4.0.0.tgz#03163047a2e84af42106270da2e1f47ab0fafc37"
+"@angular/forms@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-4.1.2.tgz#82983e9ec5d0833e7ae14beb8e47dd357c88f490"
 
-"@angular/http@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/http/-/http-4.0.0.tgz#45a538eac42a0b13f3744c7e8bafeb17d58da31c"
+"@angular/http@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/http/-/http-4.1.2.tgz#fc378c3330c0410e1fb8aac2546329a6887776e4"
 
-"@angular/platform-browser-dynamic@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-4.0.0.tgz#d1d9de80fe1e02735be89f512e0faf5a80d57fa5"
+"@angular/platform-browser-dynamic@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-4.1.2.tgz#d241c61792c794bec627ab64b31a66bea22abb9f"
 
-"@angular/platform-browser@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-4.0.0.tgz#512ae9ab19ccc25fa79027f44e291bcee236cd2b"
+"@angular/platform-browser@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-4.1.2.tgz#16e50a8f75b4d675c9e2903e499e0fe4c6a125ac"
 
-"@angular/tsc-wrapped@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/tsc-wrapped/-/tsc-wrapped-4.0.0.tgz#ea91eeda98029cdb0a4ac37d5e25d9d12a4333c1"
+"@angular/tsc-wrapped@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@angular/tsc-wrapped/-/tsc-wrapped-4.1.2.tgz#26cb145a67b9b80f5dda7874c4f0b1f1e173927d"
   dependencies:
     tsickle "^0.21.0"
 
-"@ionic-native/barcode-scanner@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/barcode-scanner/-/barcode-scanner-3.5.0.tgz#b79c63fd1d4e7b4267833f1920e5e0a4b1dd8d35"
+"@ionic-native/barcode-scanner@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/barcode-scanner/-/barcode-scanner-3.6.1.tgz#a94b930da407c68eafbfd2fcb681d67092c3c87d"
 
-"@ionic-native/camera@^3.4.4":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/camera/-/camera-3.5.0.tgz#a128d9337e07611b1cb5fdee0cc80a6d9902145c"
+"@ionic-native/camera@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/camera/-/camera-3.6.1.tgz#2a2980135d343eb2f08d7c5266541bc99e0ba3b0"
 
-"@ionic-native/core@^3.4.4":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/core/-/core-3.5.0.tgz#6a167eb287b0aff3f9a998df6dcd5d1d41b3c0e5"
+"@ionic-native/core@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/core/-/core-3.6.1.tgz#fb0dd23f611dbb33ae9bf54c897c46343968aab6"
 
-"@ionic-native/file@^3.4.4":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/file/-/file-3.5.0.tgz#154c83b50755d3558e1782811e82688de304daf6"
+"@ionic-native/file@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/file/-/file-3.6.1.tgz#5e79763234e7b5b7bd75c7f0ae4a8f92ad6a4aa4"
 
-"@ionic-native/globalization@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@ionic-native/globalization/-/globalization-3.4.4.tgz#5701e0fa203699e00f1f51a76c20e2ef2f2e9d22"
+"@ionic-native/globalization@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/globalization/-/globalization-3.6.1.tgz#78cf9cedb37f244a5635dde487b22ef18e45d95a"
 
-"@ionic-native/image-picker@^3.4.4":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/image-picker/-/image-picker-3.5.0.tgz#04b16a7fcccea9999fd9b5add937f2fd3c641182"
+"@ionic-native/image-picker@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/image-picker/-/image-picker-3.6.1.tgz#27b2d296fc19a8badc43cd94d83d84bdff671d98"
 
-"@ionic-native/in-app-browser@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@ionic-native/in-app-browser/-/in-app-browser-3.4.4.tgz#f5f97b56d8ead2a8655743a9529a919143686e7e"
+"@ionic-native/in-app-browser@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/in-app-browser/-/in-app-browser-3.6.1.tgz#5005e0bc3e6068b6e58de4f478bf6b47ab52493c"
 
-"@ionic-native/photo-viewer@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@ionic-native/photo-viewer/-/photo-viewer-3.4.4.tgz#dd4779f3061e8835bb0657ec4554aeb60f618c09"
+"@ionic-native/photo-viewer@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/photo-viewer/-/photo-viewer-3.6.1.tgz#baee50c337577c1ccf3a9de8acf4b84365b76930"
 
-"@ionic-native/push@^3.4.4":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/push/-/push-3.5.0.tgz#02d0c9c24256dfb445e7aed8c980684e405bbb33"
+"@ionic-native/push@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/push/-/push-3.6.1.tgz#bbe8aef3998e9ba224c2e11a97c3ebb27acfe11a"
 
-"@ionic-native/splash-screen@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@ionic-native/splash-screen/-/splash-screen-3.4.4.tgz#8c76adf0cf21a6ff425ddaa449b91b9aabd61cea"
+"@ionic-native/splash-screen@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/splash-screen/-/splash-screen-3.6.1.tgz#bfbd1debfab35872e224fc11a148113a0854148f"
 
-"@ionic-native/status-bar@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@ionic-native/status-bar/-/status-bar-3.4.4.tgz#78eb4d4ee2d51e25ca94dbe9974047f588f57ec1"
+"@ionic-native/status-bar@3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@ionic-native/status-bar/-/status-bar-3.6.1.tgz#7ad7e3c91eaa7ef1385514b14c5a07c0ca8d5785"
 
 "@ionic/app-scripts@1.3.7":
   version "1.3.7"
@@ -2025,9 +2025,9 @@ invert-kv@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-1.0.0.tgz#104a8e4aaca6d3d8cd157a8ef8bfab2d7a3ffdb6"
 
-ionic-angular@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/ionic-angular/-/ionic-angular-3.0.1.tgz#37e379bff8e2ccc9ebf3cdc64739a723b7142f5f"
+ionic-angular@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/ionic-angular/-/ionic-angular-3.3.0.tgz#81cabbcb3bcc218ec9056cc4fdeaebc264db6f94"
 
 ionicons@3.0.0:
   version "3.0.0"
@@ -2550,17 +2550,17 @@ mime-db@~1.27.0:
   version "1.27.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.27.0.tgz#820f572296bbd20ec25ed55e5b5de869e5436eb1"
 
-mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.7:
-  version "2.1.14"
-  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee"
-  dependencies:
-    mime-db "~1.26.0"
-
-mime-types@~2.1.15:
+mime-types@^2.1.12, mime-types@~2.1.15:
   version "2.1.15"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.15.tgz#a4ebf5064094569237b8cf70046776d09fc92aed"
   dependencies:
     mime-db "~1.27.0"
+
+mime-types@~2.1.11, mime-types@~2.1.7:
+  version "2.1.14"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee"
+  dependencies:
+    mime-db "~1.26.0"
 
 mime@1.3.4:
   version "1.3.4"
@@ -3072,11 +3072,11 @@ qrious@^2.2.0:
   optionalDependencies:
     canvas "^1.3.12"
 
-qs@6.2.0:
+qs@6.2.0, qs@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.2.0.tgz#3b7848c03c2dece69a9522b0fae8c4126d745f3b"
 
-qs@6.4.0, qs@^6.2.0:
+qs@6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
 
@@ -3819,9 +3819,9 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@~2.2.1:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.2.2.tgz#606022508479b55ffa368b58fee963a03dfd7b0c"
+typescript@~2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.3.3.tgz#9639f3c3b40148e8ca97fe08a51dd1891bb6be22"
 
 uglify-js@2.8.22, uglify-js@^2.7.5:
   version "2.8.22"
@@ -4197,6 +4197,6 @@ yeast@0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
 
-zone.js@0.8.5:
-  version "0.8.5"
-  resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.8.5.tgz#7906e017482cbff4c3f079c5c34305ce941f5ba2"
+zone.js@0.8.10:
+  version "0.8.10"
+  resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.8.10.tgz#6d1b696492c029cdbe808e59e87bbd9491b98aa8"
