@@ -36,8 +36,7 @@ export class SessionService extends Observer {
 
 	loadLogin = () => {
 		return this.sessionStorage.awaitLoading().then(() => {
-			return this.sessionStorage.get("loggedin") === "true" && this.sessionStorage.get("password");
-		}).then((loggedin: boolean) => {
+			const loggedin = this.sessionStorage.get("loggedin") === "true" && this.sessionStorage.get("password");
 			if (!loggedin) {
 				return this.sessionStorage.clear().thenReturn(false);
 			}
