@@ -110,10 +110,10 @@
 		}
 	},
 	"sales": {
-		"title": "Hey! It seems like you aren't a business user yet...",
-		"text": "whispeer brings the most secure way of encrypted communication to the professional world - for you and your comapny. Try it now!",
+		"title": "Hey! It seems like you<br/>aren't a business user yet...",
+		"text": "whispeer brings the most secure way of <em>encrypted communication</em> to the professional world - for you and<br>your company. Try it now!",
 		"callToAction": "For more details please call:",
 		"finePrint": "German landline. Charges may apply.",
-		"privateUser": "Not a business user? Switch to private"
+		"privateUser": "Not a business user? <em>Switch to private</em>"
 	}
 }

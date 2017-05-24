@@ -4,7 +4,7 @@ import { StatusBar } from "@ionic-native/status-bar";
 
 import { TranslateService } from '@ngx-translate/core';
 
-import { isBusinessVersion } from '../../lib/services/location.manager'
+import { isBusinessVersion, goToPrivateHome } from '../../lib/services/location.manager'
 
 @IonicPage({
 	name: "Sales",
@@ -29,7 +29,7 @@ export class SalesPage {
 	}
 
 	goToPrivateHome() {
-
+		goToPrivateHome()
 	}
 
 	goToBusiness() {

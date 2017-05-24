@@ -1,11 +1,29 @@
-<div class="login__scroll">
-	<div class="login__wrap">
-		<div class="login__logo-wrap">
-			<img class="login__logo" src="assets/images/logo_white.svg">
-		</div>
+<div class="sales__content">
+	<div class="sales__logo-wrap">
+		<img class="sales__logo" src="assets/images/logo_white.svg">
+	</div>
 
-		<div class="login__welcome-text">
-			<p [innerHTML]="'login.header' | translate"></p>
+	<div class="sales__main">
+		<div class="sales__main-title" [innerHtml]="'sales.title' | translate">
 		</div>
+		<div class="sales__main-text" [innerHtml]="'sales.text' | translate">
+		</div>
+		<div class="sales__callToAction">
+			<div class="sales__callToAction-text">
+				{{ 'sales.callToAction' | translate }}
+			</div>
+			<div class="sales__callToAction-number">
+				+49 (0) 30 - 55 59 76 24
+			</div>
+		</div>
+		<div class="sales__main-finePrint">
+			{{ 'sales.finePrint' | translate }}
+		</div>
+	</div>
+
+	<div class="sales__private" (click)="goToPrivateHome()">
+		<span class="sales__private-text" [innerHtml]="'sales.privateUser' | translate">
+		</span>
+		<ion-icon ios="ios-arrow-forward-outline"></ion-icon>
 	</div>
 </div>

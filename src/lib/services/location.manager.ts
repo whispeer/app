@@ -43,6 +43,10 @@ export const isBusinessVersion = () => {
 	return window.top.location.pathname.indexOf("business.html") !== -1
 }
 
+export const goToPrivateHome = () => {
+	setTopPath("/#/home")
+}
+
 export const loginPage = () => {
 	setTopLocation("#/login");
 }
