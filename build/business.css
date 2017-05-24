@@ -46492,6 +46492,10 @@ page-login strong {
   font-weight: 500;
 }
 
+page-login .sales__private em {
+  color: #ebeced;
+}
+
 .login__scroll {
   overflow-x: hidden;
   overflow-y: scroll;
@@ -47124,4 +47128,117 @@ page-settings ion-content {
 
 .logout-confirm .alert-button:last-child .button-inner {
   color: #fe2824;
+}
+
+page-sales {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+page-sales strong {
+  font-weight: 500;
+}
+
+.sales__content {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: 100%;
+  width: 100%;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  color: #fff;
+  background-color: #003b4c;
+}
+
+.sales__logo-wrap {
+  margin-top: 68px;
+  text-align: center;
+  width: 100%;
+}
+
+.sales__logo {
+  width: 78%;
+}
+
+.sales__main {
+  border-left: 4px solid #5ab70d;
+  padding-bottom: 16px;
+  margin-bottom: 30px;
+}
+
+.sales__main-title {
+  padding-top: 10px;
+  color: #5ab70d;
+  font-size: 24px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.sales__main-text {
+  margin-top: 13px;
+  font-size: 19px;
+  line-height: 1.1em;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.sales__main-text em {
+  color: #5ab70d;
+  font-style: normal;
+}
+
+.sales__callToAction {
+  margin-top: 43px;
+  background-color: #124958;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  padding-left: 20px;
+}
+
+.sales__callToAction-text {
+  font-size: 22px;
+  color: #ffeda5;
+}
+
+.sales__callToAction-number {
+  padding-top: 6px;
+  text-align: center;
+  font-size: 26px;
+}
+
+.sales__main-finePrint {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: #788286;
+}
+
+.sales__private {
+  margin-bottom: 30px;
+  padding-left: 15px;
+  font-size: 17px;
+  color: #788286;
+  width: 100%;
+  position: relative;
+}
+
+.sales__private em {
+  color: #ebeced;
+  font-style: normal;
+}
+
+.sales__private ion-icon {
+  position: absolute;
+  right: 15px;
 }
