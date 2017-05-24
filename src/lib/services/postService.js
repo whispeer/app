@@ -17,7 +17,7 @@ var userService = require("user/userService");
 var circleService = require("circles/circleService");
 var screenSize = require("services/screenSize.service").default;
 var initService = require("services/initService");
-var filterService = require("services/filter.service.ts").default;
+var filterService = require("services/filter.service").default;
 var CommentModel = require("models/comment");
 
 var postsById = {};

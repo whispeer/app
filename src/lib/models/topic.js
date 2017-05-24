@@ -12,7 +12,7 @@ var keyStore = require("services/keyStore.service").default;
 var sessionService = require("services/session.service").default;
 var initService = require("services/initService");
 
-var Cache = require("services/Cache.ts").default;
+var Cache = require("services/Cache").default;
 
 var Message = require("models/message");
 var TopicTitleUpdate = require("messages/topicTitleUpdate").default;

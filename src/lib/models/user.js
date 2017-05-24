@@ -1,6 +1,6 @@
-var errorServiceInstance = require("services/error.service.ts").errorServiceInstance;
+var errorServiceInstance = require("services/error.service").errorServiceInstance;
 var keyStoreService = require("crypto/keyStore");
-var socketService = require("services/socket.service.ts").default;
+var socketService = require("services/socket.service").default;
 
 var h = require("whispeerHelper");
 var State = require("asset/state");
@@ -14,7 +14,7 @@ var ProfileService = require("services/profile.service").default;
 var trustService = require("services/trust.service").default;
 var settingsService = require("services/settings.service").default;
 var friendsService = require("services/friendsService");
-var filterService = require("services/filter.service.ts").default;
+var filterService = require("services/filter.service").default;
 
 var advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"];
 

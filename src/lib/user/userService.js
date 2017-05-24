@@ -6,11 +6,11 @@ var trustManager = require("crypto/trustManager");
 
 var sjcl = require("sjcl");
 
-var errorService = require("services/error.service.ts").errorServiceInstance;
+var errorService = require("services/error.service").errorServiceInstance;
 var keyStoreService = require("crypto/keyStore");
-var socketService = require("services/socket.service.ts").default;
-var requestKeyService = require("services/requestKey.service.ts").default;
-var CacheService = require("services/Cache.ts").default;
+var socketService = require("services/socket.service").default;
+var requestKeyService = require("services/requestKey.service").default;
+var CacheService = require("services/Cache").default;
 var initService = require("services/initService");
 
 var sessionService = require("services/session.service").default;
