@@ -49,26 +49,6 @@ export class ChooseFriends extends ContactsWithSearch {
 		}
 	}
 
-	getContactsWithSelected = () => {
-		const users = this.getUsers();
-
-		return this.selectedUsers.concat(users);
-	}
-
-	contactDividersWithSelected = (record, recordIndex, records) => {
-		const selectedLength = this.selectedUsers.length;
-
-		if (recordIndex < selectedLength) {
-			if (recordIndex === 0) {
-				return this.translate.instant("chooseFriends.selected");
-			}
-
-			return null;
-		}
-
-		return this.contactDividers(record, recordIndex - selectedLength, records.slice(selectedLength));
-	}
-
 	create = () => {
 		this.chooseReceivers.emit(this.selectedUsers);
 	}
