@@ -88,7 +88,6 @@ export class ContactsWithSearch {
 			});
 		}).then((result: any[]) => {
 			this.contacts = result;
-			this.contactsLoading = false;
 		})
 	}
 

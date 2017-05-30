@@ -40,7 +40,9 @@ export class ContactsPage extends ContactsWithSearch {
 				this.requests = contactsService.getRequests()
 				this.loadContactsUsers()
 			});
-			return this.loadContactsUsers();
+			return this.loadContactsUsers().then(() => {
+				this.contactsLoading = false;
+			});
 		})
 	}
 

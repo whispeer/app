@@ -30,7 +30,9 @@ export class ChooseFriends extends ContactsWithSearch {
 	ngOnInit() {
 		friendsService.awaitLoading().then(() => {
 			friendsService.listen(this.loadContactsUsers);
-			this.loadContactsUsers();
+			this.loadContactsUsers().then(() => {
+				this.contactsLoading = false
+			});
 		});
 	}
 
