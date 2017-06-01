@@ -21,8 +21,8 @@
 		"password2Placeholder": "Bitte Passwort erneut eingeben",
 		"passwordPlaceholder": "Bitte Passwort eingeben",
 		"identifierPlaceholder": "Bitte Nutzernamen eingeben",
-		"tos": "Mit der Anmeldung akzeptierst du die <strong>Allgemeinen Geschäftsbedingungen</strong> und unsere <strong>Datenschutzbestimmungen</strong>",
-		"header": "<strong>Hallo</strong> und willkommen<br>in der Welt der sicheren Kommunikation!",
+		"tos": "Mit der Anmeldung akzeptierst du unsere <strong>Allgemeinen Geschäftsbedingungen</strong> und <strong>Datenschutzbestimmungen</strong>.",
+		"header": "<strong>Hallo</strong> und willkommen in <br>der Welt der sicheren Kommunikation!",
 		"messages": {
 			"defaultCallToAction": "<em>Neu registrieren</em> oder <em>einfach anmelden...</em>",
 			"loginSuccess": "<em>Yeah!</em> Wir melden dich jetzt sicher an...",
