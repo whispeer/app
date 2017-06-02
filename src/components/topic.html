@@ -29,6 +29,21 @@
 				<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>
 			</ion-avatar>
 
+			<ion-avatar
+				*ngFor="let partner of partners"
+				class="hexagon__image hexagon__image--active"
+				[ngClass]="{'hexagon__image--medium': partners.length > 1}"
+			>
+				<user-image [id]="partner.id" [image]="partner.basic.image"></user-image>
+			</ion-avatar>
+			<ion-avatar
+				*ngIf="partners.length > 3"
+				class="hexagon__image hexagon__image--medium"
+			>
+				<hexagon></hexagon>
+				<span class="hexagon__image__image topic__remainingUsers">+{{partners.length - 2}}</span>
+			</ion-avatar>
+
 		</ion-title>
 	</ion-navbar>
 </ion-header>
