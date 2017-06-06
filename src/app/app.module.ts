@@ -144,11 +144,11 @@ export class AppModule {
 				}
 
 				translate.use(lang)
+			}).then(() => {
+				translate.get('general.backButtonText').subscribe((val: string) => {
+					config.set('ios', 'backButtonText', val);
+				})
 			})
-		})
-
-		translate.get('general.backButtonText').subscribe((val: string) => {
-			config.set('ios', 'backButtonText', val);
 		})
 
 		Bluebird.setScheduler((fn) => {
