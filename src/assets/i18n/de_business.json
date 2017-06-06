@@ -21,21 +21,21 @@
 		"password2Placeholder": "Bitte Passwort erneut eingeben",
 		"passwordPlaceholder": "Bitte Passwort eingeben",
 		"identifierPlaceholder": "Bitte Nutzernamen eingeben",
-		"tos": "Mit der Anmeldung akzeptierst du unsere <strong>Nutzungsbedingungen</strong> und <strong>Datenschutzbestimmungen</strong>.",
+		"tos": "Mit der Anmeldung akzeptieren Sie die <strong>Nutzungsbedingungen</strong> und unsere <strong>Datenschutzbestimmungen</strong>",
 		"header": "<strong>Hallo</strong> und willkommen in <br>der Welt der sicheren Kommunikation!",
 		"messages": {
 			"defaultCallToAction": "<em>Neu registrieren</em> oder <em>einfach anmelden...</em>",
-			"loginSuccess": "<em>Yeah!</em> Wir melden dich jetzt sicher an...",
-			"ambiguousProcess": "Dieser Nutzername existiert. Du kannst <br>die <em>Anmeldung einfach fortsetzen</em> oder <br>einen <em>anderen Nutzernamen registrieren.</em>",
-			"incorrectPassword": "<em>Dein Passwort</em> ist inkorrekt. <br>Bitte versuche es erneut.",
-			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> <br>Wähle nun ein sicheres Passwort...",
-			"confirmPassword": "Sehr gut! Bitte <em>wiederhole deine Passworteingabe</em>...",
-			"registerSuccess": "<em>Willkommen an Bord!</em> <br>Wir melden dich jetzt sicher an...",
+			"loginSuccess": "<em>Yeah!</em> Wir melden Sie jetzt sicher an...",
+			"ambiguousProcess": "Dieser Nutzername existiert. <em>Sie können <br>die Anmeldung einfach fortsetzen</em> oder <br>einen <em>anderen Nutzernamen registrieren.</em>",
+			"incorrectPassword": "<em>Ihr Passwort</em> ist inkorrekt. <br>Bitte versuchen Sie es erneut.",
+			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> <br>Wählen Sie nun ein sicheres Passwort...",
+			"confirmPassword": "Sehr gut! Bitte <em>wiederholen Sie Ihre Passworteingabe...</em>",
+			"registerSuccess": "<em>Willkommen an Bord!</em> <br>Wir melden Sie jetzt sicher an...",
 			"invalidUsername": "<em>A-Z a-z 0-9</em> sind in Nutzernamen erlaubt. <br>Leer- und Sonderzeichen sind es nicht.",
-			"passwordsDontMatch": "Dein <em>wiederholtes Passwort</em> stimmt nicht überein.",
-			"genericErrorMessage": "Etwas ist schief gelaufen. Starte bitte neu.",
+			"passwordsDontMatch": "Ihr <em>wiederholtes Passwort</em> stimmt nicht überein.",
+			"genericErrorMessage": "Etwas ist schief gelaufen. Starten Sie bitte neu.",
 			"noConnection": "Keine Verbindung zu whispeer.",
-			"passwordTooShort": "Dein Passwort ist <em>zu kurz</em>. Es sollte <br>mindestens 8 Zeichen enthalten."
+			"passwordTooShort": "Ihr Passwort ist <em>zu kurz</em>. Es sollte <br>mindestens 8 Zeichen enthalten."
 		},
 		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>",
 		"businessUser": "Doch kein Privatnutzer? <em>Wechsel zu Business</em>"
@@ -60,19 +60,19 @@
 	"settings": {
 		"title": "Einstellungen",
 		"header": "App Einstellungen",
-		"push": "Erhalte Push-Benachrichtigungen",
+		"push": "Push-Benachrichtigungen erhalten",
 		"tutorial": "Tutorial neustarten",
 		"about": "Über whispeer",
 		"tos": "Nutzungsbedingungen",
 		"privacy": "Datenschutzbestimmungen",
-		"contact": "Kontaktiere uns",
-		"feedback": "Gebe uns Feedback",
+		"contact": "Kontaktieren Sie uns",
+		"feedback": "Geben Sie uns Feedback",
 		"logout": "Abmelden",
 		"companyName": "whispeer von mindpost GmbH",
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Möchtest du dein Konto auf diesem Gerät abmelden?"
+		"logoutWarning": "Möchten Sie Ihr Konto auf diesem Gerät abmelden?"
 	},
 	"profile": {
 		"ownTitle": "Profil",
@@ -83,23 +83,23 @@
 		"location": "Ort",
 		"languages": "Sprache",
 		"verify": "Diesen Kontakt verifizieren",
-		"idTitle": "Deine ID<br/> als Text",
-		"idExplanation": "Das ist deine persönliche und einzigartige ID auf whispeer. Diese brauchst du, <span class='text-primary'>um Kontakte zu verifizieren</span>—für die extra Portion Sicherheit! <br><br>Sie scannen deine ID, du scannst ihre IDs und ihr beide habt eure Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
+		"idTitle": "Ihre ID<br/> als Text",
+		"idExplanation": "Das ist Ihre persönliche und einzigartige ID auf whispeer. Diese brauchen Sie, <span class='text-primary'>um Kontakte zu verifizieren</span>—für die extra Portion Sicherheit! <br><br>Diese scannen Ihre ID, Sie scannen deren IDs und Sie beide haben Ihre Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
 		"contacts": {
 			"accepted": "Akzeptiert!",
 			"requestSent": "Anfrage gesendet!",
 			"acceptRequest": "Anfrage annehmen?",
 			"declineRequest": "Anfrage ablehnen",
-			"acceptRequestQuestion": "Möchtest du {{name}} als Kontakt hinzufügen?",
+			"acceptRequestQuestion": "Möchten Sie {{name}} als Kontakt hinzufügen?",
 			"sendRequest": "Anfrage senden?",
-			"sendRequestQuestion": "Möchtest du eine Kontaktanfrage an {{name}} senden?",
+			"sendRequestQuestion": "Möchten Sie eine Kontaktanfrage an {{name}} senden?",
 			"send": "Senden",
 			"removeButtonText": "Kontakt entfernen",
 			"removeTitle": "Kontakt entfernen?",
-			"removeQuestion": "Möchtest du {{name}} wirklich aus deinen Kontakten entfernen?",
+			"removeQuestion": "Möchten Sie {{name}} wirklich aus Ihren Kontakten entfernen?",
 			"removeConfirmButtonText": "Entfernen",
-			"acceptedMessage": "{{name}} ist nun dein Kontakt.",
-			"requestSentMessage": "Du hast eine Kontaktanfrage an {{name}} gesendet."
+			"acceptedMessage": "{{name}} ist nun Ihr Kontakt.",
+			"requestSentMessage": "Sie haben eine Kontaktanfrage an {{name}} gesendet."
 		},
 		"image": {
 			"view": "Bild ansehen",
@@ -107,15 +107,15 @@
 			"selectPhoto": "Aus Galerie auswählen",
 			"removeButtonText": "Entfernen",
 			"removeTitle": "Bild entfernen",
-			"removeQuestion": "Möchtest du dein Bild wirklich entfernen?",
+			"removeQuestion": "Möchten Sie Ihr Bild wirklich entfernen?",
 			"removeConfirmButtonText": "Entfernen"
 		}
 	},
 	"sales": {
 		"title": "Hey! Sie scheinen noch kein Geschäftskunde zu sein...",
-		"text": "whispeer bringt die sicherste Art <em>verschlüsselter Kommunikation</em> in die professionelle Welt - für Sie und Ihr Unternehmen. Jetzt testen!",
+		"text": "whispeer bringt die sicherste Art verschlüsselter Kommunikation in die professionelle Welt - für Sie und Ihr Unternehmen. Jetzt testen!",
 		"callToAction": "Rufen Sie uns gerne an:",
 		"finePrint": "Deutsche Festnetznummer.<br>Es können Anrufgebühren anfallen.",
-		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>"
+		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>",
 	}
 }
