@@ -30,6 +30,8 @@ import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-transla
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpModule, Http } from '@angular/http';
 
+import { isBusinessVersion } from "../lib/services/location.manager";
+
 (window as any).startup = new Date().getTime();
 
 export function createTranslateLoader(http: Http) {
@@ -134,8 +136,14 @@ export class AppModule {
 				console.warn('Cannot get language from device, remaining with default language');
 				return DEFAULT_LANG
 			}).then((lang) => {
-				translate.use(lang)
 				moment.locale(lang);
+
+				if (isBusinessVersion()) {
+					translate.use(`${lang}_business`)
+					return
+				}
+
+				translate.use(lang)
 			})
 		})
 
