@@ -85,6 +85,10 @@ MyBlob.prototype.getArrayBuffer = function () {
 	return new Bluebird(function (resolve) {
 		var reader = new FileReader();
 
+		if (reader._realReader) {
+			reader = reader._realReader
+		}
+
 		if (reader.addEventListener) {
 			reader.addEventListener("loadend", resolve);
 		} else {
