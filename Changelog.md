@@ -1,3 +1,10 @@
+=== 0.2.12 ===
+- Business Version
+- Loginseite verbessert
+- Datumstempel und Titeländerungen im Chat
+- Nutzerauswahl für neuen Chat verbessert
+- Fehlerbehebungen
+
 === 0.2.11 ===
 - Chatübersicht lädt schneller und stabiler
 - Deutsche Übersetzung der App
