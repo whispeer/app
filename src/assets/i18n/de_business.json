@@ -8,7 +8,7 @@
 	},
 	"time": {
 		"today": "Heute",
-		"tomorrow": "Morgen"
+		"yesterday": "Gestern"
 	},
 	"home": {
 		"title": "Nachrichten",
