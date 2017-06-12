@@ -13,4 +13,13 @@ import errorService from "../../lib/services/error.service";
 	templateUrl: 'details.html'
 })
 export class DetailPage {
+	topicId: number;
+
+	constructor(public navParams: NavParams, private element: ElementRef) {
+	}
+
+	ngOnInit() {
+		this.topicId = parseFloat(this.navParams.get("topicId"));
+		console.log('Init details page for topic', this.topicId);
+	}
 }
