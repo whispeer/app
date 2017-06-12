@@ -1,0 +1,121 @@
+{
+	"general": {
+		"backButtonText": "Back",
+		"cancel": "Cancel",
+		"ok": "Ok",
+		"accept": "Accept",
+		"decline": "Decline"
+	},
+	"time": {
+		"today": "Today",
+		"yesterday": "Yesterday"
+	},
+	"home": {
+		"title": "Messages",
+		"newContact": {
+			"single": "New Contact Request",
+			"many": "New Contact Requests"
+		}
+	},
+	"login": {
+		"password2Placeholder": "Please type your password again",
+		"passwordPlaceholder": "Enter a password",
+		"identifierPlaceholder": "Enter an username",
+		"tos": "By signing up you agree to our <strong>Terms of Service</strong> <br>and our very strict <strong>Privacy Policy</strong>.",
+		"header": "<strong>Hello</strong> and welcome to<br>the world of secure messaging!",
+		"messages": {
+			"defaultCallToAction": "<em>Create a new account</em> or <em>simply login...</em>",
+			"loginSuccess": "<em>Success!</em> We'll log you in securely now...",
+			"ambiguousProcess": "This username exists. You can choose to <br><em>continue logging in</em> or <em>register an unique name.</em>",
+			"incorrectPassword": "<em>Your password</em> is incorrect. Please try again.",
+			"registerMessage": "<em>This username is free.</em> <br>You can continue to choose a secure password...",
+			"confirmPassword": "<em>Great!</em> Now verify your new password...",
+			"registerSuccess": "<em>Welcome on board!</em> <br>We'll log you in securely now...",
+			"invalidUsername": "<em>A-Z a-z 0-9</em> are allowed for usernames. <br>Special characters and spaces are not.",
+			"passwordsDontMatch": "<em>Your repeated password</em> does not match.",
+			"genericErrorMessage": "Something went wrong. Please start over.",
+			"noConnection": "No connection to whispeer.",
+			"passwordTooShort": "Your password is <em>too short</em>. <br>It should consist of 8 characters minimum."
+		},
+		"privateUser": "Not a Business User? <em>Switch to Private</em>",
+		"businessUser": "Not a Private User? <em>Switch to Business</em>"
+	},
+	"contacts": {
+		"title": "Contacts",
+		"search": "Search"
+	},
+	"requests": {
+		"title": "Contact Requests"
+	},
+	"topic": {
+		"takePhoto": "Take a Photo",
+		"selectGallery": "Select from Gallery",
+		"changed": "changed the title to"
+	},
+	"chooseFriends": {
+		"title": "Select Contacts",
+		"selected": "Selected",
+		"search": "Search"
+	},
+	"settings": {
+		"title": "Settings",
+		"header": "App Settings",
+		"push": "Receive Push-Notifications",
+		"tutorial": "Restart Tutorial",
+		"about": "About whispeer",
+		"tos": "Terms of Service",
+		"privacy": "Privacy policy",
+		"contact": "Contact us",
+		"feedback": "Give us Feedback",
+		"logout": "Logout",
+		"companyName": "whispeer by mindpost GmbH",
+		"madeInGermany": "Made in Germany with",
+		"humanRights": "for human rights",
+		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
+		"logoutWarning": "Do you want to log out from this device?"
+	},
+	"profile": {
+		"ownTitle": "Profile",
+		"otherTitle": "{{name}}'s Profile",
+		"profileSegment": "Profile",
+		"qrSegment": "QR-Code",
+		"birthday": "Birthday",
+		"location": "Location",
+		"languages": "Language",
+		"verify": "Verify this Contact",
+		"idTitle": "Your ID<br/> as a text",
+		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with Contacts</span>—for extra security! <br><br>They scan your ID, you scan their IDs and both of you easily increased your security measures again. Cool, huh?",
+		"contacts": {
+			"accepted": "Accepted!",
+			"requestSent": "Request sent!",
+			"acceptRequest": "Accept this Request?",
+			"declineRequest": "Decline this Request",
+			"acceptRequestQuestion": "Do you want to add {{name}} as a Contact?",
+			"sendRequest": "Send a Request?",
+			"sendRequestQuestion": "Do you want to send {{name}} a Contact Request?",
+			"send": "Send",
+			"removeButtonText": "Remove from Contacts",
+			"removeTitle": "Remove this Contact?",
+			"removeQuestion": "Are you sure that you want to remove {{name}} from your Contacts?",
+			"removeConfirmButtonText": "Remove",
+			"acceptedMessage": "{{name}} is now a Contact.",
+			"requestSentMessage": "You've sent a Contact Request to {{name}}."
+		},
+		"image": {
+			"view": "View Picture",
+			"takePhoto": "Take a Photo",
+			"selectPhoto": "Select from Gallery",
+			"removeButtonText": "Remove",
+			"removeTitle": "Remove Picture",
+			"removeQuestion": "Are you sure that you want to remove your Picture?",
+			"removeConfirmButtonText": "Remove"
+		}
+	},
+	"sales": {
+		"title": "Hey! It seems like you<br/>aren't a Business User yet...",
+		"text": "whispeer brings the most secure way of <em>encrypted communication</em> to the professional world - for you and<br>your company. Try it now!",
+		"callToAction": "For more details please call:",
+		"finePrint": "German landline. Charges may apply.",
+		"privateUser": "Not a Business User? <em>Switch to Private</em>"
+	}
+}

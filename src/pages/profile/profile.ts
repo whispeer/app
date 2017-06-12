@@ -173,8 +173,8 @@ export class ProfilePage {
 
 		if(this.isRequest) {
 			addOrAcceptConfirm = this.alertCtrl.create({
-				title: this.translate.instant("profile.contacts.acceptRequest"),
-				message: this.translate.instant("profile.contacts.acceptRequestQuestion"),
+				title: this.translate.instant("profile.contacts.acceptRequest", { name: this.user.name }),
+				message: this.translate.instant("profile.contacts.acceptRequestQuestion", { name: this.user.name }),
 				buttons: [
 					{ text: this.translate.instant("general.decline"), role: 'danger' },
 					{ text: this.translate.instant("general.accept"),
@@ -188,7 +188,7 @@ export class ProfilePage {
 		} else {
 			addOrAcceptConfirm = this.alertCtrl.create({
 				title: this.translate.instant("profile.contacts.sendRequest"),
-				message: this.translate.instant("profile.contacts.sendRequestQuestion"),
+				message: this.translate.instant("profile.contacts.sendRequestQuestion", { name: this.user.name }),
 				buttons: [
 					{ text: this.translate.instant("general.cancel"), role: 'cancel' },
 					{ text: this.translate.instant("profile.contacts.send"),
@@ -244,7 +244,7 @@ export class ProfilePage {
 	removeFriendClick = () => {
 		this.alertCtrl.create(<AlertOptions>{
 			title: this.translate.instant("profile.contacts.removeTitle"),
-			message: this.translate.instant("profile.contacts.removeQuestion"),
+			message: this.translate.instant("profile.contacts.removeQuestion", { name: this.user.name }),
 			buttons: [{
 				text: this.translate.instant("general.cancel"),
 				role: "cancel"

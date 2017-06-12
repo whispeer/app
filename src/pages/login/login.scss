@@ -44,7 +44,7 @@ page-login {
 .login__paragraph {
 	min-height: 2.4em;
 	line-height: 1.2em;
-	font-size: 14px;
+	font-size: 16px;
 	margin: 12px 0;
 	position: relative;
 	color: map-get($colors, grey);
@@ -124,7 +124,7 @@ page-login {
 	background-color: $login-input-background;
 	color: $login-input-color;
 
-	input {
+	.text-input {
 		padding: 1em;
 		margin: 0;
 		width: 100%;
