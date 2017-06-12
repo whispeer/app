@@ -6,7 +6,7 @@ import errorService from "../../lib/services/error.service";
 
 @IonicPage({
 	name: "Chat Details",
-	segment: "details"
+	segment: "messages/:topicId/details",
 })
 @Component({
 	selector: 'page-details',
