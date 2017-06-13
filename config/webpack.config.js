@@ -45,6 +45,10 @@ module.exports = {
 			}, {
 				test: /\.js$/,
 				loader: process.env.IONIC_WEBPACK_TRANSPILE_LOADER
+			},
+			{
+				test: /\.svg$/,
+				use: "raw-loader"
 			}
 		],
 		noParse: [

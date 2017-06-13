@@ -69,6 +69,7 @@
     "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz",
     "mathsass": "^0.9.5",
     "node-sass": "^4.5.2",
+    "raw-loader": "^0.5.1",
     "typescript": "~2.3.3",
     "webpack-bundle-analyzer": "^2.4.0",
     "webpack-bundle-size-analyzer": "^2.6.0",

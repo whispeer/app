@@ -10,11 +10,9 @@ export class LoadComponent {
 	constructor(private sanitizer: DomSanitizer) {};
 
 	@Input()
-	set src(src: string) {
-		fetch(src).then((res) => {
-			return res.text();
-		}).then((res: string) => {
-			this.html = this.sanitizer.bypassSecurityTrustHtml(res);
-		});
+	set name(name: string) {
+		const icon = require(`../assets/images/icons/${name}.svg`)
+
+		this.html = this.sanitizer.bypassSecurityTrustHtml(icon)
 	}
 }
