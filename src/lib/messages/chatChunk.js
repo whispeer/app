@@ -1,26 +1,26 @@
-var h = require("whispeerHelper");
-var validator = require("validation/validator");
-var Observer = require("asset/observer");
-var SecuredData = require("asset/securedDataWithMetaData");
-var Bluebird = require("bluebird");
-var debug = require("debug");
+const h = require("whispeerHelper");
+const validator = require("validation/validator");
+const Observer = require("asset/observer");
+const SecuredData = require("asset/securedDataWithMetaData");
+const Bluebird = require("bluebird");
+const debug = require("debug");
 
-var userService = require("user/userService");
-var socket = require("services/socket.service").default;
-var keyStore = require("services/keyStore.service").default;
-var sessionService = require("services/session.service").default;
-var initService = require("services/initService");
+const userService = require("user/userService");
+const socket = require("services/socket.service").default;
+const keyStore = require("services/keyStore.service").default;
+const sessionService = require("services/session.service").default;
+const initService = require("services/initService");
 
-var Cache = require("services/Cache.ts").default;
+const Cache = require("services/Cache.ts").default;
 
-var Message = require("models/message");
+const Message = require("models/message");
 
-var ImageUpload = require("services/imageUploadService");
+const ImageUpload = require("services/imageUploadService");
 
-var debugName = "whispeer:chunk";
-var chunkDebug = debug(debugName);
+const debugName = "whispeer:chunk";
+const chunkDebug = debug(debugName);
 
-var chunksByID = {}, chunksLoadingByID = {};
+const chunksByID = {}, chunksLoadingByID = {};
 
 var Chunk = function (data) {
 	var theChunk = this
@@ -215,7 +215,7 @@ var Chunk = function (data) {
 		return receiver;
 	};
 
-	this.loadAllData = function () {
+	this.load = function () {
 		return Bluebird.all([
 			this.verify(),
 			this.loadReceiverNames(),
@@ -348,6 +348,23 @@ var Chunk = function (data) {
 	Observer.extend(theChunk);
 };
 
+Chunk.load = function (chunkData) {
+	debugger
+	var chunkID = chunkData.server.id
+
+	if (chunksByID[chunkID]) {
+		return chunksByID[chunkID]
+	}
+
+	if (chunksLoadingByID[chunkID]) {
+		return chunksLoadingByID[chunkID]
+	}
+
+	var chunk = new Chunk(chunkData)
+
+	chunksLoadingByID[chunkID] = chunk.load().thenReturn(chunk)
+}
+
 Chunk.multipleFromData = function (topicsData) {
 	return Bluebird.resolve(topicsData).map(function (topicData) {
 		return Chunk.createTopicAndAdd(topicData);
@@ -373,22 +390,22 @@ Chunk.loadInChunks = function (topicsData, count) {
 	})
 }
 
-Chunk.createTopicAndAdd = function (topicData) {
-	var topicID = h.parseDecimal(topicData.topicid)
+Chunk.createTopicAndAdd = function (chunkData) {
+	var chunkID = h.parseDecimal(chunkData.topicid)
 
-	if (chunksByID[topicID]) {
-		return chunksByID[topicID]
+	if (chunksByID[chunkID]) {
+		return chunksByID[chunkID]
 	}
 
-	var topic = new Chunk(topicData);
+	var chunk = new Chunk(chunkData);
 
-	topic.findSuccessor()
+	chunk.findSuccessor()
 
-	chunksByID[topicID] = topic
+	chunksByID[chunkID] = chunk
 
-	delete chunksLoadingByID[topicID]
+	delete chunksLoadingByID[chunkID]
 
-	return topic;
+	return chunk;
 };
 
 Chunk.loadTopic = function (topic) {
@@ -396,7 +413,7 @@ Chunk.loadTopic = function (topic) {
 		return Bluebird.resolve(topic);
 	}
 
-	return topic.loadAllData().then(function () {
+	return topic.load().then(function () {
 		chunkDebug("Topic loaded (" + topic.getID() + "):" + (new Date().getTime() - startup));
 	}).thenReturn(topic)
 };

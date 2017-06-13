@@ -1,7 +1,5 @@
 import { Component, Input } from "@angular/core";
 
-import { TranslateService } from '@ngx-translate/core';
-
 const h = require("whispeerHelper");
 
 var Topic = require("messages/chatChunk")

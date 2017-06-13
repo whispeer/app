@@ -67,8 +67,6 @@ messageService = {
 				return loadingChatsPromise
 			}
 
-			messageService.loading = true;
-
 			loadingChatsPromise = initService.awaitLoading().then(function () {
 				return messageService.getAllChatIDs()
 			}).then(function (chatIDs) {
@@ -84,13 +82,9 @@ messageService = {
 					ids: unloadedChatIDs.slice(0, 20)
 				})
 			}).then(function (latest) {
-				messageService.loading = false;
-
 				return Bluebird.all(latest.chats.map(function (chatData) {
 					return Chat.load(chatData)
 				}))
-
-				// return Topic.loadInChunks(latest.topics, 4);
 			}).then(function (topics) {
 
 			}).catch(errorService.criticalError);
@@ -161,8 +155,8 @@ messageService = {
 					receiverKeys: chunkData.receiverKeys,
 					keys: chunkData.keys
 				});
-			}).then(function (result) {
-				return Chat.multipleFromData([result.topic]);
+			}).then(function (response) {
+				return Chat.load(response);
 			}).then(function (topics) {
 				return topics[0].getID();
 			});
@@ -207,44 +201,9 @@ messageService = {
 
 Observer.extend(messageService);
 
-function updateReadCount() {
-	messageService.data.unread = messageService.data.unreadIDs.length;
-
-	messageService.notify(messageService.data.unreadIDs, "updateUnread");
-}
-
-function updateUnreadIDs(ids) {
-	ids = ids.map(h.parseDecimal);
-
-	messageService.data.unreadIDs = ids;
-
-	Chat.all().filter(function (topic) {
-		return topic.unread;
-	}).forEach(function (topic) {
-		var id = h.parseDecimal(topic.id);
-		if (ids.indexOf(id) === -1) {
-			topic.obj.wasReadOnOtherClient();
-		}
-	});
-
-	updateReadCount();
-}
-
-function changeReadTopic(topicID, read) {
-	topicID = h.parseDecimal(topicID);
-
-	h.removeArray(messageService.data.unreadIDs, topicID);
-
-	if (!read) {
-		messageService.data.unreadIDs.unshift(topicID);
-	}
-
-	updateReadCount();
-}
-
 socket.channel("message", function (e, data) {
 	if (!e) {
-		if (data.topic) {
+		/*if (data.topic) {
 			Chat.fromData(data.topic).then(function (topic) {
 				if (topic.data.unread) {
 					changeReadTopic(topic.getID(), true);
@@ -254,7 +213,8 @@ socket.channel("message", function (e, data) {
 			});
 		} else {
 			messageService.addSocketMessage(data.message);
-		}
+		}*/
+		// TODO
 	} else {
 		errorService.criticalError(e);
 	}
@@ -265,7 +225,7 @@ socket.channel("unreadTopics", function (e, data) {
 		return;
 	}
 
-	updateUnreadIDs(data.unread);
+
 });
 
 function loadUnreadTopicIDs() {
@@ -276,7 +236,7 @@ function loadUnreadTopicIDs() {
 	}).then(function () {
 		return socket.emit("messages.getUnreadTopicIDs", {});
 	}).then(function (data) {
-		updateUnreadIDs(data.unread);
+		//TODO: updateUnreadIDs(data.unread);
 	});
 }
 
@@ -289,4 +249,4 @@ initService.listen(function () {
 	messageService.sendUnsentMessages();
 }, "initDone");
 
-module.exports = messageService;
+export default messageService

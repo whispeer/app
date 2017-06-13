@@ -4,7 +4,7 @@ import { NavController, NavParams, IonicPage } from "ionic-angular";
 import TopicTitleUpdate from "../../lib/messages/topicTitleUpdate";
 import errorService from "../../lib/services/error.service";
 
-const messageService = require("../../lib/messages/messageService");
+import messageService from "../../lib/messages/messageService";
 const Burst = require("../../lib/messages/burst");
 
 const inView = require("in-view");

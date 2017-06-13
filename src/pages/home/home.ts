@@ -4,7 +4,7 @@ import { NavController, Content, IonicPage } from "ionic-angular";
 
 import { TranslateService } from '@ngx-translate/core';
 
-const messageService = require("messages/messageService");
+import messageService from "../../lib/messages/messageService";
 const contactsService = require("../../lib/services/friendsService");
 
 @IonicPage({
@@ -40,7 +40,7 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
-		this.topics = messageService.data.latestTopics.data;
+		this.topics = [] //TODO messageService.data.latestTopics.data;
 
 		console.warn("load more topics?", this.topics.length)
 		if (this.topics.length >= 10) {
@@ -48,7 +48,8 @@ export class HomePage {
 		}
 
 		messageService.loadMoreChats().then(() => {
-			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
+			/*TODO this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
+			*/
 			this.topicsLoading = false;
 		});
 	}

@@ -28,11 +28,9 @@ export default class Chat {
 	private chatUpdates = sortedSet(sortGetTime)
 	private messagesAndUpdates = sortedSet(sortGetTime)
 
-	private chunks = []
+	private chunkIDs = []
 	private unreadMessageIDs = []
 	private id: number
-
-	private read: boolean
 
 	static isChatLoaded(id) {
 		return chatsByID.hasOwnProperty(id)
@@ -52,8 +50,7 @@ export default class Chat {
 		return Bluebird.all([
 			loadChunks,
 			loadMessages,
-			chat.load(),
-		]).thenReturn(chat)
+		]).then(() => chat.load()).thenReturn(chat)
 	}
 
 	static get(id) {
@@ -69,10 +66,13 @@ export default class Chat {
 	constructor(chatData) {
 		this.id = chatData.id
 
-		// chatData.newest
+		// chatData.latestMessageID
+		// chatData.latestChunkID
 		// chatData.unreadMessageIDs
+	}
 
-		this.read = unreadChatIDs.indexOf(this.id) > -1
+	isUnread() {
+		return unreadChatIDs.indexOf(this.id) > -1
 	}
 
 	load() {

@@ -10,7 +10,7 @@ import { withPrefix } from "./storage.service";
 import errorService from "./error.service";
 
 const initService = require("./initService");
-const messageService = require("../messages/messageService");
+import messageService from "../messages/messageService";
 
 const sessionStorage = withPrefix("whispeer.session");
 
