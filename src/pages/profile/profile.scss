@@ -33,6 +33,11 @@ page-profile {
 	margin: auto auto 0;
 
 	width: 50px;
+
+	svg {
+		height: 100%;
+		width: 100%;
+	}
 }
 
 .profile__request-button {

@@ -1,7 +1,7 @@
 var keyStoreService = require("services/keyStore.service").default;
 var socketService = require("services/socket.service").default;
 var ProfileService = require("services/profile.service").default;
-var Storage = require("services/storage.service.ts");
+var Storage = require("services/storage.service");
 var errorService = require("services/error.service").errorServiceInstance;
 
 var Bluebird = require("bluebird");

@@ -1,8 +1,8 @@
-var errorService = require("./error.service.ts").errorServiceInstance;
+var errorService = require("./error.service").errorServiceInstance;
 var keyStore = require("crypto/keyStore");
-var socketService = require("services/socket.service.ts").default;
-var requestKeyService = require("services/requestKey.service.ts").default;
-var CacheService = require("./Cache.ts").default;
+var socketService = require("services/socket.service").default;
+var requestKeyService = require("services/requestKey.service").default;
+var CacheService = require("./Cache").default;
 
 var h = require("whispeerHelper");
 var debug = require("debug");

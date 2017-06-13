@@ -1,5 +1,15 @@
 page-login {
 	display: flex;
+	strong {
+		font-weight: 500;
+	}
+
+	.sales__private {
+		em {
+			color: $login-business-switch-highlight-color;
+		}
+	}
+
 }
 
 .login__scroll {
@@ -9,7 +19,7 @@ page-login {
 	width: 100%;
 
 	color: #000;
-	background-color: #fff;
+	background-color: $login-background;
 }
 
 .login__wrap {
@@ -32,19 +42,39 @@ page-login {
 }
 
 .login__paragraph {
+	min-height: 2.4em;
+	line-height: 1.2em;
+	font-size: 16px;
+	margin: 12px 0;
+	position: relative;
+	color: map-get($colors, grey);
 	text-align: center;
+
+	> p {
+		width: 100%;
+		position: absolute;
+		bottom: 0;
+		margin: 0;
+	}
+
+	&.login__paragraph--detail {
+		margin-top: 0;
+		font-size: 12px;
+	}
 }
 
 .login__paragraph--primary {
-	color: map-get($colors, primary);
+	color: $login-paragraph-color;
+
+	em {
+		font-style: normal;
+		color: $kelly_green;
+	}
 }
 
-.login__paragraph--detail {
-	margin-top: 0;
-	color: #c6cbcc;
-}
 
 .login__welcome-text {
+	color: $kelly_green;
 	font-size: 20px;
 	text-align: center;
 }
@@ -57,23 +87,26 @@ page-login {
 
 	padding: 0 2em;
 
-	.login__paragraph {
-		min-height: 2.4em;
-		line-height: 1.2em;
-		font-size: 14px;
-		margin: 12px 0;
-		position: relative;
-		> p {
-			width: 100%;
-			position: absolute;
-			bottom: 0;
-			margin: 0;
-		}
-	}
 }
 
 .login__input-wrap {
 	margin-bottom: 1em;
+	background: transparent !important;
+}
+
+@mixin placeholder-color($color) {
+	&::-webkit-input-placeholder { /* WebKit browsers */
+		color: $color;
+	}
+	&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+		color: $color;
+	}
+	&::-moz-placeholder { /* Mozilla Firefox 19+ */
+		color: $color;
+	}
+	&:-ms-input-placeholder { /* Internet Explorer 10+ */
+		color: $color;
+	}
 }
 
 .login__input {
@@ -82,21 +115,39 @@ page-login {
 
 	padding: 0;
 
-	background-color: #e9eaeb;
-	color: #b6bbbd;
-
 	border: none !important;
 	border-radius: 5px;
+	overflow: hidden;
 
 	font-size: 14px;
 
-	input {
+	background-color: $login-input-background;
+	color: $login-input-color;
+
+	.text-input {
 		padding: 1em;
 		margin: 0;
+		width: 100%;
+
+		@include placeholder-color($login-input-placeholder-color);
+		&:focus {
+			background-color: $login-input-background-focused;
+			@include placeholder-color($login-input-placeholder-color);
+		}
 	}
 
 	&[disabled="true"], &[ng-reflect-disabled="true"] {
 		background-color: #f5f6f6;
+	}
+}
+
+.login__input-error {
+	background-color: $login-input-error;
+
+	input {
+		&:focus {
+			background-color: $login-input-error;
+		}
 	}
 }
 

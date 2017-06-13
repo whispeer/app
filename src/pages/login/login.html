@@ -1,18 +1,19 @@
 <div class="login__scroll">
 	<div class="login__wrap">
 		<div class="login__logo-wrap">
-			<img class="login__logo" src="assets/images/logo_grey.svg">
+			<img class="login__logo" src="assets/images/logo_grey.svg" *ngIf="!business">
+			<img class="login__logo" src="assets/images/logo_white.svg" *ngIf="business">
 		</div>
 
 		<div class="login__welcome-text">
-			<p class="login__paragraph login__paragraph--primary" [innerHTML]="'login.header' | translate"></p>
+			<p [innerHTML]="'login.header' | translate"></p>
 		</div>
 
 		<form (ngSubmit)="loginOrRegister()">
 			<div class="login__form">
 
 				<div class="login__paragraph login__paragraph--primary">
-					<p>{{ getMessage() }}</p>
+					<p [innerHTML]="getMessage()">{{ getMessage() }}</p>
 				</div>
 
 				<ion-item class="clean-input-wrap login__input-wrap">
@@ -25,18 +26,10 @@
 						[(ngModel)]="login.identifier"
 						(ngModelChange)="checkUserNameExistance()" >
 					</ion-input>
-
-					<!--ion-label class="login__icon-label"
-						[hidden]="!register || usernameUsed"
-						fixed>
-						<ion-icon name="checkmark" />
-					</ion-label-->
-
 				</ion-item>
 
 				<ion-item *ngIf="showPasswordFeld()"
 					class="clean-input-wrap login__input-wrap">
-
 					<ion-input id="password"
 						class="login__input"
 						type="password"
@@ -44,12 +37,10 @@
 						name="password"
 						[(ngModel)]="login.password" >
 					</ion-input>
-
 				</ion-item>
 
 				<ion-item *ngIf="showPasswordConfirmationField()"
 					class="clean-input-wrap login__input-wrap">
-
 					<ion-input id="password2"
 						class="login__input"
 						type="password"
@@ -57,13 +48,12 @@
 						name="password2"
 						[(ngModel)]="passwordRepeat">
 					</ion-input>
-
 				</ion-item>
 
 				<p class="login__paragraph login__paragraph--detail" [innerHTML]="'login.tos' | translate"></p>
 				<div text-center padding>
 					<div class="hexagon-wrap">
-						<hexagon class="hexagon"></hexagon>
+						<hexagon class="hexagon hexagon--green"></hexagon>
 						<button [color]="'ios'" ion-button icon-only color="light" class="hexagon__button" type="submit" clear>
 							<ion-icon name="arrow-forward"></ion-icon>
 						</button>
@@ -71,5 +61,10 @@
 				</div>
 			</div>
 		</form>
+		<div class="sales__private" (click)="goToOtherHome()">
+			<span [innerHtml]="'login.privateUser' | translate" *ngIf="business">></span>
+			<span [innerHtml]="'login.businessUser' | translate" *ngIf="!business">></span>
+			<ion-icon ios="ios-arrow-forward-outline"></ion-icon>
+		</div>
 	</div>
 </div>

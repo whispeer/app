@@ -21,46 +21,111 @@ $fab-size: 76px;
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
 
-$colors: (
-	primary: #5ab70d,
-	primaryDarker: #3a8100,
-	secondary: #013c4c,
-	danger: #f53d3d,
-	light: #fff,
-	dark: #545b5e,
-	grey: #788286,
-	light_grey: #f9f9f9,
-	other_grey: #e5e5e5,
-	blue_grey: #d8dfe2,
-	more_grey: #efeff4,
-	highlight: #ffeda5
+$kelly_green: #5ab70d;
+$napier_green: #3a8100;
+
+$prussian_blue: #003b4c;
+$prussian_blue_highlight: #124958;
+$dark_cerulean: #1b5c6d;
+
+$red: #fe2824;
+$deep_coffee: #673c41;
+
+$white: #fff;
+$davys_grey: #545b5e;
+$grey: #788286;
+$ghost_white: #f9f9fa;
+$border_grey: #d5d8da;
+$dark_grey: #a0a7aa;
+$isabelline: #ebeced;
+
+$champagne: #ffeda5;
+
+$colors_private: (
+	primary: $kelly_green,
+	primaryDarker: $napier_green,
+
+	green: $kelly_green,
+	greenDarker: $napier_green,
+
+	secondary: $prussian_blue_highlight,
+	danger: $red,
+
+	light: $white,
+	dark: $davys_grey,
+	grey: $grey,
+	light_grey: $ghost_white,
+	other_grey: $isabelline,
+	highlight: $champagne,
 );
 
-// $primary: #3a8100;
-// $primary_light: #54ab0c;
-// $primary_lighter: #76a424;
-// $primary_dark: #3b7b06;
+$colors_business: (
+	primary: $prussian_blue,
+	primaryDarker: $napier_green,
 
-// $accent: #ffeda5;
+	green: $kelly_green,
+	greenDarker: $napier_green,
 
-// $complementary: #788286;
-// $complementary_blue: #013c4c;
-// $complementary_accent: #1b676b;
+	secondary: $prussian_blue_highlight,
+	danger: $red,
 
-// $light_grey: #f9f9f9;
-// $blue_grey: #d8dfe2;
+	light: $white,
+	dark: $davys_grey,
+	grey: $grey,
+	light_grey: $ghost_white,
+	other_grey: $isabelline,
+	highlight: $champagne,
+);
+
+$colors: $colors_private;
+
+$login-background: $white;
+$login-paragraph-color: $grey;
+$login-input-background: $isabelline;
+$login-input-background-focused: $border_grey;
+$login-input-error: $red;
+$login-input-placeholder-color: $dark_grey;
+$login-input-color: $davys_grey;
+$login-business-switch-highlight-color: $prussian_blue;
+
+$message-bubble-color: map-get($colors, primary);
+
+$svg-fill-primary: map-get($colors, primary);
+$svg-fill-primaryDark: map-get($colors, primaryDarker);
+$svg-fill-grey: map-get($colors, grey);
 
 $list-text-color: map-get($colors, dark);
 $list-border-color: map-get($colors, other_grey);
 
-// App iOS Variables
-// --------------------------------------------------
-// iOS only Sass variables can go here
-
-$list-ios-activated-background-color: #efeff4;
+$list-ios-activated-background-color: $isabelline;
 $alert-ios-message-text-color: map-get($colors, dark);
 
 $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
+
+$toggle-ios-background-color-on: $kelly_green;
+
+@if $business == 1 {
+	$colors: $colors_business;
+
+	$login-background: map-get($colors, primary);
+	$login-paragraph-color: $white;
+	$login-input-background: $prussian_blue_highlight;
+	$login-input-background-focused: $dark_cerulean;
+	$login-input-error: $deep_coffee;
+	$login-input-placeholder-color: $grey;
+	$login-input-color: $white;
+	$login-business-switch-highlight-color: $isabelline;
+
+	$message-bubble-color: map-get($colors, grey);
+
+	$svg-fill-primary: map-get($colors, primary);
+	$svg-fill-primaryDark: map-get($colors, primary);
+
+	$list-text-color: map-get($colors, dark);
+	$list-border-color: map-get($colors, other_grey);
+
+	$action-sheet-ios-button-text-color: map-get($colors, primary);
+}
 
 
 // App Material Design Variables

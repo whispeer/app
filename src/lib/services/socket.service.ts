@@ -9,6 +9,8 @@ import * as Bluebird from "bluebird";
 import Observer from "../asset/observer";
 import BlobUploader from "./blobUploader.service"
 
+import { goToBusinessVersion, isBusinessVersion } from "./location.manager";
+
 const socketDebug = debug("whispeer:socket");
 const socketError = debug("whispeer:socket:error");
 
@@ -18,8 +20,8 @@ const ServerError = h.createErrorType("serverError");
 const SOCKET_TIMEOUT = 60000;
 
 interface Interceptor {
-	transformRequest: Function
-	transformResponse: Function
+	transformRequest?: Function
+	transformResponse?: Function
 }
 
 const log = {
@@ -209,6 +211,12 @@ class SocketService extends Observer {
 			if (response.error) {
 				socketError(response);
 				throw new ServerError("server returned an error!");
+			}
+
+			if (!isBusinessVersion()) {
+				if (response.isBusiness) {
+					goToBusinessVersion()
+				}
 			}
 
 			socketDebug(response);

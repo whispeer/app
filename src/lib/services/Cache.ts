@@ -1,7 +1,7 @@
 import { errorServiceInstance } from "./error.service";
 import * as Bluebird from "bluebird";
 import Dexie from "dexie";
-const h = require("../helper/helper.ts");
+const h = require("../helper/helper");
 
 var db: Dexie;
 

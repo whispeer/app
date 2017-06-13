@@ -23,14 +23,14 @@
 		<div *ngSwitchCase="'profile'">
 			<div *ngIf="!isOwn" class="profile__avatar-row">
 				<div class="profile__request-hex">
-					<img *ngIf="isRequest || isRequestable" src="assets/images/icons/add.svg" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()">
-					<img *ngIf="!(isRequest || isRequestable)" src="assets/images/icons/added.svg" class="profile__request-button" id="request__accept__button" (click)="contactOptions()">
+					<load *ngIf="isRequest || isRequestable" [name]="'add'" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()"></load>
+					<load *ngIf="!(isRequest || isRequestable)" [name]="'added'" class="profile__request-button" id="request__accept__button" (click)="contactOptions()"></load>
 				</div>
 				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 				</ion-avatar>
 				<div class="profile__request-hex" id="request__decline">
-					<img src="assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
+					<load [name]="'write'" class="profile__request-button" id="request__accept__button" (click)="writeMessage()"></load>
 				</div>
 			</div>
 			<div *ngIf="isOwn" class="profile__avatar-row">
