@@ -47,7 +47,7 @@ export class HomePage {
 			return
 		}
 
-		messageService.loadMoreLatest(() => {}).then(() => {
+		messageService.loadMoreChats().then(() => {
 			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
 			this.topicsLoading = false;
 		});
@@ -69,7 +69,7 @@ export class HomePage {
 			return
 		}
 
-		messageService.loadMoreLatest(() => {}).then(() => {
+		messageService.loadMoreChats().then(() => {
 			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
 			infiniteScroll.complete();
 		})

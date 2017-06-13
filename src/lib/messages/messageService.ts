@@ -4,21 +4,21 @@
 
 var h = require("whispeerHelper");
 var Observer = require("asset/observer");
-var Bluebird = require("bluebird");
+import * as Bluebird from "bluebird";
 
-var errorService = require("services/error.service").errorServiceInstance;
-var socket = require("services/socket.service").default;
+import errorService from "services/error.service"
+import socket from "../services/socket.service"
+import Cache from "../services/Cache"
+
 var sessionService = require("services/session.service");
 var initService = require("services/initService");
-var Cache = require("services/Cache.ts").default;
 
-var Topic = require("models/topic");
+var Chunk = require("messages/chatChunk")
+import Chat from "../messages/chat"
 
 var messageService;
 
 var activeTopic = 0;
-
-var loadLatestPromise
 
 messageService = {
 	addSocketMessage: function (messageData) {
@@ -28,10 +28,10 @@ messageService = {
 		var messageToAdd;
 
 		return Bluebird.try(function () {
-			return Topic.messageFromData(messageData);
+			return Chunk.messageFromData(messageData);
 		}).then(function (_messageToAdd) {
 			messageToAdd = _messageToAdd;
-			return Topic.get(messageToAdd.getTopicID());
+			return Chunk.get(messageToAdd.getTopicID());
 		}).then(function (theTopic) {
 			theTopic.addMessage(messageToAdd, true);
 			messageService.notify(messageToAdd, "message");
@@ -45,62 +45,63 @@ messageService = {
 	setActiveTopic: function (topicid) {
 		activeTopic = h.parseDecimal(topicid);
 	},
-	reset: function () {
-		Topic.reset();
+	getAllChatIDs: (function () {
+		var chatIDs
 
-		messageService.data.latestTopics = {
-				count: 0,
-				loading: false,
-				loaded: false,
-				data: Topic.all()
-		};
+		return function (refresh) {
+			if (chatIDs && !refresh) {
+				return Bluebird.resolve(chatIDs)
+			}
 
-		messageService.data.unread = 0;
-	},
-	loadMoreLatest: function () {
-		var l = messageService.data.latestTopics;
-
-		if (l.loading) {
-			return loadLatestPromise;
+			return socket.definitlyEmit("chat.getAllIDs", {}).then(function (response) {
+				chatIDs = response.chatIDs
+				return chatIDs
+			});
 		}
+	})(),
+	loadMoreChats: (function () {
+		var loadingChatsPromise
 
-		l.loading = true;
-
-		loadLatestPromise = initService.awaitLoading().then(function () {
-			var last, topics = Topic.all().filter(function (topic) {
-				return !topic.obj.getIgnoreAsLastTopic();
-			});
-
-			if (topics.length > 0) {
-				last = topics[topics.length - 1].obj.getID();
-			} else {
-				last = 0;
+		return function () {
+			if (loadingChatsPromise) {
+				return loadingChatsPromise
 			}
 
-			return socket.definitlyEmit("messages.getTopics", {
-				afterTopic: last
-			});
-		}).then(function (latest) {
-			l.loaded = true;
-			l.loading = false;
+			messageService.loading = true;
 
-			if (latest.topics.length === 0) {
-				l.allTopicsLoaded = true;
-			}
+			loadingChatsPromise = initService.awaitLoading().then(function () {
+				return messageService.getAllChatIDs()
+			}).then(function (chatIDs) {
+				var unloadedChatIDs = chatIDs.filter(function (chatID) {
+					return !Chat.isChatLoaded(chatID)
+				})
 
-			return Topic.loadInChunks(latest.topics, 4);
-		}).then(function (topics) {
-			topics.forEach(function (topic) {
-				topic.setIgnoreAsLastTopic(false);
-			});
-		}).catch(errorService.criticalError);
+				if (unloadedChatIDs.length === 0) {
+					messageService.allTopicsLoaded = true
+				}
 
-		return loadLatestPromise
-	},
+				return socket.definitlyEmit("chat.getMultiple", {
+					ids: unloadedChatIDs.slice(0, 20)
+				})
+			}).then(function (latest) {
+				messageService.loading = false;
+
+				return Bluebird.all(latest.chats.map(function (chatData) {
+					return Chat.load(chatData)
+				}))
+
+				// return Topic.loadInChunks(latest.topics, 4);
+			}).then(function (topics) {
+
+			}).catch(errorService.criticalError);
+
+			return loadingChatsPromise
+		}
+	})(),
 	sendUnsentMessages: function () {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
-		return Bluebird.resolve(messageSendCache.all().toArray()).map(function (unsentMessage) {
+		return Bluebird.resolve(messageSendCache.all().toArray()).map(function (unsentMessage: any) {
 			var data = JSON.parse(unsentMessage.data);
 
 			return messageService.getTopic(data.topicID).then(function (topic) {
@@ -110,7 +111,7 @@ messageService = {
 	},
 	getTopic: function (topicid, cb) {
 		return Bluebird.try(function () {
-			return Topic.get(topicid);
+			return Chat.get(topicid);
 		}).nodeify(cb);
 	},
 	sendMessageToUserTopicIfExists: function(receiver, message, images) {
@@ -119,7 +120,7 @@ messageService = {
 				return;
 			}
 
-			return Topic.get(topicid).then(function (topic) {
+			return Chat.get(topicid).then(function (topic) {
 				var otherReceiver = topic.getReceiver().map(h.parseDecimal);
 
 				if (otherReceiver.length > 2) {
@@ -153,10 +154,15 @@ messageService = {
 				return topic.getID();
 			}
 
-			return Topic.createData(receiver, message, images).then(function (topicData) {
-				return socket.emit("messages.sendNewTopic", topicData);
+			return Chunk.createData(receiver, message, images).then(function (chunkData) {
+				return socket.emit("chat.create", {
+					initialChunk: chunkData.chunk,
+					firstMessage: chunkData.message,
+					receiverKeys: chunkData.receiverKeys,
+					keys: chunkData.keys
+				});
 			}).then(function (result) {
-				return Topic.multipleFromData([result.topic]);
+				return Chat.multipleFromData([result.topic]);
 			}).then(function (topics) {
 				return topics[0].getID();
 			});
@@ -165,7 +171,7 @@ messageService = {
 	sendMessage: function (topicID, message, images, cb) {
 		var resultPromise = Bluebird.resolve(topicID).then(function (topic) {
 			if (typeof topic !== "object") {
-				return Topic.get(topic);
+				return Chat.get(topic);
 			} else {
 				return topic;
 			}
@@ -177,8 +183,8 @@ messageService = {
 	},
 	getUserTopic: function (uid, cb) {
 		return initService.awaitLoading().then(function () {
-			return socket.definitlyEmit("messages.getUserTopic", {
-				userid: uid
+			return socket.definitlyEmit("chat.getChatWithUser", {
+				userID: uid
 			});
 		}).then(function (data) {
 			if (data.topicid) {
@@ -193,7 +199,7 @@ messageService = {
 			count: 0,
 			loading: false,
 			loaded: false,
-			data: Topic.all()
+			data: [] // Topic.all()
 		},
 		unread: 0
 	}
@@ -212,7 +218,7 @@ function updateUnreadIDs(ids) {
 
 	messageService.data.unreadIDs = ids;
 
-	Topic.all().filter(function (topic) {
+	Chat.all().filter(function (topic) {
 		return topic.unread;
 	}).forEach(function (topic) {
 		var id = h.parseDecimal(topic.id);
@@ -239,7 +245,7 @@ function changeReadTopic(topicID, read) {
 socket.channel("message", function (e, data) {
 	if (!e) {
 		if (data.topic) {
-			Topic.fromData(data.topic).then(function (topic) {
+			Chat.fromData(data.topic).then(function (topic) {
 				if (topic.data.unread) {
 					changeReadTopic(topic.getID(), true);
 				}
@@ -277,14 +283,6 @@ function loadUnreadTopicIDs() {
 socket.on("connect", function () {
 	loadUnreadTopicIDs();
 });
-
-Topic.listen(function (id) {
-	changeReadTopic(id, true);
-}, "read");
-
-Topic.listen(function (id) {
-	changeReadTopic(id, false);
-}, "unread");
 
 initService.listen(function () {
 	loadUnreadTopicIDs();

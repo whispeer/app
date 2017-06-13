@@ -17,6 +17,7 @@ define(["whispeerHelper", "crypto/keyStore", "asset/errors", "config", "bluebird
 		}
 
 		this._type = options.type;
+		this._alternativeType = options.alternativeType
 
 		this._removeEmpty = options.removeEmpty;
 		this._encryptDepth = options.encryptDepth || 0;
@@ -149,6 +150,18 @@ define(["whispeerHelper", "crypto/keyStore", "asset/errors", "config", "bluebird
 		return this._signAndEncrypt(signKey, cryptKey)
 	};
 
+	SecuredDataWithMetaData.prototype.hasType = function (type) {
+		 if (type === this._type) {
+			 return true
+		 }
+
+		 if (this._alternativeType && this._alternativeType === type) {
+			 return true
+		 }
+
+		 return false
+	}
+
 	/** verify the decrypted data
 		decrypts data if necessary
 		@param signKey key to check signature against
@@ -166,7 +179,8 @@ define(["whispeerHelper", "crypto/keyStore", "asset/errors", "config", "bluebird
 				delete metaCopy[attr];
 			});
 
-			if (metaCopy._type !== this._type) {
+			if (!this.hasType(metaCopy._type)) {
+				debugger
 				throw new errors.SecurityError("invalid object type. is: " + metaCopy._type + " should be: " + this._type);
 			}
 

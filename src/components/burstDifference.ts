@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 const h = require("whispeerHelper");
 
-var Topic = require("models/topic")
+var Topic = require("messages/chatChunk")
 
 @Component({
 	selector: "BurstDifference",

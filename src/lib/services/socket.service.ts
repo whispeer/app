@@ -261,7 +261,7 @@ class SocketService extends Observer {
 	}
 
 	/** definitly emits the request. might emit it multiple times! **/
-	definitlyEmit (channel: string, request: any, callback?: Function) : Bluebird<void> {
+	definitlyEmit (channel: string, request: any) : Bluebird<any> {
 		var SOCKET_TIMEOUT = 10000;
 
 		return this.awaitConnection().then(() => {
@@ -269,9 +269,9 @@ class SocketService extends Observer {
 		}).catch((e) => {
 			console.error(e);
 			return Bluebird.delay(500).then(() => {
-				return this.definitlyEmit(channel, request, callback);
+				return this.definitlyEmit(channel, request);
 			});
-		}).nodeify(callback);
+		})
 	}
 
 	channel (channel: string, callback: Function) {
