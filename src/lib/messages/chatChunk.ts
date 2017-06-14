@@ -7,9 +7,9 @@ const debug = require("debug");
 
 const userService = require("user/userService");
 import socket from "../services/socket.service"
+import ObjectLoader from "../services/objectLoader"
 const keyStore = require("services/keyStore.service").default;
 const sessionService = require("services/session.service").default;
-const initService = require("services/initService");
 
 import Cache from "../services/Cache.ts";
 
@@ -24,7 +24,7 @@ const chunksByID = {}, chunksLoadingByID = {};
 
 declare const startup: number
 
-class Chunk extends Observer {
+export class Chunk extends Observer {
 	private meta
 	private receiver
 	private data
@@ -118,9 +118,9 @@ class Chunk extends Observer {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
 		if (!id) {
-			Bluebird.resolve(images).bind(this).map(function (img) {
+			Bluebird.resolve(images).bind(this).map(function (img: any) {
 				return img.prepare().thenReturn(img)
-			}).map(function (img) {
+			}).map(function (img: any) {
 				return img._blobs[0].blob._blobData
 			}).then(function (imagesBlobs) {
 				messageSendCache.store(
@@ -232,6 +232,8 @@ class Chunk extends Observer {
 			}
 
 			this.data.verified = true;
+		}).finally(() => {
+			chunkDebug(`Topic loaded (${this.getID()}):${new Date().getTime() - startup}`);
 		})
 	};
 
@@ -282,7 +284,7 @@ class Chunk extends Observer {
 				receiverKeys: chunkData.receiverKeys
 			})
 		}).then(function (response) {
-			return Chunk.fromData(response.successorTopic)
+			return ChunkLoader.load(response.successorChunk.id, response.successorChunk)
 		})
 	}
 
@@ -303,7 +305,7 @@ class Chunk extends Observer {
 			return null
 		}
 
-		return Chunk.get(this.getPredecessorID()).catch(function (err) {
+		return ChunkLoader.get(this.getPredecessorID()).catch(function (err) {
 			console.log(err)
 			return null
 		}, socket.errors.Server)
@@ -331,7 +333,7 @@ class Chunk extends Observer {
 
 	getSuccessor = () => {
 		if (this.successorID) {
-			return Chunk.get(this.successorID)
+			return ChunkLoader.get(this.successorID)
 		}
 
 		return socket.emit("messages.topic.successor", { topicID: this.getID() }).bind(this).then(function (response) {
@@ -339,7 +341,7 @@ class Chunk extends Observer {
 				return
 			}
 
-			return Chunk.fromData(response.topic).then(function (successorTopic) {
+			return ChunkLoader.load(response.chunk.server.id, response.chunk).then(function (successorTopic) {
 				if (successorTopic.getPredecessorID() !== this.getID()) {
 					throw new Error("server returned invalid successor topic")
 				}
@@ -367,12 +369,8 @@ class Chunk extends Observer {
 	}
 
 	static multipleFromData(topicsData) {
-		return Bluebird.resolve(topicsData).map(function (topicData) {
-			return Chunk.createTopicAndAdd(topicData);
-		}).map(function (topic) {
-			return Chunk.loadTopic(topic).then(function () {
-				return topic.loadNewest()
-			}).thenReturn(topic)
+		return Bluebird.resolve(topicsData).map(function (topicData: any) {
+			return ChunkLoader.load(topicData.id, topicData);
 		})
 	};
 
@@ -391,47 +389,6 @@ class Chunk extends Observer {
 		})
 	}
 
-	static createTopicAndAdd(chunkData) {
-		var chunkID = h.parseDecimal(chunkData.topicid)
-
-		if (chunksByID[chunkID]) {
-			return chunksByID[chunkID]
-		}
-
-		var chunk = new Chunk(chunkData);
-
-		// chunk.findSuccessor()
-
-		chunksByID[chunkID] = chunk
-
-		delete chunksLoadingByID[chunkID]
-
-		return chunk;
-	};
-
-	static loadTopic(topic) {
-		if (topic.data.verified) {
-			return Bluebird.resolve(topic);
-		}
-
-		return topic.load().then(function () {
-			chunkDebug("Topic loaded (" + topic.getID() + "):" + (new Date().getTime() - startup));
-		}).thenReturn(topic)
-	};
-
-	static fromData(topicData, noAutoLoad = false) {
-		return Bluebird.resolve(topicData).then(function (topicData) {
-			var topic = Chunk.createTopicAndAdd(topicData);
-			return Chunk.loadTopic(topic);
-		}).then(function (topic) {
-			if (!noAutoLoad) {
-				return topic.loadNewest().thenReturn(topic)
-			}
-
-			return topic
-		});
-	};
-
 	static loadTopicChain(newTopic, oldTopic) {
 		if (newTopic.getPredecessorID() === oldTopic.getID()) {
 			return Bluebird.resolve()
@@ -449,30 +406,6 @@ class Chunk extends Observer {
 			return Chunk.loadTopicChain(pred, oldTopic)
 		})
 	}
-
-	static getLoadedTopic(topicid) {
-		return chunksByID[topicid]
-	}
-
-	static get(chunkID) {
-		if (chunksByID[chunkID]) {
-			return Bluebird.resolve(chunksByID[chunkID])
-		}
-
-		if (chunksLoadingByID[chunkID]) {
-			return chunksLoadingByID[chunkID]
-		}
-
-		chunksLoadingByID[chunkID] = initService.awaitLoading().then(function () {
-			return socket.definitlyEmit("chat.chunk.get", {
-				id: chunkID
-			});
-		}).then(function (data) {
-			return Chunk.fromData(data.topic);
-		})
-
-		return chunksLoadingByID[chunkID]
-	};
 
 	static createRawData(receiver, predecessorChunk = null, extraMeta = {}) {
 		var receiverObjects, chunkKey;
@@ -553,7 +486,7 @@ class Chunk extends Observer {
 	};
 
 	static createData(receiver, message, images, cb) {
-		var imagePreparation = Bluebird.resolve(images).map(function (image) {
+		var imagePreparation = Bluebird.resolve(images).map(function (image: any) {
 			return image.prepare();
 		});
 
@@ -563,7 +496,7 @@ class Chunk extends Observer {
 			}));
 		}
 
-		var resultPromise = Bluebird.all([Chunk.createRawData(receiver), imagePreparation]).spread(function (chunkData, imagesMeta) {
+		var resultPromise = Bluebird.all([Chunk.createRawData(receiver), imagePreparation]).spread(function (chunkData: any, imagesMeta) {
 			var chunk = new Chunk({
 				meta: chunkData.chunk,
 				server: {},
@@ -580,7 +513,7 @@ class Chunk extends Observer {
 				Message.createRawData(chunk, message, messageMeta),
 				uploadImages(chunk.getKey())
 			]);
-		}).spread(function (chunkData, messageData, imageKeys) {
+		}).spread(function (chunkData, messageData, imageKeys: any) {
 			imageKeys = h.array.flatten(imageKeys);
 			messageData.imageKeys = imageKeys.map(keyStore.upload.getKey);
 
@@ -595,4 +528,18 @@ class Chunk extends Observer {
 
 Observer.extend(Chunk);
 
-module.exports = Chunk;
+const loadHook = (chunkResponse) => {
+	const chunk = new Chunk(chunkResponse)
+
+	return chunk.load().thenReturn(chunk)
+}
+
+const downloadHook = (id) => {
+	return socket.emit("chat.chunk.get", { id })
+}
+
+const hooks = {
+	downloadHook, loadHook
+}
+
+export default class ChunkLoader extends ObjectLoader(hooks) {}

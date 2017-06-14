@@ -123,6 +123,4 @@ const hooks = {
 	downloadHook, loadHook
 }
 
-export default class ChatLoader extends ObjectLoader(hooks) {
-
-}
+export default class ChatLoader extends ObjectLoader(hooks) {}
