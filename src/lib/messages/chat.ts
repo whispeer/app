@@ -3,6 +3,8 @@ import * as Bluebird from 'bluebird';
 
 import socketService from "../services/socket.service"
 
+import ObjectLoader from "../services/objectLoader"
+
 const Chunk = require("messages/chatChunk")
 const Message = require("models/message")
 
@@ -11,7 +13,6 @@ function sortGetTime(a, b) {
 }
 
 const unreadChatIDs = []
-const chatsByID = {}
 
 /*
 - object is added to by id as soon as we receive it (definitly)
@@ -23,52 +24,22 @@ const chatsByID = {}
 ->
 */
 
-export default class Chat {
+export class Chat {
 	private messages = sortedSet(sortGetTime)
 	private chatUpdates = sortedSet(sortGetTime)
 	private messagesAndUpdates = sortedSet(sortGetTime)
 
-	private chunkIDs = []
 	private unreadMessageIDs = []
 	private id: number
-
-	static isChatLoaded(id) {
-		return chatsByID.hasOwnProperty(id)
-	}
-
-	static load(chatResponse) {
-		const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
-			Chunk.load(chunkData)
-		))
-
-		const loadMessages = Bluebird.all(chatResponse.messages.map((messageData) =>
-			Message.load(messageData)
-		))
-
-		const chat = new Chat(chatResponse.chat)
-
-		return Bluebird.all([
-			loadChunks,
-			loadMessages,
-		]).then(() => chat.load()).thenReturn(chat)
-	}
-
-	static get(id) {
-		if (chatsByID[id]) {
-			return Bluebird.resolve(chatsByID[id])
-		}
-
-		return socketService.emit("chat.get", { id }).then((chatResponse) =>
-			Chat.load(chatResponse)
-		)
-	}
+	private latestMessageID: number
+	private latestChunkID: number
 
 	constructor(chatData) {
 		this.id = chatData.id
 
-		// chatData.latestMessageID
-		// chatData.latestChunkID
-		// chatData.unreadMessageIDs
+		this.latestMessageID = chatData.latestMessageID
+		this.latestChunkID = chatData.latestChunkID
+		this.unreadMessageIDs = chatData.unreadMessageIDs
 	}
 
 	isUnread() {
@@ -76,9 +47,10 @@ export default class Chat {
 	}
 
 	load() {
-		// load latest message
-		// load latest chunk
-		// load latest chat update? (or is this rather unimportant?)
+		return Bluebird.all([
+			ChunkLoader.get(this.latestChunkID),
+			MessageLoader.get(this.latestMessageID)
+		])
 	}
 
 	getMessages() {
@@ -124,4 +96,33 @@ export default class Chat {
 	getNewestMessage() {
 
 	}
+}
+
+const loadHook = (chatResponse) => {
+	const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
+		Chunk.load(chunkData)
+	))
+
+	const loadMessages = Bluebird.all(chatResponse.messages.map((messageData) =>
+		Message.load(messageData)
+	))
+
+	const chat = new Chat(chatResponse.chat)
+
+	return Bluebird.all([
+		loadChunks,
+		loadMessages,
+	]).then(() => chat.load()).thenReturn(chat)
+}
+
+const downloadHook = (id) => {
+	return socketService.emit("chat.get", { id })
+}
+
+const hooks = {
+	downloadHook, loadHook
+}
+
+export default class ChatLoader extends ObjectLoader(hooks) {
+
 }
