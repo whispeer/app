@@ -5,7 +5,7 @@ import socketService from "../services/socket.service"
 
 import ObjectLoader from "../services/objectLoader"
 
-const Chunk = require("messages/chatChunk")
+import ChunkLoader from "./chatChunk"
 const Message = require("models/message")
 
 function sortGetTime(a, b) {
@@ -100,7 +100,7 @@ export class Chat {
 
 const loadHook = (chatResponse) => {
 	const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
-		Chunk.load(chunkData)
+		ChunkLoader.load(chunkData.server.id, chunkData)
 	))
 
 	const loadMessages = Bluebird.all(chatResponse.messages.map((messageData) =>

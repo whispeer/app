@@ -71,7 +71,7 @@ messageService = {
 				return messageService.getAllChatIDs()
 			}).then(function (chatIDs) {
 				var unloadedChatIDs = chatIDs.filter(function (chatID) {
-					return !Chat.isChatLoaded(chatID)
+					return !Chat.isLoaded(chatID)
 				})
 
 				if (unloadedChatIDs.length === 0) {
@@ -83,7 +83,7 @@ messageService = {
 				})
 			}).then(function (latest) {
 				return Bluebird.all(latest.chats.map(function (chatData) {
-					return Chat.load(chatData)
+					return Chat.load(chatData.server.id, chatData)
 				}))
 			}).then(function (topics) {
 
@@ -156,7 +156,7 @@ messageService = {
 					keys: chunkData.keys
 				});
 			}).then(function (response) {
-				return Chat.load(response);
+				return Chat.load(response.server.id, response);
 			}).then(function (topics) {
 				return topics[0].getID();
 			});

@@ -233,7 +233,7 @@ export class Chunk extends Observer {
 
 			this.data.verified = true;
 		}).finally(() => {
-			chunkDebug(`Topic loaded (${this.getID()}):${new Date().getTime() - startup}`);
+			chunkDebug(`Chunk loaded (${this.getID()}):${new Date().getTime() - startup}`);
 		})
 	};
 
@@ -268,9 +268,9 @@ export class Chunk extends Observer {
 			}
 
 			return Chunk.createRawData(receivers, this, extraMeta)
-		}).then(function (topicData) {
+		}).then(function (chunkData) {
 			if (!canReadOldMessages) {
-				return topicData
+				return chunkData
 			}
 
 			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
@@ -279,7 +279,7 @@ export class Chunk extends Observer {
 		}).then(function (chunkData) {
 			return socket.emit("chat.chunk.create", {
 				predecessorID: this.getID(),
-				chunk: chunkData.topic,
+				chunk: chunkData.chunk,
 				keys: chunkData.keys,
 				receiverKeys: chunkData.receiverKeys
 			})
@@ -314,7 +314,7 @@ export class Chunk extends Observer {
 	setSuccessor = (successorID) => {
 		this.successorID = successorID
 
-		console.warn("Set successor of topic " , this.getID(), " succ: ", successorID)
+		console.warn("Set successor of chunk " , this.getID(), " succ: ", successorID)
 
 		this.notify({ successorID: successorID }, "successor")
 	}
@@ -336,17 +336,17 @@ export class Chunk extends Observer {
 			return ChunkLoader.get(this.successorID)
 		}
 
-		return socket.emit("messages.topic.successor", { topicID: this.getID() }).bind(this).then(function (response) {
-			if (!response.topic) {
+		return socket.emit("chat.chunk.successor", { id: this.getID() }).bind(this).then(function (response) {
+			if (!response.chunk) {
 				return
 			}
 
-			return ChunkLoader.load(response.chunk.server.id, response.chunk).then(function (successorTopic) {
-				if (successorTopic.getPredecessorID() !== this.getID()) {
+			return ChunkLoader.load(response.chunk.server.id, response.chunk).then(function (successorChunk) {
+				if (successorChunk.getPredecessorID() !== this.getID()) {
 					throw new Error("server returned invalid successor topic")
 				}
 
-				return successorTopic
+				return successorChunk
 			})
 		})
 	}
@@ -368,42 +368,21 @@ export class Chunk extends Observer {
 		chunksLoadingByID[chunkID] = chunk.load().thenReturn(chunk)
 	}
 
-	static multipleFromData(topicsData) {
-		return Bluebird.resolve(topicsData).map(function (topicData: any) {
-			return ChunkLoader.load(topicData.id, topicData);
-		})
-	};
-
-	static loadInChunks(topicsData, count) {
-		var load = topicsData.slice(0, count)
-		var remaining = topicsData.slice(count)
-
-		if (topicsData.length === 0) {
-			return Bluebird.resolve([])
-		}
-
-		return Chunk.multipleFromData(load).then(function (topics) {
-			return Chunk.loadInChunks(remaining, count).then(function (otherTopics) {
-				return topics.concat(otherTopics)
-			})
-		})
-	}
-
-	static loadTopicChain(newTopic, oldTopic) {
-		if (newTopic.getPredecessorID() === oldTopic.getID()) {
+	static loadChunkChain(newChunk, oldChunk) {
+		if (newChunk.getPredecessorID() === oldChunk.getID()) {
 			return Bluebird.resolve()
 		}
 
-		return newTopic.getPredecessor().then(function (pred) {
+		return newChunk.getPredecessor().then(function (pred) {
 			if (!pred) {
 				return
 			}
 
-			if (pred.getID() === oldTopic.getID()) {
+			if (pred.getID() === oldChunk.getID()) {
 				return
 			}
 
-			return Chunk.loadTopicChain(pred, oldTopic)
+			return Chunk.loadChunkChain(pred, oldChunk)
 		})
 	}
 
@@ -426,15 +405,15 @@ export class Chunk extends Observer {
 		}).then(function (receiverO) {
 			receiverObjects = receiverO;
 
-			//generate topic key
-			return keyStore.sym.generateKey(null, "topicMain");
+			//generate chunk key
+			return keyStore.sym.generateKey(null, "chunkMain");
 		}).then(function (key) {
 			chunkKey = key;
 
-			//encrypt topic key with own mainkey
+			//encrypt chunk key with own mainkey
 			return keyStore.sym.symEncryptKey(chunkKey, userService.getown().getMainKey());
 		}).then(function () {
-			//encrypt topic key for receiver
+			//encrypt chunk key for receiver
 			return Bluebird.all(receiverObjects.map(function (receiverObject) {
 				var crypt = receiverObject.getCryptKey();
 				return keyStore.sym.asymEncryptKey(chunkKey, crypt);
