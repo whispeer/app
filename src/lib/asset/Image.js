@@ -1,5 +1,5 @@
 "use strict";
-const h = require('whispeerHelper');
+const h = require("../helper/helper").default
 const Bluebird = require('bluebird');
 var MyImage = function () { this._name = ""; };
 

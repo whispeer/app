@@ -1,5 +1,5 @@
 "use strict";
-const h = require('whispeerHelper');
+const h = require("../helper/helper").default
 const config = require('config');
 const Observer = require('asset/observer');
 const errors = require('asset/errors');

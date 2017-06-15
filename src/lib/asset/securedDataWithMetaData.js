@@ -1,6 +1,6 @@
 "use strict";
 
-const h = require('whispeerHelper');
+const h = require("../helper/helper").default
 const keyStore = require('crypto/keyStore');
 const errors = require('asset/errors');
 const config = require('config');

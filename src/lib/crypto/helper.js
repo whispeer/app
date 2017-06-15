@@ -1,6 +1,6 @@
 "use strict";
 const sjcl = require('sjcl');
-const h = require('whispeerHelper');
+const h = require("../helper/helper").default
 const errors = require('asset/errors');
 var helper = {
     hash: function (text) {
