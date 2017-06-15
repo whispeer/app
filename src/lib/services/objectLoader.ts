@@ -1,13 +1,13 @@
 import * as Bluebird from "bluebird"
 
 type hookType = {
-	 downloadHook: (id: any) => Bluebird<any>,
-	 loadHook: (response: any) => Bluebird<any>
+	downloadHook: (id: any) => Bluebird<any>,
+	loadHook: (response: any) => Bluebird<any>
 }
 
 export default ({ downloadHook, loadHook }: hookType) => {
-	const loading = {}
-	const byId = {}
+	let loading = {}
+	let byId = {}
 
 	return class ObjectLoader {
 		static getLoaded(id) {
@@ -32,14 +32,24 @@ export default ({ downloadHook, loadHook }: hookType) => {
 			}
 
 			if (!loading[id]) {
-				loading[id] = loadHook(response).then((instance) => {
-					byId[id] = instance
+				let promise = loadHook(response).then((instance) => {
+					byId = {
+						...byId,
+						[id]: instance
+					}
+
+					loading = { ...loading }
 					delete loading[id]
 
 					return instance
 				}).finally(() => {
 					delete loading[id]
 				})
+
+				loading = {
+					...loading,
+					[id]: promise
+				}
 			}
 
 			 return loading[id]
@@ -51,13 +61,24 @@ export default ({ downloadHook, loadHook }: hookType) => {
 			}
 
 			if (!loading[id]) {
-				loading[id] = downloadHook(id).then((response) => loadHook(response)).then((instance) => {
-					byId[id] = instance
+				let promise = downloadHook(id).then((response) => loadHook(response)).then((instance) => {
+					byId = {
+						...byId,
+						[id]: instance
+					}
+
+					loading = { ...loading }
+					delete loading[id]
 
 					return instance
 				}).finally(() => {
 					delete loading[id]
 				})
+
+				loading = {
+					...loading,
+					[id]: promise
+				}
 			}
 
 			 return loading[id]

@@ -10,19 +10,20 @@ import ObjectLoader from "../services/objectLoader"
 
 import { Chunk } from "./chatChunk"
 
-var notVerified = ["sendTime", "sender", "topicid", "messageid"];
-
 export class Message {
-	_hasBeenSent: any
-	_isDecrypted: any
-	_serverID: any
-	_messageID: any
-	_securedData: any
-	_isOwnMessage: any
-	_images: any
-	data: any
-	_prepareImagesPromise: any
-	imageUploadPromise: any
+	private _hasBeenSent: boolean
+	private _isDecrypted: boolean
+	private _isOwnMessage: boolean
+
+	private _serverID: number
+	private _messageID: any
+	private _securedData: any
+	private _images: any[]
+
+	private sendTime: number
+	private senderID: number
+
+	private data: any
 
 	private chunk: any
 	private chunkID: number
@@ -37,20 +38,24 @@ export class Message {
 	}
 
 	fromSecuredData = (data) => {
+		const { meta, content, server } = data
+
 		this._hasBeenSent = true;
 		this._isDecrypted = false;
 
 		var id = Message.idFromData(data)
 
-		this.chunkID = data.server.chunkID
+		this.chunkID = server.chunkID
+
+		this.sendTime = h.parseDecimal(server.sendTime)
+		this.senderID = h.parseDecimal(server.sender)
 
 		this._serverID = id.serverID
 		this._messageID = id.messageID
 
-		var metaCopy = h.deepCopyObj(data.meta);
-		this._securedData = SecuredData.load(data.content, metaCopy, {
-			type: "message",
-			attributesNotVerified: notVerified
+		var metaCopy = h.deepCopyObj(meta);
+		this._securedData = SecuredData.load(content, metaCopy, {
+			type: "message"
 		});
 
 		this.setData();
@@ -70,7 +75,7 @@ export class Message {
 		var meta = {
 			createTime: new Date().getTime(),
 			messageUUID: this._messageID,
-			sender:userService.getown().getID()
+			sender: userService.getown().getID()
 		};
 
 		this._securedData = Message.createRawSecuredData(chunk, message, meta);
@@ -78,7 +83,7 @@ export class Message {
 		this.setData();
 
 		this.data.text = message;
-		this.data.images = images.map(function (image) {
+		this.data.images = images.map((image) => {
 			if (!image.convertForGallery) {
 				return image;
 			}
@@ -90,11 +95,11 @@ export class Message {
 		this._prepareImages();
 	};
 
-	_prepareImages = () => {
-		this._prepareImagesPromise = Bluebird.resolve(this._images).map(function (image: any) {
+	_prepareImages = h.cacheResult(() => {
+		return Bluebird.resolve(this._images).map((image: any) => {
 			return image.prepare();
 		});
-	};
+	})
 
 	setData = () => {
 		this.data = {
@@ -124,19 +129,15 @@ export class Message {
 		return this._hasBeenSent;
 	};
 
-	uploadImages = (chunkKey) => {
-		if (!this.imageUploadPromise) {
-			this.imageUploadPromise = this._prepareImagesPromise.bind(this).then(function () {
-				return Bluebird.all(this._images.map(function (image) {
-					return image.upload(chunkKey);
-				}));
-			}).then(function (imageKeys) {
-				return h.array.flatten(imageKeys);
-			});
-		}
-
-		return this.imageUploadPromise;
-	};
+	uploadImages = h.cacheResult((chunkKey) => {
+		return this._prepareImages().then(() => {
+			return Bluebird.all(this._images.map((image) => {
+				return image.upload(chunkKey);
+			}));
+		}).then((imageKeys) => {
+			return h.array.flatten(imageKeys);
+		});
+	})
 
 	sendContinously = h.cacheResult(() => {
 		return h.repeatUntilTrue(Bluebird, () => {
@@ -154,7 +155,7 @@ export class Message {
 		}).then(() => {
 			return this.chunk.awaitEarlierSend(this.getTime());
 		}).then(() => {
-			return this._prepareImagesPromise;
+			return this._prepareImages();
 		}).then((imagesMeta) => {
 			this._securedData.metaSetAttr("images", imagesMeta);
 
@@ -182,13 +183,13 @@ export class Message {
 			}
 
 			if (response.server) {
-				this._securedData.metaSetAttr("sendTime", response.server.sendTime);
-				this._serverID = response.server.messageid;
+				this.sendTime = h.parseDecimal(response.server.sendTime)
+				this._serverID = h.parseDecimal(response.server.id)
 				this.data.timestamp = this.getTime();
 			}
 
 			return response.success;
-		}).catch(socket.errors.Disconnect, function (e) {
+		}).catch(socket.errors.Disconnect, (e) => {
 			console.warn(e);
 			return false;
 		});
@@ -212,7 +213,7 @@ export class Message {
 
 	getTime = () => {
 		if (this.getServerID()) {
-			return h.parseDecimal(this._securedData.metaAttr("sendTime"));
+			return this.sendTime;
 		} else {
 			return h.parseDecimal(this._securedData.metaAttr("createTime"));
 		}
@@ -223,15 +224,13 @@ export class Message {
 	};
 
 	loadSender = () => {
-		var theMessage = this;
-
-		return Bluebird.try(function () {
-			return userService.get(theMessage._securedData.metaAttr("sender"));
-		}).then(function loadS1(sender) {
+		return Bluebird.try(() => {
+			return userService.get(this.senderID);
+		}).then((sender) => {
 			return sender.loadBasicData().thenReturn(sender);
-		}).then(function loadS2(sender) {
-			theMessage.data.sender = sender.data;
-			theMessage._isOwnMessage = sender.isOwn();
+		}).then((sender) => {
+			this.data.sender = sender.data;
+			this._isOwnMessage = sender.isOwn();
 
 			return sender;
 		});
@@ -243,7 +242,7 @@ export class Message {
 				this.decrypt(),
 				this.verify(sender.getSignKey())
 			]);
-		}).then(function () {
+		}).then(() => {
 			return;
 		})
 	};
@@ -265,17 +264,16 @@ export class Message {
 			return Bluebird.resolve(this.data.text)
 		}
 
-		var theMessage = this;
-		return Bluebird.try(function () {
-			return theMessage._securedData.decrypt();
-		}).then(function () {
-			theMessage.data.text = theMessage._securedData.contentGet();
-			return theMessage._securedData.contentGet();
+		return Bluebird.try(() => {
+			return this._securedData.decrypt();
+		}).then(() => {
+			this.data.text = this._securedData.contentGet();
+			return this._securedData.contentGet();
 		})
 	}
 
 	static createData(chunk, message, imagesMeta, cb) {
-		return Bluebird.try(function () {
+		return Bluebird.try(() => {
 			var newest = chunk.data.latestMessage;
 
 			var meta = {
@@ -286,7 +284,7 @@ export class Message {
 			var mySecured = Message.createRawSecuredData(chunk, message, meta);
 			mySecured.setAfterRelationShip(newest.getSecuredData());
 			return mySecured._signAndEncrypt(userService.getown().getSignKey(), chunk.getKey());
-		}).then(function (mData) {
+		}).then((mData) => {
 			mData.meta.topicid = chunk.getID();
 
 			var result = {
@@ -300,7 +298,6 @@ export class Message {
 	static createRawSecuredData(chunk, message, meta) {
 		var secured = SecuredData.createRaw(message, meta, {
 			type: "message",
-			attributesNotVerified: notVerified
 		});
 		secured.setParent(chunk.getSecuredData());
 
@@ -313,7 +310,7 @@ export class Message {
 	};
 
 	static idFromData(data) {
-		var serverID = h.parseDecimal(data.meta.messageid || data.messageid);
+		var serverID = h.parseDecimal(data.server.id);
 		var messageID = data.meta.messageUUID || serverID;
 
 		return {

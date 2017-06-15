@@ -68,7 +68,7 @@ export class Chunk extends Observer {
 	}
 
 	awaitEarlierSend = (time) => {
-		/*var previousMessages = this.getNotSentMessages().filter(function (message) {
+		/*var previousMessages = this.getNotSentMessages().filter((message) => {
 			return message.getTime() < time;
 		});
 
@@ -104,7 +104,7 @@ export class Chunk extends Observer {
 	};
 
 	sendUnsentMessage = (messageData, files) => {
-		var images = files.map(function (file) {
+		var images = files.map((file) => {
 			return new ImageUpload(file);
 		});
 
@@ -117,11 +117,11 @@ export class Chunk extends Observer {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
 		if (!id) {
-			Bluebird.resolve(images).bind(this).map(function (img: any) {
+			Bluebird.resolve(images).map((img: any) => {
 				return img.prepare().thenReturn(img)
-			}).map(function (img: any) {
+			}).map((img: any) => {
 				return img._blobs[0].blob._blobData
-			}).then(function (imagesBlobs) {
+			}).then((imagesBlobs) => {
 				messageSendCache.store(
 					messageObject.getID(),
 					{
@@ -136,11 +136,11 @@ export class Chunk extends Observer {
 
 		var sendMessagePromise = messageObject.sendContinously();
 
-		sendMessagePromise.then(function () {
+		sendMessagePromise.then(() => {
 			return messageSendCache.delete(messageObject.getID());
 		});
 
-		sendMessagePromise.catch(function (e) {
+		sendMessagePromise.catch((e) => {
 			console.error(e);
 			alert("An error occured sending a message!" + e.toString());
 		});
@@ -172,7 +172,7 @@ export class Chunk extends Observer {
 			}
 
 			return this.meta.verify(creator.getSignKey()).thenReturn(true);
-		}).then(function (addEncryptionIdentifier) {
+		}).then((addEncryptionIdentifier) => {
 			if (addEncryptionIdentifier) {
 				keyStore.security.addEncryptionIdentifier(this.meta.metaAttr("_key"));
 			}
@@ -261,13 +261,13 @@ export class Chunk extends Observer {
 			throw new Error("Not an admin of this chunk")
 		}
 
-		return this.getSuccessor().bind(this).then(function (successor) {
+		return this.getSuccessor().then((successor) => {
 			if (successor) {
 				throw new Error("TODO: Chunk has a successor. Try again?")
 			}
 
 			return Chunk.createRawData(receivers, this, extraMeta)
-		}).then(function (chunkData) {
+		}).then((chunkData) => {
 			if (!canReadOldMessages) {
 				return chunkData
 			}
@@ -275,14 +275,14 @@ export class Chunk extends Observer {
 			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
 
 			throw new Error("not yet implemented")
-		}).then(function (chunkData) {
+		}).then((chunkData) => {
 			return socket.emit("chat.chunk.create", {
 				predecessorID: this.getID(),
 				chunk: chunkData.chunk,
 				keys: chunkData.keys,
 				receiverKeys: chunkData.receiverKeys
 			})
-		}).then(function (response) {
+		}).then((response) => {
 			return ChunkLoader.load(response.successorChunk)
 		})
 	}
@@ -304,7 +304,7 @@ export class Chunk extends Observer {
 			return null
 		}
 
-		return ChunkLoader.get(this.getPredecessorID()).catch(function (err) {
+		return ChunkLoader.get(this.getPredecessorID()).catch((err) => {
 			console.log(err)
 			return null
 		}, socket.errors.Server)
@@ -335,12 +335,12 @@ export class Chunk extends Observer {
 			return ChunkLoader.get(this.successorID)
 		}
 
-		return socket.emit("chat.chunk.successor", { id: this.getID() }).bind(this).then(function (response) {
+		return socket.emit("chat.chunk.successor", { id: this.getID() }).then((response) => {
 			if (!response.chunk) {
 				return
 			}
 
-			return ChunkLoader.load(response.chunk).then(function (successorChunk) {
+			return ChunkLoader.load(response.chunk).then((successorChunk) => {
 				if (successorChunk.getPredecessorID() !== this.getID()) {
 					throw new Error("server returned invalid successor topic")
 				}
@@ -372,7 +372,7 @@ export class Chunk extends Observer {
 			return Bluebird.resolve()
 		}
 
-		return newChunk.getPredecessor().then(function (pred) {
+		return newChunk.getPredecessor().then((pred) => {
 			if (!pred) {
 				return
 			}
@@ -387,9 +387,9 @@ export class Chunk extends Observer {
 
 	static createRawData(receiver, predecessorChunk = null, extraMeta = {}) {
 		var receiverObjects, chunkKey;
-		return Bluebird.try(function () {
+		return Bluebird.try(() => {
 			//load receiver
-			receiver = receiver.map(function (val) {
+			receiver = receiver.map((val) => {
 				if (typeof val === "object") {
 					return val.getID();
 				} else {
@@ -401,27 +401,27 @@ export class Chunk extends Observer {
 
 			//get receiver objects
 			return userService.getMultiple(receiver);
-		}).then(function (receiverO) {
+		}).then((receiverO) => {
 			receiverObjects = receiverO;
 
 			//generate chunk key
 			return keyStore.sym.generateKey(null, "chunkMain");
-		}).then(function (key) {
+		}).then((key) => {
 			chunkKey = key;
 
 			//encrypt chunk key with own mainkey
 			return keyStore.sym.symEncryptKey(chunkKey, userService.getown().getMainKey());
-		}).then(function () {
+		}).then(() => {
 			//encrypt chunk key for receiver
-			return Bluebird.all(receiverObjects.map(function (receiverObject) {
+			return Bluebird.all(receiverObjects.map((receiverObject) => {
 				var crypt = receiverObject.getCryptKey();
 				return keyStore.sym.asymEncryptKey(chunkKey, crypt);
 			}));
-		}).then(function (cryptKeys) {
+		}).then((cryptKeys) => {
 			var cryptKeysData = keyStore.upload.getKeys(cryptKeys);
 			var receiverKeys = {}, receiverIDs = [];
 
-			receiverObjects.forEach(function (receiver, index) {
+			receiverObjects.forEach((receiver, index) => {
 				receiverIDs.push(receiver.getID());
 				receiverKeys[receiver.getID()] = cryptKeys[index];
 			});
@@ -454,7 +454,7 @@ export class Chunk extends Observer {
 				secured.setParent(predecessorChunk.getSecuredData())
 			}
 
-			return secured.signAndEncrypt(userService.getown().getSignKey(), chunkKey).then(function (cData) {
+			return secured.signAndEncrypt(userService.getown().getSignKey(), chunkKey).then((cData) => {
 				return {
 					...chunkData,
 					chunk: cData.meta
@@ -463,18 +463,18 @@ export class Chunk extends Observer {
 		})
 	};
 
-	static createData(receiver, message, images, cb) {
-		var imagePreparation = Bluebird.resolve(images).map(function (image: any) {
-			return image.prepare();
-		});
+	static createData(receiver, message, images) {
+		var imagePreparation = Bluebird.resolve(images).map((image: any) => {
+			return image.prepare()
+		})
 
-		function uploadImages(chunkKey) {
-			return Bluebird.all(images.map(function (image) {
-				return image.upload(chunkKey);
-			}));
+		const uploadImages = (chunkKey) => {
+			return Bluebird.all(images.map((image) => {
+				return image.upload(chunkKey)
+			}))
 		}
 
-		var resultPromise = Bluebird.all([Chunk.createRawData(receiver), imagePreparation]).spread(function (chunkData: any, imagesMeta) {
+		return Bluebird.all([Chunk.createRawData(receiver), imagePreparation]).spread((chunkData: any, imagesMeta) => {
 			var chunk = new Chunk({
 				meta: chunkData.chunk,
 				server: {},
@@ -491,16 +491,14 @@ export class Chunk extends Observer {
 				Message.createRawData(chunk, message, messageMeta),
 				uploadImages(chunk.getKey())
 			]);
-		}).spread(function (chunkData, messageData, imageKeys: any) {
+		}).spread((chunkData, messageData, imageKeys: any) => {
 			imageKeys = h.array.flatten(imageKeys);
 			messageData.imageKeys = imageKeys.map(keyStore.upload.getKey);
 
 			chunkData.message = messageData;
 
 			return chunkData;
-		});
-
-		return resultPromise.nodeify(cb);
+		})
 	};
 }
 
