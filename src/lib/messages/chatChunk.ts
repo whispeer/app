@@ -76,7 +76,7 @@ export class Chunk extends Observer {
 			return Bluebird.resolve();
 		}
 
-		return previousMessages[previousMessages.length - 1].getSendPromise();*/
+		return previousMessages[previousMessages.length - 1].sendContinously();*/
 	}
 
 	getSecuredData = () => {

@@ -23,8 +23,9 @@ export class Message {
 	data: any
 	_prepareImagesPromise: any
 	imageUploadPromise: any
-	_sendPromise: any
-	_chunk: any
+
+	private chunk: any
+	private chunkID: number
 
 	constructor(messageData, chunk?: Chunk, images?, id?) {
 		if (!chunk) {
@@ -40,6 +41,8 @@ export class Message {
 		this._isDecrypted = false;
 
 		var id = Message.idFromData(data)
+
+		this.chunkID = data.server.chunkID
 
 		this._serverID = id.serverID
 		this._messageID = id.messageID
@@ -58,7 +61,8 @@ export class Message {
 		this._isDecrypted = true;
 		this._isOwnMessage = true;
 
-		this._chunk = chunk;
+		this.chunk = chunk;
+		this.chunkID = chunk.getID()
 		this._images = images;
 
 		this._messageID = id || h.generateUUID();
@@ -120,11 +124,11 @@ export class Message {
 		return this._hasBeenSent;
 	};
 
-	uploadImages = (topicKey) => {
+	uploadImages = (chunkKey) => {
 		if (!this.imageUploadPromise) {
 			this.imageUploadPromise = this._prepareImagesPromise.bind(this).then(function () {
 				return Bluebird.all(this._images.map(function (image) {
-					return image.upload(topicKey);
+					return image.upload(chunkKey);
 				}));
 			}).then(function (imageKeys) {
 				return h.array.flatten(imageKeys);
@@ -134,55 +138,44 @@ export class Message {
 		return this.imageUploadPromise;
 	};
 
-	getSendPromise = () => {
-		return this._sendPromise;
-	};
-
-	sendContinously = () => {
-		if (this._sendPromise) {
-			return this._sendPromise;
-		}
-
-		var message = this;
-		this._sendPromise = h.repeatUntilTrue(Bluebird, function () {
-			return message.send();
+	sendContinously = h.cacheResult(() => {
+		return h.repeatUntilTrue(Bluebird, () => {
+			return this.send();
 		}, 2000);
-
-		return this._sendPromise;
-	};
+	})
 
 	send = () => {
 		if (this._hasBeenSent) {
 			throw new Error("trying to send an already sent message");
 		}
 
-		return socket.awaitConnection().bind(this).then(function () {
-			return [this._topic.refetchMessages(), this._topic.loadNewest()];
-		}).then(function () {
-			return this._topic.awaitEarlierSend(this.getTime());
-		}).then(function () {
+		return socket.awaitConnection().then(() => {
+			return [this.chunk.refetchMessages(), this.chunk.loadNewest()];
+		}).then(() => {
+			return this.chunk.awaitEarlierSend(this.getTime());
+		}).then(() => {
 			return this._prepareImagesPromise;
-		}).then(function (imagesMeta) {
+		}).then((imagesMeta) => {
 			this._securedData.metaSetAttr("images", imagesMeta);
 
-			var topicKey = this._topic.getKey();
-			var newest = this._topic.getNewest();
+			var chunkKey = this.chunk.getKey();
+			var newest = this.chunk.getNewest();
 
-			if (newest && newest.getTopicID() === this._topic.getID()) {
+			if (newest && newest.getChunkID() === this.chunk.getID()) {
 				this._securedData.setAfterRelationShip(newest.getSecuredData());
 			}
 
-			var signAndEncryptPromise = this._securedData._signAndEncrypt(userService.getown().getSignKey(), topicKey);
+			var signAndEncryptPromise = this._securedData._signAndEncrypt(userService.getown().getSignKey(), chunkKey);
 
-			return Bluebird.all([signAndEncryptPromise, this.uploadImages(topicKey)]);
-		}).spread(function (result, imageKeys) {
-			result.meta.topicid = this._topic.getID();
+			return Bluebird.all([signAndEncryptPromise, this.uploadImages(chunkKey)]);
+		}).spread((result, imageKeys) => {
+			result.meta.topicid = this.chunk.getID();
 			result.imageKeys = imageKeys.map(keyStore.upload.getKey);
 
 			return socket.emit("messages.send", {
 				message: result
 			});
-		}).then(function (response) {
+		}).then((response) => {
 			if (response.success) {
 				this._hasBeenSent = true;
 				this.data.sent = true;
@@ -214,7 +207,7 @@ export class Message {
 	};
 
 	getTopicID = () => {
-		return this.server.chunkID
+		return this.chunkID
 	}
 
 	getTime = () => {
@@ -255,8 +248,8 @@ export class Message {
 		})
 	};
 
-	verifyParent = (topic) => {
-		this._securedData.checkParent(topic.getSecuredData())
+	verifyParent = (chunk) => {
+		this._securedData.checkParent(chunk.getSecuredData())
 	};
 
 	verify = (signKey) => {
@@ -281,20 +274,20 @@ export class Message {
 		})
 	}
 
-	static createData(topic, message, imagesMeta, cb) {
+	static createData(chunk, message, imagesMeta, cb) {
 		return Bluebird.try(function () {
-			var newest = topic.data.latestMessage;
+			var newest = chunk.data.latestMessage;
 
 			var meta = {
 				createTime: new Date().getTime(),
 				images: imagesMeta
 			};
 
-			var mySecured = Message.createRawSecuredData(topic, message, meta);
+			var mySecured = Message.createRawSecuredData(chunk, message, meta);
 			mySecured.setAfterRelationShip(newest.getSecuredData());
-			return mySecured._signAndEncrypt(userService.getown().getSignKey(), topic.getKey());
+			return mySecured._signAndEncrypt(userService.getown().getSignKey(), chunk.getKey());
 		}).then(function (mData) {
-			mData.meta.topicid = topic.getID();
+			mData.meta.topicid = chunk.getID();
 
 			var result = {
 				message: mData
@@ -304,19 +297,19 @@ export class Message {
 		}).nodeify(cb);
 	};
 
-	static createRawSecuredData(topic, message, meta) {
+	static createRawSecuredData(chunk, message, meta) {
 		var secured = SecuredData.createRaw(message, meta, {
 			type: "message",
 			attributesNotVerified: notVerified
 		});
-		secured.setParent(topic.getSecuredData());
+		secured.setParent(chunk.getSecuredData());
 
 		return secured;
 	};
 
-	static createRawData(topic, message, meta) {
-		var secured = Message.createRawSecuredData(topic, message, meta);
-		return secured._signAndEncrypt(userService.getown().getSignKey(), topic.getKey());
+	static createRawData(chunk, message, meta) {
+		var secured = Message.createRawSecuredData(chunk, message, meta);
+		return secured._signAndEncrypt(userService.getown().getSignKey(), chunk.getKey());
 	};
 
 	static idFromData(data) {
