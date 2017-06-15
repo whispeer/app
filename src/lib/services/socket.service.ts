@@ -1,7 +1,7 @@
 const APIVERSION = "0.0.3";
 
 const debug = require("debug");
-const h = require("whispeerHelper");
+import h from "../helper/helper";
 import { connect } from "socket.io-client";
 
 const config = require('../config.js');

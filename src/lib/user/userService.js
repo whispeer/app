@@ -1,4 +1,4 @@
-var h = require("whispeerHelper");
+var h = require("../helper/helper").default;
 var Observer = require("asset/observer");
 var signatureCache = require("crypto/signatureCache");
 var Bluebird = require("bluebird");

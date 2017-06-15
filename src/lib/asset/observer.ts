@@ -1,5 +1,5 @@
 import * as Bluebird from "bluebird";
-const h = require("whispeerHelper");
+import h from "../helper/helper";
 
 const afterHooks: Function[] = [];
 

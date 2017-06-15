@@ -26,7 +26,7 @@ export default ({ downloadHook, loadHook }: hookType) => {
 			return loading.hasOwnProperty(id)
 		}
 
-		static load(id, response) {
+		static load(response, id = response.server.id) {
 			if (byId[id]) {
 				return Bluebird.resolve(byId[id])
 			}

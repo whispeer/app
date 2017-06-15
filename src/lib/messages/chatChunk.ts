@@ -1,4 +1,4 @@
-const h = require("whispeerHelper");
+import h from "../helper/helper";
 const validator = require("validation/validator");
 import Observer from "../asset/observer"
 const SecuredData = require("asset/securedDataWithMetaData");
@@ -13,7 +13,7 @@ const sessionService = require("services/session.service").default;
 
 import Cache from "../services/Cache.ts";
 
-const Message = require("models/message");
+import { Message } from "./message"
 
 const ImageUpload = require("services/imageUploadService");
 
@@ -112,8 +112,7 @@ export class Chunk extends Observer {
 	};
 
 	sendMessage = (message, images, id) => {
-		var messageObject = new Message(this, message, images, id);
-		// messagesByID[messageObject.getID()] = messageObject;
+		var messageObject = new Message(message, this, images, id)
 
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
@@ -284,7 +283,7 @@ export class Chunk extends Observer {
 				receiverKeys: chunkData.receiverKeys
 			})
 		}).then(function (response) {
-			return ChunkLoader.load(response.successorChunk.id, response.successorChunk)
+			return ChunkLoader.load(response.successorChunk)
 		})
 	}
 
@@ -341,7 +340,7 @@ export class Chunk extends Observer {
 				return
 			}
 
-			return ChunkLoader.load(response.chunk.server.id, response.chunk).then(function (successorChunk) {
+			return ChunkLoader.load(response.chunk).then(function (successorChunk) {
 				if (successorChunk.getPredecessorID() !== this.getID()) {
 					throw new Error("server returned invalid successor topic")
 				}

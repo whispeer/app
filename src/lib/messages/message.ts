@@ -1,17 +1,20 @@
+import * as Bluebird from "bluebird"
+import h from "../helper/helper"
+
 var userService = require("user/userService");
 var socket = require("services/socket.service").default;
 var keyStore = require("services/keyStore.service").default;
 
-var h = require("whispeerHelper");
 var SecuredData = require("asset/securedDataWithMetaData");
-var Bluebird = require("bluebird");
+import ObjectLoader from "../services/objectLoader"
+
+import { Chunk } from "./chatChunk"
 
 var notVerified = ["sendTime", "sender", "topicid", "messageid"];
 
-class Message {
+export class Message {
 	_hasBeenSent: any
 	_isDecrypted: any
-	_topic: any
 	_serverID: any
 	_messageID: any
 	_securedData: any
@@ -21,20 +24,20 @@ class Message {
 	_prepareImagesPromise: any
 	imageUploadPromise: any
 	_sendPromise: any
+	_chunk: any
 
-	constructor(topic, message, images, id) {
-		if (arguments.length === 2) {
-			this.fromSecuredData(topic, message);
-		} else {
-			this.fromDecryptedData(topic, message, images, id);
+	constructor(messageData, chunk?: Chunk, images?, id?) {
+		if (!chunk) {
+			this.fromSecuredData(messageData);
+			return
 		}
+
+		this.fromDecryptedData(chunk, messageData, images, id);
 	}
 
-	fromSecuredData = (topic, data) => {
+	fromSecuredData = (data) => {
 		this._hasBeenSent = true;
 		this._isDecrypted = false;
-
-		this._topic = topic
 
 		var id = Message.idFromData(data)
 
@@ -50,12 +53,12 @@ class Message {
 		this.setData();
 	};
 
-	fromDecryptedData = (topic, message, images, id) => {
+	fromDecryptedData = (chunk, message, images, id) => {
 		this._hasBeenSent = false;
 		this._isDecrypted = true;
 		this._isOwnMessage = true;
 
-		this._topic = topic;
+		this._chunk = chunk;
 		this._images = images;
 
 		this._messageID = id || h.generateUUID();
@@ -66,7 +69,7 @@ class Message {
 			sender:userService.getown().getID()
 		};
 
-		this._securedData = Message.createRawSecuredData(topic, message, meta);
+		this._securedData = Message.createRawSecuredData(chunk, message, meta);
 
 		this.setData();
 
@@ -84,7 +87,7 @@ class Message {
 	};
 
 	_prepareImages = () => {
-		this._prepareImagesPromise = Bluebird.resolve(this._images).map(function (image) {
+		this._prepareImagesPromise = Bluebird.resolve(this._images).map(function (image: any) {
 			return image.prepare();
 		});
 	};
@@ -169,8 +172,7 @@ class Message {
 				this._securedData.setAfterRelationShip(newest.getSecuredData());
 			}
 
-			var signAndEncrypt = Bluebird.promisify(this._securedData._signAndEncrypt.bind(this._securedData));
-			var signAndEncryptPromise = signAndEncrypt(userService.getown().getSignKey(), topicKey);
+			var signAndEncryptPromise = this._securedData._signAndEncrypt(userService.getown().getSignKey(), topicKey);
 
 			return Bluebird.all([signAndEncryptPromise, this.uploadImages(topicKey)]);
 		}).spread(function (result, imageKeys) {
@@ -212,11 +214,7 @@ class Message {
 	};
 
 	getTopicID = () => {
-		return this._topic.getID()
-	}
-
-	getTopic = () => {
-		return this._topic
+		return this.server.chunkID
 	}
 
 	getTime = () => {
@@ -246,7 +244,7 @@ class Message {
 		});
 	};
 
-	loadFullData = () => {
+	load = () => {
 		return this.loadSender().then((sender) => {
 			return Bluebird.all([
 				this.decrypt(),
@@ -332,4 +330,18 @@ class Message {
 	}
 }
 
-module.exports = Message;
+const loadHook = (messageResponse) => {
+	const message = new Message(messageResponse)
+
+	return message.load().thenReturn(message)
+}
+
+const downloadHook = (id) => {
+	return socket.emit("chat.message.get", { id })
+}
+
+const hooks = {
+	downloadHook, loadHook
+}
+
+export default class MessageLoader extends ObjectLoader(hooks) {}

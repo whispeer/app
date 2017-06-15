@@ -1,5 +1,5 @@
 var SecuredData = require("asset/securedDataWithMetaData");
-var h = require("whispeerHelper");
+import h from "../helper/helper";
 
 var userService = require("user/userService");
 var socket = require("services/socket.service").default;

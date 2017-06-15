@@ -1,4 +1,4 @@
-const h = require("whispeerHelper");
+import h from "../helper/helper";
 const validator = require("validation/validator");
 const SecuredData = require("asset/securedDataWithMetaData")
 

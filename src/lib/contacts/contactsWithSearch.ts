@@ -4,7 +4,7 @@ import errorService from "../../lib/services/error.service";
 
 import * as Bluebird from 'bluebird';
 
-const h = require("whispeerHelper");
+import h from "../helper/helper";
 
 class Memoizer {
 	values: any[]

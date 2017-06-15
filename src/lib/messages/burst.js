@@ -1,4 +1,4 @@
-var h = require("whispeerHelper");
+var h = require("../helper/helper").default;
 var MINUTE = 60 * 1000;
 
 function Burst(topic, TopicUpdate) {

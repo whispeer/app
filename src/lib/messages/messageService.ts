@@ -2,7 +2,7 @@
 * MessageService
 **/
 
-var h = require("whispeerHelper");
+import h from "../helper/helper";
 var Observer = require("asset/observer");
 import * as Bluebird from "bluebird";
 

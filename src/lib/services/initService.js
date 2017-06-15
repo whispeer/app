@@ -4,7 +4,7 @@ var socketService = require("services/socket.service").default;
 var requestKeyService = require("services/requestKey.service").default;
 var CacheService = require("./Cache").default;
 
-var h = require("whispeerHelper");
+var h = require("../helper/helper").default;
 var debug = require("debug");
 var Observer = require("asset/observer");
 var Bluebird = require("bluebird");

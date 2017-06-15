@@ -1,7 +1,7 @@
-import * as StorageService from "./storage.service";
-import Storage from "./Storage";
-import "jquery";
-const h = require("../helper/helper");
+import * as StorageService from "./storage.service"
+import Storage from "./Storage"
+import "jquery"
+import h from "../helper/helper"
 
 const loginStorage: Storage = StorageService.withPrefix("whispeer.login");
 

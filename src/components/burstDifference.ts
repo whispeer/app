@@ -1,6 +1,6 @@
 import { Component, Input } from "@angular/core";
 
-const h = require("whispeerHelper");
+import h from "../lib/helper/helper";
 
 var Topic = require("messages/chatChunk")
 

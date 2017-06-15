@@ -11,7 +11,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 import { TranslateService } from '@ngx-translate/core';
 
 const ImageUpload = require("../lib/services/imageUploadService");
-const h = require("whispeerHelper");
+import h from "../lib/helper/helper";
 
 const ImagePickerOptions = {
 	width: 2560,

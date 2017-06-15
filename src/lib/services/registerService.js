@@ -5,7 +5,7 @@ var Storage = require("services/storage.service");
 var errorService = require("services/error.service").errorServiceInstance;
 
 var Bluebird = require("bluebird");
-var h = require("whispeerHelper");
+var h = require("../helper/helper").default;
 var trustManager = require("crypto/trustManager");
 var SecuredData = require("asset/securedDataWithMetaData");
 
