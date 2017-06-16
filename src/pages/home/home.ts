@@ -11,7 +11,6 @@ import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
 
-
 @IonicPage({
 	name: "Home",
 	segment: "home"
@@ -27,7 +26,7 @@ export class HomePage {
 	requests: any[] = [];
 	searchTerm: string = "";
 
-	topicsLoading: boolean = true;
+	chatsLoading: boolean = true;
 	moreTopicsAvailable: boolean = true;
 
 	constructor(public navCtrl: NavController, private translate: TranslateService) {}
@@ -53,9 +52,8 @@ export class HomePage {
 		}
 
 		messageService.loadMoreChats().then(() => {
-			/*TODO this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
-			*/
-			this.topicsLoading = false;
+			this.moreTopicsAvailable = !messageService.allChatsLoaded
+			this.chatsLoading = false;
 		});
 	}
 
@@ -77,39 +75,33 @@ export class HomePage {
 
 			const latestMessage = messages[chat.getLatestMessage()]
 			const latestChunk = chunks[chat.getLatestChunk()]
+			// const latestTopicUpdate = topicUpdates[chat.getLatestTopicUpdate()]
 
 			return {
 				id: chat.getID(),
-				// title: "",
-				unread: true,
-				unreadCount: 5,
+
+				unread: chat.isUnread(),
+				unreadCount: chat.getUnreadMessageIDs().length,
+
+				// title: latestTopicUpdate.getText(),
+
 				time: latestMessage.getTime(),
 				latestMessageText: latestMessage.getText(),
 
-				partners: latestChunk.data.partners,
-				partnersDisplay: latestChunk.data.partnersDisplay,
+				partners: latestChunk.getPartners(),
+				partnersDisplay: latestChunk.getPartnerDisplay()
 			}
 		})
 	}
 
-	getLoadedTopics = () => {
-		let loaded = true
-
-		return this.topics.filter((topic) => {
-			loaded = loaded && topic.loaded
-
-			return loaded
-		})
-	}
-
 	loadMoreTopics = (infiniteScroll) => {
-		if (this.topicsLoading) {
+		if (this.chatsLoading) {
 			infiniteScroll.complete();
 			return
 		}
 
 		messageService.loadMoreChats().then(() => {
-			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
+			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			infiniteScroll.complete();
 		})
 	}

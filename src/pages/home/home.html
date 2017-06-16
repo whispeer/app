@@ -4,7 +4,7 @@
 	</ion-navbar>
 </ion-header>
 
-<ion-content class="list-avatar-page" [ngClass]="{'home--empty': !topicsLoading && getChats().length === 0}">
+<ion-content class="list-avatar-page" [ngClass]="{'home--empty': !chatsLoading && getChats().length === 0}">
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="openContactRequests()">
 		<div class="badgeContainer">
 			<span class="hexBadge">{{requests.length}}</span>
@@ -53,7 +53,7 @@
 		</ion-item>
 	</ion-list>
 
-	<ion-spinner *ngIf="topicsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-spinner *ngIf="chatsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 
 	<ion-infinite-scroll [enabled]="moreTopicsAvailable" (ionInfinite)="loadMoreTopics($event)">
 		<ion-infinite-scroll-content></ion-infinite-scroll-content>

@@ -156,6 +156,10 @@ export class Chat {
 		// unreadChatIDs.remove(this.id)
 	}
 
+	getUnreadMessageIDs = () => {
+		return this.unreadMessageIDs
+	}
+
 	addUnreadMessage(id) {
 		if (this.unreadMessageIDs.indexOf(id) === -1) {
 			this.unreadMessageIDs.push(id)
@@ -166,15 +170,7 @@ export class Chat {
 		}
 	}
 
-	getBursts() {
-
-	}
-
 	loadMoreMessages() {
-
-	}
-
-	getNewestMessage() {
 
 	}
 }

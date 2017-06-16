@@ -13,12 +13,10 @@ import Cache from "../services/Cache"
 var sessionService = require("services/session.service");
 var initService = require("services/initService");
 
-import { Chunk } from "../messages/chatChunk"
+import ChunkLoader, { Chunk } from "../messages/chatChunk"
 import ChatLoader from "../messages/chat"
 
 var messageService;
-
-var activeTopic = 0;
 
 let chatIDs
 
@@ -40,12 +38,6 @@ messageService = {
 
 			return theTopic.refetchMessages();
 		}).catch(errorService.criticalError);*/
-	},
-	isActiveTopic: function (topicid) {
-		return activeTopic === h.parseDecimal(topicid);
-	},
-	setActiveTopic: function (topicid) {
-		activeTopic = h.parseDecimal(topicid);
 	},
 	loadChatIDs: function () {
 		return socket.definitlyEmit("chat.getAllIDs", {}).then(function (response) {
@@ -69,7 +61,7 @@ messageService = {
 			})
 
 			if (unloadedChatIDs.length === 0) {
-				messageService.allTopicsLoaded = true
+				messageService.allChatsLoaded = true
 			}
 
 			return socket.definitlyEmit("chat.getMultiple", {
@@ -87,8 +79,8 @@ messageService = {
 		return Bluebird.resolve(messageSendCache.all().toArray()).map(function (unsentMessage: any) {
 			var data = JSON.parse(unsentMessage.data);
 
-			return messageService.getTopic(data.topicID).then(function (topic) {
-				return topic.sendUnsentMessage(data, unsentMessage.blobs);
+			return messageService.getChat(data.topicID).then(function (chat) {
+				return chat.sendUnsentMessage(data, unsentMessage.blobs);
 			});
 		});
 	},
@@ -97,46 +89,49 @@ messageService = {
 			return ChatLoader.get(chatID);
 		}).nodeify(cb);
 	},
-	sendMessageToUserTopicIfExists: function(receiver, message, images) {
-		return messageService.getUserTopic(receiver).then(function (chatid) {
+	sendMessageToUserChatIfExists: function(receiver, message, images) {
+		return Bluebird.coroutine(function* () {
+			const chatid = yield messageService.getUserChat(receiver)
+
 			if (!chatid) {
 				return;
 			}
 
-			return ChatLoader.get(chatid).then(function (chat) {
-				/*
-				var otherReceiver = chat.getReceiver().map(h.parseDecimal);
+			const chat = yield ChatLoader.get(chatid)
+			const chunk = yield ChunkLoader.get(chat.getLatestChunk())
 
-				if (otherReceiver.length > 2) {
-					console.log("send to existing user chat failed as more than two users in receiver list");
-					return false;
-				}
+			var otherReceiver = chunk.getReceiver().map(h.parseDecimal)
 
-				if (otherReceiver.indexOf(receiver) === -1) {
-					console.log("send to existing user chat failed as other user is not in receiver list");
-					return false;
-				}
+			if (otherReceiver.length > 2) {
+				console.log("send to existing user chat failed as more than two users in receiver list")
+				return false;
+			}
 
-				if (otherReceiver.indexOf(sessionService.getUserID()) > -1) {
-					console.log("send to existing user chat failed as own user is not in receiver list");
-					return false;
-				}
+			if (otherReceiver.indexOf(receiver) === -1) {
+				console.log("send to existing user chat failed as other user is not in receiver list")
+				return false;
+			}
 
-				return messageService.sendMessage(chat, message, images).thenReturn(chat);
-				*/
-			});
+			if (otherReceiver.indexOf(sessionService.getUserID()) > -1) {
+				console.log("send to existing user chat failed as own user is not in receiver list")
+				return false;
+			}
+
+			yield messageService.sendMessage(chat, message, images)
+
+			// return chat
 		});
 	},
-	sendNewTopic: function (receiver, message, images) {
+	sendNewChat: function (receiver, message, images) {
 		return Bluebird.try(function () {
 			if (receiver.length === 1) {
-				return messageService.sendMessageToUserTopicIfExists(receiver, message, images);
+				return messageService.sendMessageToUserChatIfExists(receiver, message, images);
 			}
 
 			return false;
-		}).then(function (topic) {
-			if (topic) {
-				return topic.getID();
+		}).then(function (chat) {
+			if (chat) {
+				return chat.getID();
 			}
 
 			return Chunk.createData(receiver, message, images).then(function (chunkData) {
@@ -148,45 +143,34 @@ messageService = {
 				});
 			}).then(function (response) {
 				return ChatLoader.load(response.server.id, response);
-			}).then(function (topics) {
-				return topics[0].getID();
+			}).then(function (chat) {
+				return chat.getID();
 			});
 		});
 	},
-	sendMessage: function (topicID, message, images, cb) {
-		var resultPromise = Bluebird.resolve(topicID).then(function (topic) {
-			if (typeof topic !== "object") {
-				return ChatLoader.get(topic);
+	sendMessage: function (chatID, message, images) {
+		return Bluebird.resolve(chatID).then(function (chat) {
+			if (typeof chat !== "object") {
+				return ChatLoader.get(chat);
 			} else {
-				return topic;
+				return chat;
 			}
-		}).then(function (topic) {
-			return topic.sendMessage(message, images);
+		}).then(function (chat) {
+			return chat.sendMessage(message, images);
 		});
-
-		return resultPromise.nodeify(cb);
 	},
-	getUserTopic: function (uid, cb) {
+	getUserChat: function (uid, cb) {
 		return initService.awaitLoading().then(function () {
 			return socket.definitlyEmit("chat.getChatWithUser", {
 				userID: uid
 			});
 		}).then(function (data) {
-			if (data.topicid) {
-				return data.topicid;
+			if (data.chatID) {
+				return data.chatID;
 			}
 
 			return false;
 		}).nodeify(cb);
-	},
-	data: {
-		latestTopics: {
-			count: 0,
-			loading: false,
-			loaded: false,
-			data: [] // Topic.all()
-		},
-		unread: 0
 	}
 };
 
@@ -219,7 +203,7 @@ socket.channel("unreadTopics", function (e, data) {
 
 });
 
-function loadUnreadTopicIDs() {
+function loadUnreadChatIDs() {
 	return initService.awaitLoading().then(function () {
 		return Bluebird.delay(500);
 	}).then(function () {
@@ -232,11 +216,11 @@ function loadUnreadTopicIDs() {
 }
 
 socket.on("connect", function () {
-	loadUnreadTopicIDs();
+	loadUnreadChatIDs();
 });
 
 initService.listen(function () {
-	loadUnreadTopicIDs();
+	loadUnreadChatIDs();
 	messageService.sendUnsentMessages();
 }, "initDone");
 

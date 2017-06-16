@@ -25,10 +25,10 @@ declare const startup: number
 export class Chunk extends Observer {
 	private meta
 	private receiver
-	public data
-	private server: { id: number, createTime: number }
-	private _loadReceiverNamesPromise: any
+	private id
+	private createTime
 	private successorID: number
+	private receiverObjects: any[]
 
 	constructor(data) {
 		super()
@@ -45,19 +45,10 @@ export class Chunk extends Observer {
 			alternativeType: "chatChunk" // Allow for chatChunk already
 		});
 
-		this.server = data.server
+		this.id = data.server.id
+		this.createTime = data.server.createTime
 
 		this.receiver = this.meta.metaAttr("receiver");
-
-		this.data = {
-			partners: [],
-			partnersDisplay: [],
-
-			remainingUser: "",
-			remainingUserTitle: "",
-
-			id: data.server.chunkID,
-		};
 	}
 
 	awaitEarlierSend = (time) => {
@@ -81,12 +72,12 @@ export class Chunk extends Observer {
 	}
 
 	getID = () => {
-		return h.parseDecimal(this.server.id);
+		return h.parseDecimal(this.id);
 	};
 
 	getTime = () => {
-		if (this.server.createTime) {
-			return this.server.createTime
+		if (this.createTime) {
+			return this.createTime
 		}
 
 		return this.getSecuredData().metaAttr("createTime");
@@ -160,7 +151,7 @@ export class Chunk extends Observer {
 			return userService.get(this.meta.metaAttr("creator"));
 		}).then((creator) => {
 			if (creator.isNotExistingUser()) {
-				this.data.disabled = true;
+				// TODO this.data.disabled = true;
 				return false;
 			}
 
@@ -172,40 +163,29 @@ export class Chunk extends Observer {
 		})
 	};
 
-	loadReceiverNames = () => {
-		if (this._loadReceiverNamesPromise) {
-			return this._loadReceiverNamesPromise
-		}
-
-		this._loadReceiverNamesPromise = Bluebird.try(() => {
+	loadReceiverNames = h.cacheResult<Bluebird<any>>(() => {
+		return Bluebird.try(() => {
 			return userService.getMultipleFormatted(this.receiver)
 		}).then((receiverObjects) => {
-			var partners = receiverObjects.filter((receiverObject) => {
-				return !receiverObject.user.isOwn() || receiverObjects.length === 1
-			});
-
-			var maxDisplay = 3;
-			var displayCount = (partners.length > maxDisplay) ? 2 : partners.length;
-
-			this.data.partnersDisplay = partners.slice(0, displayCount);
-			this.data.partners = partners
-			this.data.receivers = receiverObjects
-
-			if (partners.length > displayCount) {
-				this.data.remainingUser = partners.length - displayCount;
-
-				var i = 0;
-				for (i = displayCount; i < partners.length; i += 1) {
-					this.data.remainingUserTitle += partners[i].name;
-					if (i < partners.length - 1) {
-						this.data.remainingUserTitle += ", ";
-					}
-				}
-			}
+			this.receiverObjects = receiverObjects
 		})
+	});
 
-		return this._loadReceiverNamesPromise
-	};
+	getPartners = () => {
+		return this.receiverObjects.filter((receiverObject) => {
+			return !receiverObject.user.isOwn() || this.receiverObjects.length === 1
+		});
+	}
+
+	getPartnerDisplay = (maxDisplay = 3) => {
+		const partners = this.getPartners()
+
+		if (partners.length <= maxDisplay) {
+			return partners
+		}
+
+		return partners.slice(0, maxDisplay - 1)
+	}
 
 	getReceiver = () => {
 		return this.receiver
@@ -221,8 +201,6 @@ export class Chunk extends Observer {
 			if (predecessorID && ChunkLoader.isLoaded(predecessorID)) {
 				ChunkLoader.getLoaded(predecessorID).setSuccessor(this.getID())
 			}
-
-			this.data.verified = true;
 		}).finally(() => {
 			chunkDebug(`Chunk loaded (${this.getID()}):${new Date().getTime() - startup}`);
 		})
