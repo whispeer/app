@@ -7,6 +7,11 @@ import { TranslateService } from '@ngx-translate/core';
 import messageService from "../../lib/messages/messageService";
 const contactsService = require("../../lib/services/friendsService");
 
+import ChunkLoader from "../../lib/messages/chatChunk"
+import MessageLoader from "../../lib/messages/message"
+import ChatLoader from "../../lib/messages/chat"
+
+
 @IonicPage({
 	name: "Home",
 	segment: "home"
@@ -52,6 +57,39 @@ export class HomePage {
 			*/
 			this.topicsLoading = false;
 		});
+	}
+
+	getChats = () => {
+		const chats = ChatLoader.getAll()
+		const messages = MessageLoader.getAll()
+		const chunks = ChunkLoader.getAll()
+
+		const chatIDs = messageService.getChatIDs()
+
+		let loaded = true
+
+		return chatIDs.filter((chatID) => {
+			loaded = loaded && chats.hasOwnProperty(chatID)
+
+			return loaded
+		}).map((chatID) => {
+			const chat = chats[chatID]
+
+			const latestMessage = messages[chat.getLatestMessage()]
+			const latestChunk = chunks[chat.getLatestChunk()]
+
+			return {
+				id: chat.getID(),
+				// title: "",
+				unread: true,
+				unreadCount: 5,
+				time: latestMessage.getTime(),
+				latestMessageText: latestMessage.getText(),
+
+				partners: latestChunk.data.partners,
+				partnersDisplay: latestChunk.data.partnersDisplay,
+			}
+		})
 	}
 
 	getLoadedTopics = () => {

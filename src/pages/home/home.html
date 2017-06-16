@@ -4,7 +4,7 @@
 	</ion-navbar>
 </ion-header>
 
-<ion-content class="list-avatar-page" [ngClass]="{'home--empty': !topicsLoading && topics.length === 0}">
+<ion-content class="list-avatar-page" [ngClass]="{'home--empty': !topicsLoading && getChats().length === 0}">
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="openContactRequests()">
 		<div class="badgeContainer">
 			<span class="hexBadge">{{requests.length}}</span>
@@ -14,42 +14,42 @@
 	</button>
 
 	<ion-list class="space-for-fab">
-		<ion-item *ngFor="let topic of getLoadedTopics(); let i = index" class="topic" [ngClass]="{'topic--new': topic.unread}" (click)="openChat(topic.id)">
+		<ion-item *ngFor="let chat of getChats(); let i = index" class="topic" [ngClass]="{'topic--new': chat.unread}" (click)="openChat(chat.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
-					*ngFor="let partner of topic.partnersDisplay"
+					*ngFor="let partner of chat.partnersDisplay"
 					class="hexagon__image hexagon__image--active"
-					[ngClass]="{'hexagon__image--medium': topic.partnersDisplay.length > 1}"
+					[ngClass]="{'hexagon__image--medium': chat.partnersDisplay.length > 1}"
 				>
 					<user-image [id]="partner.id" [image]="partner.basic.image"></user-image>
 				</ion-avatar>
 				<ion-avatar
-					*ngIf="topic.partners.length > 3"
+					*ngIf="chat.partners.length > 3"
 					class="hexagon__image hexagon__image--medium"
 				>
 					<hexagon></hexagon>
-					<span class="hexagon__image__image topic__remainingUsers">+{{topic.partners.length - 2}}</span>
+					<span class="hexagon__image__image topic__remainingUsers">+{{chat.partners.length - 2}}</span>
 				</ion-avatar>
 			</div>
 			<div class="topic__header">
 				<h2 class="user__name">
-					<span *ngIf="!topic.title">
-						<span *ngFor="let partner of topic.partners; let l = last">
+					<span *ngIf="!chat.title">
+						<span *ngFor="let partner of chat.partners; let l = last">
 							{{ partner.basic.shortname }}{{ l ? "":", " }}
 						</span>
 					</span>
-					<span *ngIf="topic.title">{{topic.title}}</span>
-					<div class="topic__badgeContainer" *ngIf="topic.unread">
+					<span *ngIf="chat.title">{{chat.title}}</span>
+					<div class="topic__badgeContainer" *ngIf="chat.unread">
 						<span class="topic__hexBadge">
-							<span class="topic__hexBadge__text">{{ topic.obj.getUnreadCount() | maxValue: 99 }}</span>
+							<span class="topic__hexBadge__text">{{ chat.unreadCount | maxValue: 99 }}</span>
 						</span>
 					</div>
 				</h2>
 				<div>
-					<ion-note item-right>{{topic.obj.getTime() | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
+					<ion-note item-right>{{chat.time | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 				</div>
 			</div>
-			<p *ngIf="topic.latestMessage">{{topic.latestMessage.data.text}}</p>
+			<p *ngIf="chat.latestMessageText">{{chat.latestMessageText}}</p>
 		</ion-item>
 	</ion-list>
 

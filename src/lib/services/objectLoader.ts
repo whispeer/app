@@ -83,6 +83,10 @@ function createLoader<ObjectType>({ downloadHook, loadHook }: hookType<ObjectTyp
 
 			 return loading[id]
 		}
+
+		static getAll = () => {
+			return byId
+		}
 	}
 }
 

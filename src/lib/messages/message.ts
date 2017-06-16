@@ -95,7 +95,7 @@ export class Message {
 		this._prepareImages();
 	};
 
-	_prepareImages = h.cacheResult(() => {
+	_prepareImages = h.cacheResult<Bluebird<any>>(() => {
 		return Bluebird.resolve(this._images).map((image: any) => {
 			return image.prepare();
 		});
@@ -143,7 +143,7 @@ export class Message {
 		});
 	})
 
-	sendContinously = h.cacheResult(() => {
+	sendContinously = h.cacheResult<any>(() => {
 		return h.repeatUntilTrue(Bluebird, () => {
 			return this.send();
 		}, 2000);
@@ -218,9 +218,9 @@ export class Message {
 	getTime = () => {
 		if (this.getServerID()) {
 			return this.sendTime;
-		} else {
-			return h.parseDecimal(this._securedData.metaAttr("createTime"));
 		}
+
+		return h.parseDecimal(this._securedData.metaAttr("createTime"));
 	};
 
 	isOwn = () => {
@@ -262,6 +262,10 @@ export class Message {
 
 		return this._securedData.verify(signKey)
 	};
+
+	getText = () => {
+		return this.data.text
+	}
 
 	decrypt = () => {
 		if (this._isDecrypted) {
@@ -338,4 +342,4 @@ const hooks = {
 	downloadHook, loadHook
 }
 
-export default class MessageLoader extends ObjectLoader(hooks) {}
+export default class MessageLoader extends ObjectLoader<Message>(hooks) {}

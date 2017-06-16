@@ -20,14 +20,12 @@ const ImageUpload = require("services/imageUploadService");
 const debugName = "whispeer:chunk";
 const chunkDebug = debug(debugName);
 
-const chunksByID = {}, chunksLoadingByID = {};
-
 declare const startup: number
 
 export class Chunk extends Observer {
 	private meta
 	private receiver
-	private data
+	public data
 	private server: { id: number, createTime: number }
 	private _loadReceiverNamesPromise: any
 	private successorID: number
@@ -52,9 +50,6 @@ export class Chunk extends Observer {
 		this.receiver = this.meta.metaAttr("receiver");
 
 		this.data = {
-			loaded: false,
-			verified: false,
-
 			partners: [],
 			partnersDisplay: [],
 
@@ -62,8 +57,6 @@ export class Chunk extends Observer {
 			remainingUserTitle: "",
 
 			id: data.server.chunkID,
-			type: (this.receiver.length <= 2 ? "peerChat" : "groupChat"),
-			obj: this
 		};
 	}
 
@@ -149,17 +142,17 @@ export class Chunk extends Observer {
 	};
 
 	ensureChunkChain = (predecessor) => {
-		var predecessorID = this.getPredecessorID()
-
-		if (predecessorID === predecessor) {
+		if (this.getID() === predecessor.getID()) {
 			return
 		}
 
-		if (!predecessorID || !chunksByID[predecessorID]) {
-			throw new Error()
+		var predecessorID = this.getPredecessorID()
+
+		if (!predecessorID || !ChunkLoader.isLoaded(predecessorID)) {
+			throw new Error(`Chunk chain broken ${predecessorID}`)
 		}
 
-		chunksByID[predecessorID].ensureChunkChain(predecessor)
+		ChunkLoader.getLoaded(predecessorID).ensureChunkChain(predecessor)
 	}
 
 	verify = () => {
@@ -224,10 +217,9 @@ export class Chunk extends Observer {
 			this.loadReceiverNames(),
 		]).then(() => {
 			var predecessorID = this.getPredecessorID()
-			var predecessor = chunksByID[predecessorID]
 
-			if (predecessorID && predecessor) {
-				predecessor.setSuccessor(this.getID())
+			if (predecessorID && ChunkLoader.isLoaded(predecessorID)) {
+				ChunkLoader.getLoaded(predecessorID).setSuccessor(this.getID())
 			}
 
 			this.data.verified = true;
@@ -301,7 +293,7 @@ export class Chunk extends Observer {
 
 	getPredecessor = () => {
 		if (!this.hasPredecessor()) {
-			return null
+			return Bluebird.resolve(null)
 		}
 
 		return ChunkLoader.get(this.getPredecessorID()).catch((err) => {
@@ -327,7 +319,7 @@ export class Chunk extends Observer {
 			return
 		}
 
-		return chunksByID[this.successorID]
+		return ChunkLoader.getLoaded(this.successorID)
 	}
 
 	getSuccessor = () => {
@@ -348,23 +340,6 @@ export class Chunk extends Observer {
 				return successorChunk
 			})
 		})
-	}
-
-
-	static load(chunkData) {
-		var chunkID = chunkData.server.id
-
-		if (chunksByID[chunkID]) {
-			return chunksByID[chunkID]
-		}
-
-		if (chunksLoadingByID[chunkID]) {
-			return chunksLoadingByID[chunkID]
-		}
-
-		var chunk = new Chunk(chunkData)
-
-		chunksLoadingByID[chunkID] = chunk.load().thenReturn(chunk)
 	}
 
 	static loadChunkChain(newChunk, oldChunk) {

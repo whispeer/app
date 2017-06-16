@@ -27,9 +27,9 @@ messageService = {
 		if (!messageData) {
 			return Bluebird.resolve()
 		}
-		var messageToAdd;
+		/*var messageToAdd;
 
-		/*return Bluebird.try(function () {
+		return Bluebird.try(function () {
 			return Chunk.messageFromData(messageData);
 		}).then(function (_messageToAdd) {
 			messageToAdd = _messageToAdd;
@@ -47,21 +47,24 @@ messageService = {
 	setActiveTopic: function (topicid) {
 		activeTopic = h.parseDecimal(topicid);
 	},
-	getAllChatIDs: function (refresh: boolean = false) {
-		if (chatIDs && !refresh) {
-			return Bluebird.resolve(chatIDs)
-		}
-
+	loadChatIDs: function () {
 		return socket.definitlyEmit("chat.getAllIDs", {}).then(function (response) {
 			chatIDs = response.chatIDs
 			return chatIDs
 		});
 	},
+	getChatIDs: function (refresh: boolean = false) {
+		return chatIDs || []
+	},
 	loadMoreChats: h.cacheUntilSettled(() => {
 		return initService.awaitLoading().then(function () {
-			return messageService.getAllChatIDs()
-		}).then(function (chatIDs) {
-			const unloadedChatIDs = chatIDs.filter(function (chatID) {
+			if (chatIDs) {
+				return Bluebird.resolve()
+			}
+
+			return messageService.loadChatIDs()
+		}).then(function () {
+			const unloadedChatIDs = messageService.getChatIDs().filter(function (chatID) {
 				return !ChatLoader.isLoaded(chatID)
 			})
 
@@ -78,15 +81,6 @@ messageService = {
 			}))
 		}).catch(errorService.criticalError);
 	}),
-	getChats: () => {
-		return ChatLoader.getAll()
-	},
-	getChunks: () => {
-		return ChunkLoader.getAll()
-	},
-	getMessages: () => {
-		return MessageLoader.getAll()
-	},
 	sendUnsentMessages: function () {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
@@ -98,36 +92,38 @@ messageService = {
 			});
 		});
 	},
-	getTopic: function (topicid, cb) {
+	getChat: function (chatID, cb) {
 		return Bluebird.try(function () {
-			return ChatLoader.get(topicid);
+			return ChatLoader.get(chatID);
 		}).nodeify(cb);
 	},
 	sendMessageToUserTopicIfExists: function(receiver, message, images) {
-		return messageService.getUserTopic(receiver).then(function (topicid) {
-			if (!topicid) {
+		return messageService.getUserTopic(receiver).then(function (chatid) {
+			if (!chatid) {
 				return;
 			}
 
-			return ChatLoader.get(topicid).then(function (topic) {
-				var otherReceiver = topic.getReceiver().map(h.parseDecimal);
+			return ChatLoader.get(chatid).then(function (chat) {
+				/*
+				var otherReceiver = chat.getReceiver().map(h.parseDecimal);
 
 				if (otherReceiver.length > 2) {
-					console.log("send to existing user topic failed as more than two users in receiver list");
+					console.log("send to existing user chat failed as more than two users in receiver list");
 					return false;
 				}
 
 				if (otherReceiver.indexOf(receiver) === -1) {
-					console.log("send to existing user topic failed as other user is not in receiver list");
+					console.log("send to existing user chat failed as other user is not in receiver list");
 					return false;
 				}
 
 				if (otherReceiver.indexOf(sessionService.getUserID()) > -1) {
-					console.log("send to existing user topic failed as own user is not in receiver list");
+					console.log("send to existing user chat failed as own user is not in receiver list");
 					return false;
 				}
 
-				return messageService.sendMessage(topic, message, images).thenReturn(topic);
+				return messageService.sendMessage(chat, message, images).thenReturn(chat);
+				*/
 			});
 		});
 	},

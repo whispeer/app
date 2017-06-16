@@ -4,7 +4,7 @@ import socketService from "../services/socket.service"
 
 import ObjectLoader from "../services/objectLoader"
 
-import ChunkLoader from "./chatChunk"
+import ChunkLoader, { Chunk } from "./chatChunk"
 import MessageLoader from "./message"
 
 import h from "../helper/helper"
@@ -64,6 +64,10 @@ export class Chat {
 		this.unreadMessageIDs = unreadMessageIDs
 	}
 
+	getID = () => {
+		return this.id
+	}
+
 	isUnread() {
 		return unreadChatIDs.indexOf(this.id) > -1
 	}
@@ -90,25 +94,31 @@ export class Chat {
 		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "chatUpdate", id }, time)
 	}
 
+	verifyMessageAssociations = (message) => {
+		return Bluebird.all([
+			ChunkLoader.get(message.getChunkID()),
+			ChunkLoader.get(h.array.last(this.chunkIDs)),
+		]).then(([messageChunk, latestChunk]) => {
+			message.verifyParent(messageChunk)
+
+			return Chunk.loadChunkChain(latestChunk, messageChunk).thenReturn([latestChunk, messageChunk])
+		}).then(([latestChunk, messageChunk]) => {
+			latestChunk.ensureChunkChain(messageChunk)
+		})
+	}
+
 	load = h.cacheResult<Bluebird<any>>(() => {
 		return Bluebird.all([
 			MessageLoader.get(this.loadingInfo.latestMessageID),
-			ChunkLoader.get(this.loadingInfo.latestChunkID)
+			ChunkLoader.get(this.loadingInfo.latestChunkID),
 		]).then(([latestMessage, latestChunk]) => {
 			this.loadingInfo = null
 
-			if (latestMessage.getChunkID() !== latestChunk.getID()) {
-				// get chunks in between!
-			}
+			this.chunkIDs = [latestChunk.getID()]
 
-			// load message chunk chain!
-			// ensure chunk chain is valid!
-
-			// add message id to list
-
-			return latestMessage
+			return this.verifyMessageAssociations(latestMessage).thenReturn(latestMessage)
 		}).then((latestMessage) => {
-			this.addMessageID(latestMessage.getID(), latestMessage.getServerTime())
+			this.addMessageID(latestMessage.getID(), latestMessage.getTime())
 		})
 	})
 
@@ -124,8 +134,20 @@ export class Chat {
 		return this.chatUpdates
 	}
 
-	getLatestChunk() {
+	getLatestChatUpdate() {
+		if (this.chatUpdates.length > 0) {
+			return h.array.last(this.chatUpdates).id
+		}
+	}
 
+	getLatestChunk() {
+		return h.array.last(this.chunkIDs)
+	}
+
+	getLatestMessage() {
+		if (this.messages.length > 0) {
+			return h.array.last(this.messages).id
+		}
 	}
 
 	markRead() {
