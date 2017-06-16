@@ -125,6 +125,10 @@ export class Message {
 		};
 	};
 
+	getChunkID = () => {
+		return this.chunkID
+	}
+
 	hasBeenSent = () => {
 		return this._hasBeenSent;
 	};

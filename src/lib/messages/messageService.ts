@@ -78,6 +78,15 @@ messageService = {
 			}))
 		}).catch(errorService.criticalError);
 	}),
+	getChats: () => {
+		return ChatLoader.getAll()
+	},
+	getChunks: () => {
+		return ChunkLoader.getAll()
+	},
+	getMessages: () => {
+		return MessageLoader.getAll()
+	},
 	sendUnsentMessages: function () {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 

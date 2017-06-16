@@ -1,16 +1,16 @@
 import * as Bluebird from "bluebird"
 
-type hookType = {
+type hookType<ObjectType> = {
 	downloadHook: (id: any) => Bluebird<any>,
-	loadHook: (response: any) => Bluebird<any>
+	loadHook: (response: any) => Bluebird<ObjectType>
 }
 
-export default ({ downloadHook, loadHook }: hookType) => {
-	let loading = {}
-	let byId = {}
+function createLoader<ObjectType>({ downloadHook, loadHook }: hookType<ObjectType>) {
+	let loading: { [s: string]: Bluebird<ObjectType> } = {}
+	let byId: { [s: string]: ObjectType } = {}
 
 	return class ObjectLoader {
-		static getLoaded(id) {
+		static getLoaded(id): ObjectType {
 			if (!ObjectLoader.isLoaded(id)) {
 				throw new Error(`Not yet loaded: ${id}`)
 			}
@@ -26,7 +26,7 @@ export default ({ downloadHook, loadHook }: hookType) => {
 			return loading.hasOwnProperty(id)
 		}
 
-		static load(response, id = response.server.id) {
+		static load(response, id = response.server.id): Bluebird<ObjectType> {
 			if (byId[id]) {
 				return Bluebird.resolve(byId[id])
 			}
@@ -55,7 +55,7 @@ export default ({ downloadHook, loadHook }: hookType) => {
 			 return loading[id]
 		}
 
-		static get(id) {
+		static get(id): Bluebird<ObjectType> {
 			if (byId[id]) {
 				return Bluebird.resolve(byId[id])
 			}
@@ -85,3 +85,5 @@ export default ({ downloadHook, loadHook }: hookType) => {
 		}
 	}
 }
+
+export default createLoader

@@ -1,4 +1,3 @@
-const sortedSet = require("asset/sortedSet")
 import * as Bluebird from 'bluebird';
 
 import socketService from "../services/socket.service"
@@ -8,9 +7,7 @@ import ObjectLoader from "../services/objectLoader"
 import ChunkLoader from "./chatChunk"
 import MessageLoader from "./message"
 
-function sortGetTime(a, b) {
-	return (a.getTime() - b.getTime());
-}
+import h from "../helper/helper"
 
 const unreadChatIDs = []
 
@@ -24,34 +21,96 @@ const unreadChatIDs = []
 ->
 */
 
+const addAfterTime = (arr:timeArray, id: any, time: number) => {
+	const firstLaterIndex = arr.findIndex((ele) => ele.time > time)
+
+	return [
+		...arr.slice(0, firstLaterIndex),
+		{ id, time },
+		...arr.slice(firstLaterIndex)
+	]
+}
+
+type timeArray = {
+	id: any,
+	time: number
+}[]
+
 export class Chat {
-	private messages = sortedSet(sortGetTime)
-	private chatUpdates = sortedSet(sortGetTime)
-	private messagesAndUpdates = sortedSet(sortGetTime)
+	//Sorted IDs
+	private messages:timeArray = []
+	private chatUpdates:timeArray = []
+	private messagesAndUpdates:timeArray = []
 
-	private unreadMessageIDs = []
+	// Unsorted IDs
+	private chunkIDs: number[] = []
+	private unreadMessageIDs: number[] = []
+
 	private id: number
-	private latestMessageID: number
-	private latestChunkID: number
 
-	constructor(chatData) {
-		this.id = chatData.id
+	private loadingInfo: {
+		latestMessageID: number,
+		latestChunkID: number
+	}
 
-		this.latestMessageID = chatData.latestMessageID
-		this.latestChunkID = chatData.latestChunkID
-		this.unreadMessageIDs = chatData.unreadMessageIDs
+	constructor({ id, latestMessageID, latestChunkID, unreadMessageIDs }) {
+		this.id = id
+
+		this.loadingInfo = {
+			latestMessageID: latestMessageID,
+			latestChunkID: latestChunkID,
+		}
+
+		this.unreadMessageIDs = unreadMessageIDs
 	}
 
 	isUnread() {
 		return unreadChatIDs.indexOf(this.id) > -1
 	}
 
-	load() {
-		return Bluebird.all([
-			ChunkLoader.get(this.latestChunkID),
-			MessageLoader.get(this.latestMessageID)
-		])
+	addMessageID = (id, time) => {
+		const alreadyAdded = this.messages.find((message) => message.id === id)
+
+		if (alreadyAdded) {
+			return
+		}
+
+		this.messages = addAfterTime(this.messages, id, time)
+		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "message", id }, time)
 	}
+
+	addChatUpdateID = (id, time) => {
+		const alreadyAdded = this.chatUpdates.find((chatUpdate) => chatUpdate.id === id)
+
+		if (alreadyAdded) {
+			return
+		}
+
+		this.chatUpdates = addAfterTime(this.chatUpdates, id, time)
+		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "chatUpdate", id }, time)
+	}
+
+	load = h.cacheResult<Bluebird<any>>(() => {
+		return Bluebird.all([
+			MessageLoader.get(this.loadingInfo.latestMessageID),
+			ChunkLoader.get(this.loadingInfo.latestChunkID)
+		]).then(([latestMessage, latestChunk]) => {
+			this.loadingInfo = null
+
+			if (latestMessage.getChunkID() !== latestChunk.getID()) {
+				// get chunks in between!
+			}
+
+			// load message chunk chain!
+			// ensure chunk chain is valid!
+
+			// add message id to list
+
+			return latestMessage
+		}).then((latestMessage) => {
+			this.addMessageID(latestMessage.getID(), latestMessage.getServerTime())
+		})
+	})
 
 	getMessages() {
 		return this.messages
