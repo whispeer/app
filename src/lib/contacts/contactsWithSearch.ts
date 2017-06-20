@@ -6,6 +6,39 @@ import * as Bluebird from 'bluebird';
 
 const h = require("whispeerHelper");
 
+class Memoizer {
+	values: any[]
+	cachedValue: any
+	constructor(private selectors: Function[], private reduce: Function) {}
+
+	getValue() {
+		const newValues = this.selectors.map((selector) => selector())
+
+		const changed = !this.values || newValues.some((val, index) => this.values[index] !== val)
+
+		if (!changed) {
+			return this.cachedValue
+		}
+
+		console.warn("Memoizer recalculated", this.values, newValues)
+
+		this.values = newValues
+		this.cachedValue = this.reduce(...this.values)
+
+		return this.cachedValue
+	}
+}
+
+const filterContacts = (contacts, searchTerm) => {
+	if (!searchTerm) {
+		return contacts;
+	}
+
+	return contacts.filter((contact) => {
+		return contact.names.searchName.indexOf(searchTerm) > -1;
+	});
+}
+
 export class ContactsWithSearch {
 	contacts: any[] = [];
 	contactsLoading: boolean = true;
@@ -13,11 +46,32 @@ export class ContactsWithSearch {
 	searchResults: any[] = [];
 	searchResultsLoading: boolean = false;
 
+	loadedContactIDs: number[] = []
+
 	searchTerm: string = "";
 
+	memoizer: Memoizer
+
+	constructor() {
+		this.memoizer = new Memoizer([
+			() => this.contacts,
+			() => this.searchResults,
+			() => this.searchTerm
+		], (contacts, searchResults, searchTerm) => {
+			return filterContacts(contacts, searchTerm).concat(searchResults)
+		})
+	}
+
 	protected loadContactsUsers = () => {
+		var contacts = contactsService.getFriends();
+
+		if (h.arrayEqual(this.loadedContactIDs, contacts)) {
+			return Bluebird.resolve()
+		}
+
+		this.loadedContactIDs = contacts.slice()
+
 		return Bluebird.try(() => {
-			var contacts = contactsService.getFriends();
 			return userService.getMultipleFormatted(contacts);
 		}).then((result: any[]) => {
 			return result.sort((a: any, b: any): number => {
@@ -34,7 +88,6 @@ export class ContactsWithSearch {
 			});
 		}).then((result: any[]) => {
 			this.contacts = result;
-			this.contactsLoading = false;
 		})
 	}
 
@@ -101,21 +154,7 @@ export class ContactsWithSearch {
 		});
 	}, 100)
 
-	getContacts = () =>  {
-		if (!this.searchTerm) {
-			return this.contacts;
-		}
-
-		return this.contacts.filter((contact) => {
-			return contact.names.searchName.indexOf(this.searchTerm) > -1;
-		});
-	}
-
 	getUsers = () => {
-		if (this.contactsLoading) {
-			return []
-		}
-
-		return this.getContacts().concat(this.searchResults)
+		return this.memoizer.getValue()
 	}
 }

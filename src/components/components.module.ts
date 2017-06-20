@@ -4,6 +4,7 @@ import { IonicModule } from 'ionic-angular';
 
 import { SafeUrl } from "../lib/pipes/safeStyle";
 import { ResponsiveDatePipe } from "../lib/pipes/responsiveDate";
+import { SeperatorDatePipe } from "../lib/pipes/seperatorDate";
 import { MaxValuePipe } from "../lib/pipes/maxValue";
 
 import { UserImageComponent } from "./userImage";
@@ -13,10 +14,14 @@ import { TopicComponent } from "./topicDisplay"
 import { SyntaxifyDirective } from "./syntaxify"
 import { ChooseFriends } from "./chooseFriends"
 import { GalleryComponent } from "./gallery/gallery"
+import { LoadComponent } from "./load"
+
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
 	declarations: [
 		ResponsiveDatePipe,
+		SeperatorDatePipe,
 		SafeUrl,
 		MaxValuePipe,
 		MainMenu,
@@ -25,14 +30,17 @@ import { GalleryComponent } from "./gallery/gallery"
 		SyntaxifyDirective,
 		GalleryComponent,
 		ChooseFriends,
+		LoadComponent,
 	],
 	imports: [
 		HexagonModule,
 		IonicModule,
 		CommonModule,
+		TranslateModule.forChild(),
 	],
 	exports: [
 		ResponsiveDatePipe,
+		SeperatorDatePipe,
 		SafeUrl,
 		MaxValuePipe,
 		MainMenu,
@@ -41,6 +49,7 @@ import { GalleryComponent } from "./gallery/gallery"
 		SyntaxifyDirective,
 		GalleryComponent,
 		ChooseFriends,
+		LoadComponent,
 
 		HexagonModule,
 		CommonModule,

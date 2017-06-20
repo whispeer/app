@@ -1,13 +1,7 @@
-<!--
-	Generated template for the Settings page.
-
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
--->
 <ion-header>
 
 	<ion-navbar [color]="'primary'">
-		<ion-title>Settings</ion-title>
+		<ion-title>{{ 'settings.title' | translate }}</ion-title>
 	</ion-navbar>
 
 </ion-header>
@@ -16,14 +10,14 @@
 <ion-content>
 	<ion-list>
 		<ion-list-header padding-top>
-			App settings
+			{{ 'settings.header' | translate}}
 		</ion-list-header>
 		<ion-item>
-			<ion-label>Receive push notifications</ion-label>
+			<ion-label>{{ 'settings.push' | translate}}</ion-label>
 			<ion-toggle checked="true" disabled (ngModelChange)="pushWarning()"></ion-toggle>
 		</ion-item>
 		<ion-item>
-			<ion-label>Show tutorial again</ion-label>
+			<ion-label>{{ 'settings.tutorial' | translate}}</ion-label>
 			<ion-toggle
 				[checked]="tutorialVisible()"
 				(ionChange)="resetTutorial($event)"></ion-toggle>
@@ -31,30 +25,31 @@
 	</ion-list>
 	<ion-list>
 		<ion-list-header>
-			About whispeer
+			{{ 'settings.about' | translate}}
 		</ion-list-header>
 		<ion-item detail-push (click)="tos()">
-			Terms of Service
+			{{ 'settings.tos' | translate}}
 		</ion-item>
 		<ion-item detail-push (click)="privacyPolicy()">
-			Privacy policy
+			{{ 'settings.privacy' | translate}}
 		</ion-item>
 		<ion-item detail-push (click)="contactUs()">
-			Contact us
+			{{ 'settings.contact' | translate}}
 		</ion-item>
 	</ion-list>
 	<ion-list>
 		<ion-item detail-push (click)="feedback()">
-			Send Feedback
+			{{ 'settings.feedback' | translate}}
 		</ion-item>
 	</ion-list>
 
-	<button ion-button full color="danger" (click)="logout()">Logout</button>
+	<button ion-button full color="danger" (click)="logout()">{{ 'settings.logout' | translate}}</button>
 
 	<div text-center class="space-for-fab">
 		<p class="text-grey" padding-vertical>
-			whispeer by mindpost GmbH<br>
-			Made in Germany with <ion-icon name="md-heart"></ion-icon> for human rights
+			{{ 'settings.companyName' | translate}}<br>
+			{{ 'settings.madeInGermany' | translate}} <ion-icon name="md-heart"></ion-icon> {{ 'settings.humanRights' | translate}}
+
 		</p>
 	</div>
 

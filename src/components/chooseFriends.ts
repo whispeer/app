@@ -1,9 +1,10 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { Platform, NavController } from 'ionic-angular';
 
 const friendsService = require("../lib/services/friendsService");
 
 import { ContactsWithSearch } from '../lib/contacts/contactsWithSearch'
+import { TranslateService } from '@ngx-translate/core';
 
 const h = require("whispeerHelper");
 
@@ -16,17 +17,22 @@ export class ChooseFriends extends ContactsWithSearch {
 	searchTerm: string = "";
 	selectedUserMap: any = {};
 	selectedUsers: any[] = [];
+	ios: boolean = false;
 
 	@Output() chooseReceivers = new EventEmitter();
 
-	constructor(public navCtrl: NavController) {
+	constructor(public navCtrl: NavController, private translate: TranslateService, private platform: Platform) {
 		super()
+
+		this.ios = platform.is("ios")
 	}
 
 	ngOnInit() {
 		friendsService.awaitLoading().then(() => {
 			friendsService.listen(this.loadContactsUsers);
-			this.loadContactsUsers();
+			this.loadContactsUsers().then(() => {
+				this.contactsLoading = false
+			});
 		});
 	}
 
@@ -34,38 +40,22 @@ export class ChooseFriends extends ContactsWithSearch {
 		if (this.selectedUsers.indexOf(user) === -1) {
 			this.selectedUsers.push(user);
 		}
+
+		this.selectedUserMap[user.id] = true
 	}
 
 	removeSelectedUser = (user) => {
 		h.removeArray(this.selectedUsers, user);
+
+		delete this.selectedUserMap[user.id]
 	}
 
 	updateSelectedUsers = (user) => {
 		if (this.selectedUserMap[user.id]) {
-			this.addSelectedUser(user);
-		} else {
 			this.removeSelectedUser(user);
+		} else {
+			this.addSelectedUser(user);
 		}
-	}
-
-	getContactsWithSelected = () => {
-		const users = this.getUsers();
-
-		return this.selectedUsers.concat(users);
-	}
-
-	contactDividersWithSelected = (record, recordIndex, records) => {
-		const selectedLength = this.selectedUsers.length;
-
-		if (recordIndex < selectedLength) {
-			if (recordIndex === 0) {
-				return "Selected";
-			}
-
-			return null;
-		}
-
-		return this.contactDividers(record, recordIndex - selectedLength, records.slice(selectedLength));
 	}
 
 	create = () => {

@@ -1,13 +1,7 @@
-<!--
-	Generated template for the Profile page.
-
-	See http://ionicframework.com/docs/v2/components/#navigation for more info on
-	Ionic pages and navigation.
--->
 <ion-header>
 
 	<ion-navbar [color]="'primary'">
-		<ion-title><span *ngIf="!isOwn">{{user.name}}'s</span> Profile</ion-title>
+		<ion-title>{{getTitle()}}</ion-title>
 	</ion-navbar>
 
 </ion-header>
@@ -16,10 +10,10 @@
 	<ion-toolbar *ngIf="isOwn" padding color="light">
 		<ion-segment [(ngModel)]="view" color="grey">
 			<ion-segment-button value="profile">
-				Profile
+				{{ 'profile.profileSegment' | translate }}
 			</ion-segment-button>
 			<ion-segment-button value="qr">
-				QR-Code
+				{{ 'profile.qrSegment' | translate }}
 			</ion-segment-button>
 		</ion-segment>
 	</ion-toolbar>
@@ -29,14 +23,14 @@
 		<div *ngSwitchCase="'profile'">
 			<div *ngIf="!isOwn" class="profile__avatar-row">
 				<div class="profile__request-hex">
-					<img *ngIf="isRequest || isRequestable" src="assets/images/icons/add.svg" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()">
-					<img *ngIf="!(isRequest || isRequestable)" src="assets/images/icons/added.svg" class="profile__request-button" id="request__accept__button" (click)="contactOptions()">
+					<load *ngIf="isRequest || isRequestable" [name]="'add'" class="profile__request-button" id="request__accept__button" (click)="acceptRequest()"></load>
+					<load *ngIf="!(isRequest || isRequestable)" [name]="'added'" class="profile__request-button" id="request__accept__button" (click)="contactOptions()"></load>
 				</div>
 				<ion-avatar class="hexagon__image hexagon__image--active hexagon__image--large profile__image">
 					<user-image [id]="user.id" [image]="user.basic.image"></user-image>
 				</ion-avatar>
 				<div class="profile__request-hex" id="request__decline">
-					<img src="assets/images/icons/write.svg" class="profile__request-button" id="request__accept__button" (click)="writeMessage()">
+					<load [name]="'write'" class="profile__request-button" id="request__accept__button" (click)="writeMessage()"></load>
 				</div>
 			</div>
 			<div *ngIf="isOwn" class="profile__avatar-row">
@@ -50,11 +44,11 @@
 			</div>
 			<ion-list class="profile__info-list space-for-fab" inset>
 				<ion-item *ngIf="attributeSet(user.advanced.birthday)">
-					<ion-label fixed color="primaryDarker" text-right>Birthday</ion-label>
+					<ion-label fixed color="primaryDarker" text-right>{{ 'profile.birthday' | translate }}</ion-label>
 					<p item-content class="profile__info">{{user.advanced.birthday.day}}.<span *ngIf="user.advanced.birthday.month && user.advanced.birthday.month.length === 1">0</span>{{user.advanced.birthday.month}}.{{user.advanced.birthday.year}}</p>
 				</ion-item>
 				<ion-item *ngIf="attributeSet(user.advanced.location)">
-					<ion-label fixed color="primaryDarker" text-right>Location</ion-label>
+					<ion-label fixed color="primaryDarker" text-right>{{ 'profile.location' | translate }}</ion-label>
 					<p item-content class="profile__info">{{user.advanced.location.town}} {{user.advanced.location.country}}</p>
 				</ion-item>
 				<!-- <ion-item *ngIf="user.advanced.relationship">
@@ -76,7 +70,7 @@
 					<p item-content class="profile__info">{{user.advanced.work.what}} at {{user.advanced.work.where}}</p>
 				</ion-item> -->
 				<ion-item *ngIf="attributeSet(user.advanced.languages)">
-					<ion-label fixed color="primaryDarker" text-right>Languages</ion-label>
+					<ion-label fixed color="primaryDarker" text-right>{{ 'profile.languages' | translate }}</ion-label>
 					<p item-content class="profile__info">
 						<span *ngFor="let language of user.advanced.languages; let last = last">{{language.name}}{{last ? '' : ', '}}</span>
 					</p>
@@ -86,18 +80,18 @@
 			<div *ngIf="!isOwn && user.trustLevel < 2">
 				<ion-list showWhen="ios">
 					<button ion-item (click)="verifyPerson()">
-						Verify this contact
+						{{ 'profile.verify' | translate }}
 					</button>
 					<button *ngIf="isRequest" ion-item (click)="declineRequest()">
-						<span ion-text color="danger">Decline this request</span>
+						<span ion-text color="danger">{{ 'profile.contacts.declineRequest' | translate }}</span>
 					</button>
 				</ion-list>
 				<div padding-horizontal hideWhen="ios">
 					<button ion-button block color="light" (click)="verifyPerson()">
-						Verify this contact
+						{{ 'profile.verify' | translate }}
 					</button>
 					<button *ngIf="isRequest" ion-button block color="danger" (click)="declineRequest()">
-						Decline this request
+						{{ 'profile.contacts.declineRequest' | translate }}
 					</button>
 				</div>
 			</div>
@@ -108,7 +102,7 @@
 
 			<ion-grid class="fingerprint">
 				<ion-row>
-					<ion-col class="fingerprint-label" col-3>Your ID<br/> as a text</ion-col>
+					<ion-col class="fingerprint-label" col-3 [innerHtml]="'profile.idTitle' | translate"></ion-col>
 					<ion-col class="fingerprint-value" col-9>
 						<pre *ngFor="let part of fingerprint" class="fingerprint-part">{{part}}</pre>
 					</ion-col>
@@ -116,13 +110,7 @@
 			</ion-grid>
 
 			<div class="space-for-fab" padding-horizontal>
-				<p class="text-grey" padding-horizontal>
-					This is your personal and unique ID on whispeer. You need this
-					<span class="text-primary">to verify with friends</span>—for
-					extra security! They scan your ID, you scan their ID and both
-					of you have easily increased your security measures. Cool,
-					huh?
-				</p>
+				<p class="text-grey" padding-horizontal [innerHtml]="'profile.idExplanation' | translate"></p>
 			</div>
 
 		</div>

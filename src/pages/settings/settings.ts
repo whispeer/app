@@ -3,6 +3,7 @@ import { NavController, NavParams, AlertController, IonicPage } from "ionic-angu
 import sessionService from "../../lib/services/session.service";
 import Tutorial from "../../app/tutorial";
 
+import { TranslateService } from '@ngx-translate/core';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 
 @IonicPage({
@@ -31,7 +32,7 @@ export class SettingsPage {
 		}
 	}
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private iab: InAppBrowser) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService, private iab: InAppBrowser) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
@@ -39,7 +40,7 @@ export class SettingsPage {
 
 	pushWarning() {
 		this.pushEnabled = true;
-		alert("This feature is not ready yet but we are working on it, promise!");
+		alert(this.translate.instant("settings.pushAlert"));
 	}
 
 	goBack() {
@@ -48,8 +49,8 @@ export class SettingsPage {
 
 	logout() {
 		let logoutConfirm = this.alertCtrl.create({
-			title: 'Logout',
-			message: 'Do you want to log out from your account on this device?',
+			title: this.translate.instant("settings.logout"),
+			message: this.translate.instant("settings.logoutWarning"),
 			buttons: [
 				{ text: 'Cancel', role: 'cancel' },
 				{ text: 'Logout',

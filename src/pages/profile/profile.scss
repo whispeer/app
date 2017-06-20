@@ -2,6 +2,12 @@ page-profile {
 	.item-block:last-child {
 		border-bottom: 1px solid $list-border-color !important;
 	}
+
+	.toolbar {
+		ion-title {
+			padding: 0 0 1px;
+		}
+	}
 }
 
 .item-block {
@@ -27,6 +33,11 @@ page-profile {
 	margin: auto auto 0;
 
 	width: 50px;
+
+	svg {
+		height: 100%;
+		width: 100%;
+	}
 }
 
 .profile__request-button {

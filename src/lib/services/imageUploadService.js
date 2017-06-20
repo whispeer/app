@@ -9,7 +9,7 @@ var Queue = require("asset/Queue");
 var Bluebird = require("bluebird");
 var $ = require("jquery");
 var imageLib = require("imageLib");
-var screenSizeService = require("services/screenSize.service.ts").default;
+var screenSizeService = require("services/screenSize.service").default;
 
 var blobService = require("services/blobService");
 

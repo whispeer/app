@@ -15,6 +15,28 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
+chooseFriends {
+	.friends__list .item .checkbox {
+		margin-right: 8px;
+	}
+}
+
+.fill-primary, .fill-primaryDark, .fill-grey {
+	fill-rule: evenodd;
+}
+
+.fill-primary {
+	fill: $svg-fill-primary;
+}
+
+.fill-primaryDark {
+	fill: $svg-fill-primaryDark;
+}
+
+.fill-grey {
+	fill: $svg-fill-grey;
+}
+
 main-menu[ion-fixed] {
 	position: fixed;
 	bottom: 0;
@@ -64,6 +86,10 @@ ion-fab-list[side="top"] {
 	.content {
 		fill: #fff;
 	}
+}
+
+.hexagon--green .border {
+	fill: map-get($colors, green) !important;
 }
 
 .hexagon__button {
@@ -128,7 +154,7 @@ ion-fab-list[side="top"] {
 }
 
 .hexagon__image--active .border {
-	fill: map-get($colors, primary);
+	fill: map-get($colors, green);
 }
 
 .hexagon__image--large {

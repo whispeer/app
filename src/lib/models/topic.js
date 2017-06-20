@@ -12,10 +12,10 @@ var keyStore = require("services/keyStore.service").default;
 var sessionService = require("services/session.service").default;
 var initService = require("services/initService");
 
-var Cache = require("services/Cache.ts").default;
+var Cache = require("services/Cache").default;
 
 var Message = require("models/message");
-var TopicUpdate = require("models/topicUpdate");
+var TopicTitleUpdate = require("messages/topicTitleUpdate").default;
 
 var ImageUpload = require("services/imageUploadService");
 
@@ -132,7 +132,7 @@ var Topic = function (data) {
 				return Bluebird.resolve();
 			}
 
-			var topicUpdateObject = new TopicUpdate(topicUpdateData);
+			var topicUpdateObject = new TopicTitleUpdate(topicUpdateData);
 
 			topicUpdatesById[topicUpdateData.id] = topicUpdateObject;
 
@@ -286,10 +286,7 @@ var Topic = function (data) {
 
 	this.setTitle = function (title) {
 		return this.getLatestTopicUpdate().bind(this).then(function (previousTopicUpdate) {
-			return TopicUpdate.create(this, {
-				title: title,
-				previousTopicUpdate: previousTopicUpdate
-			});
+			return TopicTitleUpdate.create(this, previousTopicUpdate, title);
 		}).then(function (topicUpdate) {
 			return this._addTopicUpdates([topicUpdate]);
 		});
@@ -748,10 +745,9 @@ Topic.createData = function (receiver, message, images, cb) {
 		}));
 	}
 
-	var createRawTopicData = Bluebird.promisify(Topic.createRawData.bind(Topic));
 	var createRawMessageData = Bluebird.promisify(Message.createRawData.bind(Message));
 
-	var resultPromise = Bluebird.all([createRawTopicData(receiver), imagePreparation]).spread(function (topicData, imagesMeta) {
+	var resultPromise = Bluebird.all([Topic.createRawData(receiver), imagePreparation]).spread(function (topicData, imagesMeta) {
 		var topic = new Topic({
 			meta: topicData.topic,
 			unread: []

@@ -2,6 +2,8 @@ import { Component, ViewChild } from "@angular/core";
 
 import { NavController, Content, IonicPage } from "ionic-angular";
 
+import { TranslateService } from '@ngx-translate/core';
+
 const messageService = require("messages/messageService");
 const contactsService = require("../../lib/services/friendsService");
 
@@ -23,7 +25,7 @@ export class HomePage {
 	topicsLoading: boolean = true;
 	moreTopicsAvailable: boolean = true;
 
-	constructor(public navCtrl: NavController) {}
+	constructor(public navCtrl: NavController, private translate: TranslateService) {}
 
 	ngOnInit() {}
 
@@ -80,7 +82,9 @@ export class HomePage {
 	}
 
 	get requestsLabel() {
-		return this.requests.length > 1 ? 'New contact requests' : 'New contact request'
+		const count = this.requests.length > 1 ? "many" : "single"
+
+		return this.translate.instant(`home.newContact.${count}`)
 	}
 
 	openContactRequests = () => {

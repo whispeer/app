@@ -1,0 +1,15 @@
+[
+"asset/*",
+
+"crypto/*",
+
+"interceptors/addKeysInterceptor.js",
+"interceptors/interceptorsModule.js",
+"interceptors/sessionServiceInterceptor.js",
+
+"migrations/*",
+
+"models/*",
+
+"services/*"
+]

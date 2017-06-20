@@ -1,0 +1,121 @@
+{
+	"general": {
+		"backButtonText": "Zurück",
+		"cancel": "Abbrechen",
+		"ok": "Ok",
+		"accept": "Akzeptieren",
+		"decline": "Ablehnen"
+	},
+	"time": {
+		"today": "Heute",
+		"yesterday": "Gestern"
+	},
+	"home": {
+		"title": "Nachrichten",
+		"newContact": {
+			"single": "Neue Kontaktanfrage",
+			"many": "Neue Kontaktanfragen"
+		}
+	},
+	"login": {
+		"password2Placeholder": "Bitte Passwort erneut eingeben",
+		"passwordPlaceholder": "Bitte Passwort eingeben",
+		"identifierPlaceholder": "Bitte Nutzernamen eingeben",
+		"tos": "Mit der Anmeldung akzeptierst du unsere <strong>Nutzungsbedingungen</strong> und <strong>Datenschutzbestimmungen</strong>.",
+		"header": "<strong>Hallo</strong> und willkommen in <br>der Welt der sicheren Kommunikation!",
+		"messages": {
+			"defaultCallToAction": "<em>Neu registrieren</em> oder <em>einfach anmelden...</em>",
+			"loginSuccess": "<em>Yeah!</em> Wir melden dich jetzt sicher an...",
+			"ambiguousProcess": "Dieser Nutzername existiert. Du kannst <br>die <em>Anmeldung einfach fortsetzen</em> oder <br>einen <em>anderen Nutzernamen registrieren.</em>",
+			"incorrectPassword": "<em>Dein Passwort</em> ist inkorrekt. <br>Bitte versuche es erneut.",
+			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> <br>Wähle nun ein sicheres Passwort...",
+			"confirmPassword": "Sehr gut! Bitte <em>wiederhole deine Passworteingabe</em>...",
+			"registerSuccess": "<em>Willkommen an Bord!</em> <br>Wir melden dich jetzt sicher an...",
+			"invalidUsername": "<em>A-Z a-z 0-9</em> sind in Nutzernamen erlaubt. <br>Leer- und Sonderzeichen sind es nicht.",
+			"passwordsDontMatch": "Dein <em>wiederholtes Passwort</em> stimmt nicht überein.",
+			"genericErrorMessage": "Etwas ist schief gelaufen. Starte bitte neu.",
+			"noConnection": "Keine Verbindung zu whispeer.",
+			"passwordTooShort": "Dein Passwort ist <em>zu kurz</em>. Es sollte <br>mindestens 8 Zeichen enthalten."
+		},
+		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>",
+		"businessUser": "Doch kein Privatnutzer? <em>Wechsel zu Business</em>"
+	},
+	"contacts": {
+		"title": "Kontakte",
+		"search": "Suche"
+	},
+	"requests": {
+		"title": "Kontaktanfragen"
+	},
+	"topic": {
+		"takePhoto": "Foto aufnehmen",
+		"selectGallery": "Aus Galerie auswählen",
+		"changed": "hat den Titel geändert zu"
+	},
+	"chooseFriends": {
+		"title": "Kontakte auswählen",
+		"selected": "Ausgewählt",
+		"search": "Suche"
+	},
+	"settings": {
+		"title": "Einstellungen",
+		"header": "App Einstellungen",
+		"push": "Erhalte Push-Benachrichtigungen",
+		"tutorial": "Tutorial neustarten",
+		"about": "Über whispeer",
+		"tos": "Nutzungsbedingungen",
+		"privacy": "Datenschutzbestimmungen",
+		"contact": "Kontaktiere uns",
+		"feedback": "Gebe uns Feedback",
+		"logout": "Abmelden",
+		"companyName": "whispeer von mindpost GmbH",
+		"madeInGermany": "Made in Germany mit",
+		"humanRights": "für Menschenrechte",
+		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
+		"logoutWarning": "Möchtest du dein Konto auf diesem Gerät abmelden?"
+	},
+	"profile": {
+		"ownTitle": "Profil",
+		"otherTitle": "{{name}}s Profil",
+		"profileSegment": "Profil",
+		"qrSegment": "QR-Code",
+		"birthday": "Geburtstag",
+		"location": "Ort",
+		"languages": "Sprache",
+		"verify": "Diesen Kontakt verifizieren",
+		"idTitle": "Deine ID<br/> als Text",
+		"idExplanation": "Das ist deine persönliche und einzigartige ID auf whispeer. Diese brauchst du, <span class='text-primary'>um Kontakte zu verifizieren</span>—für die extra Portion Sicherheit! <br><br>Sie scannen deine ID, du scannst ihre IDs und ihr beide habt eure Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
+		"contacts": {
+			"accepted": "Akzeptiert!",
+			"requestSent": "Anfrage gesendet!",
+			"acceptRequest": "Anfrage annehmen?",
+			"declineRequest": "Anfrage ablehnen",
+			"acceptRequestQuestion": "Möchtest du {{name}} als Kontakt hinzufügen?",
+			"sendRequest": "Anfrage senden?",
+			"sendRequestQuestion": "Möchtest du eine Kontaktanfrage an {{name}} senden?",
+			"send": "Senden",
+			"removeButtonText": "Kontakt entfernen",
+			"removeTitle": "Kontakt entfernen?",
+			"removeQuestion": "Möchtest du {{name}} wirklich aus deinen Kontakten entfernen?",
+			"removeConfirmButtonText": "Entfernen",
+			"acceptedMessage": "{{name}} ist nun dein Kontakt.",
+			"requestSentMessage": "Du hast eine Kontaktanfrage an {{name}} gesendet."
+		},
+		"image": {
+			"view": "Bild ansehen",
+			"takePhoto": "Foto aufnehmen",
+			"selectPhoto": "Aus Galerie auswählen",
+			"removeButtonText": "Entfernen",
+			"removeTitle": "Bild entfernen",
+			"removeQuestion": "Möchtest du dein Bild wirklich entfernen?",
+			"removeConfirmButtonText": "Entfernen"
+		}
+	},
+	"sales": {
+		"title": "Hey! Sie scheinen noch kein Geschäftskunde zu sein...",
+		"text": "whispeer bringt die sicherste Art <em>verschlüsselter Kommunikation</em> in die professionelle Welt - für Sie und Ihr Unternehmen. Jetzt testen!",
+		"callToAction": "Rufen Sie uns gerne an:",
+		"finePrint": "Deutsche Festnetznummer.<br>Es können Anrufgebühren anfallen.",
+		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>"
+	}
+}

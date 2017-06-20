@@ -4,17 +4,19 @@ import { IonicPageModule } from 'ionic-angular';
 import { NewMessagePage } from './new-message'
 
 import { ComponentsModule } from "../../components/components.module";
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-  declarations: [
-    NewMessagePage,
-  ],
-  imports: [
-    IonicPageModule.forChild(NewMessagePage),
+	declarations: [
+		NewMessagePage,
+	],
+	imports: [
+		IonicPageModule.forChild(NewMessagePage),
 		ComponentsModule,
-  ],
-  entryComponents: [
-    NewMessagePage,
-  ]
+		TranslateModule.forChild(),
+	],
+	entryComponents: [
+		NewMessagePage,
+	]
 })
 export class NewMessagePageModule {}

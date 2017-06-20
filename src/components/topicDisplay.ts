@@ -8,6 +8,8 @@ import { ImagePicker } from '@ionic-native/image-picker';
 import { File } from '@ionic-native/file';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 
+import { TranslateService } from '@ngx-translate/core';
+
 const ImageUpload = require("../lib/services/imageUploadService");
 const h = require("whispeerHelper");
 
@@ -45,13 +47,16 @@ export class TopicComponent {
 
 	mutationObserver: MutationObserver
 
+	bursts: any[]
+
 	constructor(
 		public navCtrl: NavController,
 		private actionSheetCtrl: ActionSheetController,
 		private platform: Platform,
 		private imagePicker: ImagePicker,
 		private file: File,
-		private camera: Camera
+		private camera: Camera,
+		private translate: TranslateService
 	) {
 		this.cameraOptions = {
 			quality: 50,
@@ -82,7 +87,7 @@ export class TopicComponent {
 	mutationListener = (mutations) => {
 		const id = this.getFirstInViewMessageId()
 
-		if (!id) {
+		if (!id || this.oldScrollFromBottom < 15) {
 			return this.stabilizeScroll()
 		}
 
@@ -99,6 +104,7 @@ export class TopicComponent {
 		if (updateScroll) {
 			return this.stabilizeScroll()
 		}
+
 		console.warn("Only elements below newest messages have changed not updating viewport")
 	}
 
@@ -137,7 +143,7 @@ export class TopicComponent {
 		let actionSheet = this.actionSheetCtrl.create({
 			buttons: [
 				{
-					text: "Take Photo",
+					text: this.translate.instant("topic.takePhoto"),
 					icon: !this.platform.is("ios") ? "camera": null,
 					handler: () => {
 						this.camera.getPicture(this.cameraOptions).then((url) => {
@@ -152,7 +158,7 @@ export class TopicComponent {
 						});
 					}
 				}, {
-					text: "Select from Gallery",
+					text: this.translate.instant("topic.selectGallery"),
 					icon: !this.platform.is("ios") ? "image": null,
 					handler: () => {
 						Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
@@ -167,12 +173,9 @@ export class TopicComponent {
 						});
 					}
 				}, {
-					text: "Cancel",
+					text: this.translate.instant("general.cancel"),
 					icon: !this.platform.is("ios") ? "close" : null,
-					role: "cancel",
-					handler: () => {
-						console.log("Cancel clicked.");
-					}
+					role: "cancel"
 				}
 			]
 		});
@@ -304,11 +307,13 @@ export class TopicComponent {
 			const { changed, bursts } = this.afterViewBurstMessages()
 
 			if (changed) {
+				this.bursts = bursts
 				return bursts
 			}
 		}
 
-		return this.allBurstMessages()
+		this.bursts = this.allBurstMessages()
+		return this.bursts
 	}
 
 	ngOnChanges(changes: SimpleChanges) {

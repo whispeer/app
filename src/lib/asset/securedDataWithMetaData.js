@@ -391,7 +391,7 @@ define(["whispeerHelper", "crypto/keyStore", "asset/errors", "config", "bluebird
 			});
 		},
 		create: function (content, meta, options, signKey, cryptKey, cb) {
-			var secured = new SecuredDataWithMetaData(content, meta, options, true);
+			var secured = api.createRaw(content, meta, options)
 
 			Bluebird.resolve().delay(1).then(function () {
 				return secured._signAndEncrypt(signKey, cryptKey);

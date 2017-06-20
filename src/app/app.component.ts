@@ -7,6 +7,8 @@ import { Globalization } from '@ionic-native/globalization';
 import { Push } from '@ionic-native/push';
 
 import { PushService } from "../lib/services/push.service";
+import socketService from "../lib/services/socket.service";
+import { isBusinessVersion } from "../lib/services/location.manager";
 import Tutorial from "./tutorial";
 
 import sessionService from '../lib/services/session.service';
@@ -91,8 +93,29 @@ export class MyApp {
 			const pushService = new PushService(this.nav, platform, this.push);
 			pushService.register();
 
+			socketService.addInterceptor({
+				transformResponse: (response) => {
+					if (isBusinessVersion() && response.logedin) {
+						const activeNav = this.nav.getActive()
+						const onSalesPage = activeNav && activeNav.component.name === "SalesPage"
+
+						if (onSalesPage && response.isBusiness) {
+							this.nav.remove(0, this.nav.length() - 1)
+							this.nav.setRoot("Home")
+						}
+
+						if (!onSalesPage && !response.isBusiness) {
+							this.nav.remove(0, this.nav.length() - 1)
+							this.nav.setRoot("Sales")
+						}
+					}
+
+					return response
+				}
+			})
+
 			sessionService.loadLogin().then((loggedin) => {
-				if (!loggedin) {
+				if (!loggedin && this.nav.length() > 0) {
 					this.nav.remove(0, this.nav.length() - 1)
 					this.nav.setRoot("Login")
 				}

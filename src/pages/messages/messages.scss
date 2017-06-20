@@ -41,6 +41,47 @@ topicWithBursts {
 	.messages_filler {
 		flex: 1 0 auto;
 	}
+
+	.burst-seperator-date {
+		color: #a0a7aa;
+		margin-bottom: 22px;
+	}
+
+	.burst-seperator-update {
+		color: #788286;
+	}
+
+	.burst-seperator {
+		text-align: center;
+
+		span {
+			display: inline;
+			position: relative;
+			white-space: normal;
+			font-size: 0.85em;
+
+			&:before,
+			&:after {
+				content: "";
+				position: absolute;
+				height: 1.5px;
+				background-color: #ebeced;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 5000px;
+			}
+
+			&:before {
+				right: 100%;
+				margin-right: 5px;
+			}
+
+			&:after {
+				left: 100%;
+				margin-left: 5px;
+			}
+		}
+	}
 }
 
 .md {
@@ -54,7 +95,7 @@ topicWithBursts {
 		position: absolute;
 		top: 50%;
 		left: 0;
-		margin-top: -13px;
+		transform: translateY(-50%);
 	}
 	.messages__header__username {
 		padding-left: 24px;
@@ -84,7 +125,7 @@ topicWithBursts {
 		position: absolute;
 		top: 50%;
 		right: 1em;
-		margin-top: -13px;
+		transform: translateY(-50%);
 	}
 }
 .messages__message {
@@ -142,7 +183,7 @@ topicWithBursts {
 		margin: auto 5px 1px 10px;
 		order: 2;
 
-		background: map-get($colors, primary);
+		background: $message-bubble-color;
 		color: #fff;
 	}
 
@@ -155,7 +196,7 @@ topicWithBursts {
 				bottom: -2px;
 				right: -7px;
 				height: 20px;
-				border-right: 20px solid map-get($colors, primary);
+				border-right: 20px solid $message-bubble-color;
 				border-bottom-left-radius: 16px 14px;
 				transform: translate(0, -2px);
 			}
@@ -234,10 +275,10 @@ topicWithBursts {
 }
 
 .messages__message-input {
-	textarea {
+	.text-input {
 		border: 1px solid map-get($colors, other_grey);
 		border-radius: 20px;
-		padding: 4px 10px;
+		padding: 4px 40px 4px 10px;
 
 		margin: 0 !important;
 
@@ -270,4 +311,6 @@ topicWithBursts {
 	bottom: 4px;
 
 	margin: 0 !important;
+
+	color: $kelly_green;
 }

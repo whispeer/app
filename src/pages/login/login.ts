@@ -11,6 +11,10 @@ import jQuery from "jquery";
 const registerService = require('../../lib/services/registerService');
 const whispeerHelper = require('whispeerHelper')
 
+import { TranslateService } from '@ngx-translate/core';
+
+import { isBusinessVersion, goToPrivateHome, goToBusinessVersion } from '../../lib/services/location.manager'
+
 @IonicPage({
 	name: "Login",
 	segment: "login"
@@ -28,7 +32,9 @@ export class LoginPage {
 
 	tutorialDisabled = true;
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private statusBar: StatusBar) {
+	business = isBusinessVersion();
+
+	constructor(public navCtrl: NavController, public navParams: NavParams, private statusBar: StatusBar, private translate: TranslateService) {
 		this.statusBar.styleDefault();
 
 		this.login = loginService;
@@ -40,6 +46,14 @@ export class LoginPage {
 		});
 	}
 
+	goToOtherHome() {
+		if (this.business) {
+			goToPrivateHome()
+		} else {
+			goToBusinessVersion()
+		}
+	}
+
 	ionViewCanEnter(): boolean {
 		return !sessionService.loggedin
 	}
@@ -49,36 +63,40 @@ export class LoginPage {
 		this.navCtrl.setRoot("Home")
 	}
 
+	getTranslation(key) {
+		return this.translate.instant(`login.${key}`)
+	}
+
 	getMessage() {
 		switch (this.usernameState) {
 			case USERNAME_TAKEN:
-				return AMBIGUOUS_PROCESS;
+				return this.getTranslation("messages.ambiguousProcess");
 			case USERNAME_FREE:
-				return REGISTER_MESSAGE;
+				return this.getTranslation("messages.registerMessage");
 			case USERNAME_INVALID:
-				return INVALID_USERNAME;
+				return this.getTranslation("messages.invalidUsername");
 			case USERNAME_LOGIN_SUCCESS:
-				return LOGIN_SUCCESS;
+				return this.getTranslation("messages.loginSuccess");
 			case USERNAME_REGISTER_SUCCESS:
-				return REGISTER_SUCCESS;
+				return this.getTranslation("messages.registerSuccess");
 			case USERNAME_NO_CONNECTION:
-				return NO_CONNECTION;
+				return this.getTranslation("messages.noConnection");
 			case USERNAME_LOGIN_INCORRECT_PASSWORD:
-				return INCORRECT_PASSWORD;
+				return this.getTranslation("messages.incorrectPassword");
 			case USERNAME_PASSWORDS_DONT_MATCH:
-				return PASSWORDS_DONT_MATCH;
+				return this.getTranslation("messages.passwordsDontMatch");
 			case USERNAME_PASSWORD_TOO_SHORT:
-				return PASSWORD_TOO_SHORT;
+				return this.getTranslation("messages.passwordTooShort");
 			case USERNAME_LOGIN_ERROR:
 			case USERNAME_REGISTER_ERROR:
-				return GENERIC_ERROR_MESSAGE;
+				return this.getTranslation("messages.genericErrorMessage");
 			case USERNAME_PASSWORD_CONFIRM:
-				return CONFIRM_PASSWORD;
+				return this.getTranslation("messages.confirmPassword");
 
 			case USERNAME_EMPTY:
 			case USERNAME_UNKNOWN:
 			default:
-				return DEFAULT_CALL_TO_ACTION;
+				return this.getTranslation("messages.defaultCallToAction");
 		}
 	}
 
@@ -240,19 +258,6 @@ export class LoginPage {
 		}
 	}
 }
-
-const INVALID_USERNAME = "Usernames should start with a letter and must not include special characters."
-const DEFAULT_CALL_TO_ACTION = "Create a new account or simply login..."
-const AMBIGUOUS_PROCESS = "This username exists. You can choose to continue login or register a unique name"
-const LOGIN_SUCCESS = "Success! We'll log you in securely now..."
-const REGISTER_MESSAGE = "This username is free. You can continue to choose a secure password..."
-const GENERIC_ERROR_MESSAGE = "Something went wrong."
-const CONFIRM_PASSWORD = "Great! Now verify your new password..."
-const REGISTER_SUCCESS = "Welcome on board! We'll log you in now..."
-const NO_CONNECTION = "Could not connect to whispeer"
-const INCORRECT_PASSWORD = "Your password is wrong. Please try again."
-const PASSWORDS_DONT_MATCH = "Your repeated password does not match"
-const PASSWORD_TOO_SHORT = "Your password is too short. We require a minimum of 8 characters"
 
 const USERNAME_UNKNOWN = -1;
 const USERNAME_EMPTY = 1;

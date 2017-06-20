@@ -4,17 +4,19 @@ import { IonicPageModule } from 'ionic-angular';
 import { ContactsPage } from './contacts'
 
 import { ComponentsModule } from "../../components/components.module";
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-  declarations: [
-    ContactsPage
-  ],
-  imports: [
-    IonicPageModule.forChild(ContactsPage),
+	declarations: [
+		ContactsPage
+	],
+	imports: [
+		IonicPageModule.forChild(ContactsPage),
 		ComponentsModule,
-  ],
-  entryComponents: [
-    ContactsPage
-  ]
+		TranslateModule.forChild(),
+	],
+	entryComponents: [
+		ContactsPage
+	]
 })
 export class ContactsPageModule {}

@@ -10,7 +10,7 @@ var errorService = require("services/error.service").errorServiceInstance;
 var socket = require("services/socket.service").default;
 var sessionService = require("services/session.service");
 var initService = require("services/initService");
-var Cache = require("services/Cache.ts").default;
+var Cache = require("services/Cache").default;
 
 var Topic = require("models/topic");
 

@@ -5,18 +5,20 @@ import { ProfilePage } from './profile'
 
 import { QRCodeModule } from "angular2-qrcode";
 import { ComponentsModule } from "../../components/components.module";
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-  declarations: [
-    ProfilePage,
-  ],
-  imports: [
-    IonicPageModule.forChild(ProfilePage),
+	declarations: [
+		ProfilePage,
+	],
+	imports: [
+		IonicPageModule.forChild(ProfilePage),
 		ComponentsModule,
 		QRCodeModule,
-  ],
-  entryComponents: [
-    ProfilePage,
-  ]
+		TranslateModule.forChild(),
+	],
+	entryComponents: [
+		ProfilePage,
+	]
 })
 export class ProfilePageModule {}

@@ -2,11 +2,12 @@ require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 
+import * as moment from 'moment';
+
 import { NgModule, ErrorHandler, NgZone } from '@angular/core';
 import { DatePipe } from "@angular/common";
 
-import { IonicApp, IonicErrorHandler } from 'ionic-angular';
-import { IonicModule } from 'ionic-angular';
+import { Platform, IonicApp, IonicErrorHandler, IonicModule, Config } from 'ionic-angular';
 
 import * as Bluebird from 'bluebird';
 
@@ -25,7 +26,21 @@ import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 
-(<any>window).startup = new Date().getTime();
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HttpModule, Http } from '@angular/http';
+
+import { isBusinessVersion } from "../lib/services/location.manager";
+
+(window as any).startup = new Date().getTime();
+
+export function createTranslateLoader(http: Http) {
+	return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+import 'moment/locale/de';
+
+const DEFAULT_LANG = "de"
 
 @NgModule({
 	declarations: [
@@ -33,7 +48,15 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
 	],
 	imports: [
 		IonicModule.forRoot(MyApp),
+		TranslateModule.forRoot({
+			loader: {
+				provide: TranslateLoader,
+				useFactory: createTranslateLoader,
+				deps: [Http]
+			}
+		}),
 		BrowserModule,
+		HttpModule,
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
@@ -55,6 +78,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
 	]
 })
 export class AppModule {
+
 	tasks: any[] = []
 	taskRunnerStarted: Boolean = false
 
@@ -101,7 +125,32 @@ export class AppModule {
 		fn()
 	}
 
-	constructor(private zone: NgZone) {
+	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization, private config: Config, private platform: Platform) {
+		translate.setDefaultLang("en");
+
+		platform.ready().then(() => {
+			this.globalization.getPreferredLanguage().then(({ value }) => {
+				console.warn(`Language from device: ${value}`)
+				return value.split("-")[0].toLowerCase()
+			}).catch(() => {
+				console.warn('Cannot get language from device, remaining with default language');
+				return DEFAULT_LANG
+			}).then((lang) => {
+				moment.locale(lang);
+
+				if (isBusinessVersion()) {
+					translate.use(`${lang}_business`)
+					return
+				}
+
+				translate.use(lang)
+			}).then(() => {
+				translate.get('general.backButtonText').subscribe((val: string) => {
+					config.set('ios', 'backButtonText', val);
+				})
+			})
+		})
+
 		Bluebird.setScheduler((fn) => {
 			this.tasks.push(fn)
 

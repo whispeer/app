@@ -76,7 +76,7 @@ page-home {
 		position: absolute;
 		left: 0;
 		top: 50%;
-		margin-top: -13.5px;
+		transform: translateY(-50%);
 		width: 86px;
 		.platform-android & { width: 78px; }
 	}
@@ -130,7 +130,7 @@ page-home {
 
 .topic__hexBadge {
 	margin-bottom: 1.5px;
-	@include hexagon(18px, map-get($colors, primary));
+	@include hexagon(18px, map-get($colors, green));
 
 	display: inline-flex;
 	align-content: center;
@@ -147,7 +147,7 @@ page-home {
 		color: map-get($colors, dark);
 	}
 	.user__name, .note {
-		color: map-get($colors, primary);
+		color: map-get($colors, green);
 	}
 	.user__name {
 		font-weight: 500;

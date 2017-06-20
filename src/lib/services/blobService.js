@@ -8,10 +8,10 @@ var debug = require("debug");
 var Bluebird = require("bluebird");
 
 var keyStore = require("crypto/keyStore");
-var Cache = require("services/Cache.ts").default;
+var Cache = require("services/Cache").default;
 
-var socketService = require("services/socket.service.ts").default;
-var BlobDownloader = require("services/blobDownloader.service.ts").default;
+var socketService = require("services/socket.service").default;
+var BlobDownloader = require("services/blobDownloader.service").default;
 
 var initService = require("services/initService");
 
