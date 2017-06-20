@@ -104,6 +104,9 @@ $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);
 
 $toggle-ios-background-color-on: $kelly_green;
 
+// this would use the list border color but that is way to light
+$toggle-ios-border-color-off: grayscale(lighten($border_grey, 11%));
+
 @if $business == 1 {
 	$colors: $colors_business;
 
