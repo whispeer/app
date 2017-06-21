@@ -90,15 +90,15 @@ messageService = {
 		}).nodeify(cb);
 	},
 	sendMessageToUserChatIfExists: function(receiver, message, images) {
-		return Bluebird.coroutine(function* () {
-			const chatid = yield messageService.getUserChat(receiver)
+		return Bluebird.try(async () => {
+			const chatid = await messageService.getUserChat(receiver)
 
 			if (!chatid) {
 				return;
 			}
 
-			const chat = yield ChatLoader.get(chatid)
-			const chunk = yield ChunkLoader.get(chat.getLatestChunk())
+			const chat = await ChatLoader.get(chatid)
+			const chunk = await ChunkLoader.get(chat.getLatestChunk())
 
 			var otherReceiver = chunk.getReceiver().map(h.parseDecimal)
 
@@ -117,7 +117,7 @@ messageService = {
 				return false;
 			}
 
-			yield messageService.sendMessage(chat, message, images)
+			await messageService.sendMessage(chat, message, images)
 
 			// return chat
 		});
