@@ -1,8 +1,6 @@
 import TopicUpdate from "./topicUpdate"
 import * as Bluebird from "bluebird"
 
-const topicTitleUpdatesById = {}
-
 export default class TopicTitleUpdate extends TopicUpdate {
 	constructor(updateData, topic) {
 		super(updateData, topic)
