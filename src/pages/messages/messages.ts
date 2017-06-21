@@ -1,17 +1,19 @@
 import { Component, ElementRef } from "@angular/core";
 import { NavController, NavParams, IonicPage } from "ionic-angular";
 
-import TopicTitleUpdate from "../../lib/messages/topicTitleUpdate";
 import errorService from "../../lib/services/error.service";
 
 import messageService from "../../lib/messages/messageService";
-const Burst = require("../../lib/messages/burst");
+import Burst from "../../lib/messages/burst"
+import { Chat } from "../../lib/messages/chat"
 
 const inView = require("in-view");
 
+const initService = require("../../lib/services/initService");
+
 @IonicPage({
 	name: "Messages",
-	segment: "messages/:topicId",
+	segment: "messages/:chatID",
 	defaultHistory: ["Home"]
 })
 @Component({
@@ -19,9 +21,8 @@ const inView = require("in-view");
 	templateUrl: 'messages.html'
 })
 export class MessagesPage {
-	topicId: number;
-	topic: any;
-	topicObject: any;
+	chatID: number;
+	chat: Chat;
 
 	partners: any[] = [];
 	messagesLoading: boolean = true;
@@ -35,18 +36,20 @@ export class MessagesPage {
 	}
 
 	ngOnInit() {
-		this.topicId = parseFloat(this.navParams.get("topicId"));
+		this.chatID = parseFloat(this.navParams.get("chatID"));
 
-		messageService.getTopic(this.topicId).then((topic) => {
-			this.topic = topic.data;
-			this.topicObject = topic;
-			this.partners = topic.data.partners;
+		initService.awaitLoading().then(() =>
+			messageService.getChat(this.chatID)
+		).then((chat) => {
+			debugger
 
-			topic.listen(this.onSuccessor, "successor")
+			this.chat = chat;
 
-			topic.loadInitialMessages().then(() => {
+			// this.partners = chat.data.partners;
+
+			chat.loadInitialMessages().then(() => {
 				this.messagesLoading = false;
-				this.topicObject.markRead(errorService.criticalError)
+				this.chat.markRead().catch(errorService.criticalError)
 			});
 		})
 	}
@@ -62,7 +65,7 @@ export class MessagesPage {
 	}
 
 	private calculateBursts(messages) {
-		var bursts = [new Burst(this.topicObject, TopicTitleUpdate)];
+		var bursts = [new Burst(this.chat)];
 		var currentBurst = bursts[0];
 
 		messages.sort((m1, m2) => {
@@ -71,7 +74,7 @@ export class MessagesPage {
 
 		messages.forEach((messageOrUpdate) => {
 			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst(messageOrUpdate.getTopic(), TopicTitleUpdate);
+				currentBurst = new Burst(messageOrUpdate.getTopic());
 				bursts.push(currentBurst);
 			}
 
@@ -133,15 +136,15 @@ export class MessagesPage {
 	}
 
 	private getBursts = (options) => {
-		if (!this.topic || this.topic.messagesAndUpdates.length === 0) {
+		if (!this.chat || this.chat.getMessagesAndUpdates().length === 0) {
 			return { changed: false, bursts: [] };
 		}
 
-		var messagesAndUpdates = this.topic.messagesAndUpdates;
+		const messagesAndUpdates = this.chat.getMessagesAndUpdates()
 
-		if (this.burstTopic !== this.topic.id) {
+		if (this.burstTopic !== this.chat.getID()) {
 			this.bursts = this.calculateBursts(messagesAndUpdates);
-			this.burstTopic = this.topic.id;
+			this.burstTopic = this.chat.getID();
 
 			return { changed: true, bursts: this.bursts };
 		}
@@ -150,7 +153,7 @@ export class MessagesPage {
 
 		if (options) {
 			const firstViewMessage = messagesAndUpdates.find((elem) => {
-				return options.after == elem.getID().toString()
+				return options.after == elem.id.toString()
 			})
 
 			const index = messagesAndUpdates.indexOf(firstViewMessage)
@@ -211,9 +214,9 @@ export class MessagesPage {
 
 		this.messagesLoading = true;
 
-		return this.topicObject.loadMoreMessages().then(() => {
+		return this.chat.loadMoreMessages().then(({ remaining }) => {
 			this.messagesLoading = false;
-			return this.topic.remaining
+			return remaining
 		})
 	}
 
@@ -229,8 +232,8 @@ export class MessagesPage {
 
 	markRead = () => {
 		setTimeout(() => {
-			console.log('mark topic read', this.topicObject.getID())
-			this.topicObject.markRead(errorService.criticalError)
+			console.log('mark topic read', this.chat.getID())
+			this.chat.markRead().catch(errorService.criticalError)
 		}, 0)
 	}
 
@@ -239,24 +242,13 @@ export class MessagesPage {
 			return;
 		}
 
-		messageService.sendMessage(this.topic.id, text, images).then(() => {
-			this.topic.newMessage = "";
+		messageService.sendMessage(this.chat.getID(), text, images).then(() => {
+			this.chat.newMessage = "";
 			this.markRead();
 		});
 	}
 
-	onSuccessor = () => {
-		const successorTopic = this.topicObject.getLoadedSuccessor()
-
-		this.topic = successorTopic.data
-		this.topicObject = successorTopic
-		this.topicId = successorTopic.getID()
-		this.partners = successorTopic.data.partners;
-
-		// this.navCtrl.push("Messages", { topicId: successorTopic.getID() }, { animate: false })
-	}
-
 	addReceiver = (receiverToAddId) => {
-		this.topic.obj.addReceivers(receiverToAddId)
+		this.chat.addReceivers(receiverToAddId)
 	}
 }

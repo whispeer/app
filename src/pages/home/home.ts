@@ -127,8 +127,8 @@ export class HomePage {
 		this.navCtrl.push("Requests");
 	}
 
-	openChat = (topicId: number) => {
-		this.navCtrl.push("Messages", { topicId: topicId });
+	openChat = (chatID: number) => {
+		this.navCtrl.push("Messages", { chatID: chatID });
 	}
 
 	newMessage = () => {

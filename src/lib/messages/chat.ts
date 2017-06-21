@@ -53,6 +53,8 @@ export class Chat {
 		latestChunkID: number
 	}
 
+	public newMessage = ""
+
 	constructor({ id, latestMessageID, latestChunkID, unreadMessageIDs }) {
 		this.id = id
 
@@ -122,6 +124,10 @@ export class Chat {
 		})
 	})
 
+	loadInitialMessages = h.cacheResult<Bluebird<any>>(() => {
+
+	})
+
 	getMessages() {
 		return this.messages
 	}
@@ -154,6 +160,8 @@ export class Chat {
 		// call server mark read function
 		this.unreadMessageIDs = []
 		// unreadChatIDs.remove(this.id)
+
+		return Bluebird.resolve()
 	}
 
 	getUnreadMessageIDs = () => {
@@ -170,8 +178,12 @@ export class Chat {
 		}
 	}
 
-	loadMoreMessages() {
+	addReceivers = (additionalReceivers) => {
+		throw new Error("Not Implemented")
+	}
 
+	loadMoreMessages() {
+		return Bluebird.resolve({ remaining: 0 })
 	}
 }
 
