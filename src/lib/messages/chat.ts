@@ -5,9 +5,13 @@ import socketService from "../services/socket.service"
 import ObjectLoader from "../services/objectLoader"
 
 import ChunkLoader, { Chunk } from "./chatChunk"
-import MessageLoader from "./message"
+import MessageLoader, { Message } from "./message"
 
 import h from "../helper/helper"
+
+import Cache from "../services/Cache.ts";
+
+const ImageUpload = require("services/imageUploadService");
 
 const unreadChatIDs = []
 
@@ -63,7 +67,7 @@ export class Chat {
 			latestChunkID: latestChunkID,
 		}
 
-		this.unreadMessageIDs = unreadMessageIDs
+		this.unreadMessageIDs = unreadMessageIDs || []
 	}
 
 	getID = () => {
@@ -72,6 +76,11 @@ export class Chat {
 
 	isUnread() {
 		return unreadChatIDs.indexOf(this.id) > -1
+	}
+
+	removeMessageID = (removeID) => {
+		this.messages = this.messages.filter(({ id }) => removeID !== id)
+		this.messagesAndUpdates = this.messagesAndUpdates.filter(({ id: { id } }) => removeID !== id)
 	}
 
 	addMessageID = (id, time) => {
@@ -120,12 +129,20 @@ export class Chat {
 
 			return this.verifyMessageAssociations(latestMessage).thenReturn(latestMessage)
 		}).then((latestMessage) => {
-			this.addMessageID(latestMessage.getID(), latestMessage.getTime())
+			this.addMessageID(latestMessage.getServerID(), latestMessage.getTime())
 		})
 	})
 
 	loadInitialMessages = h.cacheResult<Bluebird<any>>(() => {
+		const oldestKnownMessage = this.messages.length === 0 ? 0 : this.messages[0].id
 
+		return socketService.emit("chat.getMessages", { id: this.getID(), oldestKnownMessage }).then(({ messages }) => {
+			return Bluebird.all<Message>(messages.map((message) => MessageLoader.load(message)))
+		}).then((messages: Message[]) =>
+			messages.forEach((message) =>
+				this.addMessageID(message.getServerID(), message.getTime())
+			)
+		)
 	})
 
 	getMessages() {
@@ -185,6 +202,58 @@ export class Chat {
 	loadMoreMessages() {
 		return Bluebird.resolve({ remaining: 0 })
 	}
+
+	sendUnsentMessage = (messageData, files) => {
+		var images = files.map((file) => {
+			return new ImageUpload(file);
+		});
+
+		return this.sendMessage(messageData.message, images, messageData.id);
+	};
+
+	sendMessage = (message, images, id?) => {
+		var messageObject = new Message(message, this, images, id)
+
+		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
+
+		if (!id) {
+			Bluebird.try(async () => {
+				await Bluebird.all(images.map((img) => img.prepare()))
+
+				const imagesBlobs = images.map((img) => img._blobs[0].blob._blobData)
+
+				await messageSendCache.store(
+					messageObject.getID(),
+					{
+						chatID: this.getID(),
+						id: messageObject.getID(),
+						message: message
+					},
+					imagesBlobs
+				);
+			})
+		}
+
+		var sendMessagePromise = messageObject.sendContinously();
+
+		sendMessagePromise.then(() => {
+			MessageLoader.addLoaded(messageObject.getID(), messageObject)
+			this.removeMessageID(messageObject.getID())
+			this.addMessageID(messageObject.getID(), messageObject.getTime())
+
+			return messageSendCache.delete(messageObject.getID());
+		});
+
+		sendMessagePromise.catch((e) => {
+			console.error(e);
+			alert("An error occured sending a message!" + e.toString());
+		});
+
+		MessageLoader.addLoaded(messageObject.getID(), messageObject)
+		this.addMessageID(messageObject.getID(), Number.MAX_SAFE_INTEGER)
+
+		return null;
+	};
 }
 
 const loadHook = (chatResponse) => {
@@ -205,7 +274,7 @@ const loadHook = (chatResponse) => {
 }
 
 const downloadHook = (id) => {
-	return socketService.emit("chat.get", { id })
+	return socketService.emit("chat.get", { id }).then((response) => response.chat)
 }
 
 const hooks = {

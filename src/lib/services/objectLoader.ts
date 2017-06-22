@@ -87,6 +87,10 @@ function createLoader<ObjectType>({ downloadHook, loadHook }: hookType<ObjectTyp
 		static getAll = () => {
 			return byId
 		}
+
+		static addLoaded = (id, obj: ObjectType) => {
+			byId[id] = obj
+		}
 	}
 }
 

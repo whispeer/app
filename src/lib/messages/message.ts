@@ -8,7 +8,8 @@ var keyStore = require("services/keyStore.service").default;
 var SecuredData = require("asset/securedDataWithMetaData");
 import ObjectLoader from "../services/objectLoader"
 
-import { Chunk } from "./chatChunk"
+import ChunkLoader, { Chunk } from "./chatChunk"
+import { Chat } from "./chat"
 
 export class Message {
 	private _hasBeenSent: boolean
@@ -25,16 +26,17 @@ export class Message {
 
 	private data: any
 
-	private chunk: any
 	private chunkID: number
 
-	constructor(messageData, chunk?: Chunk, images?, id?) {
-		if (!chunk) {
+	private chat: Chat
+
+	constructor(messageData, chat?: Chat, images?, id?) {
+		if (!chat) {
 			this.fromSecuredData(messageData);
 			return
 		}
 
-		this.fromDecryptedData(chunk, messageData, images, id);
+		this.fromDecryptedData(chat, messageData, images, id);
 	}
 
 	fromSecuredData = (data) => {
@@ -61,16 +63,17 @@ export class Message {
 		this.setData();
 	};
 
-	fromDecryptedData = (chunk, message, images, id) => {
+	fromDecryptedData = (chat: Chat, message, images, id) => {
 		this._hasBeenSent = false;
 		this._isDecrypted = true;
 		this._isOwnMessage = true;
 
-		this.chunk = chunk;
-		this.chunkID = chunk.getID()
+		this.chat = chat;
 		this._images = images;
 
 		this._messageID = id || h.generateUUID();
+
+		this.senderID = h.parseDecimal(userService.getown().getID())
 
 		var meta = {
 			createTime: new Date().getTime(),
@@ -78,7 +81,7 @@ export class Message {
 			sender: userService.getown().getID()
 		};
 
-		this._securedData = Message.createRawSecuredData(chunk, message, meta);
+		this._securedData = Message.createRawSecuredData(message, meta);
 
 		this.setData();
 
@@ -133,7 +136,7 @@ export class Message {
 		return this._hasBeenSent;
 	};
 
-	uploadImages = h.cacheResult((chunkKey) => {
+	uploadImages = h.cacheResult<Bluebird<any>>((chunkKey) => {
 		return this._prepareImages().then(() => {
 			return Bluebird.all(this._images.map((image) => {
 				return image.upload(chunkKey);
@@ -154,33 +157,39 @@ export class Message {
 			throw new Error("trying to send an already sent message");
 		}
 
-		return socket.awaitConnection().then(() => {
-			return [this.chunk.refetchMessages(), this.chunk.loadNewest()];
-		}).then(() => {
-			return this.chunk.awaitEarlierSend(this.getTime());
-		}).then(() => {
-			return this._prepareImages();
-		}).then((imagesMeta) => {
+		return Bluebird.try(async () => {
+			await socket.awaitConnection()
+
+			const chunk = await ChunkLoader.get(this.chat.getLatestChunk())
+
+			this._securedData.setParent(chunk.getSecuredData());
+
+			await chunk.awaitEarlierSend(this.getTime());
+
+			const imagesMeta = await this._prepareImages()
+
 			this._securedData.metaSetAttr("images", imagesMeta);
 
-			var chunkKey = this.chunk.getKey();
-			var newest = this.chunk.getNewest();
+			const chunkKey = chunk.getKey();
+			const newest = await MessageLoader.get(this.chat.getLatestMessage())
 
-			if (newest && newest.getChunkID() === this.chunk.getID()) {
+			if (newest && newest.getChunkID() === this.chat.getLatestChunk()) {
 				this._securedData.setAfterRelationShip(newest.getSecuredData());
 			}
 
-			var signAndEncryptPromise = this._securedData._signAndEncrypt(userService.getown().getSignKey(), chunkKey);
+			const signAndEncryptPromise = this._securedData._signAndEncrypt(userService.getown().getSignKey(), chunkKey);
 
-			return Bluebird.all([signAndEncryptPromise, this.uploadImages(chunkKey)]);
-		}).spread((result, imageKeys) => {
-			result.meta.topicid = this.chunk.getID();
-			result.imageKeys = imageKeys.map(keyStore.upload.getKey);
+			const imageKeys = await this.uploadImages(chunkKey)
 
-			return socket.emit("messages.send", {
-				message: result
+			const request = await signAndEncryptPromise
+
+			request.imageKeys = imageKeys.map(keyStore.upload.getKey);
+
+			const response = await socket.emit("chat.message.create", {
+				chunkID: chunk.getID(),
+				message: request
 			});
-		}).then((response) => {
+
 			if (response.success) {
 				this._hasBeenSent = true;
 				this.data.sent = true;
@@ -280,40 +289,20 @@ export class Message {
 		})
 	}
 
-	static createData(chunk, message, imagesMeta, cb) {
-		return Bluebird.try(() => {
-			var newest = chunk.data.latestMessage;
-
-			var meta = {
-				createTime: new Date().getTime(),
-				images: imagesMeta
-			};
-
-			var mySecured = Message.createRawSecuredData(chunk, message, meta);
-			mySecured.setAfterRelationShip(newest.getSecuredData());
-			return mySecured._signAndEncrypt(userService.getown().getSignKey(), chunk.getKey());
-		}).then((mData) => {
-			mData.meta.topicid = chunk.getID();
-
-			var result = {
-				message: mData
-			};
-
-			return result;
-		}).nodeify(cb);
-	};
-
-	static createRawSecuredData(chunk, message, meta) {
+	static createRawSecuredData(message, meta, chunk?: Chunk) {
 		var secured = SecuredData.createRaw(message, meta, {
 			type: "message",
 		});
-		secured.setParent(chunk.getSecuredData());
+
+		if (chunk) {
+			secured.setParent(chunk.getSecuredData())
+		}
 
 		return secured;
 	};
 
-	static createRawData(chunk, message, meta) {
-		var secured = Message.createRawSecuredData(chunk, message, meta);
+	static createRawData(message, meta, chunk: Chunk) {
+		var secured = Message.createRawSecuredData(message, meta, chunk);
 		return secured._signAndEncrypt(userService.getown().getSignKey(), chunk.getKey());
 	};
 

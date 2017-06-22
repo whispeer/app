@@ -11,11 +11,7 @@ import ObjectLoader from "../services/objectLoader"
 const keyStore = require("services/keyStore.service").default;
 const sessionService = require("services/session.service").default;
 
-import Cache from "../services/Cache.ts";
-
 import { Message } from "./message"
-
-const ImageUpload = require("services/imageUploadService");
 
 const debugName = "whispeer:chunk";
 const chunkDebug = debug(debugName);
@@ -85,51 +81,6 @@ export class Chunk extends Observer {
 
 	getKey = () => {
 		return this.meta.metaAttr("_key");
-	};
-
-	sendUnsentMessage = (messageData, files) => {
-		var images = files.map((file) => {
-			return new ImageUpload(file);
-		});
-
-		return this.sendMessage(messageData.message, images, messageData.id);
-	};
-
-	sendMessage = (message, images, id) => {
-		var messageObject = new Message(message, this, images, id)
-
-		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
-
-		if (!id) {
-			Bluebird.resolve(images).map((img: any) => {
-				return img.prepare().thenReturn(img)
-			}).map((img: any) => {
-				return img._blobs[0].blob._blobData
-			}).then((imagesBlobs) => {
-				messageSendCache.store(
-					messageObject.getID(),
-					{
-						chunkID: this.getID(),
-						id: messageObject.getID(),
-						message: message
-					},
-					imagesBlobs
-				);
-			})
-		}
-
-		var sendMessagePromise = messageObject.sendContinously();
-
-		sendMessagePromise.then(() => {
-			return messageSendCache.delete(messageObject.getID());
-		});
-
-		sendMessagePromise.catch((e) => {
-			console.error(e);
-			alert("An error occured sending a message!" + e.toString());
-		});
-
-		return null;
 	};
 
 	ensureChunkChain = (predecessor) => {
@@ -441,7 +392,7 @@ export class Chunk extends Observer {
 
 			return Bluebird.all([
 				chunkData,
-				Message.createRawData(chunk, message, messageMeta),
+				Message.createRawData(message, messageMeta, chunk),
 				uploadImages(chunk.getKey())
 			]);
 		}).spread((chunkData, messageData, imageKeys: any) => {

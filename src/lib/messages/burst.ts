@@ -1,16 +1,17 @@
 import h from "../helper/helper"
 
 import TopicUpdate from "./topicTitleUpdate"
+import ChunkLoader from "./chunk"
 
 const MINUTE = 60 * 1000;
 
 export default class Burst {
 	private items
-	private chunk
+	private chunkID
 
 	constructor (chunk) {
 		this.items = []
-		this.chunk = chunk
+		// this.chunk = chunk
 	}
 
 	getItems = () => {
@@ -22,9 +23,8 @@ export default class Burst {
 	}
 
 	addItem = (item) => {
-		debugger
 		if (!this.hasItems()) {
-			this.chunk = item.getChunk()
+			this.chunkID = item.getChunkID()
 		}
 
 		this.items.push(item);
@@ -47,14 +47,14 @@ export default class Burst {
 	}
 
 	isMessageBurst = () => {
-		return !this.isChunkUpdate();
+		return !this.isChatUpdate();
 	}
 
 	private _isItemChunkUpdate = (item) => {
 		return item instanceof TopicUpdate;
 	}
 
-	isChunkUpdate = () => {
+	isChatUpdate = () => {
 		return this._isItemChunkUpdate(this.firstItem());
 	}
 
@@ -78,12 +78,8 @@ export default class Burst {
 
 	}
 
-	getChunk = () => {
-		return this.chunk
-	}
-
 	getChunkID = () => {
-		return this.getChunk().getID()
+		return this.chunkID
 	}
 
 	sameChunk = (burst: Burst) => {

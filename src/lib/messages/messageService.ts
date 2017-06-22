@@ -79,7 +79,7 @@ messageService = {
 		return Bluebird.resolve(messageSendCache.all().toArray()).map(function (unsentMessage: any) {
 			var data = JSON.parse(unsentMessage.data);
 
-			return messageService.getChat(data.topicID).then(function (chat) {
+			return messageService.getChat(data.chatID).then(function (chat) {
 				return chat.sendUnsentMessage(data, unsentMessage.blobs);
 			});
 		});

@@ -6,6 +6,8 @@ import errorService from "../../lib/services/error.service";
 import messageService from "../../lib/messages/messageService";
 import Burst from "../../lib/messages/burst"
 import { Chat } from "../../lib/messages/chat"
+import ChunkLoader from "../../lib/messages/chatChunk"
+import MessageLoader from "../../lib/messages/message"
 
 const inView = require("in-view");
 
@@ -41,11 +43,11 @@ export class MessagesPage {
 		initService.awaitLoading().then(() =>
 			messageService.getChat(this.chatID)
 		).then((chat) => {
-			debugger
-
 			this.chat = chat;
 
-			// this.partners = chat.data.partners;
+			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
+
+			this.partners = latestChunk.getPartners()
 
 			chat.loadInitialMessages().then(() => {
 				this.messagesLoading = false;
@@ -64,7 +66,7 @@ export class MessagesPage {
 		});
 	}
 
-	private calculateBursts(messages) {
+	private calculateBursts(messages: any[]) {
 		var bursts = [new Burst(this.chat)];
 		var currentBurst = bursts[0];
 
@@ -74,7 +76,7 @@ export class MessagesPage {
 
 		messages.forEach((messageOrUpdate) => {
 			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst(messageOrUpdate.getTopic());
+				currentBurst = new Burst(messageOrUpdate.getChunkID());
 				bursts.push(currentBurst);
 			}
 
@@ -140,7 +142,17 @@ export class MessagesPage {
 			return { changed: false, bursts: [] };
 		}
 
-		const messagesAndUpdates = this.chat.getMessagesAndUpdates()
+		const messagesAndUpdates = this.chat.getMessagesAndUpdates().map(({ id: { id, type }}) => {
+			if (type === "message") {
+				return MessageLoader.getLoaded(id)
+			}
+
+			if (type === "topicUpdate") {
+				throw new Error("not yet implemented")
+			}
+
+			throw new Error("invalid type for message or update")
+		})
 
 		if (this.burstTopic !== this.chat.getID()) {
 			this.bursts = this.calculateBursts(messagesAndUpdates);
@@ -153,7 +165,7 @@ export class MessagesPage {
 
 		if (options) {
 			const firstViewMessage = messagesAndUpdates.find((elem) => {
-				return options.after == elem.id.toString()
+				return options.after == elem.getID().toString()
 			})
 
 			const index = messagesAndUpdates.indexOf(firstViewMessage)
