@@ -48,14 +48,14 @@ export class NewMessagePage {
 			return Bluebird.resolve();
 		}
 
-		return messageService.getUserTopic(users[0].id);
+		return messageService.getUserChat(users[0].id);
 
 	}
 
 	send = (users) => {
-		this.sendToUserTopic(users).then((topicId) => {
-			if (topicId) {
-				this.goToTopic(topicId)
+		this.sendToUserTopic(users).then((chatID) => {
+			if (chatID) {
+				this.goToChat(chatID)
 				return
 			}
 
@@ -91,8 +91,8 @@ export class NewMessagePage {
 		return { changed: false, bursts: this.bursts };
 	}
 
-	goToTopic = (topicId) => {
-		this.navCtrl.push("Messages", { topicId: topicId }).then(() => {
+	goToChat = (chatID) => {
+		this.navCtrl.push("Messages", { chatID }).then(() => {
 			this.navCtrl.remove(this.navCtrl.length() - 2, 1)
 		})
 	}
@@ -101,8 +101,8 @@ export class NewMessagePage {
 		this.bursts = []
 		this.messagesLoading = true
 
-		messageService.sendNewTopic(this.partners.map((partner) => partner.user.getID()), text, images).then((topicId) => {
-			this.goToTopic(topicId)
+		messageService.sendNewTopic(this.partners.map((partner) => partner.user.getID()), text, images).then((chatID) => {
+			this.goToChat(chatID)
 		});
 	}
 }
