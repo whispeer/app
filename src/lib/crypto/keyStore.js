@@ -2123,7 +2123,7 @@ keyStore = {
 
 			return Bluebird.all([
 				stringifyObject(object, version),
-				SignKey.get(realID)
+				SignKey.get(realID),
 			]).spread(function (objectString, key) {
 				return key.verify(signature, objectString, object._type, id);
 			}).catch(function (e) {

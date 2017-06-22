@@ -1,5 +1,5 @@
-<div class="messages_message">
-	<div class="burst-seperator burst-seperator-date" *ngIf="differentDay()">
+<div class="messages_message" *ngIf="differentDay()">
+	<div class="burst-seperator burst-seperator-date">
 		<span class="burst-seperator-text">
 			{{getTime()|seperatorDate}}
 		</span>

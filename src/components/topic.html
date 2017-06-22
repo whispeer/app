@@ -46,7 +46,7 @@
 						<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 					</div>
 				</span>
-				<div class="messages_message" *ngIf="burst.isTopicUpdate()">
+				<div class="messages_message" *ngIf="burst.isChatUpdate()">
 					<div class="burst-seperator burst-seperator-update">
 						<span class="burst-seperator-text">
 							{{ burst.firstItem().state.sender.data.name }} {{ 'topic.changed' | translate }} "<strong>{{ burst.firstItem().state.title }}</strong>"
