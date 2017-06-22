@@ -208,7 +208,7 @@ export class TopicComponent {
 			return
 		}
 
-		const scrollTop = this.content.nativeElement.scrollTop
+		const { scrollTop } = this.content.nativeElement
 
 		if (scrollTop < INFINITE_SCROLLING_THRESHOLD) {
 			this.messagesLoading = true

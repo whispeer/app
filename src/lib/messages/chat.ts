@@ -12,18 +12,9 @@ import h from "../helper/helper"
 import Cache from "../services/Cache.ts";
 
 const ImageUpload = require("services/imageUploadService");
+const initService = require("services/initService");
 
-const unreadChatIDs = []
-
-/*
-- object is added to by id as soon as we receive it (definitly)
-- question: add object to list after it is verified or as soon as it is received (with a flag "loading")
-
-
--> verify chunk chain between all chunks under one chat!
--> add message to chat (but verify parent chunk is under said chat and verify parent chunk!)
-->
-*/
+let unreadChatIDs = []
 
 const addAfterTime = (arr:timeArray, id: any, time: number) => {
 	const firstLaterIndex = arr.findIndex((ele) => ele.time > time)
@@ -67,7 +58,7 @@ export class Chat {
 			latestChunkID: latestChunkID,
 		}
 
-		this.unreadMessageIDs = unreadMessageIDs || []
+		this.unreadMessageIDs = unreadMessageIDs
 	}
 
 	getID = () => {
@@ -286,3 +277,24 @@ const hooks = {
 }
 
 export default class ChatLoader extends ObjectLoader(hooks) {}
+
+function loadUnreadChatIDs() {
+	return initService.awaitLoading().then(function () {
+		return Bluebird.delay(500);
+	}).then(function () {
+		return socketService.awaitConnection();
+	}).then(function () {
+		return socketService.emit("chat.getUnreadIDs", {});
+	}).then(function (data) {
+		unreadChatIDs = data.chatIDs
+		//TODO: updateUnreadIDs(data.unread);
+	});
+}
+
+socketService.on("connect", function () {
+	loadUnreadChatIDs();
+});
+
+initService.listen(function () {
+	loadUnreadChatIDs();
+}, "initDone");

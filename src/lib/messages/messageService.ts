@@ -203,24 +203,7 @@ socket.channel("unreadTopics", function (e, data) {
 
 });
 
-function loadUnreadChatIDs() {
-	return initService.awaitLoading().then(function () {
-		return Bluebird.delay(500);
-	}).then(function () {
-		return socket.awaitConnection();
-	}).then(function () {
-		return socket.emit("messages.getUnreadTopicIDs", {});
-	}).then(function (data) {
-		//TODO: updateUnreadIDs(data.unread);
-	});
-}
-
-socket.on("connect", function () {
-	loadUnreadChatIDs();
-});
-
 initService.listen(function () {
-	loadUnreadChatIDs();
 	messageService.sendUnsentMessages();
 }, "initDone");
 
