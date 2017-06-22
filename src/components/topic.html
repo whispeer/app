@@ -33,7 +33,7 @@
 			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">
 				<BurstDifference [topic]="topic && topic.obj" [burst]="bursts[0]"></BurstDifference>
 			</ion-item>
-			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
+			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 				<BurstDifference [topic]="topic && topic.obj" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>
 
 				<span *ngIf="burst.isMessageBurst()">
@@ -53,9 +53,8 @@
 						</span>
 					</div>
 				</div>
-			</ion-item>
-			<ion-item class="messages__burst" *ngIf="bursts && bursts.length > 0">
-				<BurstDifference [topic]="topic && topic.obj" [previousBurst]="bursts[bursts.length - 1]" [noDates]="true"></BurstDifference>
+
+				<BurstDifference [topic]="topic && topic.obj" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>
 			</ion-item>
 		</ion-list>
 	</div>
