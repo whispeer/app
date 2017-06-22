@@ -133,16 +133,24 @@ export class Chat {
 		})
 	})
 
-	loadInitialMessages = h.cacheResult<Bluebird<any>>(() => {
+	loadMoreMessages() {
 		const oldestKnownMessage = this.messages.length === 0 ? 0 : this.messages[0].id
 
-		return socketService.emit("chat.getMessages", { id: this.getID(), oldestKnownMessage }).then(({ messages }) => {
-			return Bluebird.all<Message>(messages.map((message) => MessageLoader.load(message)))
-		}).then((messages: Message[]) =>
-			messages.forEach((message) =>
+		return Bluebird.try(async () => {
+			const { messages, remainingMessagesCount } = await socketService.emit("chat.getMessages", { id: this.getID(), oldestKnownMessage })
+
+			const messagesObjects = await Bluebird.all<Message>(messages.map((message) => MessageLoader.load(message)))
+
+			messagesObjects.forEach((message) =>
 				this.addMessageID(message.getServerID(), message.getTime())
 			)
-		)
+
+			return { remaining: remainingMessagesCount }
+		})
+	}
+
+	loadInitialMessages = h.cacheResult<Bluebird<any>>(() => {
+		return this.loadMoreMessages()
 	})
 
 	getMessages() {
@@ -197,10 +205,6 @@ export class Chat {
 
 	addReceivers = (additionalReceivers) => {
 		throw new Error("Not Implemented")
-	}
-
-	loadMoreMessages() {
-		return Bluebird.resolve({ remaining: 0 })
 	}
 
 	sendUnsentMessage = (messageData, files) => {

@@ -263,7 +263,7 @@ export class Chunk extends Observer {
 
 			return ChunkLoader.load(response.chunk).then((successorChunk) => {
 				if (successorChunk.getPredecessorID() !== this.getID()) {
-					throw new Error("server returned invalid successor topic")
+					throw new Error("server returned invalid successor chunk")
 				}
 
 				return successorChunk
