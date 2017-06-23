@@ -24,6 +24,7 @@ export class Chunk extends Observer {
 	private id
 	private createTime
 	private successorID: number
+	private predecessorID: number
 	private receiverObjects: any[]
 
 	constructor(data) {
@@ -42,9 +43,10 @@ export class Chunk extends Observer {
 		});
 
 		this.id = data.server.id
+		this.predecessorID = data.server.predecessorID
 		this.createTime = data.server.createTime
 
-		this.receiver = this.meta.metaAttr("receiver");
+		this.receiver = this.meta.metaAttr("receiver").map(h.parseDecimal);
 	}
 
 	awaitEarlierSend = (time) => {
@@ -169,47 +171,8 @@ export class Chunk extends Observer {
 		return h.parseDecimal(this.meta.metaAttr("creator"))
 	}
 
-	addReceivers = (newReceiverIDs, canReadOldMessages) => {
-		var oldReceivers = this.getReceiver()
-
-		return this.setReceivers(oldReceivers.concat(newReceiverIDs), {
-			addedReceivers: [].concat(newReceiverIDs)
-		}, canReadOldMessages)
-	}
-
-	setReceivers = (receivers, extraMeta, canReadOldMessages) => {
-		if (!this.amIAdmin()) {
-			throw new Error("Not an admin of this chunk")
-		}
-
-		return this.getSuccessor().then((successor) => {
-			if (successor) {
-				throw new Error("TODO: Chunk has a successor. Try again?")
-			}
-
-			return Chunk.createRawData(receivers, this, extraMeta)
-		}).then((chunkData) => {
-			if (!canReadOldMessages) {
-				return chunkData
-			}
-
-			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
-
-			throw new Error("not yet implemented")
-		}).then((chunkData) => {
-			return socket.emit("chat.chunk.create", {
-				predecessorID: this.getID(),
-				chunk: chunkData.chunk,
-				keys: chunkData.keys,
-				receiverKeys: chunkData.receiverKeys
-			})
-		}).then((response) => {
-			return ChunkLoader.load(response.successorChunk)
-		})
-	}
-
 	hasPredecessor = () => {
-		return !!this.meta.metaAttr("predecessor")
+		return !!this.predecessorID
 	}
 
 	getPredecessorID = () => {
@@ -217,7 +180,7 @@ export class Chunk extends Observer {
 			return null
 		}
 
-		return h.parseDecimal(this.meta.metaAttr("predecessor"))
+		return h.parseDecimal(this.predecessorID)
 	}
 
 	getPredecessor = () => {
@@ -289,7 +252,7 @@ export class Chunk extends Observer {
 		})
 	}
 
-	static createRawData(receiver, predecessorChunk = null, extraMeta = {}) {
+	static createRawData(receiver, predecessorChunk : Chunk = null) {
 		var receiverObjects, chunkKey;
 		return Bluebird.try(() => {
 			//load receiver
@@ -333,17 +296,11 @@ export class Chunk extends Observer {
 			receiverIDs.push(userService.getown().getID());
 			receiverIDs.sort();
 
-			const predecessorInfo = predecessorChunk ? {
-				predecessor: predecessorChunk.getID()
-			} : {}
-
 			// chunk signable data.
 			var chunkMeta = {
 				createTime: new Date().getTime(),
 				receiver: receiverIDs,
 				creator: userService.getown().getID(),
-				...extraMeta,
-				...predecessorInfo
 			}
 
 			//create data

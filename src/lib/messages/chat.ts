@@ -194,8 +194,48 @@ export class Chat {
 		}
 	}
 
-	addReceivers = (additionalReceivers) => {
-		throw new Error("Not Implemented")
+
+	addReceivers = (newReceiverIDs, canReadOldMessages = false) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		const oldReceivers = latestChunk.getReceiver()
+
+		return this.setReceivers(oldReceivers.concat(newReceiverIDs), canReadOldMessages)
+	}
+
+	setReceivers = (receivers, canReadOldMessages) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		if (!latestChunk.amIAdmin()) {
+			throw new Error("Not an admin of this chunk")
+		}
+
+		return latestChunk.getSuccessor().then((successor) => {
+			if (successor) {
+				throw new Error("TODO: Chunk has a successor. Try again?")
+			}
+
+			return Chunk.createRawData(receivers, latestChunk)
+		}).then((chunkData) => {
+			if (!canReadOldMessages) {
+				return chunkData
+			}
+
+			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
+
+			throw new Error("not yet implemented")
+		}).then((chunkData) => {
+			return socketService.emit("chat.chunk.create", {
+				predecessorID: this.getID(),
+				chunkMeta: chunkData.chunk,
+				keys: chunkData.keys,
+				receiverKeys: chunkData.receiverKeys
+			})
+		}).then((response) => {
+			return ChunkLoader.load(response.chunk)
+		}).then((chunk) => {
+			this.chunkIDs.push(chunk.getID())
+		})
 	}
 
 	sendUnsentMessage = (messageData, files) => {
