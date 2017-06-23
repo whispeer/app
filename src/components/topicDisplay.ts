@@ -27,11 +27,12 @@ const INFINITE_SCROLLING_THRESHOLD = 1000
 })
 export class TopicComponent {
 	@Input() partners;
-	@Input() topic;
+	@Input() chat;
 	@Input() messageBurstsFunction;
 	@Input() loadMoreMessages;
 	@Input() messagesLoading;
 	@Input() forceBackButton;
+	@Input() addReceiver;
 
 	@Output() sendMessage = new EventEmitter();
 
@@ -48,6 +49,8 @@ export class TopicComponent {
 	mutationObserver: MutationObserver
 
 	bursts: any[]
+
+	receiverToAddId: string
 
 	constructor(
 		public navCtrl: NavController,
@@ -112,7 +115,7 @@ export class TopicComponent {
 		this.stabilizeScroll()
 	}
 
-	sendMessageToTopic = () => {
+	sendMessageToChat = () => {
 		this.sendMessage.emit({
 			text: this.newMessageText,
 			images: []
@@ -318,19 +321,19 @@ export class TopicComponent {
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
-		const topicChanges = changes["topic"]
+		const chatChanges = changes["chat"]
 
-		if (!topicChanges || !topicChanges.currentValue || this.newMessageText !== "") {
+		if (!chatChanges || !chatChanges.currentValue || this.newMessageText !== "") {
 			return
 		}
 
-		this.newMessageText = topicChanges.currentValue.newMessage
+		this.newMessageText = chatChanges.currentValue.newMessage
 	}
 
 	change() {
 		setTimeout(() => {
-			if (this.topic) {
-				this.topic.newMessage = this.newMessageText
+			if (this.chat) {
+				this.chat.newMessage = this.newMessageText
 			}
 
 			const fontSize = 16;

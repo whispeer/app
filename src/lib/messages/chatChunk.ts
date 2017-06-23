@@ -96,7 +96,15 @@ export class Chunk extends Observer {
 			throw new Error(`Chunk chain broken ${predecessorID}`)
 		}
 
-		ChunkLoader.getLoaded(predecessorID).ensureChunkChain(predecessor)
+		const predecessorChunk = ChunkLoader.getLoaded(predecessorID)
+
+		predecessorChunk.verifyParent(this)
+
+		predecessorChunk.ensureChunkChain(predecessor)
+	}
+
+	verifyParent = (chunk: Chunk) => {
+		chunk.getSecuredData().checkParent(this.getSecuredData())
 	}
 
 	verify = () => {
