@@ -96,7 +96,7 @@ export class Chat {
 		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "chatUpdate", id }, time)
 	}
 
-	verifyMessageAssociations = (message) => {
+	verifyMessageAssociations = (message: Message) => {
 		return Bluebird.all([
 			ChunkLoader.get(message.getChunkID()),
 			ChunkLoader.get(h.array.last(this.chunkIDs)),
@@ -128,9 +128,16 @@ export class Chat {
 		const oldestKnownMessage = this.messages.length === 0 ? 0 : this.messages[0].id
 
 		return Bluebird.try(async () => {
-			const { messages, remainingMessagesCount } = await socketService.emit("chat.getMessages", { id: this.getID(), oldestKnownMessage })
+			const { messages, chunks = [], remainingMessagesCount } = await socketService.emit("chat.getMessages", {
+				id: this.getID(),
+				oldestKnownMessage
+			})
+
+			await Bluebird.all<Chunk>(chunks.map((chunk) => ChunkLoader.load(chunk)))
 
 			const messagesObjects = await Bluebird.all<Message>(messages.map((message) => MessageLoader.load(message)))
+
+			await Bluebird.all(messagesObjects.map((message) => this.verifyMessageAssociations(message)))
 
 			messagesObjects.forEach((message) =>
 				this.addMessageID(message.getServerID(), message.getTime())
@@ -173,14 +180,10 @@ export class Chat {
 	}
 
 	markRead() {
-		// call server mark read function
-
 		this.unreadMessageIDs = []
 		unreadChatIDs = unreadChatIDs.filter((id) => id !== this.id)
 
-		return socketService.definitlyEmit("chat.markRead", { id: this.id }).then(() => {
-
-		})
+		return socketService.definitlyEmit("chat.markRead", { id: this.id })
 	}
 
 	getUnreadMessageIDs = () => {

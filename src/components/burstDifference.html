@@ -6,23 +6,24 @@
 	</div>
 </div>
 <div *ngIf="differentChunk()">
-	<div *ngFor="let topic of getChunksOfInterest()">
-		<div class="messages_message" *ngIf="wasIAdded(topic)">
-			<div class="burst-seperator burst-seperator-date">
-				<span class="burst-seperator-text">
-					Du wurdest dem Chat hinzugefügt!
+	<div class="messages_message" *ngIf="hasPreviousChunk()">
+		<div class="burst-seperator burst-seperator-date">
+			<span class="burst-seperator-text">
+				Nutzer hinzugefügt:
+				<span *ngFor="let user of addedReceiver()">
+					{{ user.name }}
 				</span>
-			</div>
+			</span>
 		</div>
-		<div class="messages_message" *ngIf="personsAdded(topic)">
-			<div class="burst-seperator burst-seperator-date">
-				<span class="burst-seperator-text">
-					Nutzer hinzugefügt:
-					<span *ngFor="let user of newPersons(topic)">
-						{{ user.name }}
-					</span>
+	</div>
+	<div class="messages_message" *ngIf="!hasPreviousChunk()">
+		<div class="burst-seperator burst-seperator-date">
+			<span class="burst-seperator-text">
+				Nutzer in diesem Chat:
+				<span *ngFor="let user of receiver()">
+					{{ user.name }}
 				</span>
-			</div>
+			</span>
 		</div>
 	</div>
 </div>

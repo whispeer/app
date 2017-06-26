@@ -46,75 +46,28 @@ export class BurstDifferenceComponent {
 		return true
 	}
 
-	getChunksBetween = (chunk: Chunk, previousChunk: Chunk) => {
-		if (chunk.getID() === previousChunk.getID()) {
-			return []
-		}
-
-		const predecessorChunk = ChunkLoader.getLoaded(chunk.getPredecessorID())
-
-		if (!predecessorChunk) {
-			return [chunk]
-		}
-
-		return this.getChunksBetween(predecessorChunk, previousChunk).concat([chunk])
+	hasPreviousChunk = () => {
+		return Boolean(this.previousBurst)
 	}
 
-	getKnownPredecessors = (chunk: Chunk) => {
-		if (!ChunkLoader.isLoaded(chunk.getPredecessorID())) {
-			return [chunk]
-		}
+	addedReceiver = () => {
+		const burstChunkID = this.burst ? this.burst.getChunkID() : this.chat.getLatestChunk()
 
-		const predecessorChunk = ChunkLoader.getLoaded(chunk.getPredecessorID())
+		const burstChunk = ChunkLoader.getLoaded(burstChunkID)
+		const previousBurstChunk = ChunkLoader.getLoaded(this.previousBurst.getChunkID())
 
-		return this.getKnownPredecessors(predecessorChunk).concat([chunk])
+		const currentPartners = burstChunk.getPartners()
+		const previousPartners = previousBurstChunk.getPartners()
+
+		const added = currentPartners.filter((partner) => previousPartners.indexOf(partner) === -1)
+
+		return added
 	}
 
-	getChunksOfInterest = () => {
-		if (this.burst && this.previousBurst) {
-			const burstChunk = ChunkLoader.getLoaded(this.burst.getChunkID())
-			const previousBurstChunk = ChunkLoader.getLoaded(this.previousBurst.getChunkID())
+	receiver = () => {
+		const burstChunk = ChunkLoader.getLoaded(this.burst.getChunkID())
 
-			return this.getChunksBetween(burstChunk, previousBurstChunk)
-		}
-
-		if (this.burst) {
-			const burstChunk = ChunkLoader.getLoaded(this.burst.getChunkID())
-
-			return this.getKnownPredecessors(burstChunk)
-		}
-
-		if (this.previousBurst) {
-			const chatChunk = ChunkLoader.getLoaded(this.chat.getLatestChunk())
-			const previousBurstChunk = ChunkLoader.getLoaded(this.previousBurst.getChunkID())
-
-			return this.getChunksBetween(chatChunk, previousBurstChunk)
-		}
-
-		return [this.chat]
-	}
-
-	newPersons = (chunk: Chunk) => {
-		return this.getAddedReceivers(chunk).filter(function (u) {
-			return !u.me
-		})
-	}
-
-	getAddedReceivers = (chunk: Chunk) => {
-		// TODO: (CH) chunk receivers!
-		return chunk.getPartners()
-	}
-
-	personsAdded = (chunk: Chunk) => {
-		return this.getAddedReceivers(chunk).filter(function (u) {
-			return !u.me
-		}).length > 0
-	};
-
-	wasIAdded = (chunk: Chunk) => {
-		return this.getAddedReceivers(chunk).some(function (u) {
-			return u.me
-		})
+		return burstChunk.getPartners()
 	}
 
 	getTime = () => {
