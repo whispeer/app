@@ -37,8 +37,9 @@ export class Chat {
 	private chatUpdates:timeArray = []
 	private messagesAndUpdates:timeArray = []
 
-	// Unsorted IDs
 	private chunkIDs: number[] = []
+
+	// Unsorted IDs
 	private unreadMessageIDs: number[] = []
 
 	private id: number
@@ -107,6 +108,14 @@ export class Chat {
 		}).then(([latestChunk, messageChunk]) => {
 			latestChunk.ensureChunkChain(messageChunk)
 		})
+	}
+
+	addChunkID = (chunkID) => {
+		if (this.chunkIDs.indexOf(chunkID) > -1) {
+			return
+		}
+
+		this.chunkIDs.push(chunkID)
 	}
 
 	load = h.cacheResult<Bluebird<any>>(() => {
@@ -245,7 +254,7 @@ export class Chat {
 		}).then((response) => {
 			return ChunkLoader.load(response.chunk)
 		}).then((chunk) => {
-			this.chunkIDs.push(chunk.getID())
+			this.addChunkID(chunk.getID())
 		})
 	}
 

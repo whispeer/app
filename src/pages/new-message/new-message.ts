@@ -22,7 +22,7 @@ export class NewMessagePage {
 
 	bursts = []
 
-	topic = {
+	chat = {
 		newMessage: ""
 	};
 
@@ -101,7 +101,7 @@ export class NewMessagePage {
 		this.bursts = []
 		this.messagesLoading = true
 
-		messageService.sendNewTopic(this.partners.map((partner) => partner.user.getID()), text, images).then((chatID) => {
+		messageService.sendNewChat(this.partners.map((partner) => partner.user.getID()), text, images).then((chatID) => {
 			this.goToChat(chatID)
 		});
 	}

@@ -1,7 +1,3 @@
-/**
-* MessageService
-**/
-
 import h from "../helper/helper";
 var Observer = require("asset/observer");
 import * as Bluebird from "bluebird";
@@ -15,6 +11,7 @@ var initService = require("services/initService");
 
 import ChunkLoader, { Chunk } from "../messages/chatChunk"
 import ChatLoader from "../messages/chat"
+import MessageLoader from "../messages/message"
 
 var messageService;
 
@@ -125,7 +122,7 @@ messageService = {
 	sendNewChat: function (receiver, message, images) {
 		return Bluebird.try(function () {
 			if (receiver.length === 1) {
-				return messageService.sendMessageToUserChatIfExists(receiver, message, images);
+				return messageService.sendMessageToUserChatIfExists(receiver[0], message, images);
 			}
 
 			return false;
@@ -142,7 +139,7 @@ messageService = {
 					keys: chunkData.keys
 				});
 			}).then(function (response) {
-				return ChatLoader.load(response.server.id, response);
+				return ChatLoader.load(response.chat, response.chat.chat.id);
 			}).then(function (chat) {
 				return chat.getID();
 			});
@@ -176,20 +173,32 @@ messageService = {
 
 Observer.extend(messageService);
 
-socket.channel("message", function (e, data) {
+socket.channel("notify.chat", function (e, data) {
 	if (!e) {
-		/*if (data.topic) {
-			Chat.fromData(data.topic).then(function (topic) {
-				if (topic.data.unread) {
-					changeReadTopic(topic.getID(), true);
-				}
+		return Bluebird.try(async () => {
+			if (data.message) {
+				const chunk = await ChunkLoader.get(data.message.server.chunkID)
+				const chat = await ChatLoader.get(chunk.getChatID())
+				const message = await MessageLoader.load(data.message)
 
-				messageService.addSocketMessage(data.message);
-			});
-		} else {
-			messageService.addSocketMessage(data.message);
-		}*/
-		// TODO
+				chat.addMessageID(message.getServerID(), message.getTime())
+				chat.addUnreadMessage(message.getServerID())
+			}
+
+			if (data.chunk) {
+				const chunk = await ChunkLoader.load(data.chunk)
+				const chat = await ChatLoader.get(chunk.getChatID())
+
+				chat.addChunkID(chunk.getID())
+			}
+
+			if (data.chat) {
+				const chat = await ChatLoader.load(data, data.chat.id)
+				chatIDs = [...chatIDs, chat.getID()]
+			}
+
+			await Bluebird.resolve()
+		})
 	} else {
 		errorService.criticalError(e);
 	}

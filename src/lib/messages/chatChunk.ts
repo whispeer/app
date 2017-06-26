@@ -26,6 +26,7 @@ export class Chunk extends Observer {
 	private successorID: number
 	private predecessorID: number
 	private receiverObjects: any[]
+	private chatID: number
 
 	constructor(data) {
 		super()
@@ -43,11 +44,14 @@ export class Chunk extends Observer {
 		});
 
 		this.id = data.server.id
+		this.chatID = data.server.chatID
 		this.predecessorID = data.server.predecessorID
 		this.createTime = data.server.createTime
 
 		this.receiver = this.meta.metaAttr("receiver").map(h.parseDecimal);
 	}
+
+	getChatID = () => this.chatID
 
 	awaitEarlierSend = (time) => {
 		/*var previousMessages = this.getNotSentMessages().filter((message) => {
