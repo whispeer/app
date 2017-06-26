@@ -174,10 +174,13 @@ export class Chat {
 
 	markRead() {
 		// call server mark read function
-		this.unreadMessageIDs = []
-		// unreadChatIDs.remove(this.id)
 
-		return Bluebird.resolve()
+		this.unreadMessageIDs = []
+		unreadChatIDs = unreadChatIDs.filter((id) => id !== this.id)
+
+		return socketService.definitlyEmit("chat.markRead", { id: this.id }).then(() => {
+
+		})
 	}
 
 	getUnreadMessageIDs = () => {
@@ -194,6 +197,11 @@ export class Chat {
 		}
 	}
 
+	getPartners = () => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.getPartners()
+	}
 
 	addReceivers = (newReceiverIDs, canReadOldMessages = false) => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
@@ -226,7 +234,7 @@ export class Chat {
 			throw new Error("not yet implemented")
 		}).then((chunkData) => {
 			return socketService.emit("chat.chunk.create", {
-				predecessorID: this.getID(),
+				predecessorID: latestChunk.getID(),
 				chunkMeta: chunkData.chunk,
 				keys: chunkData.keys,
 				receiverKeys: chunkData.receiverKeys

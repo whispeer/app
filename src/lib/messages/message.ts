@@ -129,7 +129,7 @@ export class Message {
 	};
 
 	getChunkID = () => {
-		return this.chunkID
+		return this.chunkID || this.chat.getLatestChunk()
 	}
 
 	hasBeenSent = () => {

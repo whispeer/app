@@ -26,7 +26,6 @@ export class MessagesPage {
 	chatID: number;
 	chat: Chat;
 
-	partners: any[] = [];
 	messagesLoading: boolean = true;
 
 	burstTopic: number = 0;
@@ -45,10 +44,6 @@ export class MessagesPage {
 		).then((chat) => {
 			this.chat = chat;
 
-			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
-
-			this.partners = latestChunk.getPartners()
-
 			chat.loadInitialMessages().then(() => {
 				this.messagesLoading = false;
 				this.chat.markRead().catch(errorService.criticalError)
@@ -57,6 +52,14 @@ export class MessagesPage {
 	}
 
 	ionViewDidEnter = () => {}
+
+	getPartners = () => {
+		if (!this.chat) {
+			return []
+		}
+
+		return this.chat.getPartners()
+	}
 
 	private getNewElements(messagesAndUpdates, bursts) {
 		return messagesAndUpdates.filter((message) => {

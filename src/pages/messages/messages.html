@@ -2,7 +2,7 @@
 		[chat]="chat"
 		[messageBurstsFunction]="messageBursts"
 		[loadMoreMessages]="loadMoreMessages"
-		[partners]="partners"
+		[partners]="getPartners()"
 		[messagesLoading]="messagesLoading"
 		[addReceiver]="addReceiver"
 		(sendMessage)="sendMessage($event)"
