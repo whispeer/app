@@ -19,7 +19,7 @@ export class BurstDifferenceComponent {
 	constructor() {}
 
 	differentDay = () => {
-		if (this.noDates || !this.chat) {
+		if (this.noDates || !this.chat || !this.chat.getLatestChunk) {
 			return false
 		}
 
@@ -31,7 +31,7 @@ export class BurstDifferenceComponent {
 	}
 
 	differentChunk = () => {
-		if (!this.chat) {
+		if (!this.chat || !this.chat.getLatestChunk) {
 			return false
 		}
 
