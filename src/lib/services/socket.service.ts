@@ -208,24 +208,24 @@ class SocketService extends Observer {
 
 			this._lastRequestTime = response.serverTime;
 
+			this._interceptors.forEach((interceptor) => {
+				if (interceptor.transformResponse) {
+					response = interceptor.transformResponse(response);
+				}
+			});
+
 			if (response.error) {
 				socketError(response);
 				throw new ServerError("server returned an error!");
 			}
+
+			socketDebug(response);
 
 			if (!isBusinessVersion()) {
 				if (response.isBusiness) {
 					goToBusinessVersion()
 				}
 			}
-
-			socketDebug(response);
-
-			this._interceptors.forEach((interceptor) => {
-				if (interceptor.transformResponse) {
-					response = interceptor.transformResponse(response);
-				}
-			});
 
 			return response;
 		}).finally(() => {

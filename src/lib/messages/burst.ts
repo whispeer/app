@@ -1,7 +1,6 @@
 import h from "../helper/helper"
 
 import TopicUpdate from "./topicTitleUpdate"
-import ChunkLoader from "./chunk"
 
 const MINUTE = 60 * 1000;
 
@@ -9,9 +8,8 @@ export default class Burst {
 	private items
 	private chunkID
 
-	constructor (chunk) {
+	constructor () {
 		this.items = []
-		// this.chunk = chunk
 	}
 
 	getItems = () => {

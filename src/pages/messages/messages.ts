@@ -69,7 +69,7 @@ export class MessagesPage {
 	}
 
 	private calculateBursts(messages: any[]) {
-		var bursts = [new Burst(this.chat)];
+		var bursts = [new Burst()];
 		var currentBurst = bursts[0];
 
 		messages.sort((m1, m2) => {
@@ -78,7 +78,7 @@ export class MessagesPage {
 
 		messages.forEach((messageOrUpdate) => {
 			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst(messageOrUpdate.getChunkID());
+				currentBurst = new Burst();
 				bursts.push(currentBurst);
 			}
 

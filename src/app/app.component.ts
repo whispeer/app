@@ -95,7 +95,7 @@ export class MyApp {
 
 			socketService.addInterceptor({
 				transformResponse: (response) => {
-					if (isBusinessVersion() && response.logedin) {
+					if (isBusinessVersion() && response.logedin && !response.error) {
 						const activeNav = this.nav.getActive()
 						const onSalesPage = activeNav && activeNav.component.name === "SalesPage"
 
