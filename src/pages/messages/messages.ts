@@ -32,6 +32,7 @@ export class MessagesPage {
 	lastMessageElement: any;
 
 	messages: any[];
+
 	constructor(public navParams: NavParams, private element: ElementRef, private navCtrl: NavController) {
 	}
 

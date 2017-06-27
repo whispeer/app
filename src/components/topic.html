@@ -1,11 +1,15 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
 		<ion-title [ngClass]="{'title--force-back': forceBackButton}">
+
+			<!-- Back button -->
 			<div class="messages__header__fake-back">
 				<button *ngIf="forceBackButton" (click)="navCtrl.pop()" class="bar-button bar-button-ios" color="light" ion-button icon-only clear>
 					<ion-icon name="arrow-back"></ion-icon>
 				</button>
 			</div>
+
+			<!-- Actual navbar title -->
 			<span class="messages__header__username" [ngClass]="{'messages__header__username--no-image': partners.length > 1}">
 				<span *ngIf="partners.length == 1 && !(chat && chat.title)" (click)="goToProfile(partners[0].id)">
 					{{ partners[0].name }}
@@ -19,9 +23,12 @@
 					{{chat.title}}
 				</span>
 			</span>
-			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
+
+			<!-- Avatar for one user -->
+			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">
 				<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>
 			</ion-avatar>
+
 		</ion-title>
 	</ion-navbar>
 </ion-header>

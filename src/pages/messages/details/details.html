@@ -1,0 +1,77 @@
+<ion-header>
+
+	<ion-navbar [color]="'primary'" no-border>
+		<ion-title>Details</ion-title>
+	</ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+	<ion-list>
+
+		<ion-list-header padding-top>
+			Conversation Title
+		</ion-list-header>
+
+		<ion-item>
+			<ion-input type="text" placeholder="Something something"></ion-input>
+		</ion-item>
+
+		<ion-list-header padding-top>
+			All Members
+		</ion-list-header>
+
+		<ion-item-sliding #item>
+
+			<ion-item>
+				Daniel Dietrich
+			</ion-item>
+			<ion-item-options side="left">
+				<button ion-button color="primary" (click)="deOrProMote(item)">*Mote</button>
+			</ion-item-options>
+
+			<ion-item-options side="right">
+				<button ion-button color="danger" (click)="remove(item)">Remove</button>
+			</ion-item-options>
+		</ion-item-sliding>
+
+		<ion-item-sliding #item>
+
+			<ion-item>
+				Martin Sonneborn
+			</ion-item>
+			<ion-item-options side="left">
+				<button ion-button color="primary" (click)="deOrProMote(item)">*Mote</button>
+			</ion-item-options>
+
+			<ion-item-options side="right">
+				<button ion-button color="danger" (click)="remove(item)">Remove</button>
+			</ion-item-options>
+		</ion-item-sliding>
+
+		<ion-item-sliding #item>
+
+			<ion-item>
+				Partyfrei
+			</ion-item>
+			<ion-item-options side="left">
+				<button ion-button color="primary" (click)="deOrProMote(item)">*Mote</button>
+			</ion-item-options>
+
+			<ion-item-options side="right">
+				<button ion-button color="danger" (click)="remove(item)">Remove</button>
+			</ion-item-options>
+		</ion-item-sliding>
+
+		<ion-item detail-push (click)="addContact()">
+			Add more contacts...
+		</ion-item>
+	</ion-list>
+
+	<div text-center class="space-for-fab">
+	</div>
+
+	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
+
+</ion-content>
