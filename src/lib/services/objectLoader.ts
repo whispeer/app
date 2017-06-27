@@ -2,10 +2,11 @@ import * as Bluebird from "bluebird"
 
 type hookType<ObjectType> = {
 	downloadHook: (id: any) => Bluebird<any>,
-	loadHook: (response: any) => Bluebird<ObjectType>
+	loadHook: (response: any) => Bluebird<ObjectType>,
+	idHook: (response: any) => any,
 }
 
-function createLoader<ObjectType>({ downloadHook, loadHook }: hookType<ObjectType>) {
+function createLoader<ObjectType>({ downloadHook, loadHook, idHook }: hookType<ObjectType>) {
 	let loading: { [s: string]: Bluebird<ObjectType> } = {}
 	let byId: { [s: string]: ObjectType } = {}
 
@@ -26,7 +27,9 @@ function createLoader<ObjectType>({ downloadHook, loadHook }: hookType<ObjectTyp
 			return loading.hasOwnProperty(id)
 		}
 
-		static load(response, id = response.server.id): Bluebird<ObjectType> {
+		static load(response): Bluebird<ObjectType> {
+			const id = idHook(response)
+
 			if (byId[id]) {
 				return Bluebird.resolve(byId[id])
 			}

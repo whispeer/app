@@ -391,8 +391,10 @@ const downloadHook = (id) => {
 	return socket.emit("chat.chunk.get", { id })
 }
 
+const idHook = (response) => response.server.id
+
 const hooks = {
-	downloadHook, loadHook
+	downloadHook, loadHook, idHook
 }
 
 export default class ChunkLoader extends ObjectLoader(hooks) {}

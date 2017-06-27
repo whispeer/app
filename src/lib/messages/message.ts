@@ -17,7 +17,7 @@ export class Message {
 	private _isOwnMessage: boolean
 
 	private _serverID: number
-	private _messageID: any
+	private _clientID: any
 	private _securedData: any
 	private _images: any[]
 
@@ -53,7 +53,7 @@ export class Message {
 		this.senderID = h.parseDecimal(server.sender)
 
 		this._serverID = id.serverID
-		this._messageID = id.messageID
+		this._clientID = id.clientID
 
 		var metaCopy = h.deepCopyObj(meta);
 		this._securedData = SecuredData.load(content, metaCopy, {
@@ -71,13 +71,13 @@ export class Message {
 		this.chat = chat;
 		this._images = images;
 
-		this._messageID = id || h.generateUUID();
+		this._clientID = id || h.generateUUID();
 
 		this.senderID = h.parseDecimal(userService.getown().getID())
 
 		var meta = {
 			createTime: new Date().getTime(),
-			messageUUID: this._messageID,
+			messageUUID: this._clientID,
 			sender: userService.getown().getID()
 		};
 
@@ -123,7 +123,7 @@ export class Message {
 
 			images: this._securedData.metaAttr("images"),
 
-			id: this._messageID,
+			id: this._clientID,
 			obj: this
 		};
 	};
@@ -218,8 +218,8 @@ export class Message {
 		return this._serverID;
 	};
 
-	getID = () => {
-		return this._messageID;
+	getClientID = () => {
+		return this._clientID;
 	};
 
 	getTopicID = () => {
@@ -309,12 +309,12 @@ export class Message {
 	};
 
 	static idFromData(data) {
-		var serverID = h.parseDecimal(data.server.id);
-		var messageID = data.meta.messageUUID || serverID;
+		var serverID = h.parseDecimal(data.server.id)
+		var clientID = data.server.uuid
 
 		return {
-			serverID: serverID,
-			messageID: messageID
+			serverID,
+			clientID
 		}
 	}
 }
@@ -329,8 +329,12 @@ const downloadHook = (id) => {
 	return socket.emit("chat.message.get", { id })
 }
 
+const idHook = (response) => {
+	return response.server.uuid
+}
+
 const hooks = {
-	downloadHook, loadHook
+	downloadHook, loadHook, idHook
 }
 
 export default class MessageLoader extends ObjectLoader<Message>(hooks) {}

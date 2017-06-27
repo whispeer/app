@@ -19,6 +19,13 @@ let unreadChatIDs = []
 const addAfterTime = (arr:timeArray, id: any, time: number) => {
 	const firstLaterIndex = arr.findIndex((ele) => ele.time > time)
 
+	if (firstLaterIndex === -1) {
+		return [
+			...arr,
+			{ id, time }
+		]
+	}
+
 	return [
 		...arr.slice(0, firstLaterIndex),
 		{ id, time },
@@ -134,12 +141,12 @@ export class Chat {
 
 			await this.verifyMessageAssociations(latestMessage)
 
-			this.addMessageID(latestMessage.getServerID(), latestMessage.getTime())
+			this.addMessageID(latestMessage.getClientID(), latestMessage.getTime())
 		})
 	})
 
 	loadMoreMessages() {
-		const oldestKnownMessage = this.messages.length === 0 ? 0 : this.messages[0].id
+		const oldestKnownMessage = this.messages.length === 0 ? 0 : MessageLoader.getLoaded(this.messages[0].id).getServerID()
 
 		return Bluebird.try(async () => {
 			const { messages, chunks = [], remainingMessagesCount } = await socketService.emit("chat.getMessages", {
@@ -154,7 +161,7 @@ export class Chat {
 			await Bluebird.all(messagesObjects.map((message) => this.verifyMessageAssociations(message)))
 
 			messagesObjects.forEach((message) =>
-				this.addMessageID(message.getServerID(), message.getTime())
+				this.addMessageID(message.getClientID(), message.getTime())
 			)
 
 			return { remaining: remainingMessagesCount }
@@ -283,10 +290,10 @@ export class Chat {
 				const imagesBlobs = images.map((img) => img._blobs[0].blob._blobData)
 
 				await messageSendCache.store(
-					messageObject.getID(),
+					messageObject.getClientID(),
 					{
 						chatID: this.getID(),
-						id: messageObject.getID(),
+						id: messageObject.getClientID(),
 						message: message
 					},
 					imagesBlobs
@@ -297,11 +304,10 @@ export class Chat {
 		var sendMessagePromise = messageObject.sendContinously();
 
 		sendMessagePromise.then(() => {
-			MessageLoader.addLoaded(messageObject.getID(), messageObject)
-			this.removeMessageID(messageObject.getID())
-			this.addMessageID(messageObject.getID(), messageObject.getTime())
+			this.removeMessageID(messageObject.getClientID())
+			this.addMessageID(messageObject.getClientID(), messageObject.getTime())
 
-			return messageSendCache.delete(messageObject.getID());
+			return messageSendCache.delete(messageObject.getClientID());
 		});
 
 		sendMessagePromise.catch((e) => {
@@ -309,8 +315,8 @@ export class Chat {
 			alert("An error occured sending a message!" + e.toString());
 		});
 
-		MessageLoader.addLoaded(messageObject.getID(), messageObject)
-		this.addMessageID(messageObject.getID(), Number.MAX_SAFE_INTEGER)
+		MessageLoader.addLoaded(messageObject.getClientID(), messageObject)
+		this.addMessageID(messageObject.getClientID(), Number.MAX_SAFE_INTEGER)
 
 		return null;
 	};
@@ -337,8 +343,10 @@ const downloadHook = (id) => {
 	return socketService.emit("chat.get", { id }).then((response) => response.chat)
 }
 
+const idHook = (response) => response.chat.id
+
 const hooks = {
-	downloadHook, loadHook
+	downloadHook, loadHook, idHook
 }
 
 export default class ChatLoader extends ObjectLoader(hooks) {}

@@ -66,7 +66,7 @@ messageService = {
 			})
 		}).then(function (latest) {
 			return Bluebird.all(latest.chats.map(function (chatData) {
-				return ChatLoader.load(chatData, chatData.chat.id)
+				return ChatLoader.load(chatData)
 			}))
 		}).catch(errorService.criticalError);
 	}),
@@ -116,7 +116,7 @@ messageService = {
 
 			await messageService.sendMessage(chat, message, images)
 
-			// return chat
+			return chat.getID()
 		});
 	},
 	sendNewChat: function (receiver, message, images) {
@@ -139,7 +139,7 @@ messageService = {
 					keys: chunkData.keys
 				});
 			}).then(function (response) {
-				return ChatLoader.load(response.chat, response.chat.chat.id);
+				return ChatLoader.load(response.chat);
 			}).then(function (chat) {
 				return chat.getID();
 			});
@@ -181,7 +181,7 @@ socket.channel("notify.chat", function (e, data) {
 				const chat = await ChatLoader.get(chunk.getChatID())
 				const message = await MessageLoader.load(data.message)
 
-				chat.addMessageID(message.getServerID(), message.getTime())
+				chat.addMessageID(message.getClientID(), message.getTime())
 				chat.addUnreadMessage(message.getServerID())
 			}
 
@@ -193,7 +193,7 @@ socket.channel("notify.chat", function (e, data) {
 			}
 
 			if (data.chat) {
-				const chat = await ChatLoader.load(data, data.chat.id)
+				const chat = await ChatLoader.load(data)
 				chatIDs = [...chatIDs, chat.getID()]
 			}
 

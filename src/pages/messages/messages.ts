@@ -167,7 +167,7 @@ export class MessagesPage {
 
 		if (options) {
 			const firstViewMessage = messagesAndUpdates.find((elem) => {
-				return options.after == elem.getID().toString()
+				return options.after == elem.getClientID().toString()
 			})
 
 			const index = messagesAndUpdates.indexOf(firstViewMessage)

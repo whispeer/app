@@ -107,7 +107,9 @@ export class HomePage {
 			}
 
 			return Object.assign({}, chatInfo, chunkInfo, messageInfo, chatUpdateInfo)
-		})
+		}).sort((a, b) =>
+			b.time - a.time
+		)
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
