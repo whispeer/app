@@ -59,7 +59,9 @@ export class HomePage {
 
 	private getMessageInfo = (latestMessageID) => {
 		if (!MessageLoader.isLoaded(latestMessageID)) {
-			return {}
+			return {
+				latestMessageText: ""
+			}
 		}
 
 		const latestMessage = MessageLoader.getLoaded(latestMessageID)
@@ -94,7 +96,8 @@ export class HomePage {
 
 			const chunkInfo = {
 				partners: latestChunk.getPartners(),
-				partnersDisplay: latestChunk.getPartnerDisplay()
+				partnersDisplay: latestChunk.getPartnerDisplay(),
+				time: latestChunk.getTime(),
 			}
 
 			const messageInfo = this.getMessageInfo(chat.getLatestMessage())
