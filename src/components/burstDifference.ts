@@ -2,7 +2,7 @@ import { Component, Input } from "@angular/core";
 
 import h from "../lib/helper/helper";
 
-import ChunkLoader, { Chunk } from "../lib/messages/chatChunk"
+import ChunkLoader from "../lib/messages/chatChunk"
 import { Chat } from "../lib/messages/chat"
 import Burst from "../lib/messages/burst"
 
@@ -65,9 +65,11 @@ export class BurstDifferenceComponent {
 	}
 
 	receiver = () => {
-		const burstChunk = ChunkLoader.getLoaded(this.burst.getChunkID())
+		if (this.burst) {
+			return ChunkLoader.getLoaded(this.burst.getChunkID()).getPartners()
+		}
 
-		return burstChunk.getPartners()
+		return ChunkLoader.getLoaded(this.chat.getLatestChunk()).getPartners()
 	}
 
 	getTime = () => {

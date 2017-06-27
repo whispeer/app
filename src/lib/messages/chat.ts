@@ -119,16 +119,21 @@ export class Chat {
 	}
 
 	load = h.cacheResult<Bluebird<any>>(() => {
-		return Bluebird.all([
-			MessageLoader.get(this.loadingInfo.latestMessageID),
-			ChunkLoader.get(this.loadingInfo.latestChunkID),
-		]).then(([latestMessage, latestChunk]) => {
-			this.loadingInfo = null
+		return Bluebird.try(async () => {
+			const { latestChunkID, latestMessageID } = this.loadingInfo
+
+			const latestChunk = await ChunkLoader.get(latestChunkID)
 
 			this.chunkIDs = [latestChunk.getID()]
 
-			return this.verifyMessageAssociations(latestMessage).thenReturn(latestMessage)
-		}).then((latestMessage) => {
+			if (!latestMessageID) {
+				return
+			}
+
+			const latestMessage = await MessageLoader.get(latestMessageID)
+
+			await this.verifyMessageAssociations(latestMessage)
+
 			this.addMessageID(latestMessage.getServerID(), latestMessage.getTime())
 		})
 	})

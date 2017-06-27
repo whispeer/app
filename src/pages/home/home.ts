@@ -44,7 +44,7 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
-		this.topics = [] //TODO messageService.data.latestTopics.data;
+		this.topics = []
 
 		console.warn("load more topics?", this.topics.length)
 		if (this.topics.length >= 10) {
@@ -57,40 +57,53 @@ export class HomePage {
 		});
 	}
 
-	getChats = () => {
-		const chats = ChatLoader.getAll()
-		const messages = MessageLoader.getAll()
-		const chunks = ChunkLoader.getAll()
+	private getMessageInfo = (latestMessageID) => {
+		if (!MessageLoader.isLoaded(latestMessageID)) {
+			return {}
+		}
 
+		const latestMessage = MessageLoader.getLoaded(latestMessageID)
+
+		return {
+			time: latestMessage.getTime(),
+			latestMessageText: latestMessage.getText(),
+		}
+	}
+
+	getChats = () => {
 		const chatIDs = messageService.getChatIDs()
 
 		let loaded = true
 
 		return chatIDs.filter((chatID) => {
-			loaded = loaded && chats.hasOwnProperty(chatID)
+			loaded = loaded && ChatLoader.isLoaded(chatID)
 
 			return loaded
 		}).map((chatID) => {
-			const chat = chats[chatID]
+			const chat = ChatLoader.getLoaded(chatID)
 
-			const latestMessage = messages[chat.getLatestMessage()]
-			const latestChunk = chunks[chat.getLatestChunk()]
-			// const latestTopicUpdate = topicUpdates[chat.getLatestTopicUpdate()]
+			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
+			// const latestTopicUpdate = TopicUpdatesLoader.getLoaded(chat.getLatestTopicUpdate())
 
-			return {
+			const chatInfo = {
 				id: chat.getID(),
 
 				unread: chat.isUnread(),
 				unreadCount: chat.getUnreadMessageIDs().length,
+			}
 
-				// title: latestTopicUpdate.getText(),
-
-				time: latestMessage.getTime(),
-				latestMessageText: latestMessage.getText(),
-
+			const chunkInfo = {
 				partners: latestChunk.getPartners(),
 				partnersDisplay: latestChunk.getPartnerDisplay()
 			}
+
+			const messageInfo = this.getMessageInfo(chat.getLatestMessage())
+
+			const chatUpdateInfo = {
+				// title: latestTopicUpdate.getText(),
+			}
+
+			return Object.assign({}, chatInfo, chunkInfo, messageInfo, chatUpdateInfo)
 		})
 	}
 
