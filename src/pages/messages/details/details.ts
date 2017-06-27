@@ -1,25 +1,39 @@
 import { Component, ElementRef } from "@angular/core";
 import { NavParams, IonicPage } from "ionic-angular";
 
-import TopicUpdate from "../../lib/messages/topicTitleUpdate";
-import errorService from "../../lib/services/error.service";
+import ChatLoader, { Chat } from "../../../lib/messages/chat"
+
+const initService = require("../../../lib/services/initService")
 
 @IonicPage({
 	name: "Chat Details",
-	segment: "messages/:topicId/details",
+	segment: "messages/:chatID/details",
 })
 @Component({
 	selector: 'page-details',
 	templateUrl: 'details.html'
 })
 export class DetailPage {
-	topicId: number;
+	chat: Chat;
 
-	constructor(public navParams: NavParams, private element: ElementRef) {
-	}
+	constructor(public navParams: NavParams, private element: ElementRef) {}
 
 	ngOnInit() {
-		this.topicId = parseFloat(this.navParams.get("topicId"));
-		console.log('Init details page for topic', this.topicId);
+		const chatID = parseInt(this.navParams.get("chatID"), 10);
+
+		initService.awaitLoading().then(() => {
+			return ChatLoader.get(chatID)
+		}).then((chat) => {
+			this.chat = chat
+		})
+		console.log('Init details page for topic', chatID);
+	}
+
+	getPartners = () => {
+		if (!this.chat) {
+			return []
+		}
+
+		return this.chat.getPartners()
 	}
 }
