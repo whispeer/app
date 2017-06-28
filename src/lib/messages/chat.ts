@@ -221,6 +221,18 @@ export class Chat {
 		}
 	}
 
+	isAdmin = (user) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.isAdmin(user)
+	}
+
+	amIAdmin = () => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.amIAdmin()
+	}
+
 	getReceivers = () => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 

@@ -12,7 +12,7 @@
 		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
-	<div ion-fixed class="home__no-content-container" *ngIf="!topicsLoading && getChats().length === 0">
+	<div ion-fixed class="home__no-content-container" *ngIf="!chatsLoading && getChats().length === 0">
 		<img class="home__no-content-image" src="assets/images/no_conversations_{{lang}}.png">
 	</div>
 	<ion-list class="space-for-fab">

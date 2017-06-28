@@ -8,7 +8,9 @@
 
 
 <ion-content>
-	<ion-list>
+	<ion-spinner *ngIf="loading" text-center margin-vertical class="spinner--full"></ion-spinner>
+
+	<ion-list *ngIf="!loading">
 
 		<ion-list-header padding-top>
 			Conversation Title
@@ -22,10 +24,23 @@
 			All Members
 		</ion-list-header>
 
-		<ion-item-sliding #item *ngFor="let partner of getReceivers();">
+		<ion-item-sliding #item *ngFor="let receiver of getReceivers();">
 
-			<ion-item>
-				{{ partner.name }}
+			<ion-item (click)="goToUser(receiver.id)">
+				<ion-avatar class="hexagon--border" item-left>
+					<user-image [id]="receiver.id" [image]="receiver.basic.image"></user-image>
+				</ion-avatar>
+				<span>
+					<h2>
+						{{ receiver.name }}
+					</h2>
+					<small *ngIf="isAdmin(receiver.user)">
+						Administrator
+					</small>
+					<small *ngIf="!isAdmin(receiver.user)">
+						Member
+					</small>
+				</span>
 			</ion-item>
 			<!--
 				<ion-item-options side="left">
@@ -39,12 +54,12 @@
 			-->
 		</ion-item-sliding>
 
-		<ion-item detail-push (click)="addContact()">
+		<ion-item detail-push (click)="addContact()" *ngIf="amIAdmin()">
 			Add more contacts...
 		</ion-item>
 	</ion-list>
 
-	<div text-center class="space-for-fab">
+	<div text-center class="space-for-fab" *ngIf="!loading">
 	</div>
 
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
