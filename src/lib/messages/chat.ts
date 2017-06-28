@@ -221,6 +221,12 @@ export class Chat {
 		}
 	}
 
+	getReceivers = () => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.getReceivers()
+	}
+
 	getPartners = () => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 

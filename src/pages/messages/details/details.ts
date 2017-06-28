@@ -29,11 +29,11 @@ export class DetailPage {
 		console.log('Init details page for topic', chatID);
 	}
 
-	getPartners = () => {
+	getReceivers = () => {
 		if (!this.chat) {
 			return []
 		}
 
-		return this.chat.getPartners()
+		return this.chat.getReceivers()
 	}
 }

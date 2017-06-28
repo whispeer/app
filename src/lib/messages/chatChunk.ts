@@ -136,6 +136,10 @@ export class Chunk extends Observer {
 		})
 	});
 
+	getReceivers = () => {
+		return this.receiverObjects
+	}
+
 	getPartners = () => {
 		return this.receiverObjects.filter((receiverObject) => {
 			return !receiverObject.user.isOwn() || this.receiverObjects.length === 1
