@@ -19,7 +19,7 @@ const chunkDebug = debug(debugName);
 declare const startup: number
 
 export class Chunk extends Observer {
-	private meta
+	private securedData
 	private receiver
 	private id
 	private createTime
@@ -27,6 +27,7 @@ export class Chunk extends Observer {
 	private predecessorID: number
 	private receiverObjects: any[]
 	private chatID: number
+	private title: string = ""
 
 	constructor(data) {
 		super()
@@ -38,7 +39,7 @@ export class Chunk extends Observer {
 
 		data.meta.receiver.sort();
 
-		this.meta = SecuredData.load(undefined, data.meta, {
+		this.securedData = SecuredData.load(data.content, data.meta, {
 			type: "topic", // Keep topic for now until lots of clients have picked up the change
 			alternativeType: "chatChunk" // Allow for chatChunk already
 		});
@@ -48,7 +49,7 @@ export class Chunk extends Observer {
 		this.predecessorID = data.server.predecessorID
 		this.createTime = data.server.createTime
 
-		this.receiver = this.meta.metaAttr("receiver").map(h.parseDecimal);
+		this.receiver = this.securedData.metaAttr("receiver").map(h.parseDecimal);
 	}
 
 	getChatID = () => this.chatID
@@ -66,11 +67,11 @@ export class Chunk extends Observer {
 	}
 
 	getSecuredData = () => {
-		return this.meta;
+		return this.securedData;
 	}
 
 	getHash = () => {
-		return this.meta.getHash();
+		return this.securedData.getHash();
 	}
 
 	getID = () => {
@@ -86,7 +87,7 @@ export class Chunk extends Observer {
 	};
 
 	getKey = () => {
-		return this.meta.metaAttr("_key");
+		return this.securedData.metaAttr("_key");
 	};
 
 	ensureChunkChain = (predecessor) => {
@@ -113,17 +114,17 @@ export class Chunk extends Observer {
 
 	verify = () => {
 		return Bluebird.try(() => {
-			return userService.get(this.meta.metaAttr("creator"));
+			return userService.get(this.securedData.metaAttr("creator"));
 		}).then((creator) => {
 			if (creator.isNotExistingUser()) {
 				// TODO this.data.disabled = true;
 				return false;
 			}
 
-			return this.meta.verify(creator.getSignKey()).thenReturn(true);
+			return this.securedData.verify(creator.getSignKey()).thenReturn(true);
 		}).then((addEncryptionIdentifier) => {
 			if (addEncryptionIdentifier) {
-				keyStore.security.addEncryptionIdentifier(this.meta.metaAttr("_key"));
+				keyStore.security.addEncryptionIdentifier(this.securedData.metaAttr("_key"));
 			}
 		})
 	};
@@ -160,10 +161,26 @@ export class Chunk extends Observer {
 		return this.receiver
 	}
 
+	decryptContent = () => {
+		if (!this.securedData.hasContent()) {
+			this.title = ""
+			return
+		}
+
+		return this.securedData.decrypt().then((content) => {
+			this.title = content.title
+		})
+	}
+
+	getTitle = () => {
+		return this.title
+	}
+
 	load = () => {
 		return Bluebird.all([
 			this.verify(),
 			this.loadReceiverNames(),
+			this.decryptContent(),
 		]).then(() => {
 			var predecessorID = this.getPredecessorID()
 
@@ -184,7 +201,7 @@ export class Chunk extends Observer {
 	}
 
 	getCreator = () => {
-		return h.parseDecimal(this.meta.metaAttr("creator"))
+		return h.parseDecimal(this.securedData.metaAttr("creator"))
 	}
 
 	hasPredecessor = () => {
@@ -272,7 +289,7 @@ export class Chunk extends Observer {
 		})
 	}
 
-	static createRawData(receiver, predecessorChunk : Chunk = null) {
+	static createRawData(receiver, content, predecessorChunk : Chunk = null) {
 		var receiverObjects, chunkKey;
 		return Bluebird.try(() => {
 			//load receiver
@@ -329,7 +346,7 @@ export class Chunk extends Observer {
 				receiverKeys: receiverKeys
 			};
 
-			var secured = SecuredData.createRaw({}, chunkMeta, { type: "topic" })
+			var secured = SecuredData.createRaw(content, chunkMeta, { type: "topic" })
 
 			if (predecessorChunk) {
 				secured.setParent(predecessorChunk.getSecuredData())
@@ -338,7 +355,7 @@ export class Chunk extends Observer {
 			return secured.signAndEncrypt(userService.getown().getSignKey(), chunkKey).then((cData) => {
 				return {
 					...chunkData,
-					chunk: cData.meta
+					chunk: cData
 				}
 			})
 		})
@@ -355,7 +372,7 @@ export class Chunk extends Observer {
 			}))
 		}
 
-		return Bluebird.all([Chunk.createRawData(receiver), imagePreparation]).spread((chunkData: any, imagesMeta) => {
+		return Bluebird.all([Chunk.createRawData(receiver, {}), imagePreparation]).spread((chunkData: any, imagesMeta) => {
 			var chunk = new Chunk({
 				meta: chunkData.chunk,
 				server: {},

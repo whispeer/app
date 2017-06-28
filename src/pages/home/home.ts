@@ -90,7 +90,6 @@ export class HomePage {
 			const chat = ChatLoader.getLoaded(chatID)
 
 			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
-			// const latestTopicUpdate = TopicUpdatesLoader.getLoaded(chat.getLatestTopicUpdate())
 
 			const chatInfo = {
 				id: chat.getID(),
@@ -102,16 +101,13 @@ export class HomePage {
 			const chunkInfo = {
 				partners: latestChunk.getPartners(),
 				partnersDisplay: latestChunk.getPartnerDisplay(),
+				title: latestChunk.getTitle(),
 				time: latestChunk.getTime(),
 			}
 
 			const messageInfo = this.getMessageInfo(chat.getLatestMessage())
 
-			const chatUpdateInfo = {
-				// title: latestTopicUpdate.getText(),
-			}
-
-			return Object.assign({}, chatInfo, chunkInfo, messageInfo, chatUpdateInfo)
+			return Object.assign({}, chatInfo, chunkInfo, messageInfo)
 		}).sort((a, b) =>
 			b.time - a.time
 		)

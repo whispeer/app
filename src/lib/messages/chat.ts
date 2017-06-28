@@ -239,6 +239,12 @@ export class Chat {
 		return latestChunk.getReceivers()
 	}
 
+	getTitle = () => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.getTitle()
+	}
+
 	getPartners = () => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
@@ -253,6 +259,29 @@ export class Chat {
 		return this.setReceivers(oldReceivers.concat(newReceiverIDs), canReadOldMessages)
 	}
 
+	setTitle = (title) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.getSuccessor().then((successor) => {
+			if (successor) {
+				throw new Error("TODO: Chunk has a successor. Try again?")
+			}
+
+			return Chunk.createRawData(latestChunk.getReceiver(), { title }, latestChunk)
+		}).then(({ chunk, keys, receiverKeys }) => {
+			return socketService.emit("chat.chunk.create", {
+				predecessorID: latestChunk.getID(),
+				chunk,
+				keys,
+				receiverKeys,
+			})
+		}).then((response: any) => {
+			return ChunkLoader.load(response.chunk)
+		}).then((chunk) => {
+			this.addChunkID(chunk.getID())
+		})
+	}
+
 	setReceivers = (receivers, canReadOldMessages) => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
@@ -265,7 +294,7 @@ export class Chat {
 				throw new Error("TODO: Chunk has a successor. Try again?")
 			}
 
-			return Chunk.createRawData(receivers, latestChunk)
+			return Chunk.createRawData(receivers, { title: latestChunk.getTitle() }, latestChunk)
 		}).then((chunkData) => {
 			if (!canReadOldMessages) {
 				return chunkData
@@ -274,12 +303,12 @@ export class Chat {
 			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
 
 			throw new Error("not yet implemented")
-		}).then((chunkData) => {
+		}).then(({ chunk, keys, receiverKeys }) => {
 			return socketService.emit("chat.chunk.create", {
 				predecessorID: latestChunk.getID(),
-				chunkMeta: chunkData.chunk,
-				keys: chunkData.keys,
-				receiverKeys: chunkData.receiverKeys
+				chunk,
+				keys,
+				receiverKeys,
 			})
 		}).then((response) => {
 			return ChunkLoader.load(response.chunk)

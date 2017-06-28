@@ -60,6 +60,10 @@ SecuredDataWithMetaData.prototype._blockDisallowedAttributes = function (data) {
 		}
 };
 
+SecuredDataWithMetaData.prototype.hasContent = function () {
+		return this._hasContent
+}
+
 SecuredDataWithMetaData.prototype.getHash = function () {
 		return this._updated.meta._ownHash;
 };

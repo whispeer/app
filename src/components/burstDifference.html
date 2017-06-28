@@ -6,13 +6,20 @@
 	</div>
 </div>
 <div *ngIf="differentChunk()">
-	<div class="messages_message" *ngIf="hasPreviousChunk()">
+	<div class="messages_message" *ngIf="hasPreviousChunk() && addedReceiver().length > 0">
 		<div class="burst-seperator burst-seperator-date">
 			<span class="burst-seperator-text">
 				Nutzer hinzugefügt:
 				<span *ngFor="let user of addedReceiver()">
 					{{ user.name }}
 				</span>
+			</span>
+		</div>
+	</div>
+	<div class="messages_message" *ngIf="hasTitleDifference()">
+		<div class="burst-seperator burst-seperator-date">
+			<span class="burst-seperator-text">
+				Titel geändert: {{ getTitle() }}
 			</span>
 		</div>
 	</div>

@@ -121,14 +121,14 @@ export default class ChatTitleUpdate {
 		});
 	};
 
-	static create(topic, previousTopicUpdate, title = "") {
-		var topicContainer = topic.getSecuredData();
+	static create(chunk, previousTopicUpdate, title = "") {
+		var chunkSecuredData = chunk.getSecuredData();
 		var topicUpdatePromisified = SecuredData.createPromisified({ title }, {
 				userID: userService.getown().getID(),
 				time: new Date().getTime(),
-			}, { type: "topicUpdate" }, userService.getown().getSignKey(), topicContainer.getKey());
+			}, { type: "topicUpdate" }, userService.getown().getSignKey(), chunkSecuredData.getKey());
 
-		topicUpdatePromisified.data.setParent(topicContainer);
+		topicUpdatePromisified.data.setParent(chunkSecuredData);
 
 		if (previousTopicUpdate) {
 			topicUpdatePromisified.data.setAfterRelationShip(previousTopicUpdate.getSecuredData());
@@ -136,7 +136,7 @@ export default class ChatTitleUpdate {
 
 		return topicUpdatePromisified.promise.then(function(topicUpdateData) {
 			return socket.emit("messages.createTopicUpdate", {
-				topicID: topic.getID(),
+				chunkID: chunk.getID(),
 				topicUpdate: topicUpdateData
 			}).then(function(response) {
 				topicUpdateData.id = response.id;

@@ -1,6 +1,6 @@
 import h from "../helper/helper"
 
-import TopicUpdate from "./topicTitleUpdate"
+import TopicUpdate from "./chatTitleUpdate"
 
 const MINUTE = 60 * 1000;
 

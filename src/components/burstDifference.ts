@@ -81,4 +81,23 @@ export class BurstDifferenceComponent {
 
 		return h.parseDecimal(latestChunk.getTime())
 	}
+
+	getChunk = () => {
+		const burstChunkID = this.burst ? this.burst.getChunkID() : this.chat.getLatestChunk()
+
+		return ChunkLoader.getLoaded(burstChunkID)
+	}
+
+	hasTitleDifference = () => {
+		if (!this.previousBurst) {
+			return false
+		}
+
+		const burstChunk = this.getChunk()
+		const previousBurstChunk = ChunkLoader.getLoaded(this.previousBurst.getChunkID())
+
+		return burstChunk.getTitle() !== previousBurstChunk.getTitle()
+	}
+
+	getTitle = () => this.getChunk().getTitle()
 }

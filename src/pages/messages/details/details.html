@@ -16,8 +16,9 @@
 			Conversation Title
 		</ion-list-header>
 
-		<ion-item>
-			<ion-input type="text" placeholder="Something something"></ion-input>
+		<ion-item class="no--padding--right">
+			<ion-input type="text" placeholder="Chat Title" [(ngModel)]="title"></ion-input>
+			<button ion-button item-end class="full--height" (click)="setTitle(title)">Change</button>
 		</ion-item>
 
 		<ion-list-header padding-top>
