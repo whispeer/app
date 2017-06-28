@@ -29,6 +29,8 @@ export class HomePage {
 	chatsLoading: boolean = true;
 	moreTopicsAvailable: boolean = true;
 
+	lang: string = "en"
+
 	constructor(public navCtrl: NavController, private translate: TranslateService) {}
 
 	ngOnInit() {}
@@ -41,6 +43,9 @@ export class HomePage {
 		//this.content.scrollTo(0, 58, 0);
 		this.loadTopics();
 		this.loadRequests();
+
+		const en = (this.translate.currentLang.toLowerCase().indexOf("de") === -1);
+		this.lang = en ? "en" : "de";
 	}
 
 	loadTopics = () => {
