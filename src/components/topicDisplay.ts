@@ -32,7 +32,6 @@ export class TopicComponent {
 	@Input() loadMoreMessages;
 	@Input() messagesLoading;
 	@Input() forceBackButton;
-	@Input() addReceiver;
 
 	@Output() sendMessage = new EventEmitter();
 
@@ -49,8 +48,6 @@ export class TopicComponent {
 	mutationObserver: MutationObserver
 
 	bursts: any[]
-
-	receiverToAddId: string
 
 	constructor(
 		public navCtrl: NavController,

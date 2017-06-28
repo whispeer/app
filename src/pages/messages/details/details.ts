@@ -18,6 +18,8 @@ export class DetailPage {
 	loading: boolean = true
 	title: string = ""
 
+	receiverToAdd: string
+
 	constructor(private navCtrl: NavController, private navParams: NavParams, private element: ElementRef) {}
 
 	ngOnInit() {
@@ -43,6 +45,10 @@ export class DetailPage {
 		this.navCtrl.push("Messages", {
 			chatID: this.chat.getID()
 		})
+	}
+
+	addReceiver = (receiverToAdd: string) => {
+		this.chat.addReceivers(receiverToAdd.split(","))
 	}
 
 	setTitle = (title) => {

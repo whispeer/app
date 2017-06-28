@@ -262,8 +262,4 @@ export class MessagesPage {
 			this.markRead();
 		});
 	}
-
-	addReceiver = (receiverToAddId) => {
-		this.chat.addReceivers(receiverToAddId)
-	}
 }
