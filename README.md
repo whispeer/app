@@ -101,6 +101,8 @@ compile for the simulator or a physical device that is connected.
 
 	$ open ./platforms/ios/whispeer\ Messenger.xcodeproj
 
+Make sure that Push Notifications in the Tab Capabilities are switched on.
+
 [ionic2]: https://github.com/driftyco/ionic
 [yarn]: https://yarnpkg.com/en/docs/install
 [cocoapods]: https://cocoapods.org/
