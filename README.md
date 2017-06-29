@@ -109,6 +109,7 @@ Click on Product -> Archive. XCode will start building the project.
 After finishing the Organizer will open, showing you all your Archives. The Archive that was just created is marked per default. Click on "Upload to App Store..." in the right panel.
 If you are asked to select a team, select "mindpost GmbH" and click choose.
 Now just click proceed until XCode uploads your Archive to iTunes Connect.
+
 After a successful upload you will get an e-mail that your build is being processed and after succeeding this automatic check you can enable the build for Testflight or the live Store.
 
 [ionic2]: https://github.com/driftyco/ionic
