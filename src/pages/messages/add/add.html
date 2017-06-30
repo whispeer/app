@@ -1,0 +1,33 @@
+<ion-header>
+	<ion-navbar [color]="'primary'">
+		<ion-title>
+			{{ 'chooseFriends.title' | translate }}
+		</ion-title>
+	</ion-navbar>
+</ion-header>
+
+<ion-content>
+	<ion-searchbar
+		*ngIf="!contactsLoading"
+		animated
+		[placeholder]="'chooseFriends.search' | translate"
+		[(ngModel)]="searchTerm"
+		(ngModelChange)="executeSearch()"
+	></ion-searchbar>
+	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
+		<ion-item-divider *virtualHeader="let header" class="friends__divider">
+			{{ header }}
+		</ion-item-divider>
+
+		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
+			<ion-label>{{contact.name}}</ion-label>
+			<div item-content class="checkbox" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
+			</div>
+		</ion-item>
+	</ion-list>
+	<ion-spinner *ngIf="searchResultsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+
+	<main-menu [icon]="'arrow-forward'" (mainHandle)="addReceivers()" ion-fixed></main-menu>
+</ion-content>

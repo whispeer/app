@@ -47,6 +47,10 @@ export class DetailPage {
 		})
 	}
 
+	addContact = () => {
+		// todo link to add page
+	}
+
 	addReceiver = (receiverToAdd: string) => {
 		this.chat.addReceivers(receiverToAdd.split(","))
 	}
