@@ -11,6 +11,8 @@ import { TranslateService } from "@ngx-translate/core";
 
 import h from "../../../lib/helper/helper";
 
+import Memoizer from "../../../lib/asset/memoizer"
+
 import * as Bluebird from "bluebird";
 
 @IonicPage({
@@ -27,16 +29,29 @@ export class AddPage extends ContactsWithSearch {
 	chat: Chat
 	title: string = ""
 
-	searchTerm: string = "";
-	selectedUserMap: any = {};
-	selectedUsers: any[] = [];
-	ios: boolean = false;
+	searchTerm: string = ""
+	selectedUserMap: any = {}
+	selectedUsers: any[] = []
+	ios: boolean = false
 	loading: boolean = true
+
+	addMemoizer: Memoizer
 
 	constructor(private navCtrl: NavController, private navParams: NavParams, private platform: Platform, private element: ElementRef, private translate: TranslateService) {
 		super()
 
 		this.ios = platform.is("ios")
+
+		this.addMemoizer = new Memoizer([
+			() => this.getUsers(),
+			() => this.chat,
+		], (users, chat) => {
+			if (!chat) {
+				return users
+			}
+
+			return users.filter((u) => chat.getReceiverIDs().indexOf(u.id) === -1)
+		})
 	}
 
 	ngOnInit() {
@@ -81,13 +96,19 @@ export class AddPage extends ContactsWithSearch {
 		}
 	}
 
+	getFilteredUsers = () => {
+		return this.addMemoizer.getValue()
+	}
+
 	addReceivers = () => {
+		this.loading = true
+
 		Bluebird.resolve(this.selectedUsers).map((user: any): any => {
 			return user.id
 		}).then((data) => {
 			return this.chat.addReceivers(data)
 		}).then((data) => {
-			// todo link to details page
+			// todo redirect link to details page
 		});
 	}
 

@@ -161,6 +161,10 @@ export class Chunk extends Observer {
 		return this.receiver
 	}
 
+	getReceiverIDs = () => {
+		return this.receiver
+	}
+
 	decryptContent = () => {
 		if (!this.securedData.hasContent()) {
 			this.title = ""

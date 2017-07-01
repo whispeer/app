@@ -239,6 +239,12 @@ export class Chat {
 		return latestChunk.getReceivers()
 	}
 
+	getReceiverIDs = () => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.getReceiverIDs()
+	}
+
 	getTitle = () => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
