@@ -108,7 +108,7 @@ export class AddPage extends ContactsWithSearch {
 		}).then((data) => {
 			return this.chat.addReceivers(data)
 		}).then((data) => {
-			// todo redirect link to details page
+			this.navCtrl.push("Chat Details", { chatID: this.chat.getID() })
 		});
 	}
 

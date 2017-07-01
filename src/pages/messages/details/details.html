@@ -58,13 +58,6 @@
 		<ion-item detail-push (click)="addContact()" *ngIf="amIAdmin()">
 			Add more contacts...
 		</ion-item>
-
-		<div *ngIf="addReceiver">
-			 <input type="text" [(ngModel)]="receiverToAdd" />
-			 <button (click)="addReceiver(receiverToAdd)">
-				 ADD RECEIVER!
-			 </button>
-		</div>
 	</ion-list>
 
 	<div text-center class="space-for-fab" *ngIf="!loading">

@@ -48,11 +48,7 @@ export class DetailPage {
 	}
 
 	addContact = () => {
-		// todo link to add page
-	}
-
-	addReceiver = (receiverToAdd: string) => {
-		this.chat.addReceivers(receiverToAdd.split(","))
+		this.navCtrl.push("Select User", { chatID: this.chat.getID() })
 	}
 
 	setTitle = (title) => {
