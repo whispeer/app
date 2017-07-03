@@ -35,6 +35,8 @@ export class TopicComponent {
 
 	@Output() sendMessage = new EventEmitter();
 
+	firstRender: Boolean = true
+
 	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
 
@@ -301,16 +303,18 @@ export class TopicComponent {
 	}
 
 	messageBursts = () => {
-		const scrollFromBottom = this.scrollFromBottom()
+		const { changed, bursts } = this.afterViewBurstMessages()
 
-		if (scrollFromBottom > 15) {
-			const { changed, bursts } = this.afterViewBurstMessages()
+		if (changed) {
+			const scrollFromBottom = this.scrollFromBottom()
 
-			if (changed) {
+			if (scrollFromBottom > 15) {
 				this.bursts = bursts
 				return bursts
 			}
 		}
+
+		this.firstRender = false
 
 		this.bursts = this.allBurstMessages()
 
@@ -353,7 +357,21 @@ export class TopicComponent {
 		}, 100);
 	}
 
+	goToDetails() {
+		if (!this.chat) {
+			return
+		}
+
+		this.navCtrl.push("Chat Details", {
+			chatID: this.chat.id
+		});
+	}
+
 	goToProfile(userId: number) {
+		if (this.chat) {
+			return
+		}
+
 		this.navCtrl.push("Profile", {
 			userId
 		});

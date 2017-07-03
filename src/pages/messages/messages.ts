@@ -207,6 +207,10 @@ export class MessagesPage {
 	}
 
 	registerMarkReadListener() {
+		if (!this.chat || !this.chat.isUnread()) {
+			return
+		}
+
 		const selector = ".messages__burst:last-child .messages__wrap:last-child"
 		const lastMessageElement: Element = this.element.nativeElement.querySelector(selector)
 

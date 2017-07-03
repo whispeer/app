@@ -1,6 +1,6 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
-		<ion-title [ngClass]="{'title--force-back': forceBackButton}">
+		<ion-title [ngClass]="{'title--force-back': forceBackButton}" (click)="goToDetails()">
 
 			<!-- Back button -->
 			<div class="messages__header__fake-back">
@@ -11,16 +11,18 @@
 
 			<!-- Actual navbar title -->
 			<span class="messages__header__username" [ngClass]="{'messages__header__username--no-image': partners.length > 1}">
-				<span *ngIf="partners.length == 1 && !(chat && chat.title)" (click)="goToProfile(partners[0].id)">
-					{{ partners[0].name }}
-				</span>
-				<span *ngIf="partners.length != 1 && !(chat && chat.title)">
-					<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
-						{{ partner.basic.shortname }}{{ l ? "":", " }}
+				<span *ngIf="!chat || !chat.getTitle()">
+					<span *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">
+						{{ partners[0].name }}
+					</span>
+					<span *ngIf="partners.length != 1">
+						<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
+							{{ partner.basic.shortname }}{{ l ? "":", " }}
+						</span>
 					</span>
 				</span>
-				<span *ngIf="chat && chat.title">
-					{{chat.title}}
+				<span *ngIf="chat && chat.getTitle()">
+					{{chat.getTitle()}}
 				</span>
 			</span>
 
