@@ -22,10 +22,6 @@ export class NewMessagePage {
 
 	bursts = []
 
-	chat = {
-		newMessage: ""
-	};
-
 	receiverString: string;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}

@@ -378,7 +378,8 @@ export class Chunk extends Observer {
 
 		return Bluebird.all([Chunk.createRawData(receiver, {}), imagePreparation]).spread((chunkData: any, imagesMeta) => {
 			var chunk = new Chunk({
-				meta: chunkData.chunk,
+				meta: chunkData.chunk.meta,
+				content: chunkData.chunk.content,
 				server: {},
 				unread: []
 			});
