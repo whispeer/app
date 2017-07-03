@@ -77,8 +77,7 @@ export class Message {
 
 		var meta = {
 			createTime: new Date().getTime(),
-			messageUUID: this._clientID,
-			sender: userService.getown().getID()
+			messageUUID: this._clientID
 		};
 
 		this._securedData = Message.createRawSecuredData(message, meta);
@@ -115,7 +114,7 @@ export class Message {
 			sent: this._hasBeenSent,
 
 			sender: {
-				"id": this._securedData.metaAttr("sender"),
+				"id": this.senderID,
 				"name": "",
 				"url": "",
 				"image": "assets/img/user.png"
