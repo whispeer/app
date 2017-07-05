@@ -68,7 +68,7 @@ messageService = {
 			return latest.chats
 		}).map((chatData) => {
 			return ChatLoader.load(chatData)
-		}).catch(errorService.criticalError);
+		}, { concurrency: 5 }).catch(errorService.criticalError);
 	}),
 	sendUnsentMessages: function () {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
