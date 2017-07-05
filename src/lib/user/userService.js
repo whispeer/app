@@ -50,15 +50,15 @@ var NotExistingUser = function (identifier) {
 	};
 
 	this.loadBasicData = function (cb) {
-		cb();
+		return Bluebird.resolve().nodeify(cb)
 	};
 
 	this.reLoadBasicData = function (cb) {
-		cb();
+		return Bluebird.resolve().nodeify(cb)
 	};
 
 	this.loadFullData = function (cb) {
-		cb();
+		return Bluebird.resolve().nodeify(cb)
 	};
 
 	this.isOwn = function () {
@@ -124,6 +124,8 @@ function doLoad(identifier, cb) {
 		if (!user.isNotExistingUser()) {
 			return user.verifyKeys().thenReturn(user);
 		}
+
+		return user
 	}).nodeify(cb);
 }
 
