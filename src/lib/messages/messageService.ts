@@ -194,7 +194,7 @@ socket.channel("notify.chat", function (e, data) {
 
 			if (data.chat) {
 				const chat = await ChatLoader.load(data)
-				chatIDs = [...chatIDs, chat.getID()]
+				chatIDs = [...this.getChatIDs(), chat.getID()]
 			}
 
 			await Bluebird.resolve()
