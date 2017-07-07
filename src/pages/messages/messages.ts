@@ -12,6 +12,87 @@ const inView = require("in-view");
 
 const initService = require("../../lib/services/initService");
 
+namespace BurstHelper {
+	export const getNewElements = (messagesAndUpdates, bursts) => {
+		return messagesAndUpdates.filter((message) => {
+			return bursts.reduce((prev, current) => {
+				return prev && !current.hasItem(message);
+			}, true);
+		});
+	}
+
+	export const calculateBursts = (messages: any[]) => {
+		var bursts = [new Burst()];
+		var currentBurst = bursts[0];
+
+		messages.sort((m1, m2) => {
+			return m2.getTime() - m1.getTime();
+		});
+
+		messages.forEach((messageOrUpdate) => {
+			if(!currentBurst.fitsItem(messageOrUpdate)) {
+				currentBurst = new Burst();
+				bursts.push(currentBurst);
+			}
+
+			currentBurst.addItem(messageOrUpdate);
+		});
+
+		return bursts;
+	}
+
+	const hasMatchingMessage = (oldBurst, newBurst) => {
+		var matchingMessages = newBurst.getItems().filter((message) => {
+			return oldBurst.hasItem(message);
+		});
+
+		return matchingMessages.length > 0;
+	}
+
+	const addBurst = (bursts, burst) => {
+		bursts.push(burst);
+
+		return true;
+	}
+
+	const mergeBurst = (oldBurst, newBurst) => {
+		var newMessages = newBurst.getItems().filter((message) => {
+			return !oldBurst.hasItem(message);
+		});
+
+		newMessages.forEach((message) => {
+			oldBurst.addItem(message);
+		});
+
+		return true;
+	}
+
+	const addBurstOrMerge = (bursts, burst) => {
+		var possibleMatches = bursts.filter((oldBurst) => {
+			return hasMatchingMessage(oldBurst, burst);
+		});
+
+		if (possibleMatches.length === 0) {
+			return addBurst(bursts, burst);
+		}
+
+		if (possibleMatches.length === 1) {
+			return mergeBurst(possibleMatches[0], burst);
+		}
+
+		if (possibleMatches.length > 1) {
+			errorService.criticalError(new Error("Burst merging possible matches > 1 wtf..."));
+			return false;
+		}
+	}
+
+	export const mergeBursts = (bursts, newBursts) => {
+		return newBursts.reduce((prev, burst) => {
+			return prev && addBurstOrMerge(bursts, burst);
+		}, true);
+	}
+}
+
 @IonicPage({
 	name: "Messages",
 	segment: "messages/:chatID",
@@ -61,85 +142,6 @@ export class MessagesPage {
 		return this.chat.getPartners()
 	}
 
-	private getNewElements(messagesAndUpdates, bursts) {
-		return messagesAndUpdates.filter((message) => {
-			return bursts.reduce((prev, current) => {
-				return prev && !current.hasItem(message);
-			}, true);
-		});
-	}
-
-	private calculateBursts(messages: any[]) {
-		var bursts = [new Burst()];
-		var currentBurst = bursts[0];
-
-		messages.sort((m1, m2) => {
-			return m2.getTime() - m1.getTime();
-		});
-
-		messages.forEach((messageOrUpdate) => {
-			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst();
-				bursts.push(currentBurst);
-			}
-
-			currentBurst.addItem(messageOrUpdate);
-		});
-
-		return bursts;
-	}
-
-	private hasMatchingMessage(oldBurst, newBurst) {
-		var matchingMessages = newBurst.getItems().filter((message) => {
-			return oldBurst.hasItem(message);
-		});
-
-		return matchingMessages.length > 0;
-	}
-
-	private addBurst(bursts, burst) {
-		bursts.push(burst);
-
-		return true;
-	}
-
-	private mergeBurst(oldBurst, newBurst) {
-		var newMessages = newBurst.getItems().filter((message) => {
-			return !oldBurst.hasItem(message);
-		});
-
-		newMessages.forEach((message) => {
-			oldBurst.addItem(message);
-		});
-
-		return true;
-	}
-
-	private addBurstOrMerge(bursts, burst) {
-		var possibleMatches = bursts.filter((oldBurst) => {
-			return this.hasMatchingMessage(oldBurst, burst);
-		});
-
-		if (possibleMatches.length === 0) {
-			return this.addBurst(bursts, burst);
-		}
-
-		if (possibleMatches.length === 1) {
-			return this.mergeBurst(possibleMatches[0], burst);
-		}
-
-		if (possibleMatches.length > 1) {
-			errorService.criticalError(new Error("Burst merging possible matches > 1 wtf..."));
-			return false;
-		}
-	}
-
-	private mergeBursts(bursts, newBursts) {
-		return newBursts.reduce((prev, burst) => {
-			return prev && this.addBurstOrMerge(bursts, burst);
-		}, true);
-	}
-
 	private getBursts = (options) => {
 		if (!this.chat || this.chat.getMessagesAndUpdates().length === 0) {
 			return { changed: false, bursts: [] };
@@ -158,13 +160,13 @@ export class MessagesPage {
 		})
 
 		if (this.burstTopic !== this.chat.getID()) {
-			this.bursts = this.calculateBursts(messagesAndUpdates);
+			this.bursts = BurstHelper.calculateBursts(messagesAndUpdates);
 			this.burstTopic = this.chat.getID();
 
 			return { changed: true, bursts: this.bursts };
 		}
 
-		var newElements = this.getNewElements(messagesAndUpdates, this.bursts);
+		var newElements = BurstHelper.getNewElements(messagesAndUpdates, this.bursts);
 
 		if (options) {
 			const firstViewMessage = messagesAndUpdates.find((elem) => {
@@ -186,8 +188,8 @@ export class MessagesPage {
 			burst.removeAllExceptLast();
 		});
 
-		var newBursts = this.calculateBursts(messagesAndUpdates);
-		if (!this.mergeBursts(this.bursts, newBursts)) {
+		var newBursts = BurstHelper.calculateBursts(messagesAndUpdates);
+		if (!BurstHelper.mergeBursts(this.bursts, newBursts)) {
 			console.warn("Rerender all bursts!");
 			this.bursts = newBursts;
 		}
