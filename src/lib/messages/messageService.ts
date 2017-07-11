@@ -204,14 +204,6 @@ socket.channel("notify.chat", function (e, data) {
 	}
 });
 
-socket.channel("unreadTopics", function (e, data) {
-	if (e) {
-		return;
-	}
-
-
-});
-
 initService.listen(function () {
 	messageService.sendUnsentMessages();
 }, "initDone");

@@ -16,6 +16,10 @@ const initService = require("services/initService");
 
 let unreadChatIDs = []
 
+socketService.channel("unreadChats", (e, { unread }) => {
+	unreadChatIDs = unread
+})
+
 const addAfterTime = (arr:timeArray, id: any, time: number) => {
 	const firstLaterIndex = arr.findIndex((ele) => ele.time > time)
 
