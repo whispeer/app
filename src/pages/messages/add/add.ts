@@ -33,7 +33,8 @@ export class AddPage extends ContactsWithSearch {
 	selectedUserMap: any = {}
 	selectedUsers: any[] = []
 	ios: boolean = false
-	loading: boolean = true
+	loadingChat: boolean = true
+	saving: boolean = false
 
 	addMemoizer: Memoizer
 
@@ -69,7 +70,7 @@ export class AddPage extends ContactsWithSearch {
 			return ChatLoader.get(chatID)
 		}).then((chat) => {
 			this.chat = chat
-			this.loading = false
+			this.loadingChat = false
 			this.title = this.chat.getTitle()
 		})
 	}
@@ -101,7 +102,7 @@ export class AddPage extends ContactsWithSearch {
 	}
 
 	addReceivers = () => {
-		this.loading = true
+		this.saving = true
 
 		Bluebird.resolve(this.selectedUsers).map((user: any): any => {
 			return user.id
