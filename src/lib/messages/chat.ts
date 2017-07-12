@@ -16,8 +16,13 @@ const initService = require("services/initService");
 
 let unreadChatIDs = []
 
-socketService.channel("unreadChats", (e, { unread }) => {
-	unreadChatIDs = unread
+socketService.channel("unreadChats", (e, data) => {
+	if (!data.unreadChatIDs) {
+		console.warn("got no chat ids from socket channel")
+		return
+	}
+
+	unreadChatIDs = data.unreadChatIDs
 })
 
 const addAfterTime = (arr:timeArray, id: any, time: number) => {
@@ -408,7 +413,13 @@ const hooks = {
 
 export default class ChatLoader extends ObjectLoader(hooks) {}
 
+let lastLoaded = 0
+
 function loadUnreadChatIDs() {
+	if (new Date().getTime() - lastLoaded < 5 * 1000) {
+		return
+	}
+
 	return initService.awaitLoading().then(function () {
 		return Bluebird.delay(500);
 	}).then(function () {
@@ -416,6 +427,11 @@ function loadUnreadChatIDs() {
 	}).then(function () {
 		return socketService.emit("chat.getUnreadIDs", {});
 	}).then(function (data) {
+		if (!data.chatIDs) {
+			console.warn("got no chat ids from socket request")
+			return
+		}
+
 		unreadChatIDs = data.chatIDs
 		//TODO: updateUnreadIDs(data.unread);
 	});

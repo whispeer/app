@@ -19,23 +19,41 @@ let chatIDs
 let activeChat = 0
 
 messageService = {
-	addSocketMessage: function (messageData) {
-		if (!messageData) {
+	addSocketData: function (data) {
+		if (!data) {
 			return Bluebird.resolve()
 		}
-		/*var messageToAdd;
 
-		return Bluebird.try(function () {
-			return Chunk.messageFromData(messageData);
-		}).then(function (_messageToAdd) {
-			messageToAdd = _messageToAdd;
-			return Chunk.get(messageToAdd.getTopicID());
-		}).then(function (theTopic) {
-			theTopic.addMessage(messageToAdd, true);
-			messageService.notify(messageToAdd, "message");
+		return Bluebird.try(async () => {
+			if (data.chat) {
+				console.warn("Add chat")
 
-			return theTopic.refetchMessages();
-		}).catch(errorService.criticalError);*/
+				const chat = await ChatLoader.load(data.chat)
+				chatIDs = [chat.getID(), ...this.getChatIDs()]
+			}
+
+			if (data.chunk) {
+				console.warn("Add chunk")
+
+				const chunk = await ChunkLoader.load(data.chunk)
+				const chat = await ChatLoader.get(chunk.getChatID())
+
+				chat.addChunkID(chunk.getID())
+			}
+
+			if (data.message) {
+				console.warn("Add message")
+
+				const chunk = await ChunkLoader.get(data.message.server.chunkID)
+				const chat = await ChatLoader.get(chunk.getChatID())
+				const message = await MessageLoader.load(data.message)
+
+				chat.addMessageID(message.getClientID(), message.getTime())
+				chat.addUnreadMessage(message.getServerID())
+			}
+
+			await Bluebird.resolve()
+		})
 	},
 	loadChatIDs: function () {
 		return socket.definitlyEmit("chat.getAllIDs", {}).then(function (response) {
@@ -182,30 +200,7 @@ Observer.extend(messageService);
 
 socket.channel("notify.chat", function (e, data) {
 	if (!e) {
-		return Bluebird.try(async () => {
-			if (data.message) {
-				const chunk = await ChunkLoader.get(data.message.server.chunkID)
-				const chat = await ChatLoader.get(chunk.getChatID())
-				const message = await MessageLoader.load(data.message)
-
-				chat.addMessageID(message.getClientID(), message.getTime())
-				chat.addUnreadMessage(message.getServerID())
-			}
-
-			if (data.chunk) {
-				const chunk = await ChunkLoader.load(data.chunk)
-				const chat = await ChatLoader.get(chunk.getChatID())
-
-				chat.addChunkID(chunk.getID())
-			}
-
-			if (data.chat) {
-				const chat = await ChatLoader.load(data)
-				chatIDs = [...this.getChatIDs(), chat.getID()]
-			}
-
-			await Bluebird.resolve()
-		})
+		messageService.addSocketData(data)
 	} else {
 		errorService.criticalError(e);
 	}

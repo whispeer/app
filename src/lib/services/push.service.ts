@@ -81,15 +81,15 @@ export class PushService {
 		return this.getActiveNav() instanceof MessagesPage
 	}
 
-	private isActiveTopic = (topicId) => {
-		const navTopicID = this.getActiveNav().navParams.data.topicId
+	private isActiveChat = (chatID) => {
+		const navChatID = this.getActiveNav().navParams.data.chatID
 
-		return parseInt(navTopicID, 10) === parseInt(topicId, 10)
+		return parseInt(navChatID, 10) === parseInt(chatID, 10)
 	}
 
-	private goToTopic = (topicId) => {
+	private goToChat = (chatID) => {
 		if (this.isOnMessagesPage()) {
-			if (this.isActiveTopic(topicId)) {
+			if (this.isActiveChat(chatID)) {
 				return;
 			}
 
@@ -97,7 +97,7 @@ export class PushService {
 			this.navCtrl.remove(index);
 		}
 
-		return this.navCtrl.push("Messages", { topicId: topicId });
+		return this.navCtrl.push("Messages", { chatID });
 	}
 
 	private goToUser = (userId) => {
@@ -106,7 +106,7 @@ export class PushService {
 
 	private goToReference = (reference) => {
 		if (reference.type === "message") {
-			this.goToTopic(reference.id);
+			this.goToChat(reference.chatID);
 		}
 
 		if (reference.type === "contactRequest") {
@@ -140,7 +140,16 @@ export class PushService {
 				}
 
 				if (additionalData.content) {
-					return messageService.addSocketMessage(additionalData.content.message);
+					const message = additionalData.content.message
+
+					if (message) {
+						delete message.meta.sender
+						delete message.meta.sendTime
+						delete message.meta.topicid
+						delete message.meta.messageid
+					}
+
+					return messageService.addSocketData(additionalData.content);
 				}
 			}).then(() => {
 				this.pushInstance.finish(() => {console.log(`push done at ${new Date()}`)}, () => {console.warn("Finishing push failed!")}, additionalData.notId)

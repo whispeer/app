@@ -31,6 +31,7 @@ const getMessageInfo = (latestMessageID) => {
 const memoizer = new Memoizer([
 	() => messageService.getChatIDs(),
 	() => ChatLoader.getAll(),
+	() => MessageLoader.getAll(),
 ], (chatIDs) => {
 	let loaded = true
 
