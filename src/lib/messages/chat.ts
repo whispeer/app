@@ -9,7 +9,7 @@ import MessageLoader, { Message } from "./message"
 
 import h from "../helper/helper"
 
-import Cache from "../services/Cache.ts";
+import Cache from "../services/Cache";
 
 const ImageUpload = require("services/imageUploadService");
 const initService = require("services/initService");
