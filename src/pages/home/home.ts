@@ -5,11 +5,66 @@ import { NavController, Content, IonicPage } from "ionic-angular";
 import { TranslateService } from '@ngx-translate/core';
 
 import messageService from "../../lib/messages/messageService";
+import Memoizer from "../../lib/asset/memoizer"
+
 const contactsService = require("../../lib/services/friendsService");
 
 import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
+
+const getMessageInfo = (latestMessageID) => {
+	if (!MessageLoader.isLoaded(latestMessageID)) {
+		return {
+			latestMessageText: ""
+		}
+	}
+
+	const latestMessage = MessageLoader.getLoaded(latestMessageID)
+
+	return {
+		time: latestMessage.getTime(),
+		latestMessageText: latestMessage.getText(),
+	}
+}
+
+const memoizer = new Memoizer([
+	() => messageService.getChatIDs(),
+	() => ChatLoader.getAll(),
+], (chatIDs) => {
+	let loaded = true
+
+	return chatIDs.filter((chatID) => {
+		loaded = loaded && ChatLoader.isLoaded(chatID)
+
+		return loaded
+	}).map((chatID) => {
+		const chat = ChatLoader.getLoaded(chatID)
+
+		const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
+
+		const chatInfo = {
+			id: chat.getID(),
+
+			unread: chat.isUnread(),
+			unreadCount: chat.getUnreadMessageIDs().length,
+		}
+
+		const chunkInfo = {
+			partners: latestChunk.getPartners(),
+			partnersDisplay: latestChunk.getPartnerDisplay(),
+			title: latestChunk.getTitle(),
+			time: latestChunk.getTime(),
+			type: latestChunk.getReceiver().length > 2 ? "groupChat" : "peerChat"
+		}
+
+		const messageInfo = getMessageInfo(chat.getLatestMessage())
+
+		return Object.assign({}, chatInfo, chunkInfo, messageInfo)
+	}).sort((a, b) =>
+		b.time - a.time
+	)
+})
 
 @IonicPage({
 	name: "Home",
@@ -62,55 +117,8 @@ export class HomePage {
 		});
 	}
 
-	private getMessageInfo = (latestMessageID) => {
-		if (!MessageLoader.isLoaded(latestMessageID)) {
-			return {
-				latestMessageText: ""
-			}
-		}
-
-		const latestMessage = MessageLoader.getLoaded(latestMessageID)
-
-		return {
-			time: latestMessage.getTime(),
-			latestMessageText: latestMessage.getText(),
-		}
-	}
-
 	getChats = () => {
-		const chatIDs = messageService.getChatIDs()
-
-		let loaded = true
-
-		return chatIDs.filter((chatID) => {
-			loaded = loaded && ChatLoader.isLoaded(chatID)
-
-			return loaded
-		}).map((chatID) => {
-			const chat = ChatLoader.getLoaded(chatID)
-
-			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
-
-			const chatInfo = {
-				id: chat.getID(),
-
-				unread: chat.isUnread(),
-				unreadCount: chat.getUnreadMessageIDs().length,
-			}
-
-			const chunkInfo = {
-				partners: latestChunk.getPartners(),
-				partnersDisplay: latestChunk.getPartnerDisplay(),
-				title: latestChunk.getTitle(),
-				time: latestChunk.getTime(),
-			}
-
-			const messageInfo = this.getMessageInfo(chat.getLatestMessage())
-
-			return Object.assign({}, chatInfo, chunkInfo, messageInfo)
-		}).sort((a, b) =>
-			b.time - a.time
-		)
+		return memoizer.getValue()
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
