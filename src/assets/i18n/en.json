@@ -50,7 +50,14 @@
 	"topic": {
 		"takePhoto": "Take a Photo",
 		"selectGallery": "Select from Gallery",
-		"changed": "changed the title to"
+		"changed": "changed the title to",
+		"detail": {
+			"reportTopic": "Report this chat",
+			"reportConfirm": {
+				"title": "Report this chat?",
+				"message": "Please confirm that you want to report this chat. We'll then get in touch with you."
+			}
+		}
 	},
 	"chooseFriends": {
 		"title": "Select Contacts",
@@ -99,7 +106,12 @@
 			"removeQuestion": "Are you sure that you want to remove {{name}} from your Contacts?",
 			"removeConfirmButtonText": "Remove",
 			"acceptedMessage": "{{name}} is now a Contact.",
-			"requestSentMessage": "You've sent a Contact Request to {{name}}."
+			"requestSentMessage": "You've sent a Contact Request to {{name}}.",
+			"reportContact": "Report this user",
+			"reportConfirm": {
+				"title": "Report this user?",
+				"message": "Please confirm that you want to report this user. We'll then get in touch with you."
+			}
 		},
 		"image": {
 			"view": "View Picture",

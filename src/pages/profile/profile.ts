@@ -400,6 +400,24 @@ export class ProfilePage {
 		}).present();
 	}
 
+	report = () => {
+		let reportConfirm = this.alertCtrl.create({
+			title: this.translate.instant("profile.contacts.reportConfirm.title"),
+			message: this.translate.instant("profile.contacts.reportConfirm.message"),
+			buttons: [{
+				text: "Cancel"
+			}, {
+				text: "Report",
+				handler: () => {
+					// todo send to server
+				}
+			}]
+		});
+
+		reportConfirm.setCssClass('logout-confirm');
+		reportConfirm.present();
+	}
+
 	close = () => {
 		this.navCtrl.setRoot("Home");
 	}

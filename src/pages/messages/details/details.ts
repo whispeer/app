@@ -1,7 +1,9 @@
 import { Component, ElementRef } from "@angular/core";
-import { NavController, NavParams, IonicPage } from "ionic-angular";
+import { NavController, NavParams, IonicPage, AlertController } from "ionic-angular";
 
 import ChatLoader, { Chat } from "../../../lib/messages/chat"
+
+import { TranslateService } from '@ngx-translate/core';
 
 const initService = require("../../../lib/services/initService")
 
@@ -20,7 +22,13 @@ export class DetailPage {
 
 	receiverToAdd: string
 
-	constructor(private navCtrl: NavController, private navParams: NavParams, private element: ElementRef) {}
+	constructor(
+		private navCtrl: NavController,
+		private navParams: NavParams,
+		private element: ElementRef,
+		private alertCtrl: AlertController,
+		private translate: TranslateService
+	) {}
 
 	ngOnInit() {
 		const chatID = parseInt(this.navParams.get("chatID"), 10);
@@ -73,5 +81,23 @@ export class DetailPage {
 		}
 
 		return this.chat.getReceivers()
+	}
+
+	report = () => {
+		let reportConfirm = this.alertCtrl.create({
+			title: this.translate.instant("topic.detail.reportConfirm.title"),
+			message: this.translate.instant("topic.detail.reportConfirm.message"),
+			buttons: [{
+				text: "Cancel"
+			}, {
+				text: "Report",
+				handler: () => {
+					// todo send to server
+				}
+			}]
+		});
+
+		reportConfirm.setCssClass('logout-confirm');
+		reportConfirm.present();
 	}
 }
