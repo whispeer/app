@@ -5,6 +5,8 @@ import ChatLoader, { Chat } from "../../../lib/messages/chat"
 
 import { TranslateService } from '@ngx-translate/core';
 
+import ReportService from "../../../lib/services/reportService";
+
 const initService = require("../../../lib/services/initService")
 
 @IonicPage({
@@ -92,7 +94,7 @@ export class DetailPage {
 			}, {
 				text: "Report",
 				handler: () => {
-					// todo send to server
+					ReportService.sendReport("chat", this.chat.getID());
 				}
 			}]
 		});
