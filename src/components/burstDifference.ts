@@ -2,7 +2,7 @@ import { Component, Input } from "@angular/core";
 
 import h from "../lib/helper/helper";
 
-import ChunkLoader from "../lib/messages/chatChunk"
+import ChunkLoader, { Chunk } from "../lib/messages/chatChunk"
 import { Chat } from "../lib/messages/chat"
 import Burst from "../lib/messages/burst"
 
@@ -46,22 +46,60 @@ export class BurstDifferenceComponent {
 		return true
 	}
 
-	hasPreviousChunk = () => {
-		return Boolean(this.previousBurst)
+	chunksBetweenBursts = () => {
+		if (!this.previousBurst) {
+			return []
+		}
+
+		if (!this.burst) {
+			return []
+		}
+
+		return this.getChunksBetween(
+			ChunkLoader.getLoaded(this.burst.getChunkID()),
+			ChunkLoader.getLoaded(this.previousBurst.getChunkID())
+		).reverse()
 	}
 
-	addedReceiver = () => {
-		const burstChunkID = this.burst ? this.burst.getChunkID() : this.chat.getLatestChunk()
+	addedReceiver = (chunk: Chunk) => {
+		const currentPartners = chunk.getPartners()
+		const previousPartners = ChunkLoader.getLoaded(chunk.getPredecessorID()).getPartners()
 
-		const burstChunk = ChunkLoader.getLoaded(burstChunkID)
-		const previousBurstChunk = ChunkLoader.getLoaded(this.previousBurst.getChunkID())
+		return currentPartners.filter((partner) => previousPartners.indexOf(partner) === -1)
+	}
 
-		const currentPartners = burstChunk.getPartners()
-		const previousPartners = previousBurstChunk.getPartners()
+	removedReceiver = (chunk: Chunk) => {
+		const currentPartners = chunk.getPartners()
+		const previousPartners = ChunkLoader.getLoaded(chunk.getPredecessorID()).getPartners()
 
-		const added = currentPartners.filter((partner) => previousPartners.indexOf(partner) === -1)
+		return previousPartners.filter((partner) => currentPartners.indexOf(partner) === -1)
+	}
 
-		return added
+	changedTitle = (chunk: Chunk) => {
+		const currentTitle = chunk.getTitle()
+		const previousTitle = ChunkLoader.getLoaded(chunk.getPredecessorID()).getTitle()
+
+		if (currentTitle !== previousTitle) {
+			return currentTitle
+		}
+	}
+
+	getCreator = (chunk: Chunk) => {
+		return chunk.getReceivers().find((user) => user.id === chunk.getCreator())
+	}
+
+	private getChunksBetween = (newerChunk: Chunk, olderChunk: Chunk) => {
+		if (newerChunk.getID() === olderChunk.getID()) {
+			return []
+		}
+
+		const predecessor = ChunkLoader.getLoaded(newerChunk.getPredecessorID())
+
+		return [newerChunk, ...this.getChunksBetween(predecessor, olderChunk)]
+	}
+
+	hasPreviousChunk = () => {
+		return Boolean(this.previousBurst)
 	}
 
 	receiver = () => {

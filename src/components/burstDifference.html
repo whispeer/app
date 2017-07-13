@@ -6,31 +6,47 @@
 	</div>
 </div>
 <div *ngIf="differentChunk()">
-	<div class="messages_message" *ngIf="hasPreviousChunk() && addedReceiver().length > 0">
-		<div class="burst-seperator burst-seperator-date">
-			<span class="burst-seperator-text">
-				Nutzer hinzugefügt:
-				<span *ngFor="let user of addedReceiver()">
-					{{ user.name }}
-				</span>
-			</span>
-		</div>
-	</div>
-	<div class="messages_message" *ngIf="hasTitleDifference()">
-		<div class="burst-seperator burst-seperator-date">
-			<span class="burst-seperator-text">
-				Titel geändert: {{ getTitle() }}
-			</span>
-		</div>
-	</div>
 	<div class="messages_message" *ngIf="!hasPreviousChunk()">
 		<div class="burst-seperator burst-seperator-date">
 			<span class="burst-seperator-text">
-				Nutzer in diesem Chat:
-				<span *ngFor="let user of receiver()">
-					{{ user.name }}
-				</span>
+				Nutzer in diesem Chat: <br />
+				<ng-container *ngFor="let user of receiver()">
+					{{ user.name }} <br />
+				</ng-container>
 			</span>
 		</div>
 	</div>
+
+	<ng-container *ngFor="let chunk of chunksBetweenBursts()">
+		<div class="messages_message" *ngIf="addedReceiver(chunk).length > 0">
+			<div class="burst-seperator burst-seperator-date">
+				<span class="burst-seperator-text">
+					{{ getCreator(chunk).name }} hat Nutzer hinzugefügt: <br />
+					<ng-container *ngFor="let user of addedReceiver(chunk)">
+						{{ user.name }} <br />
+					</ng-container>
+				</span>
+			</div>
+		</div>
+
+		<div class="messages_message" *ngIf="removedReceiver(chunk).length > 0">
+			<div class="burst-seperator burst-seperator-date">
+				<span class="burst-seperator-text">
+					{{ getCreator(chunk).name }} hat Nutzer entfernt: <br />
+					<ng-container *ngFor="let user of removedReceiver(chunk)">
+						{{ user.name }} <br />
+					</ng-container>
+				</span>
+			</div>
+		</div>
+
+		<div class="messages_message" *ngIf="changedTitle(chunk)">
+			<div class="burst-seperator burst-seperator-date">
+				<span class="burst-seperator-text">
+					{{ getCreator(chunk).name }} hat den Chattitel geändert: <br />
+					{{ changedTitle(chunk) }}
+				</span>
+			</div>
+		</div>
+	</ng-container>
 </div>
