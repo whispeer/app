@@ -215,6 +215,7 @@ export class Message {
 			if (response.server) {
 				this.sendTime = h.parseDecimal(response.server.sendTime)
 				this._serverID = h.parseDecimal(response.server.id)
+				this.chunkID = h.parseDecimal(response.server.chunkID)
 				this.data.timestamp = this.getTime();
 			}
 

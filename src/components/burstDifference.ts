@@ -51,12 +51,10 @@ export class BurstDifferenceComponent {
 			return []
 		}
 
-		if (!this.burst) {
-			return []
-		}
+		const currentChunkID = this.burst ? this.burst.getChunkID() : this.chat.getLatestChunk()
 
 		return this.getChunksBetween(
-			ChunkLoader.getLoaded(this.burst.getChunkID()),
+			ChunkLoader.getLoaded(currentChunkID),
 			ChunkLoader.getLoaded(this.previousBurst.getChunkID())
 		).reverse()
 	}
