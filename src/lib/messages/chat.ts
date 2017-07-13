@@ -266,6 +266,37 @@ export class Chat {
 		return latestChunk.getPartners()
 	}
 
+	removeReceiver = (receiver) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+		const oldReceiverIDs = latestChunk.getReceiver()
+		const newReceiverIDs = oldReceiverIDs.filter((id) => id !== receiver.getID())
+
+		return this.setReceivers(newReceiverIDs)
+	}
+
+	addAdmin = (receiver) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		const adminIDs = latestChunk.getAdmins()
+
+		if (adminIDs.indexOf(receiver.getID()) > -1) {
+			return Bluebird.resolve()
+		}
+
+		return this.setAdmins([...adminIDs, receiver.getID()])
+	}
+
+	getAdmins = () => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return latestChunk.getAdmins()
+	}
+
+	setAdmins = (admins) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+		return this.createSuccessor(latestChunk.getReceiver(), { admins })
+	}
+
 	addReceivers = (newReceiverIDs, canReadOldMessages = false) => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
@@ -274,42 +305,31 @@ export class Chat {
 		return this.setReceivers(oldReceivers.concat(newReceiverIDs), canReadOldMessages)
 	}
 
-	setTitle = (title) => {
+	createSuccessor = (receiver, options : { canReadOldMessages? : boolean, title? : String, admins? : number[] }) => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
-		return latestChunk.getSuccessor().then((successor) => {
-			if (successor) {
-				throw new Error("TODO: Chunk has a successor. Try again?")
-			}
-
-			return Chunk.createRawData(latestChunk.getReceiver(), { title }, latestChunk)
-		}).then(({ chunk, keys, receiverKeys }) => {
-			return socketService.emit("chat.chunk.create", {
-				predecessorID: latestChunk.getID(),
-				chunk,
-				keys,
-				receiverKeys,
-			})
-		}).then((response: any) => {
-			return ChunkLoader.load(response.chunk)
-		}).then((chunk) => {
-			this.addChunkID(chunk.getID())
-		})
-	}
-
-	setReceivers = (receivers, canReadOldMessages) => {
-		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+		const {
+			canReadOldMessages = false,
+			title = latestChunk.getTitle(),
+			admins = latestChunk.getAdmins(),
+		} = options
 
 		if (!latestChunk.amIAdmin()) {
 			throw new Error("Not an admin of this chunk")
 		}
 
+		const addedReceiver = receiver.filter((id) => latestChunk.getReceiver().indexOf(id) === -1)
+		const removedReceiver = latestChunk.getReceiver().filter((id) => receiver.indexOf(id) === -1)
+
 		return latestChunk.getSuccessor().then((successor) => {
 			if (successor) {
 				throw new Error("TODO: Chunk has a successor. Try again?")
 			}
 
-			return Chunk.createRawData(receivers, { title: latestChunk.getTitle() }, latestChunk)
+			const content = { title }
+			const meta = { admins }
+
+			return Chunk.createRawData(receiver, { content, meta, predecessorChunk: latestChunk })
 		}).then((chunkData) => {
 			if (!canReadOldMessages) {
 				return chunkData
@@ -325,11 +345,21 @@ export class Chat {
 				keys,
 				receiverKeys,
 			})
-		}).then((response) => {
+		}).then((response: any) => {
 			return ChunkLoader.load(response.chunk)
 		}).then((chunk) => {
 			this.addChunkID(chunk.getID())
 		})
+	}
+
+	setTitle = (title) => {
+		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
+
+		return this.createSuccessor(latestChunk.getReceiverIDs(), { title })
+	}
+
+	setReceivers = (receivers, canReadOldMessages = false) => {
+		return this.createSuccessor(receivers, { canReadOldMessages })
 	}
 
 	sendUnsentMessage = (messageData, files) => {

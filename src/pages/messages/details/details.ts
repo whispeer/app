@@ -47,6 +47,14 @@ export class DetailPage {
 		})
 	}
 
+	promote = (user) => {
+		return this.chat.addAdmin(user)
+	}
+
+	remove = (user) => {
+		return this.chat.removeReceiver(user)
+	}
+
 	addContact = () => {
 		this.navCtrl.push("Select User", { chatID: this.chat.getID() })
 	}

@@ -17,8 +17,11 @@
 		</ion-list-header>
 
 		<ion-item class="no--padding--right">
-			<ion-input type="text" placeholder="Chat Title" [(ngModel)]="title"></ion-input>
-			<button ion-button item-end class="full--height" (click)="setTitle(title)">Change</button>
+			<ion-input type="text" placeholder="Chat Title" *ngIf="amIAdmin()" [(ngModel)]="title"></ion-input>
+			<div *ngIf="!amIAdmin()">
+				{{ title }}
+			</div>
+			<button ion-button item-end class="full--height" *ngIf="amIAdmin()" (click)="setTitle(title)">Change</button>
 		</ion-item>
 
 		<ion-list-header padding-top>
@@ -43,15 +46,14 @@
 					</small>
 				</span>
 			</ion-item>
+			<ion-item-options side="left" *ngIf="!isAdmin(receiver.user) && amIAdmin()">
+				<button ion-button color="primary" (click)="promote(receiver.user)">Promote</button>
+			</ion-item-options>
+
 			<!--
-				<ion-item-options side="left">
-					<button ion-button color="primary" (click)="deOrProMote(item)">*Mote</button>
-				</ion-item-options>
-
-
-				<ion-item-options side="right">
-					<button ion-button color="danger" (click)="remove(item)">Remove</button>
-				</ion-item-options>
+			<ion-item-options side="right" *ngIf="!isAdmin(receiver.user) && amIAdmin()">
+				<button ion-button color="danger" (click)="remove(receiver.user)">Remove</button>
+			</ion-item-options>
 			-->
 		</ion-item-sliding>
 
