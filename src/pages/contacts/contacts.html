@@ -6,7 +6,7 @@
 
 
 <ion-content>
-	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()" (keypress)="handleSearchKey($event)" [placeholder]="'contacts.search' | translate"></ion-searchbar>
+	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()" (keypress)="handleSearchKey($event)" [placeholder]="'contacts.search' | translate" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate"></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="goToRequests()">
 		<div class="badgeContainer">
