@@ -19,6 +19,12 @@ let chatIDs
 let activeChat = 0
 
 messageService = {
+	prependChatID: function (chatID) {
+		chatIDs = [
+			chatID,
+			...messageService.getChatIDs().filter((id) => id !== chatID)
+		]
+	},
 	addSocketData: function (data) {
 		if (!data) {
 			return Bluebird.resolve()
@@ -29,7 +35,7 @@ messageService = {
 				console.warn("Add chat")
 
 				const chat = await ChatLoader.load(data.chat)
-				chatIDs = [chat.getID(), ...this.getChatIDs()]
+				messageService.prependChatID(chat.getID())
 			}
 
 			if (data.chunk) {
@@ -39,6 +45,7 @@ messageService = {
 				const chat = await ChatLoader.get(chunk.getChatID())
 
 				chat.addChunkID(chunk.getID())
+				messageService.prependChatID(chat.getID())
 			}
 
 			if (data.message) {
@@ -50,6 +57,8 @@ messageService = {
 
 				chat.addMessageID(message.getClientID(), message.getTime())
 				chat.addUnreadMessage(message.getServerID())
+
+				messageService.prependChatID(chat.getID())
 			}
 
 			await Bluebird.resolve()
