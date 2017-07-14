@@ -3,12 +3,17 @@ var webpack = require("webpack");
 var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
 var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
-
+var ModuleConcatPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
 var WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").WebpackBundleSizeAnalyzerPlugin;
 
 process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
 
 var data = require(path.resolve("package.json"))
+
+var prodPlugins = [];
+if (process.env.IONIC_ENV === "prod") {
+  prodPlugins.push(new ModuleConcatPlugin());
+}
 
 module.exports = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,
@@ -63,12 +68,7 @@ module.exports = {
 
 	plugins: [
 		ionicWebpackFactory.getIonicEnvironmentPlugin(),
-		new webpack.optimize.CommonsChunkPlugin({
-			name: "external",
-			minChunks: function (module) {
-				return module.context && module.context.indexOf("node_modules") !== -1;
-			}
-		}),
+		ionicWebpackFactory.getCommonChunksPlugin(),
 		new webpack.DefinePlugin({
 			"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV),
 			"CLIENT_INFO": JSON.stringify({
@@ -82,7 +82,7 @@ module.exports = {
 			openAnalyzer: false
 		}),
 		new WebpackBundleSizeAnalyzerPlugin("./report-size.txt")
-	],
+	].concat(prodPlugins),
 
 	// Some libraries import Node modules but don't use them in the browser.
 	// Tell Webpack to provide empty mocks for them so importing them works.
