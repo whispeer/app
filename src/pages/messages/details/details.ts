@@ -5,7 +5,7 @@ import ChatLoader, { Chat } from "../../../lib/messages/chat"
 
 import { TranslateService } from '@ngx-translate/core';
 
-import ReportService from "../../../lib/services/reportService";
+import reportService from "../../../lib/services/reportService";
 
 const initService = require("../../../lib/services/initService")
 
@@ -94,7 +94,7 @@ export class DetailPage {
 			}, {
 				text: "Report",
 				handler: () => {
-					ReportService.sendReport("chat", this.chat.getID());
+					reportService.sendReport("chat", this.chat.getID());
 				}
 			}]
 		});

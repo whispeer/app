@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform, IonicPage } from 'ionic-angular';
 import sessionService from '../../lib/services/session.service';
-import ReportService from "../../lib/services/reportService";
+import reportService from "../../lib/services/reportService";
 import * as Bluebird from 'bluebird';
 
 const userService = require("user/userService")
@@ -410,7 +410,7 @@ export class ProfilePage {
 			}, {
 				text: "Report",
 				handler: () => {
-					ReportService.sendReport("user", this.user.id);
+					reportService.sendReport("user", this.user.id);
 				}
 			}]
 		});

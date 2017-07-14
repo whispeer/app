@@ -1,12 +1,12 @@
-import Socket from "./socket.service";
+import socketService from "./socket.service";
 
-export class ReportService {
-	sendReport = (what: string, id: number) => {
-		Socket.emit("reports.add", {
+namespace reportService {
+	export const sendReport = (what: string, id: number) => {
+		return socketService.emit("reports.add", {
 			what: what,
 			id: id
 		})
 	}
 }
 
-export default new ReportService();
+export default reportService
