@@ -1,0 +1,20 @@
+page-add {
+	ion-content {
+		background-color: map-get($colors, light_grey) !important;
+	}
+
+	.item.no--padding--right {
+		.item-inner {
+			padding-right: 0
+		}
+	}
+
+	.item {
+		.full--height {
+			padding: 0 1em;
+			margin: 0;
+			height: 100%;
+			border-radius: 0;
+		}
+	}
+}

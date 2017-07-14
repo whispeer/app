@@ -1,7 +1,7 @@
 const APIVERSION = "0.0.3";
 
 const debug = require("debug");
-const h = require("whispeerHelper");
+import h from "../helper/helper";
 import { connect } from "socket.io-client";
 
 const config = require('../config.js');
@@ -14,8 +14,8 @@ import { goToBusinessVersion, isBusinessVersion } from "./location.manager";
 const socketDebug = debug("whispeer:socket");
 const socketError = debug("whispeer:socket:error");
 
-const DisconnectError = h.createErrorType("disconnectedError");
-const ServerError = h.createErrorType("serverError");
+export const DisconnectError = h.createErrorType("disconnectedError");
+export const ServerError = h.createErrorType("serverError");
 
 const SOCKET_TIMEOUT = 60000;
 
@@ -98,7 +98,7 @@ class SocketService extends Observer {
 
 		this._socket.on("connect", () => {
 			socketDebug("socket connected");
-			this.emit("ping", { blockageToken: this._token });
+			this.emit("whispeerPing", { blockageToken: this._token });
 		});
 	}
 
@@ -208,24 +208,24 @@ class SocketService extends Observer {
 
 			this._lastRequestTime = response.serverTime;
 
+			this._interceptors.forEach((interceptor) => {
+				if (interceptor.transformResponse) {
+					response = interceptor.transformResponse(response);
+				}
+			});
+
 			if (response.error) {
 				socketError(response);
-				throw new ServerError("server returned an error!");
+				throw new ServerError("server returned an error!", { response });
 			}
+
+			socketDebug(response);
 
 			if (!isBusinessVersion()) {
 				if (response.isBusiness) {
 					goToBusinessVersion()
 				}
 			}
-
-			socketDebug(response);
-
-			this._interceptors.forEach((interceptor) => {
-				if (interceptor.transformResponse) {
-					response = interceptor.transformResponse(response);
-				}
-			});
 
 			return response;
 		}).finally(() => {
@@ -269,7 +269,7 @@ class SocketService extends Observer {
 	}
 
 	/** definitly emits the request. might emit it multiple times! **/
-	definitlyEmit (channel: string, request: any, callback?: Function) : Bluebird<void> {
+	definitlyEmit (channel: string, request: any) : Bluebird<any> {
 		var SOCKET_TIMEOUT = 10000;
 
 		return this.awaitConnection().then(() => {
@@ -277,9 +277,9 @@ class SocketService extends Observer {
 		}).catch((e) => {
 			console.error(e);
 			return Bluebird.delay(500).then(() => {
-				return this.definitlyEmit(channel, request, callback);
+				return this.definitlyEmit(channel, request);
 			});
-		}).nodeify(callback);
+		})
 	}
 
 	channel (channel: string, callback: Function) {

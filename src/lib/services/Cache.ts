@@ -1,7 +1,7 @@
 import { errorServiceInstance } from "./error.service";
 import * as Bluebird from "bluebird";
 import Dexie from "dexie";
-const h = require("../helper/helper");
+import h from "../helper/helper"
 
 var db: Dexie;
 
@@ -161,7 +161,7 @@ export default class Cache {
 	 * get all cache entries as a dexie collection.<
 	 * @return {Bluebird<any>} Promise containing all cache entries as a dexie collection.
 	 */
-	all(): Bluebird<any> {
+	all(): any {
 		if (this._cacheDisabled) {
 			return Bluebird.resolve([]);
 		}

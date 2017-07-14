@@ -1,33 +1,39 @@
-define ([], function () {
-	"use strict";
+"use strict";
 
-	var sortedSet = function (sortFunction) {
-		var arr = [];
+var sortedSet = function (sortFunction) {
+    var arr = [];
 
-		arr.clear = function () {
-			arr.length = 0;
-		};
+    arr.clear = function () {
+        arr.length = 0;
+    };
 
-		arr.push = function () {
-			Array.prototype.push.apply(this, arguments);
-			this.resort();
-		};
+    arr.push = function () {
+        Array.prototype.push.apply(this, arguments);
+        this.resort();
+    };
 
-		arr.join = function (elements) {
-			Array.prototype.push.apply(this, elements);
-			this.resort();
-		};
+    arr.remove = function (element) {
+        var index = Array.prototype.indexOf.call(this, element);
 
-		arr.resort = function () {
-			this.sort(sortFunction);
-		};
+        if (index > -1) {
+            Array.prototype.splice.call(this, index, 1);
+        }
+    };
 
-		arr.last = function () {
-			return arr[arr.length - 1];
-		};
+    arr.join = function (elements) {
+        Array.prototype.push.apply(this, elements);
+        this.resort();
+    };
 
-		return arr;
-	};
+    arr.resort = function () {
+        this.sort(sortFunction);
+    };
 
-	return sortedSet;
-});
+    arr.last = function () {
+        return arr[arr.length - 1];
+    };
+
+    return arr;
+};
+
+module.exports = sortedSet;

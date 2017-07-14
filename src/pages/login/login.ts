@@ -9,7 +9,7 @@ import passwordStrengthService from '../../lib/services/passwordStrength.service
 import jQuery from "jquery";
 
 const registerService = require('../../lib/services/registerService');
-const whispeerHelper = require('whispeerHelper')
+import whispeerHelper from "../../lib/helper/helper"
 
 import { TranslateService } from '@ngx-translate/core';
 

@@ -24,7 +24,7 @@
 }
 */
 
-var h = require("whispeerHelper");
+var h = require("../helper/helper").default;
 var chelper = require("crypto/helper");
 var sjcl = require("sjcl");
 var waitForReady = require("crypto/waitForReady");
@@ -2123,7 +2123,7 @@ keyStore = {
 
 			return Bluebird.all([
 				stringifyObject(object, version),
-				SignKey.get(realID)
+				SignKey.get(realID),
 			]).spread(function (objectString, key) {
 				return key.verify(signature, objectString, object._type, id);
 			}).catch(function (e) {

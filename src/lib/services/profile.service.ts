@@ -1,4 +1,4 @@
-const h = require("whispeerHelper");
+import h from "../helper/helper";
 const validator = require("validation/validator");
 const SecuredData = require("asset/securedDataWithMetaData")
 
@@ -13,7 +13,7 @@ export default class ProfileService extends Observer {
 	private securedData: any;
 	private isPublicProfile: boolean;
 	private isDecrypted: boolean;
-	private id: number;
+	private id: String | number;
 
 	constructor(data: any, options: ProfileServiceOptions) {
 		super();

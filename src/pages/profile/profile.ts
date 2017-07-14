@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, ActionSheetController, AlertController, AlertOptions, Platform, IonicPage } from 'ionic-angular';
 import sessionService from '../../lib/services/session.service';
+import reportService from "../../lib/services/reportService";
 import * as Bluebird from 'bluebird';
 
 const userService = require("user/userService")
@@ -398,6 +399,24 @@ export class ProfilePage {
 				icon: !this.platform.is("ios") ? "close" : null
 			}]
 		}).present();
+	}
+
+	report = () => {
+		let reportConfirm = this.alertCtrl.create({
+			title: this.translate.instant("profile.contacts.reportConfirm.title"),
+			message: this.translate.instant("profile.contacts.reportConfirm.message"),
+			buttons: [{
+				text: "Cancel"
+			}, {
+				text: "Report",
+				handler: () => {
+					reportService.sendReport("user", this.user.id);
+				}
+			}]
+		});
+
+		reportConfirm.setCssClass('logout-confirm');
+		reportConfirm.present();
 	}
 
 	close = () => {

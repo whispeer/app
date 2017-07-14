@@ -3,7 +3,7 @@
 **/
 require("toBlob");
 
-var h = require("whispeerHelper");
+var h = require("../helper/helper").default;
 var Progress = require("asset/Progress");
 var Queue = require("asset/Queue");
 var Bluebird = require("bluebird");

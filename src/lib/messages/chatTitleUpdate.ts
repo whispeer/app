@@ -1,18 +1,19 @@
 var SecuredData = require("asset/securedDataWithMetaData");
-var h = require("whispeerHelper");
+import h from "../helper/helper";
 
 var userService = require("user/userService");
 var socket = require("services/socket.service").default;
 
 import * as Bluebird from "bluebird"
 
-export default class TopicUpdate {
-	state: any
-	private _id: any
-	private _securedData: any
-	private _userID: any
+export default class ChatTitleUpdate {
+	state
+	private _id
+	private _securedData
+	private _userID
+	private topic
 
-	constructor(updateData) {
+	constructor(updateData, topic) {
 		var content = updateData.content,
 			meta = updateData.meta;
 
@@ -22,8 +23,11 @@ export default class TopicUpdate {
 
 		this.state = {
 			loading: true,
-			timestamp: h.parseDecimal(updateData.meta.time)
+			timestamp: h.parseDecimal(updateData.meta.time),
+			title: ""
 		};
+
+		this.topic = topic
 	}
 
 	setState = (newState) => {
@@ -40,6 +44,10 @@ export default class TopicUpdate {
 	getTime = () => {
 		return h.parseDecimal(this._securedData.metaAttr("time"));
 	};
+
+	getTopic = () => {
+		return this.topic
+	}
 
 	isAfter = (topicUpdate) => {
 		if (!topicUpdate) {
@@ -67,11 +75,24 @@ export default class TopicUpdate {
 	});
 
 	protected load() {
-		return this.decryptAndVerify()
+		return Bluebird.try(async () => {
+			const content = await this.decryptAndVerify()
+
+			this.setState({
+				title: content.title,
+				loading: false
+			});
+
+			return content;
+		})
 	}
 
 	ensureParent = (topic) => {
-		this._securedData.checkParent(topic.getSecuredData());
+		this._securedData.checkParent(this.topic.getSecuredData());
+
+		if (topic !== this.topic) {
+			topic.ensureTopicChain(this.topic.getID())
+		}
 	};
 
 	ensureIsAfterTopicUpdate = (topicUpdate) => {
@@ -94,15 +115,20 @@ export default class TopicUpdate {
 		return this._securedData.metaAttr("metaUpdate")
 	}
 
-	static create(topic, previousTopicUpdate, { meta, content }: { meta?, content? }) {
-		var topicContainer = topic.getSecuredData();
-		var topicUpdatePromisified = SecuredData.createPromisified(content, {
+	getTitle = () => {
+		return this.load().then((content) => {
+			return content.title;
+		});
+	};
+
+	static create(chunk, previousTopicUpdate, title = "") {
+		var chunkSecuredData = chunk.getSecuredData();
+		var topicUpdatePromisified = SecuredData.createPromisified({ title }, {
 				userID: userService.getown().getID(),
 				time: new Date().getTime(),
-				metaUpdate: meta
-			}, { type: "topicUpdate" }, userService.getown().getSignKey(), topicContainer.getKey());
+			}, { type: "topicUpdate" }, userService.getown().getSignKey(), chunkSecuredData.getKey());
 
-		topicUpdatePromisified.data.setParent(topicContainer);
+		topicUpdatePromisified.data.setParent(chunkSecuredData);
 
 		if (previousTopicUpdate) {
 			topicUpdatePromisified.data.setAfterRelationShip(previousTopicUpdate.getSecuredData());
@@ -110,7 +136,7 @@ export default class TopicUpdate {
 
 		return topicUpdatePromisified.promise.then(function(topicUpdateData) {
 			return socket.emit("messages.createTopicUpdate", {
-				topicID: topic.getID(),
+				chunkID: chunk.getID(),
 				topicUpdate: topicUpdateData
 			}).then(function(response) {
 				topicUpdateData.id = response.id;
