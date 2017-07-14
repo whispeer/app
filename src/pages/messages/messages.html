@@ -1,8 +1,8 @@
 <topicWithBursts
-		[topic]="topic"
+		[chat]="chat"
 		[messageBurstsFunction]="messageBursts"
 		[loadMoreMessages]="loadMoreMessages"
-		[partners]="partners"
+		[partners]="getPartners()"
 		[messagesLoading]="messagesLoading"
 		(sendMessage)="sendMessage($event)"
 ></topicWithBursts>

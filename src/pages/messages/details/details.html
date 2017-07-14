@@ -1,0 +1,70 @@
+<ion-header>
+
+	<ion-navbar [color]="'primary'" no-border>
+		<ion-title>Details</ion-title>
+	</ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+	<ion-spinner *ngIf="loading" text-center margin-vertical class="spinner--full"></ion-spinner>
+
+	<ion-list *ngIf="!loading">
+
+		<ion-list-header padding-top>
+			Conversation Title
+		</ion-list-header>
+
+		<ion-item class="no--padding--right">
+			<ion-input type="text" placeholder="Chat Title" *ngIf="amIAdmin()" [(ngModel)]="title"></ion-input>
+			<div *ngIf="!amIAdmin()">
+				{{ title }}
+			</div>
+			<button ion-button item-end class="full--height" *ngIf="amIAdmin()" [disabled]="saving" (click)="setTitle(title)">Change</button>
+		</ion-item>
+
+		<ion-list-header padding-top>
+			All Members
+		</ion-list-header>
+
+		<ion-item-sliding #item *ngFor="let receiver of getReceivers();">
+
+			<ion-item (click)="goToUser(receiver.id)">
+				<ion-avatar class="hexagon--border" item-left>
+					<user-image [id]="receiver.id" [image]="receiver.basic.image"></user-image>
+				</ion-avatar>
+				<span>
+					<h2>
+						{{ receiver.name }}
+					</h2>
+					<small *ngIf="isAdmin(receiver.user)">
+						Administrator
+					</small>
+					<small *ngIf="!isAdmin(receiver.user)">
+						Member
+					</small>
+				</span>
+			</ion-item>
+			<ion-item-options side="left" *ngIf="!isAdmin(receiver.user) && amIAdmin()">
+				<button ion-button color="primary" [disabled]="saving" (click)="promote(receiver.user)">Promote</button>
+			</ion-item-options>
+
+			<ion-item-options side="right" *ngIf="!isAdmin(receiver.user) && amIAdmin()">
+				<button ion-button color="danger" [disabled]="saving" (click)="remove(receiver.user)">Remove</button>
+			</ion-item-options>
+		</ion-item-sliding>
+
+		<ion-item detail-push (click)="addContact()" *ngIf="amIAdmin()">
+			Add more contacts...
+		</ion-item>
+	</ion-list>
+
+	<button *ngIf="!loading" ion-button full color="danger" (click)="report()">{{ 'topic.detail.reportTopic' | translate }}</button>
+
+	<div text-center class="space-for-fab" *ngIf="!loading">
+	</div>
+
+	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
+
+</ion-content>

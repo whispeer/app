@@ -4,8 +4,68 @@ import { NavController, Content, IonicPage } from "ionic-angular";
 
 import { TranslateService } from '@ngx-translate/core';
 
-const messageService = require("messages/messageService");
+import messageService from "../../lib/messages/messageService";
+import Memoizer from "../../lib/asset/memoizer"
+
 const contactsService = require("../../lib/services/friendsService");
+
+import ChunkLoader from "../../lib/messages/chatChunk"
+import MessageLoader from "../../lib/messages/message"
+import ChatLoader from "../../lib/messages/chat"
+
+const getMessageInfo = (latestMessageID) => {
+	if (!MessageLoader.isLoaded(latestMessageID)) {
+		return {
+			latestMessageText: ""
+		}
+	}
+
+	const latestMessage = MessageLoader.getLoaded(latestMessageID)
+
+	return {
+		time: latestMessage.getTime(),
+		latestMessageText: latestMessage.getText(),
+	}
+}
+
+const memoizer = new Memoizer([
+	() => messageService.getChatIDs(),
+	() => ChatLoader.getAll(),
+	() => MessageLoader.getAll(),
+], (chatIDs) => {
+	let loaded = true
+
+	return chatIDs.filter((chatID) => {
+		loaded = loaded && ChatLoader.isLoaded(chatID)
+
+		return loaded
+	}).map((chatID) => {
+		const chat = ChatLoader.getLoaded(chatID)
+
+		const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
+
+		const chatInfo = {
+			id: chat.getID(),
+
+			unread: chat.isUnread(),
+			unreadCount: chat.getUnreadMessageIDs().length,
+		}
+
+		const chunkInfo = {
+			partners: latestChunk.getPartners(),
+			partnersDisplay: latestChunk.getPartnerDisplay(),
+			title: latestChunk.getTitle(),
+			time: latestChunk.getTime(),
+			type: latestChunk.getReceiver().length > 2 ? "groupChat" : "peerChat"
+		}
+
+		const messageInfo = getMessageInfo(chat.getLatestMessage())
+
+		return Object.assign({}, chatInfo, chunkInfo, messageInfo)
+	}).sort((a, b) =>
+		b.time - a.time
+	)
+})
 
 @IonicPage({
 	name: "Home",
@@ -22,7 +82,7 @@ export class HomePage {
 	requests: any[] = [];
 	searchTerm: string = "";
 
-	topicsLoading: boolean = true;
+	chatsLoading: boolean = true;
 	moreTopicsAvailable: boolean = true;
 
 	lang: string = "en"
@@ -45,32 +105,31 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
-		this.topics = messageService.data.latestTopics.data;
+		this.topics = []
 
 		console.warn("load more topics?", this.topics.length)
 		if (this.topics.length >= 10) {
 			return
 		}
 
-		messageService.loadMoreLatest(() => {}).then(() => {
-			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
-			this.topicsLoading = false;
+		messageService.loadMoreChats().then(() => {
+			this.moreTopicsAvailable = !messageService.allChatsLoaded
+			this.chatsLoading = false;
 		});
 	}
 
-	getLoadedTopics = () => {
-		let loaded = true
-
-		return this.topics.filter((topic) => {
-			loaded = loaded && topic.loaded
-
-			return loaded
-		})
+	getChats = () => {
+		return memoizer.getValue()
 	}
 
 	loadMoreTopics = (infiniteScroll) => {
-		messageService.loadMoreLatest(() => {}).then(() => {
-			this.moreTopicsAvailable = !messageService.data.latestTopics.allTopicsLoaded
+		if (this.chatsLoading) {
+			infiniteScroll.complete();
+			return
+		}
+
+		messageService.loadMoreChats().then(() => {
+			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			infiniteScroll.complete();
 		})
 	}
@@ -96,8 +155,8 @@ export class HomePage {
 		this.navCtrl.push("Requests");
 	}
 
-	openChat = (topicId: number) => {
-		this.navCtrl.push("Messages", { topicId: topicId });
+	openChat = (chatID: number) => {
+		this.navCtrl.push("Messages", { chatID: chatID });
 	}
 
 	newMessage = () => {

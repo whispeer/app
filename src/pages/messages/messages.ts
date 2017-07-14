@@ -1,57 +1,19 @@
 import { Component, ElementRef } from "@angular/core";
-import { NavParams, IonicPage } from "ionic-angular";
+import { NavController, NavParams, IonicPage } from "ionic-angular";
 
-import TopicUpdate from "../../lib/messages/topicTitleUpdate";
 import errorService from "../../lib/services/error.service";
 
-const messageService = require("../../lib/messages/messageService");
-const Burst = require("../../lib/messages/burst");
+import messageService from "../../lib/messages/messageService";
+import Burst from "../../lib/messages/burst"
+import { Chat } from "../../lib/messages/chat"
+import MessageLoader from "../../lib/messages/message"
 
 const inView = require("in-view");
 
-@IonicPage({
-	name: "Messages",
-	segment: "messages/:topicId",
-	defaultHistory: ["Home"]
-})
-@Component({
-	selector: 'page-messages',
-	templateUrl: 'messages.html'
-})
-export class MessagesPage {
-	topicId: number;
-	topic: any;
-	topicObject: any;
+const initService = require("../../lib/services/initService");
 
-	partners: any[] = [];
-	messagesLoading: boolean = true;
-
-	burstTopic: number = 0;
-	bursts: any[] = [];
-	lastMessageElement: any;
-
-	messages: any[];
-	constructor(public navParams: NavParams, private element: ElementRef) {
-	}
-
-	ngOnInit() {
-		this.topicId = parseFloat(this.navParams.get("topicId"));
-
-		messageService.getTopic(this.topicId).then((topic) => {
-			this.topic = topic.data;
-			this.topicObject = topic;
-			this.partners = topic.data.partners;
-
-			topic.loadInitialMessages().then(() => {
-				this.messagesLoading = false;
-				this.topicObject.markRead(errorService.criticalError)
-			});
-		})
-	}
-
-	ionViewDidEnter = () => {}
-
-	private getNewElements(messagesAndUpdates, bursts) {
+namespace BurstHelper {
+	export const getNewElements = (messagesAndUpdates, bursts) => {
 		return messagesAndUpdates.filter((message) => {
 			return bursts.reduce((prev, current) => {
 				return prev && !current.hasItem(message);
@@ -59,8 +21,8 @@ export class MessagesPage {
 		});
 	}
 
-	private calculateBursts(messages) {
-		var bursts = [new Burst(TopicUpdate)];
+	export const calculateBursts = (messages: any[]) => {
+		var bursts = [new Burst()];
 		var currentBurst = bursts[0];
 
 		messages.sort((m1, m2) => {
@@ -69,7 +31,7 @@ export class MessagesPage {
 
 		messages.forEach((messageOrUpdate) => {
 			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst(TopicUpdate);
+				currentBurst = new Burst();
 				bursts.push(currentBurst);
 			}
 
@@ -79,7 +41,7 @@ export class MessagesPage {
 		return bursts;
 	}
 
-	private hasMatchingMessage(oldBurst, newBurst) {
+	const hasMatchingMessage = (oldBurst, newBurst) => {
 		var matchingMessages = newBurst.getItems().filter((message) => {
 			return oldBurst.hasItem(message);
 		});
@@ -87,13 +49,13 @@ export class MessagesPage {
 		return matchingMessages.length > 0;
 	}
 
-	private addBurst(bursts, burst) {
+	const addBurst = (bursts, burst) => {
 		bursts.push(burst);
 
 		return true;
 	}
 
-	private mergeBurst(oldBurst, newBurst) {
+	const mergeBurst = (oldBurst, newBurst) => {
 		var newMessages = newBurst.getItems().filter((message) => {
 			return !oldBurst.hasItem(message);
 		});
@@ -105,17 +67,17 @@ export class MessagesPage {
 		return true;
 	}
 
-	private addBurstOrMerge(bursts, burst) {
+	const addBurstOrMerge = (bursts, burst) => {
 		var possibleMatches = bursts.filter((oldBurst) => {
-			return this.hasMatchingMessage(oldBurst, burst);
+			return hasMatchingMessage(oldBurst, burst);
 		});
 
 		if (possibleMatches.length === 0) {
-			return this.addBurst(bursts, burst);
+			return addBurst(bursts, burst);
 		}
 
 		if (possibleMatches.length === 1) {
-			return this.mergeBurst(possibleMatches[0], burst);
+			return mergeBurst(possibleMatches[0], burst);
 		}
 
 		if (possibleMatches.length > 1) {
@@ -124,31 +86,91 @@ export class MessagesPage {
 		}
 	}
 
-	private mergeBursts(bursts, newBursts) {
+	export const mergeBursts = (bursts, newBursts) => {
 		return newBursts.reduce((prev, burst) => {
-			return prev && this.addBurstOrMerge(bursts, burst);
+			return prev && addBurstOrMerge(bursts, burst);
 		}, true);
+	}
+}
+
+@IonicPage({
+	name: "Messages",
+	segment: "messages/:chatID",
+	defaultHistory: ["Home"]
+})
+@Component({
+	selector: 'page-messages',
+	templateUrl: 'messages.html'
+})
+export class MessagesPage {
+	chatID: number;
+	chat: Chat;
+
+	messagesLoading: boolean = true;
+
+	burstTopic: number = 0;
+	bursts: any[] = [];
+	lastMessageElement: any;
+
+	messages: any[];
+
+	constructor(public navParams: NavParams, private element: ElementRef, private navCtrl: NavController) {
+	}
+
+	ngOnInit() {
+		this.chatID = parseFloat(this.navParams.get("chatID"));
+
+		initService.awaitLoading().then(() =>
+			messageService.getChat(this.chatID)
+		).then((chat) => {
+			this.chat = chat;
+
+			chat.loadInitialMessages().then(() => {
+				this.messagesLoading = false;
+				this.chat.markRead().catch(errorService.criticalError)
+			});
+		})
+	}
+
+	ionViewDidEnter = () => {}
+
+	getPartners = () => {
+		if (!this.chat) {
+			return []
+		}
+
+		return this.chat.getPartners()
 	}
 
 	private getBursts = (options) => {
-		if (!this.topic || this.topic.messagesAndUpdates.length === 0) {
+		if (!this.chat || this.chat.getMessagesAndUpdates().length === 0) {
 			return { changed: false, bursts: [] };
 		}
 
-		var messagesAndUpdates = this.topic.messagesAndUpdates;
+		const messagesAndUpdates = this.chat.getMessagesAndUpdates().map(({ id: { id, type }}) => {
+			if (type === "message") {
+				return MessageLoader.getLoaded(id)
+			}
 
-		if (this.burstTopic !== this.topic.id) {
-			this.bursts = this.calculateBursts(messagesAndUpdates);
-			this.burstTopic = this.topic.id;
+			if (type === "topicUpdate") {
+				throw new Error("not yet implemented")
+			}
+
+			throw new Error("invalid type for message or update")
+		})
+
+		if (this.burstTopic !== this.chat.getID()) {
+			this.bursts = BurstHelper.calculateBursts(messagesAndUpdates);
+			this.burstTopic = this.chat.getID();
 
 			return { changed: true, bursts: this.bursts };
 		}
 
-		var newElements = this.getNewElements(messagesAndUpdates, this.bursts);
+		var newElements = BurstHelper.getNewElements(messagesAndUpdates, this.bursts);
 
 		if (options) {
 			const firstViewMessage = messagesAndUpdates.find((elem) => {
-				return options.after == elem.getID().toString()
+				return options.after == elem.getClientID().toString()
 			})
 
 			const index = messagesAndUpdates.indexOf(firstViewMessage)
@@ -166,8 +188,8 @@ export class MessagesPage {
 			burst.removeAllExceptLast();
 		});
 
-		var newBursts = this.calculateBursts(messagesAndUpdates);
-		if (!this.mergeBursts(this.bursts, newBursts)) {
+		var newBursts = BurstHelper.calculateBursts(messagesAndUpdates);
+		if (!BurstHelper.mergeBursts(this.bursts, newBursts)) {
 			console.warn("Rerender all bursts!");
 			this.bursts = newBursts;
 		}
@@ -187,6 +209,10 @@ export class MessagesPage {
 	}
 
 	registerMarkReadListener() {
+		if (!this.chat || !this.chat.isUnread()) {
+			return
+		}
+
 		const selector = ".messages__burst:last-child .messages__wrap:last-child"
 		const lastMessageElement: Element = this.element.nativeElement.querySelector(selector)
 
@@ -209,9 +235,9 @@ export class MessagesPage {
 
 		this.messagesLoading = true;
 
-		return this.topicObject.loadMoreMessages().then(() => {
+		return this.chat.loadMoreMessages().then(({ remaining }) => {
 			this.messagesLoading = false;
-			return this.topic.remaining
+			return remaining
 		})
 	}
 
@@ -227,8 +253,8 @@ export class MessagesPage {
 
 	markRead = () => {
 		setTimeout(() => {
-			console.log('mark topic read', this.topicObject.getID())
-			this.topicObject.markRead(errorService.criticalError)
+			console.log('mark topic read', this.chat.getID())
+			this.chat.markRead().catch(errorService.criticalError)
 		}, 0)
 	}
 
@@ -237,10 +263,8 @@ export class MessagesPage {
 			return;
 		}
 
-		console.log(images);
-
-		messageService.sendMessage(this.topic.id, text, images).then(() => {
-			this.topic.newMessage = "";
+		messageService.sendMessage(this.chat.getID(), text, images).then(() => {
+			this.chat.newMessage = "";
 			this.markRead();
 		});
 	}

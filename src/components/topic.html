@@ -1,27 +1,36 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
-		<ion-title [ngClass]="{'title--force-back': forceBackButton}">
+		<ion-title [ngClass]="{'title--force-back': forceBackButton}" (click)="goToDetails()">
+
+			<!-- Back button -->
 			<div class="messages__header__fake-back">
 				<button *ngIf="forceBackButton" (click)="navCtrl.pop()" class="bar-button bar-button-ios" color="light" ion-button icon-only clear>
 					<ion-icon name="arrow-back"></ion-icon>
 				</button>
 			</div>
+
+			<!-- Actual navbar title -->
 			<span class="messages__header__username" [ngClass]="{'messages__header__username--no-image': partners.length > 1}">
-				<span *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">
-					{{ partners[0].name }}
-				</span>
-				<span *ngIf="partners.length != 1 && !(topic && topic.title)">
-					<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
-						{{ partner.basic.shortname }}{{ l ? "":", " }}
+				<span *ngIf="!chat || !chat.getTitle()">
+					<span *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">
+						{{ partners[0].name }}
+					</span>
+					<span *ngIf="partners.length != 1">
+						<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">
+							{{ partner.basic.shortname }}{{ l ? "":", " }}
+						</span>
 					</span>
 				</span>
-				<span *ngIf="topic && topic.title">
-					{{topic.title}}
+				<span *ngIf="chat && chat.getTitle()">
+					{{chat.getTitle()}}
 				</span>
 			</span>
-			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1">
+
+			<!-- Avatar for one user -->
+			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">
 				<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>
 			</ion-avatar>
+
 		</ion-title>
 	</ion-navbar>
 </ion-header>
@@ -30,14 +39,12 @@
 		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 		<div class="messages_filler"></div>
 		<ion-list no-lines>
-			<ion-item class="messages__burst" *ngFor="let burst of messageBursts(); let $index=index" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-				<div class="messages_message" *ngIf="!burst.sameDay(bursts[$index - 1])">
-					<div class="burst-seperator burst-seperator-date">
-						<span>
-							{{burst.firstItem().getTime()|seperatorDate}}
-						</span>
-					</div>
-				</div>
+			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">
+				<BurstDifference [chat]="chat" [burst]="bursts[0]"></BurstDifference>
+			</ion-item>
+			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
+				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>
+
 				<span *ngIf="burst.isMessageBurst()">
 					<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
 					<div *ngFor="let message of burst.items" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
@@ -48,13 +55,15 @@
 						<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 					</div>
 				</span>
-				<div class="messages_message" *ngIf="burst.isTopicUpdate()">
+				<div class="messages_message" *ngIf="burst.isChatUpdate()">
 					<div class="burst-seperator burst-seperator-update">
-						<span>
+						<span class="burst-seperator-text">
 							{{ burst.firstItem().state.sender.data.name }} {{ 'topic.changed' | translate }} "<strong>{{ burst.firstItem().state.title }}</strong>"
 						</span>
 					</div>
 				</div>
+
+				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>
 			</ion-item>
 		</ion-list>
 	</div>
@@ -65,7 +74,7 @@
 		<ion-item class="clean-input-wrap messages__input-wrap">
 			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 		</ion-item>
-		<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToTopic()">
+		<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToChat()">
 			<ion-icon name="arrow-dropup-circle"></ion-icon>
 		</button>
 	</div>

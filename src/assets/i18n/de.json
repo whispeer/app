@@ -50,7 +50,14 @@
 	"topic": {
 		"takePhoto": "Foto aufnehmen",
 		"selectGallery": "Aus Galerie auswählen",
-		"changed": "hat den Titel geändert zu"
+		"changed": "hat den Titel geändert zu",
+		"detail": {
+			"reportTopic": "Diesen Chat melden",
+			"reportConfirm": {
+				"title": "Diesen Chat melden?",
+				"message": "Bitte bestätige, dass du diesen Chat melden möchtest. Wir setzen uns dann mit dir in Verbindung."
+			}
+		}
 	},
 	"chooseFriends": {
 		"title": "Kontakte auswählen",
@@ -99,7 +106,12 @@
 			"removeQuestion": "Möchtest du {{name}} wirklich aus deinen Kontakten entfernen?",
 			"removeConfirmButtonText": "Entfernen",
 			"acceptedMessage": "{{name}} ist nun dein Kontakt.",
-			"requestSentMessage": "Du hast eine Kontaktanfrage an {{name}} gesendet."
+			"requestSentMessage": "Du hast eine Kontaktanfrage an {{name}} gesendet.",
+			"reportContact": "Diesen Nutzer melden",
+			"reportConfirm": {
+				"title": "Diesen Nutzer melden?",
+				"message": "Bitte bestätige, dass du diesen Nutzer melden möchtest. Wir setzen uns dann mit dir in Verbindung."
+			}
 		},
 		"image": {
 			"view": "Bild ansehen",

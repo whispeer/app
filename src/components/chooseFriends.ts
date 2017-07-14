@@ -6,7 +6,7 @@ const friendsService = require("../lib/services/friendsService");
 import { ContactsWithSearch } from '../lib/contacts/contactsWithSearch'
 import { TranslateService } from '@ngx-translate/core';
 
-const h = require("whispeerHelper");
+import h from "../lib/helper/helper";
 
 @Component({
 	selector: 'chooseFriends',

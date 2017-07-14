@@ -11,7 +11,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 import { TranslateService } from '@ngx-translate/core';
 
 const ImageUpload = require("../lib/services/imageUploadService");
-const h = require("whispeerHelper");
+import h from "../lib/helper/helper";
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -27,13 +27,15 @@ const INFINITE_SCROLLING_THRESHOLD = 1000
 })
 export class TopicComponent {
 	@Input() partners;
-	@Input() topic;
+	@Input() chat;
 	@Input() messageBurstsFunction;
 	@Input() loadMoreMessages;
 	@Input() messagesLoading;
 	@Input() forceBackButton;
 
 	@Output() sendMessage = new EventEmitter();
+
+	firstRender: Boolean = true
 
 	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
@@ -112,7 +114,7 @@ export class TopicComponent {
 		this.stabilizeScroll()
 	}
 
-	sendMessageToTopic = () => {
+	sendMessageToChat = () => {
 		this.sendMessage.emit({
 			text: this.newMessageText,
 			images: []
@@ -208,7 +210,7 @@ export class TopicComponent {
 			return
 		}
 
-		const scrollTop = this.content.nativeElement.scrollTop
+		const { scrollTop } = this.content.nativeElement
 
 		if (scrollTop < INFINITE_SCROLLING_THRESHOLD) {
 			this.messagesLoading = true
@@ -301,35 +303,38 @@ export class TopicComponent {
 	}
 
 	messageBursts = () => {
-		const scrollFromBottom = this.scrollFromBottom()
+		const { changed, bursts } = this.afterViewBurstMessages()
 
-		if (scrollFromBottom > 15) {
-			const { changed, bursts } = this.afterViewBurstMessages()
+		if (changed) {
+			const scrollFromBottom = this.scrollFromBottom()
 
-			if (changed) {
+			if (scrollFromBottom > 15) {
 				this.bursts = bursts
 				return bursts
 			}
 		}
 
+		this.firstRender = false
+
 		this.bursts = this.allBurstMessages()
+
 		return this.bursts
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
-		const topicChanges = changes["topic"]
+		const chatChanges = changes["chat"]
 
-		if (!topicChanges || !topicChanges.currentValue || this.newMessageText !== "") {
+		if (!chatChanges || !chatChanges.currentValue || this.newMessageText !== "") {
 			return
 		}
 
-		this.newMessageText = topicChanges.currentValue.newMessage
+		this.newMessageText = chatChanges.currentValue.newMessage
 	}
 
 	change() {
 		setTimeout(() => {
-			if (this.topic) {
-				this.topic.newMessage = this.newMessageText
+			if (this.chat) {
+				this.chat.newMessage = this.newMessageText
 			}
 
 			const fontSize = 16;
@@ -352,7 +357,21 @@ export class TopicComponent {
 		}, 100);
 	}
 
+	goToDetails() {
+		if (!this.chat) {
+			return
+		}
+
+		this.navCtrl.push("Chat Details", {
+			chatID: this.chat.id
+		});
+	}
+
 	goToProfile(userId: number) {
+		if (this.chat) {
+			return
+		}
+
 		this.navCtrl.push("Profile", {
 			userId
 		});
