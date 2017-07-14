@@ -105,10 +105,8 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
-		this.topics = []
-
-		console.warn("load more topics?", this.topics.length)
-		if (this.topics.length >= 10) {
+		console.warn("load more chats?", this.getChats().length)
+		if (this.getChats().length >= 10) {
 			return
 		}
 
