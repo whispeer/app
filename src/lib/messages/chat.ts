@@ -305,7 +305,21 @@ export class Chat {
 		return this.setReceivers(oldReceivers.concat(newReceiverIDs), canReadOldMessages)
 	}
 
-	createSuccessor = (receiver, options : { canReadOldMessages? : boolean, title? : String, admins? : number[] }) => {
+	loadAllChunks = () => {
+		return socketService.emit("chat.getChunks", { id: this.id }).then((chunks) => {
+			// TODO: request all chunks from server
+			throw new Error("not yet implemented")
+		})
+	}
+
+	private encryptAllChunksForReceiver = (chunkData, addedReceiver: number[]) => {
+		return this.loadAllChunks().then(() => {
+			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
+			throw new Error("not yet implemented")
+		})
+	}
+
+	private createSuccessor = (receiver, options : { canReadOldMessages? : boolean, title? : String, admins? : number[] }) => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
 		const {
@@ -321,6 +335,10 @@ export class Chat {
 		const addedReceiver = receiver.filter((id) => latestChunk.getReceiver().indexOf(id) === -1)
 		const removedReceiver = latestChunk.getReceiver().filter((id) => receiver.indexOf(id) === -1)
 
+		if (removedReceiver.length > 0 && canReadOldMessages) {
+			throw new Error("Can not remove receiver and allow reading of old messages")
+		}
+
 		return latestChunk.getSuccessor().then((successor) => {
 			if (successor) {
 				throw new Error("TODO: Chunk has a successor. Try again?")
@@ -331,19 +349,18 @@ export class Chat {
 
 			return Chunk.createRawData(receiver, { content, meta, predecessorChunk: latestChunk })
 		}).then((chunkData) => {
-			if (!canReadOldMessages) {
+			if (!canReadOldMessages || addedReceiver.length === 0) {
 				return chunkData
 			}
 
-			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
-
-			throw new Error("not yet implemented")
+			return this.encryptAllChunksForReceiver(chunkData, addedReceiver)
 		}).then(({ chunk, keys, receiverKeys }) => {
 			return socketService.emit("chat.chunk.create", {
 				predecessorID: latestChunk.getID(),
 				chunk,
 				keys,
 				receiverKeys,
+				canReadOldMessages
 			})
 		}).then((response: any) => {
 			return ChunkLoader.load(response.chunk)
