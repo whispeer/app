@@ -52,6 +52,12 @@ export class ContactsPage extends ContactsWithSearch {
 		return this.translate.instant(`home.newContact.${count}`)
 	}
 
+	handleSearchKey = (event) => {
+		if(event.keyCode === 13) {
+			event.target.blur();
+		}
+	}
+
 	goToUser(userId) {
 		this.navCtrl.push("Profile", {
 			userId: userId
