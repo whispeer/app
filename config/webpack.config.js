@@ -45,8 +45,7 @@ module.exports = {
 			}, {
 				test: /\.js$/,
 				loader: process.env.IONIC_WEBPACK_TRANSPILE_LOADER
-			},
-			{
+			}, {
 				test: /\.js$/,
 				exclude: /(node_modules|bower_components)/,
 				loader: "babel-loader"
