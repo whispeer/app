@@ -4036,7 +4036,7 @@ signal-exit@^3.0.0:
 
 "sjcl@git+https://github.com/whispeer/sjcl.git#custom-build":
   version "1.0.2"
-  resolved "git+https://github.com/whispeer/sjcl.git#577e3fbb3c7e2e7336f83b3d8a36556e015835f1"
+  resolved "git+https://github.com/whispeer/sjcl.git#b3c31b7d2bc54517aa3b662d3b50e11bd3647ccc"
 
 slash@^1.0.0:
   version "1.0.0"
