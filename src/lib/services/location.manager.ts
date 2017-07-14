@@ -1,6 +1,5 @@
 import * as StorageService from "./storage.service"
 import Storage from "./Storage"
-import "jquery"
 import h from "../helper/helper"
 
 const loginStorage: Storage = StorageService.withPrefix("whispeer.login");
@@ -9,16 +8,6 @@ const blockedReturnUrls: string[] = ["/b2c", "/recovery"];
 
 const basePath = window.top.location.href.match(/([^?#]*)/)[0]
 const basePathname = basePath.match(/(.*)\/.*/)[1]
-
-const removeOther = (ele: JQuery) => {
-	ele.siblings().remove();
-
-	if (!ele.parent().is("body")) {
-		removeOther(ele.parent());
-	} else {
-		ele.hide();
-	}
-};
 
 const setTopLocation = (url: string) => {
 	console.warn("set top location", url, basePath + url)
@@ -31,7 +20,7 @@ const setTopPath = (url: string) => {
 }
 
 export const landingPage = () => {
-	setTopLocation("#/login")
+	setTopLocation("#/nav/n4/login")
 	window.top.location.reload()
 }
 
@@ -44,11 +33,11 @@ export const isBusinessVersion = () => {
 }
 
 export const goToPrivateHome = () => {
-	setTopPath("/index.html#/home")
+	setTopPath("/")
 }
 
 export const loginPage = () => {
-	setTopLocation("#/login");
+	setTopLocation("#/nav/n4/login");
 }
 
 export const goToBusinessVersion = () => {
