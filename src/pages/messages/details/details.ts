@@ -22,6 +22,8 @@ export class DetailPage {
 	loading: boolean = true
 	title: string = ""
 
+	saving: boolean = false
+
 	receiverToAdd: string
 
 	constructor(
@@ -58,11 +60,19 @@ export class DetailPage {
 	}
 
 	promote = (user) => {
-		return this.chat.addAdmin(user)
+		this.saving = true
+
+		return this.chat.addAdmin(user).then(() => {
+			this.saving = false
+		})
 	}
 
 	remove = (user) => {
-		return this.chat.removeReceiver(user)
+		this.saving = true
+
+		return this.chat.removeReceiver(user).then(() => {
+			this.saving = false
+		})
 	}
 
 	addContact = () => {
@@ -70,7 +80,11 @@ export class DetailPage {
 	}
 
 	setTitle = (title) => {
-		this.chat.setTitle(title)
+		this.saving = true
+
+		return this.chat.setTitle(title).then(() => {
+			this.saving = false
+		})
 	}
 
 	isAdmin = (user) => this.chat.isAdmin(user)
