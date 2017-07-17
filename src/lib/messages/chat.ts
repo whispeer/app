@@ -10,6 +10,7 @@ import MessageLoader, { Message } from "./message"
 import h from "../helper/helper"
 
 import Cache from "../services/Cache";
+import keyStore from "../services/keyStore.service"
 
 const ImageUpload = require("services/imageUploadService");
 const initService = require("services/initService");
@@ -131,7 +132,7 @@ export class Chat {
 			return
 		}
 
-		this.chunkIDs.push(chunkID)
+		this.chunkIDs = [...this.chunkIDs, chunkID].sort((a, b) => a - b)
 	}
 
 	load = h.cacheResult<Bluebird<any>>(() => {
@@ -271,7 +272,7 @@ export class Chat {
 		const oldReceiverIDs = latestChunk.getReceiver()
 		const newReceiverIDs = oldReceiverIDs.filter((id) => id !== receiver.getID())
 
-		return this.setReceivers(newReceiverIDs)
+		return this.createSuccessor(newReceiverIDs, {})
 	}
 
 	addAdmin = (receiver) => {
@@ -302,20 +303,42 @@ export class Chat {
 
 		const oldReceivers = latestChunk.getReceiver()
 
-		return this.setReceivers(oldReceivers.concat(newReceiverIDs), canReadOldMessages)
+		return this.createSuccessor(oldReceivers.concat(newReceiverIDs), { canReadOldMessages })
 	}
 
 	loadAllChunks = () => {
-		return socketService.emit("chat.getChunks", { id: this.id }).then((chunks) => {
-			// TODO: request all chunks from server
-			throw new Error("not yet implemented")
-		})
+		return socketService.emit("chat.getChunks", { id: this.id }).then(({ chunks }) =>
+			chunks
+		).map((chunk) =>
+			ChunkLoader.load(chunk)
+		)
 	}
 
 	private encryptAllChunksForReceiver = (chunkData, addedReceiver: number[]) => {
-		return this.loadAllChunks().then(() => {
-			// TODO:  encrypt this chunks (and previous chunks) key with new chunks key
-			throw new Error("not yet implemented")
+		return this.loadAllChunks().then((chunks) => {
+			chunks.sort((c1, c2) => c1.getID() - c2.getID())
+
+			chunks.forEach((chunk, index) => {
+				if (chunks[index + 1] && chunks[index + 1].getPredecessorID() !== chunk.getID()) {
+					throw new Error("chunk chain invalid")
+				}
+			})
+
+			const receiverKeys = addedReceiver.map((receiver) =>
+				chunkData.receiverKeys[receiver]
+			)
+
+			const chunkKeys = chunks.map((chunk) => chunk.getSecuredData().metaAttr("_key")).filter((value, index, self) =>
+				self.indexOf(value) === index
+			)
+
+			return Bluebird.all(receiverKeys.map((receiverKey) =>
+				Bluebird.all(chunkKeys.map((chunkKey) => {
+					return keyStore.sym.symEncryptKey(chunkKey, receiverKey)
+				})
+			))).thenReturn([chunkKeys, receiverKeys])
+		}).then(([chunkKeys, receiverKeys]) => {
+			return { ...chunkData, previousChunksDecryptors: keyStore.upload.getDecryptors(chunkKeys, receiverKeys) }
 		})
 	}
 
@@ -354,12 +377,13 @@ export class Chat {
 			}
 
 			return this.encryptAllChunksForReceiver(chunkData, addedReceiver)
-		}).then(({ chunk, keys, receiverKeys }) => {
+		}).then(({ chunk, keys, receiverKeys, previousChunksDecryptors }) => {
 			return socketService.emit("chat.chunk.create", {
 				predecessorID: latestChunk.getID(),
 				chunk,
 				keys,
 				receiverKeys,
+				previousChunksDecryptors,
 				canReadOldMessages
 			})
 		}).then((response: any) => {
@@ -373,10 +397,6 @@ export class Chat {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
 		return this.createSuccessor(latestChunk.getReceiverIDs(), { title })
-	}
-
-	setReceivers = (receivers, canReadOldMessages = false) => {
-		return this.createSuccessor(receivers, { canReadOldMessages })
 	}
 
 	sendUnsentMessage = (messageData, files) => {
