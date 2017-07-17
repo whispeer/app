@@ -60,17 +60,17 @@ export class BurstDifferenceComponent {
 	}
 
 	addedReceiver = (chunk: Chunk) => {
-		const currentPartners = chunk.getPartners()
-		const previousPartners = ChunkLoader.getLoaded(chunk.getPredecessorID()).getPartners()
+		const currentReceiveers = chunk.getReceivers()
+		const previousReceiveers = ChunkLoader.getLoaded(chunk.getPredecessorID()).getReceivers()
 
-		return currentPartners.filter((partner) => previousPartners.indexOf(partner) === -1)
+		return currentReceiveers.filter((partner) => previousReceiveers.indexOf(partner) === -1)
 	}
 
 	removedReceiver = (chunk: Chunk) => {
-		const currentPartners = chunk.getPartners()
-		const previousPartners = ChunkLoader.getLoaded(chunk.getPredecessorID()).getPartners()
+		const currentReceiveers = chunk.getReceivers()
+		const previousReceiveers = ChunkLoader.getLoaded(chunk.getPredecessorID()).getReceivers()
 
-		return previousPartners.filter((partner) => currentPartners.indexOf(partner) === -1)
+		return previousReceiveers.filter((partner) => currentReceiveers.indexOf(partner) === -1)
 	}
 
 	changedTitle = (chunk: Chunk) => {

@@ -81,7 +81,7 @@ messageService = {
 	},
 	loadMoreChats: h.cacheUntilSettled(() => {
 		return initService.awaitLoading().then(function () {
-			if (chatIDs) {
+			if (chatIDs && chatIDs.length > 0) {
 				return Bluebird.resolve()
 			}
 
