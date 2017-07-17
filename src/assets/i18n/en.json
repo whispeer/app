@@ -21,7 +21,7 @@
 		"password2Placeholder": "Please type your password again",
 		"passwordPlaceholder": "Enter a password",
 		"identifierPlaceholder": "Enter an username",
-		"tos": "By signing up you agree to our <strong>Terms of Service</strong> <br>and our very strict <strong>Privacy Policy</strong>.",
+		"tos": "By signing up you agree to our <strong><a href='https://whispeer.de/en/agb' target='_blank'>Terms of Service</a></strong> <br>and our very strict <strong><a href='https://whispeer.de/en/privacyPolicy' target='_blank'>Privacy Policy</a></strong>.",
 		"header": "<strong>Hello</strong> and welcome to<br>the world of secure messaging!",
 		"messages": {
 			"defaultCallToAction": "<em>Create a new account</em> or <em>simply login...</em>",

@@ -21,7 +21,7 @@
 		"password2Placeholder": "Bitte Passwort erneut eingeben",
 		"passwordPlaceholder": "Bitte Passwort eingeben",
 		"identifierPlaceholder": "Bitte Nutzernamen eingeben",
-		"tos": "Mit der Anmeldung akzeptierst du unsere <strong>Nutzungsbedingungen</strong> und <strong>Datenschutzbestimmungen</strong>.",
+		"tos": "Mit der Anmeldung akzeptierst du unsere <strong><a href='https://whispeer.de/de/agb' target='_blank'>Nutzungsbedingungen</a></strong> und <strong><a href='https://whispeer.de/en/privacyPolicy' target='_blank'>Datenschutzbestimmungen</a></strong>.",
 		"header": "<strong>Hallo</strong> und willkommen in <br>der Welt der sicheren Kommunikation!",
 		"messages": {
 			"defaultCallToAction": "<em>Neu registrieren</em> oder <em>einfach anmelden...</em>",
