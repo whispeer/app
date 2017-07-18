@@ -17,11 +17,11 @@
 		</ion-list-header>
 
 		<ion-item class="no--padding--right">
-			<ion-input type="text" placeholder="Chat Title" *ngIf="amIAdmin()" [(ngModel)]="title"></ion-input>
-			<div *ngIf="!amIAdmin()">
+			<ion-input type="text" placeholder="Chat Title" *ngIf="featureEnabled('chat.changeTitle') && amIAdmin()" [(ngModel)]="title"></ion-input>
+			<button ion-button item-end class="full--height" *ngIf="featureEnabled('chat.changeTitle') && amIAdmin()" [disabled]="saving" (click)="setTitle(title)">Change</button>
+			<div *ngIf="!featureEnabled('chat.changeTitle') || !amIAdmin()">
 				{{ title }}
 			</div>
-			<button ion-button item-end class="full--height" *ngIf="amIAdmin()" [disabled]="saving" (click)="setTitle(title)">Change</button>
 		</ion-item>
 
 		<ion-list-header padding-top>
@@ -46,16 +46,16 @@
 					</small>
 				</span>
 			</ion-item>
-			<ion-item-options side="left" *ngIf="!isAdmin(receiver.user) && amIAdmin()">
+			<ion-item-options side="left" *ngIf="featureEnabled('chat.promoteReceiver') && !isAdmin(receiver.user) && amIAdmin()">
 				<button ion-button color="primary" [disabled]="saving" (click)="promote(receiver.user)">Promote</button>
 			</ion-item-options>
 
-			<ion-item-options side="right" *ngIf="!isAdmin(receiver.user) && amIAdmin()">
+			<ion-item-options side="right" *ngIf="featureEnabled('chat.removeReceiver') && !isAdmin(receiver.user) && amIAdmin()">
 				<button ion-button color="danger" [disabled]="saving" (click)="remove(receiver.user)">Remove</button>
 			</ion-item-options>
 		</ion-item-sliding>
 
-		<ion-item detail-push (click)="addContact()" *ngIf="amIAdmin()">
+		<ion-item detail-push (click)="addContact()" *ngIf="featureEnabled('chat.addReceiver') && amIAdmin()">
 			Add more contacts...
 		</ion-item>
 	</ion-list>

@@ -32,6 +32,8 @@ import { HttpModule, Http } from '@angular/http';
 
 import { isBusinessVersion } from "../lib/services/location.manager";
 
+import "../lib/services/featureToggles"
+
 import "../lib/services/settings.service"
 
 (window as any).startup = new Date().getTime();

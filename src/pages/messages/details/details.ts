@@ -5,7 +5,8 @@ import ChatLoader, { Chat } from "../../../lib/messages/chat"
 
 import { TranslateService } from '@ngx-translate/core';
 
-import reportService from "../../../lib/services/reportService";
+import featureToggles from "../../../lib/services/featureToggles"
+import reportService from "../../../lib/services/reportService"
 
 const initService = require("../../../lib/services/initService")
 
@@ -45,6 +46,10 @@ export class DetailPage {
 			this.title = this.chat.getTitle()
 		})
 		console.log('Init details page for topic', chatID);
+	}
+
+	featureEnabled(featureName) : boolean {
+		return featureToggles.isFeatureEnabled(featureName)
 	}
 
 	goToUser(userID) {
