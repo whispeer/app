@@ -89,7 +89,19 @@
 		"birthday": "Birthday",
 		"location": "Location",
 		"languages": "Language",
-		"verify": "Verify this Contact",
+		"verify": {
+			"action": "Verify this Contact",
+			"success": {
+				"heading": "Trusted contact",
+				"body": "This contact is now verified. Please let your contact scan your personal id too, to ensure maximum security.",
+				"action": "Show my ID"
+			},
+			"fail": {
+				"heading": "Something went wrong",
+				"body": "The scanned QR-Code didn't match this contact. This may be because of the camera having problems sorting out the code. Please try again.",
+				"action": "Try again"
+			}
+		},
 		"idTitle": "Your ID<br/> as a text",
 		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with Contacts</span>—for extra security! <br><br>They scan your ID, you scan their IDs and both of you easily increased your security measures again. Cool, huh?",
 		"contacts": {
