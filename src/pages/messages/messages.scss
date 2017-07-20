@@ -305,6 +305,10 @@ topicWithBursts {
 	}
 }
 
+.messages__message-input textarea {
+	resize: none;
+}
+
 .ios__messages__send-message {
 	position: absolute;
 	right: 7px;
