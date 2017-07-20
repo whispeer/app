@@ -80,7 +80,7 @@
 			<div *ngIf="!isOwn">
 				<ion-list showWhen="ios">
 					<button ion-item (click)="verifyPerson()" *ngIf="user.trustLevel < 2">
-						{{ 'profile.verify' | translate }}
+						{{ 'profile.verify.action' | translate }}
 					</button>
 					<button *ngIf="isRequest" ion-item (click)="declineRequest()">
 						<span ion-text color="danger">{{ 'profile.contacts.declineRequest' | translate }}</span>
@@ -91,7 +91,7 @@
 				</ion-list>
 				<div padding-horizontal hideWhen="ios">
 					<button ion-button block color="light" (click)="verifyPerson()" *ngIf="user.trustLevel < 2">
-						{{ 'profile.verify' | translate }}
+						{{ 'profile.verify.action' | translate }}
 					</button>
 					<button *ngIf="isRequest" ion-button block color="danger" (click)="declineRequest()">
 						{{ 'profile.contacts.declineRequest' | translate }}

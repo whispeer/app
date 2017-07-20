@@ -237,8 +237,34 @@ export class ProfilePage {
 	verifyPerson = () => {
 		return this.barcodeScanner.scan().then((res) => {
 			return this.userObject.verifyFingerPrint(res.text);
+		}).then((data) => {
+			this.alertCtrl.create({
+				title: this.translate.instant("profile.verify.success.heading"),
+				message: this.translate.instant("profile.verify.success.body"),
+				buttons: [
+					{ text: 'Cancel', role: 'cancel' },
+					{ text: this.translate.instant("profile.verify.success.action"),
+						handler: () => {
+							this.navCtrl.push("Profile", {userId: sessionService.userid})
+						}
+					}
+				]
+			});
+			return data;
 		}).catch((err) => {
 			console.error(err);
+			this.alertCtrl.create({
+				title: this.translate.instant("profile.verify.fail.heading"),
+				message: this.translate.instant("profile.verify.fail.body"),
+				buttons: [
+					{ text: 'Cancel', role: 'cancel' },
+					{ text: this.translate.instant("profile.verify.fail.action"),
+						handler: () => {
+							this.verifyPerson()
+						}
+					}
+				]
+			});
 		});
 	}
 
@@ -263,7 +289,7 @@ export class ProfilePage {
 	contactOptions() {
 		const verifyButton = {
 			icon: !this.platform.is("ios") ? "lock": null,
-			text: this.translate.instant("profile.verify"),
+			text: this.translate.instant("profile.verify.action"),
 			handler: () => {
 				this.verifyPerson();
 			}
