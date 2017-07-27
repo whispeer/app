@@ -14,7 +14,17 @@ import { PhotoViewer } from '@ionic-native/photo-viewer';
 	templateUrl: "gallery.html"
 })
 export class GalleryComponent {
-	@Input() images;
+	_images;
+
+	@Input() set images(value: string) {
+		this._images = value;
+
+		this.loadPreviews()
+	}
+
+	get images(): string {
+		return this._images;
+	}
 
 	previewChunk: number = 2
 	preview: number = this.previewChunk;
@@ -98,10 +108,11 @@ export class GalleryComponent {
 		return false;
 	}
 
-	ngOnInit() {
+	loadPreviews() {
 		this.loadImagePreviews(this.images.slice(0, this.preview));
 	}
 
-	ngOnDestroy() {
+	ngOnInit() {
+		this.loadPreviews()
 	}
 }
