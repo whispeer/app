@@ -29,6 +29,7 @@
     "@ionic-native/globalization": "3.6.1",
     "@ionic-native/image-picker": "3.6.1",
     "@ionic-native/in-app-browser": "3.6.1",
+    "@ionic-native/media": "^4.1.0",
     "@ionic-native/photo-viewer": "3.6.1",
     "@ionic-native/push": "3.6.1",
     "@ionic-native/splash-screen": "3.6.1",
@@ -70,9 +71,9 @@
     "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz",
     "mathsass": "^0.9.5",
     "node-sass": "^4.5.2",
+    "raw-loader": "^0.5.1",
     "typescript": "~2.2.1",
     "webpack": "^3.0.0",
-    "raw-loader": "^0.5.1",
     "webpack-bundle-analyzer": "^2.4.0",
     "webpack-bundle-size-analyzer": "^2.6.0",
     "xml2js": "^0.4.17"

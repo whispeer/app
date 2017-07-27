@@ -121,5 +121,8 @@
 	<plugin name="cordova-plugin-inappbrowser" spec="~1.7.1"/>
 	<engine name="android" spec="~6.2.1"/>
 	<engine name="ios" spec="~4.3.1"/>
-	<hook type="after_prepare" src="scripts/copyPushIcon.js"/>
+	<hook src="scripts/copyPushIcon.js" type="after_prepare"/>
+	<plugin name="cordova-plugin-media" spec="~3.0.1">
+		<variable name="MICROPHONE_USAGE_DESCRIPTION" value=" "/>
+	</plugin>
 </widget>
