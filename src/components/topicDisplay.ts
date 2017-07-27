@@ -10,7 +10,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 
 import { TranslateService } from '@ngx-translate/core';
 
-const ImageUpload = require("../lib/services/imageUploadService");
+import ImageUpload from "../lib/services/imageUpload.service"
 import h from "../lib/helper/helper";
 
 const ImagePickerOptions = {

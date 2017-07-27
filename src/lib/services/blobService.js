@@ -1,8 +1,8 @@
 /**
 * MessageService
 **/
-var h = require("../helper/helper").default;
-var Progress = require("asset/Progress");
+var h = require("../helper/helper").default
+var Progress = require("asset/Progress").default
 var Queue = require("asset/Queue");
 var debug = require("debug");
 var Bluebird = require("bluebird");
