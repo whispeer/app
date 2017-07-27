@@ -263,7 +263,7 @@ export class MessagesPage {
 			return;
 		}
 
-		messageService.sendMessage(this.chat.getID(), text, images).then(() => {
+		messageService.sendMessage(this.chat.getID(), text, { images, files: [] }).then(() => {
 			this.chat.newMessage = "";
 			this.markRead();
 		});
