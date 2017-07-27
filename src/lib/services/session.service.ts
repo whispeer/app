@@ -4,6 +4,8 @@ import { withPrefix } from "./storage.service";
 import keyStore from "./keyStore.service";
 
 import { landingPage } from "./location.manager";
+import h from "../helper/helper"
+import * as Bluebird from "bluebird"
 
 export class SessionService extends Observer {
 	sid: string = "";
@@ -34,7 +36,7 @@ export class SessionService extends Observer {
 		this.sessionStorage.set("password", password);
 	}
 
-	loadLogin = () => {
+	loadLogin = h.cacheResult<Bluebird<Boolean>>(() => {
 		return this.sessionStorage.awaitLoading().then(() => {
 			const loggedin = this.sessionStorage.get("loggedin") === "true" && this.sessionStorage.get("password");
 			if (!loggedin) {
@@ -46,7 +48,7 @@ export class SessionService extends Observer {
 
 			return true;
 		})
-	}
+	})
 
 	getSID = () => {
 		return this.sid;
