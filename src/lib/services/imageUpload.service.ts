@@ -271,9 +271,13 @@ class ImageUpload extends FileUpload {
 		return this.url;
 	};
 
-	upload = (encryptionKey) => {
+	upload = (encryptionKey?) => {
 		if (!this.blobs) {
 			throw new Error("usage error: prepare was not called!");
+		}
+
+		if (this.options.encrypt && !encryptionKey) {
+			throw new Error("No encryption key given")
 		}
 
 		return uploadQueue.enqueue(1, () => {
@@ -302,7 +306,7 @@ class ImageUpload extends FileUpload {
 		});
 	};
 
-	prepare = h.cacheResult(() => {
+	prepare = h.cacheResult<Bluebird<any>>(() => {
 		this.isGif = !!this.file.type.match(/image.gif/i);
 
 		var sizes = this.isGif ? this.options.gifSizes : this.options.sizes;
