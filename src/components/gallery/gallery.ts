@@ -59,6 +59,15 @@ export class GalleryComponent {
 				return;
 			}
 
+			if (image.lowest.width && image.lowest.height) {
+				const canvas = document.createElement("canvas");
+
+				canvas.width = image.lowest.width
+				canvas.height = image.lowest.height
+
+				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(canvas.toDataURL())
+			}
+
 			this.loadImage(image.lowest);
 		});
 	}
