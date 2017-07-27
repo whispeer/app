@@ -36,7 +36,7 @@ export class SessionService extends Observer {
 		this.sessionStorage.set("password", password);
 	}
 
-	loadLogin = h.cacheResult<Bluebird<Boolean>>(() => {
+	loadLogin = () => {
 		return this.sessionStorage.awaitLoading().then(() => {
 			const loggedin = this.sessionStorage.get("loggedin") === "true" && this.sessionStorage.get("password");
 			if (!loggedin) {
@@ -48,7 +48,7 @@ export class SessionService extends Observer {
 
 			return true;
 		})
-	})
+	}
 
 	getSID = () => {
 		return this.sid;
