@@ -98,7 +98,7 @@ class SocketService extends Observer {
 
 		this._socket.on("connect", () => {
 			socketDebug("socket connected");
-			// TODO: this.emit("whispeerPing", { blockageToken: this._token });
+			this.emit("whispeerPing", { blockageToken: this._token });
 		});
 	}
 
