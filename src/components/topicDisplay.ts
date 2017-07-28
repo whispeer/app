@@ -40,6 +40,7 @@ export class TopicComponent {
 	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
 
+	recording: any = { state: "", playback: false }
 	newMessageText = "";
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
@@ -141,6 +142,42 @@ export class TopicComponent {
 		});
 	}
 
+	takeImage = () => {
+		this.camera.getPicture(this.cameraOptions).then((url) => {
+			return this.getFile(url, "image/png");
+		}).then((file: any) => {
+			return new ImageUpload(file);
+		}).then((image) => {
+			this.sendMessage.emit({
+				images: [image],
+				text: ""
+			});
+		});
+	};
+
+	startRecording = () => {
+		this.recording.state = "recording"
+	}
+
+	stopRecording = () => {
+		this.recording.state = "stopped"
+	}
+
+	resumeRecording = () => {
+		this.recording.state = "recording"
+	}
+
+	discardRecording = () => {
+		this.recording = {
+			state: "",
+			playback: false
+		}
+	}
+
+	togglePlayback = () => {
+		this.recording.playback = !this.recording.playback
+	}
+
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({
 			buttons: [
@@ -148,16 +185,7 @@ export class TopicComponent {
 					text: this.translate.instant("topic.takePhoto"),
 					icon: !this.platform.is("ios") ? "camera": null,
 					handler: () => {
-						this.camera.getPicture(this.cameraOptions).then((url) => {
-							return this.getFile(url, "image/png");
-						}).then((file: any) => {
-							return new ImageUpload(file);
-						}).then((image) => {
-							this.sendMessage.emit({
-								images: [image],
-								text: ""
-							});
-						});
+						this.takeImage();
 					}
 				}, {
 					text: this.translate.instant("topic.selectGallery"),

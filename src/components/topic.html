@@ -51,6 +51,7 @@
 						<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
 							<span whispeerSyntaxify content="{{message.data.text}}"></span>
 							<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
+							<div class="message-files"></div>
 						</div>
 						<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 					</div>
@@ -67,15 +68,94 @@
 			</ion-item>
 		</ion-list>
 	</div>
-	<div class="messages__form" #footer>
-		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
-			<ion-icon name="add-circle"></ion-icon>
+
+	<div class="messages__form" *ngIf="platform.is('ios')" #footer>
+		<div [ngSwitch]="recording.state">
+			<div
+				class="messages__form__button-wrap"
+				*ngSwitchCase="'recording'">
+				<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="discardRecording()">
+					<ion-icon name="trash"></ion-icon>
+				</button>
+				<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="stopRecording()">
+					<ion-icon name="pause"></ion-icon>
+				</button>
+			</div>
+			<div
+				class="messages__form__button-wrap"
+				*ngSwitchCase="'stopped'">
+				<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="discardRecording()">
+					<ion-icon name="trash"></ion-icon>
+				</button>
+				<button ion-button icon-only clear color="danger" class="ios__messages__add-assets" (click)="resumeRecording()">
+					<ion-icon name="mic"></ion-icon>
+				</button>
+				<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="togglePlayback()">
+					<ion-icon name="{{(recording.playback ? 'pause' : 'play')}}"></ion-icon>
+				</button>
+			</div>
+			<div
+				class="messages__form__button-wrap"
+				*ngSwitchDefault>
+				<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">
+					<ion-icon name="add-circle"></ion-icon>
+				</button>
+				<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()">
+					<ion-icon name="camera"></ion-icon>
+				</button>
+			</div>
+		</div>
+		<ion-item class="clean-input-wrap ios__messages__input-wrap">
+			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="recording.state !== ''"></ion-textarea>
+		</ion-item>
+		<div class="ios__messages__recording-overlay" [ngClass]="{'ios__messages__recording-overlay--distance': recording.state === 'stopped'}">
+			<span *ngIf="recording.state === 'recording'">
+				<ion-icon name="mic" color="danger"></ion-icon>
+				<span>&nbsp;Recording - <time class="ios__messages__recording__time">0:42</time></span>
+			</span>
+			<span *ngIf="recording.state === 'stopped'">
+				<span *ngIf="recording.playback">
+					<ion-icon icon name="ios-barcode-outline" color="primary"></ion-icon>
+					<span>&nbsp;0:01 / 0:42</span>
+				</span>
+				<span *ngIf="!recording.playback">Paused - <time class="ios__messages__recording__time">0:42</time></span>
+			</span>
+		</div>
+		<button ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"
+		*ngIf="newMessageText.length > 0 || recording.state !== ''">
+			<ion-icon name="md-arrow-round-up"></ion-icon>
 		</button>
-		<ion-item class="clean-input-wrap messages__input-wrap">
+		<button ion-button icon-only class="ios__messages__send-message" (click)="startRecording()"
+		*ngIf="newMessageText.length === 0 && recording.state === ''">
+			<ion-icon name="mic"></ion-icon>
+		</button>
+	</div>
+
+	<div class="messages__form" *ngIf="!platform.is('ios')" #footer>
+		<div
+			class="messages__form__button-wrap"
+			*ngIf="!recording">
+			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
+				<ion-icon name="add-circle"></ion-icon>
+			</button>
+			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()">
+				<ion-icon name="camera"></ion-icon>
+			</button>
+		</div>
+		<ion-item class="messages__input-wrap">
 			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 		</ion-item>
-		<button ion-button icon-only clear class="messages__send-message" (click)="sendMessageToChat()">
-			<ion-icon name="arrow-dropup-circle"></ion-icon>
+		<button
+			ion-button icon-only clear (click)="sendMessageToChat()"
+			class="messages__send-message"
+			*ngIf="newMessageText.length > 0 || recording">
+			<ion-icon name="send"></ion-icon>
+		</button>
+		<button
+			ion-button icon-only clear (click)="startRecording()"
+			class="messages__send-message"
+			*ngIf="newMessageText.length === 0 && !recording">
+			<ion-icon name="mic"></ion-icon>
 		</button>
 	</div>
 </ion-content>

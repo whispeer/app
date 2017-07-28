@@ -1,11 +1,14 @@
-import * as Bluebird from 'bluebird';
-import socketService from "./socket.service";
+import * as Bluebird from 'bluebird'
+import socketService from "./socket.service"
+import sessionService from "./session.service"
 
 class FeatureToggles {
 	config = {}
 
 	constructor() {
-		socketService.definitlyEmit("featureToggles", {}).then((response) => {
+		sessionService.loadLogin().then(() =>
+			socketService.definitlyEmit("featureToggles", {})
+		).then((response) => {
 			if (response.toggles) {
 				this.config = response.toggles
 			}

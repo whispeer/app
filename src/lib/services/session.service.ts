@@ -4,6 +4,8 @@ import { withPrefix } from "./storage.service";
 import keyStore from "./keyStore.service";
 
 import { landingPage } from "./location.manager";
+import h from "../helper/helper"
+import * as Bluebird from "bluebird"
 
 export class SessionService extends Observer {
 	sid: string = "";
