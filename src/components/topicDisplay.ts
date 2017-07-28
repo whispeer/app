@@ -14,6 +14,24 @@ import { TranslateService } from '@ngx-translate/core'
 const ImageUpload = require("../lib/services/imageUploadService")
 import h from "../lib/helper/helper"
 
+import { TypeState } from "typestate"
+
+enum RecordingStates {
+	NotRecording,
+	Recording,
+	Paused,
+	Playing
+}
+
+var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording);
+
+RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.Recording)
+RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording)
+
+RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused)
+RecordingStateMachine.from(RecordingStates.Paused).to(RecordingStates.Playing)
+RecordingStateMachine.from(RecordingStates.Playing).to(RecordingStates.Paused)
+
 const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
@@ -42,7 +60,6 @@ export class TopicComponent {
 	private recordingFile: MediaObject
 
 	firstRender: Boolean = true
-	recording: any = { state: "", playback: false }
 	newMessageText = "";
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
@@ -73,6 +90,15 @@ export class TopicComponent {
 			allowEdit: !this.platform.is('ios'),
 			correctOrientation: true
 		}
+
+		RecordingStateMachine.on(RecordingStates.NotRecording, () => {
+			if (!this.recordingFile) {
+				return
+			}
+
+			this.recordingFile.release()
+			this.recordingFile = null
+		})
 	}
 
 	ngAfterViewInit() {
@@ -158,27 +184,60 @@ export class TopicComponent {
 		});
 	};
 
-	startRecording = () => {
-		this.recording.state = "recording"
+	isRecordingUIVisible = () =>
+		!RecordingStateMachine.is(RecordingStates.NotRecording)
+
+	isPlayback = () =>
+		RecordingStateMachine.is(RecordingStates.Playing)
+
+	isRecording = () =>
+		RecordingStateMachine.is(RecordingStates.Recording)
+
+	isPaused = () =>
+		RecordingStateMachine.is(RecordingStates.Paused) ||
+		RecordingStateMachine.is(RecordingStates.Playing)
+
+	private startRecording() {
+		if (this.recordingFile) {
+			return
+		}
+
+		const recordingID = 5
+
+		const fileName = `${this.file.externalRootDirectory}recording_${recordingID}.aac`
+
+		this.recordingFile = this.media.create(fileName)
+
+		this.recordingFile.onStatusUpdate.subscribe(status => console.log(status))
+		this.recordingFile.onSuccess.subscribe(() => console.log('Action is successful'))
+		this.recordingFile.onError.subscribe(error => console.log('Error!', error));
+
+		this.recordingFile.startRecord();
 	}
 
-	stopRecording = () => {
-		this.recording.state = "stopped"
-	}
-
-	resumeRecording = () => {
-		this.recording.state = "recording"
-	}
-
-	discardRecording = () => {
-		this.recording = {
-			state: "",
-			playback: false
+	toggleRecording = () => {
+		if (RecordingStateMachine.is(RecordingStates.Recording)) {
+			RecordingStateMachine.go(RecordingStates.Paused)
+		} else {
+			this.startRecording()
+			RecordingStateMachine.go(RecordingStates.Recording)
 		}
 	}
 
+	resumeRecording = () => {
+		RecordingStateMachine.go(RecordingStates.Recording)
+	}
+
+	discardRecording = () => {
+		RecordingStateMachine.go(RecordingStates.NotRecording)
+	}
+
 	togglePlayback = () => {
-		this.recording.playback = !this.recording.playback
+		if (RecordingStateMachine.is(RecordingStates.Paused)) {
+			RecordingStateMachine.go(RecordingStates.Playing)
+		} else {
+			RecordingStateMachine.go(RecordingStates.Paused)
+		}
 	}
 
 	presentActionSheet = () => {
