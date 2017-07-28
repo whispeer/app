@@ -100,14 +100,14 @@
 		<div class="ios__messages__recording-overlay" [ngClass]="{'ios__messages__recording-overlay--distance': isPaused()}">
 			<span *ngIf="isRecording()">
 				<ion-icon name="mic" color="danger"></ion-icon>
-				<span>&nbsp;Recording - <time class="ios__messages__recording__time">0:42</time></span>
+				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ getDuration() }}</time></span>
 			</span>
 			<span *ngIf="isPaused()">
 				<span *ngIf="isPlayback()">
 					<ion-icon icon name="ios-barcode-outline" color="primary"></ion-icon>
-					<span>&nbsp;0:01 / 0:42</span>
+					<span>&nbsp;0:01 / {{ getDuration() }}</span>
 				</span>
-				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">0:42</time></span>
+				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ getDuration() }}</time></span>
 			</span>
 		</div>
 		<button ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"

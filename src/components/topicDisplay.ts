@@ -16,6 +16,8 @@ import h from "../lib/helper/helper"
 
 import { TypeState } from "typestate"
 
+import uuidv4 from 'uuid/v4'
+
 enum RecordingStates {
 	NotRecording,
 	Recording,
@@ -70,6 +72,10 @@ export class TopicComponent {
 	mutationObserver: MutationObserver
 
 	bursts: any[]
+
+	private recordings : MediaObject[] = []
+	private recordingUUID : string
+
 
 	constructor(
 		public navCtrl: NavController,
@@ -197,16 +203,24 @@ export class TopicComponent {
 		RecordingStateMachine.is(RecordingStates.Paused) ||
 		RecordingStateMachine.is(RecordingStates.Playing)
 
+	getRecordingFileName = () => {
+		const recordingID = this.recordings.length;
+
+		(<any>window).rs = this.recordings
+
+		return `${this.file.externalRootDirectory}recording_${this.recordingUUID}_${recordingID}.aac`
+	}
+
 	private startRecording() {
 		if (this.recordingFile) {
 			return
 		}
 
-		const recordingID = 5
+		if (!this.recordingUUID) {
+			this.recordingUUID = uuidv4()
+		}
 
-		const fileName = `${this.file.externalRootDirectory}recording_${recordingID}.aac`
-
-		this.recordingFile = this.media.create(fileName)
+		this.recordingFile = this.media.create(this.getRecordingFileName())
 
 		this.recordingFile.onStatusUpdate.subscribe(status => console.log(status))
 		this.recordingFile.onSuccess.subscribe(() => console.log('Action is successful'))
@@ -215,28 +229,49 @@ export class TopicComponent {
 		this.recordingFile.startRecord();
 	}
 
+	getDuration = () => {
+		return this.recordings.reduce((previousValue, currentValue) => {
+			return previousValue + currentValue.getDuration()
+		}, 0)
+	}
+
 	toggleRecording = () => {
 		if (RecordingStateMachine.is(RecordingStates.Recording)) {
 			RecordingStateMachine.go(RecordingStates.Paused)
+
+			this.recordingFile.stopRecord()
+			this.recordingFile.release()
+			this.recordingFile = null
+
+			const currentRecording = this.media.create(this.getRecordingFileName())
+			currentRecording.seekTo(0)
+
+			this.recordings.push(currentRecording)
 		} else {
-			this.startRecording()
 			RecordingStateMachine.go(RecordingStates.Recording)
+
+			this.startRecording()
 		}
 	}
 
-	resumeRecording = () => {
-		RecordingStateMachine.go(RecordingStates.Recording)
-	}
-
 	discardRecording = () => {
+		if (this.recordingFile) {
+			this.recordingFile.release()
+			this.recordingFile = null
+
+			// TODO delete all files created!
+		}
+
 		RecordingStateMachine.go(RecordingStates.NotRecording)
 	}
 
 	togglePlayback = () => {
 		if (RecordingStateMachine.is(RecordingStates.Paused)) {
 			RecordingStateMachine.go(RecordingStates.Playing)
+			this.recordings[0].play()
 		} else {
 			RecordingStateMachine.go(RecordingStates.Paused)
+			this.recordings[0].pause()
 		}
 	}
 
