@@ -70,9 +70,26 @@
 	</div>
 
 	<div class="messages__form" *ngIf="platform.is('ios')" #footer>
-		<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">
-			<ion-icon name="add-circle"></ion-icon>
-		</button>
+		<div
+			class="messages__form__button-wrap"
+			*ngIf="!recording">
+			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">
+				<ion-icon name="add-circle"></ion-icon>
+			</button>
+			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()">
+				<ion-icon name="camera"></ion-icon>
+			</button>
+		</div>
+		<div
+			class="messages__form__button-wrap"
+			*ngIf="recording">
+			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">
+				<ion-icon name="add-circle"></ion-icon>
+			</button>
+			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()">
+				<ion-icon name="camera"></ion-icon>
+			</button>
+		</div>
 		<ion-item class="clean-input-wrap ios__messages__input-wrap">
 			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 		</ion-item>
@@ -87,9 +104,16 @@
 	</div>
 
 	<div class="messages__form" *ngIf="!platform.is('ios')" #footer>
-		<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
-			<ion-icon name="add-circle"></ion-icon>
-		</button>
+		<div
+			class="messages__form__button-wrap"
+			*ngIf="!recording">
+			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
+				<ion-icon name="add-circle"></ion-icon>
+			</button>
+			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()">
+				<ion-icon name="camera"></ion-icon>
+			</button>
+		</div>
 		<ion-item class="messages__input-wrap">
 			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 		</ion-item>

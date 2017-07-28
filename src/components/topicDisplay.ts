@@ -141,6 +141,19 @@ export class TopicComponent {
 		});
 	}
 
+	takeImage = () => {
+		this.camera.getPicture(this.cameraOptions).then((url) => {
+			return this.getFile(url, "image/png");
+		}).then((file: any) => {
+			return new ImageUpload(file);
+		}).then((image) => {
+			this.sendMessage.emit({
+				images: [image],
+				text: ""
+			});
+		});
+	};
+
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({
 			buttons: [
@@ -148,16 +161,7 @@ export class TopicComponent {
 					text: this.translate.instant("topic.takePhoto"),
 					icon: !this.platform.is("ios") ? "camera": null,
 					handler: () => {
-						this.camera.getPicture(this.cameraOptions).then((url) => {
-							return this.getFile(url, "image/png");
-						}).then((file: any) => {
-							return new ImageUpload(file);
-						}).then((image) => {
-							this.sendMessage.emit({
-								images: [image],
-								text: ""
-							});
-						});
+						this.takeImage();
 					}
 				}, {
 					text: this.translate.instant("topic.selectGallery"),
