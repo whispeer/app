@@ -51,6 +51,7 @@
 						<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
 							<span whispeerSyntaxify content="{{message.data.text}}"></span>
 							<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
+							<div class="message-files"></div>
 						</div>
 						<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 					</div>
@@ -75,11 +76,11 @@
 		<ion-item class="clean-input-wrap ios__messages__input-wrap">
 			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 		</ion-item>
-		<button ion-button icon-only clear class="ios__messages__send-message" (click)="sendMessageToTopic()"
+		<button ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToTopic()"
 		*ngIf="newMessageText.length > 0">
-			<ion-icon name="arrow-round-up"></ion-icon>
+			<ion-icon name="md-arrow-round-up"></ion-icon>
 		</button>
-		<button ion-button icon-only clear class="ios__messages__send-message" (click)="sendMessageToTopic()"
+		<button ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToTopic()"
 		*ngIf="newMessageText.length === 0">
 			<ion-icon name="mic"></ion-icon>
 		</button>
