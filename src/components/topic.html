@@ -75,8 +75,13 @@
 		<ion-item class="clean-input-wrap ios__messages__input-wrap">
 			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
 		</ion-item>
-		<button ion-button icon-only clear class="ios__messages__send-message" (click)="sendMessageToTopic()">
-			<ion-icon name="arrow-dropup-circle"></ion-icon>
+		<button ion-button icon-only clear class="ios__messages__send-message" (click)="sendMessageToTopic()"
+		*ngIf="newMessageText.length > 0">
+			<ion-icon name="arrow-round-up"></ion-icon>
+		</button>
+		<button ion-button icon-only clear class="ios__messages__send-message" (click)="sendMessageToTopic()"
+		*ngIf="newMessageText.length === 0">
+			<ion-icon name="mic"></ion-icon>
 		</button>
 	</div>
 
@@ -89,8 +94,15 @@
 		</ion-item>
 		<button
 			ion-button icon-only clear (click)="sendMessageToChat()"
-			class="messages__send-message">
+			class="messages__send-message"
+			*ngIf="newMessageText.length > 0">
 			<ion-icon name="send"></ion-icon>
+		</button>
+		<button
+			ion-button icon-only clear (click)="sendMessageToChat()"
+			class="messages__send-message"
+			*ngIf="newMessageText.length === 0">
+			<ion-icon name="mic"></ion-icon>
 		</button>
 	</div>
 </ion-content>
