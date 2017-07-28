@@ -25,6 +25,7 @@ import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { Media } from '@ionic-native/media';
 
 import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -78,7 +79,8 @@ const DEFAULT_LANG = "de"
 		ImagePicker,
 		File,
 		Camera,
-		InAppBrowser
+		InAppBrowser,
+		Media,
 	]
 })
 export class AppModule {

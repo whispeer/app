@@ -1,17 +1,18 @@
-import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core";
+import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core"
+import { Media, MediaObject } from '@ionic-native/media';
 
-import { NavController, ActionSheetController, Platform } from "ionic-angular";
+import { NavController, ActionSheetController, Platform } from "ionic-angular"
 
-import * as Bluebird from "bluebird";
+import * as Bluebird from "bluebird"
 
-import { ImagePicker } from '@ionic-native/image-picker';
-import { File } from '@ionic-native/file';
-import { Camera, CameraOptions } from '@ionic-native/camera';
+import { ImagePicker } from '@ionic-native/image-picker'
+import { File } from '@ionic-native/file'
+import { Camera, CameraOptions } from '@ionic-native/camera'
 
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core'
 
-const ImageUpload = require("../lib/services/imageUploadService");
-import h from "../lib/helper/helper";
+const ImageUpload = require("../lib/services/imageUploadService")
+import h from "../lib/helper/helper"
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -35,11 +36,12 @@ export class TopicComponent {
 
 	@Output() sendMessage = new EventEmitter();
 
-	firstRender: Boolean = true
-
 	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
 
+	private recordingFile: MediaObject
+
+	firstRender: Boolean = true
 	recording: any = { state: "", playback: false }
 	newMessageText = "";
 	moreMessagesAvailable = true
@@ -59,7 +61,8 @@ export class TopicComponent {
 		private imagePicker: ImagePicker,
 		private file: File,
 		private camera: Camera,
-		private translate: TranslateService
+		private translate: TranslateService,
+		private media: Media
 	) {
 		this.cameraOptions = {
 			quality: 50,
