@@ -40,6 +40,7 @@ export class TopicComponent {
 	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
 
+	recording: any = { state: "", playback: false }
 	newMessageText = "";
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
@@ -153,6 +154,29 @@ export class TopicComponent {
 			});
 		});
 	};
+
+	startRecording = () => {
+		this.recording.state = "recording"
+	}
+
+	stopRecording = () => {
+		this.recording.state = "stopped"
+	}
+
+	resumeRecording = () => {
+		this.recording.state = "recording"
+	}
+
+	discardRecording = () => {
+		this.recording = {
+			state: "",
+			playback: false
+		}
+	}
+
+	togglePlayback = () => {
+		this.recording.playback = !this.recording.playback
+	}
 
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({

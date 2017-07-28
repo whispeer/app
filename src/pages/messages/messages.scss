@@ -330,6 +330,21 @@ topicWithBursts {
 	display: flex;
 }
 
+.ios__messages__recording-overlay {
+	position: absolute;
+	width: 200px;
+	left: 115px;
+	color: map-get($colors, dark);
+}
+
+.ios__messages__recording-overlay--distance {
+	left: 155px;
+}
+
+.ios__messages__recording__time {
+	color: map-get($colors, grey);
+}
+
 .messages__send-message {
 	position: relative;
 }
