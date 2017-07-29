@@ -280,13 +280,11 @@ export class TopicComponent {
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
 
-		this.recordingFile.onStatusUpdate.subscribe(status => console.log(status))
-		this.recordingFile.onSuccess.subscribe(() => console.log('Action is successful'))
-		this.recordingFile.onError.subscribe(error => console.log('Error!', error));
-
 		this.recordingInfo.startTime = Date.now()
 
 		this.recordingFile.startRecord();
+
+		clearInterval(this.recordingInfo.updateInterval)
 
 		this.recordingInfo.updateInterval = window.setInterval(() => {
 			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
@@ -300,10 +298,22 @@ export class TopicComponent {
 		return `${minutes}:${fullSeconds}`
 	}
 
+	getCurrentDuration = (beforeIndex?: number) => {
+		if (beforeIndex) {
+			return 0
+		}
+
+		if (!RecordingStateMachine.is(RecordingStates.Recording)) {
+			return 0
+		}
+
+		return this.recordingInfo.duration
+	}
+
 	getDuration = (beforeIndex?: number) => {
 		return this.recordings.slice(0, beforeIndex).reduce((previousValue, currentValue) => {
 			return previousValue + currentValue.duration
-		}, 0) + ( beforeIndex ? 0 : this.recordingInfo.duration)
+		}, 0) + this.getCurrentDuration()
 	}
 
 	toggleRecording = () => {
@@ -350,6 +360,8 @@ export class TopicComponent {
 			this.recordingFile = null
 		}
 
+		clearInterval(this.recordingInfo.updateInterval)
+
 		this.resetPlayback()
 
 		this.recordings.forEach(({ recording, fileName }) => {
@@ -372,6 +384,8 @@ export class TopicComponent {
 		if (RecordingStateMachine.is(RecordingStates.Paused)) {
 			RecordingStateMachine.go(RecordingStates.Playing)
 			this.recordings[this.playback.recordIndex].recording.play()
+
+			clearInterval(this.playback.interval)
 
 			this.playback.interval = window.setInterval(() => {
 				this.recordings[this.playback.recordIndex].recording.getCurrentPosition().then((pos) => {
