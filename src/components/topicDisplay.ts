@@ -73,9 +73,24 @@ export class TopicComponent {
 
 	bursts: any[]
 
-	private recordings : MediaObject[] = []
-	private recordingUUID : string
+	private recordings : {
+		fileName: string,
+		recording: MediaObject,
+		duration: number
+	}[] = []
 
+	private recordingInfo = {
+		UUID: "",
+		duration: 0,
+		startTime: 0,
+		updateInterval: 0
+	}
+
+	private playback = {
+		recordIndex: 0,
+		position: 0,
+		interval: 0
+	}
 
 	constructor(
 		public navCtrl: NavController,
@@ -105,6 +120,34 @@ export class TopicComponent {
 			this.recordingFile.release()
 			this.recordingFile = null
 		})
+
+		RecordingStateMachine.onExit(RecordingStates.Paused, (to) => {
+			if (to !== RecordingStates.Playing) {
+				this.resetPlayback()
+			}
+
+			return true
+		})
+
+		RecordingStateMachine.onExit(RecordingStates.Playing, (to) => {
+			if (to !== RecordingStates.Paused) {
+				this.resetPlayback()
+			}
+
+			return true
+		})
+	}
+
+	resetPlayback = () => {
+		clearInterval(this.playback.interval)
+
+		this.recordings.forEach(({ recording }) => recording.stop())
+
+		this.playback = {
+			recordIndex: 0,
+			position: 0,
+			interval: 0
+		}
 	}
 
 	ngAfterViewInit() {
@@ -120,6 +163,21 @@ export class TopicComponent {
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
+	}
+
+	statusListener = (status) => {
+		if (status === this.media.MEDIA_STOPPED && this.isPlayback()) {
+			this.playback.recordIndex += 1
+			this.playback.position = 0
+
+			if (this.playback.recordIndex >= this.recordings.length) {
+				this.resetPlayback()
+				RecordingStateMachine.go(RecordingStates.Paused)
+				return
+			}
+
+			this.recordings[this.playback.recordIndex].recording.play()
+		}
 	}
 
 	mutationListener = (mutations) => {
@@ -208,7 +266,7 @@ export class TopicComponent {
 
 		(<any>window).rs = this.recordings
 
-		return `${this.file.externalRootDirectory}recording_${this.recordingUUID}_${recordingID}.aac`
+		return `${this.file.externalRootDirectory}recording_${this.recordingInfo.UUID}_${recordingID}.aac`
 	}
 
 	private startRecording() {
@@ -216,8 +274,8 @@ export class TopicComponent {
 			return
 		}
 
-		if (!this.recordingUUID) {
-			this.recordingUUID = uuidv4()
+		if (!this.recordingInfo.UUID) {
+			this.recordingInfo.UUID = uuidv4()
 		}
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
@@ -226,18 +284,33 @@ export class TopicComponent {
 		this.recordingFile.onSuccess.subscribe(() => console.log('Action is successful'))
 		this.recordingFile.onError.subscribe(error => console.log('Error!', error));
 
+		this.recordingInfo.startTime = Date.now()
+
 		this.recordingFile.startRecord();
+
+		this.recordingInfo.updateInterval = window.setInterval(() => {
+			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
+		}, 100)
 	}
 
-	getDuration = () => {
-		return this.recordings.reduce((previousValue, currentValue) => {
-			return previousValue + currentValue.getDuration()
-		}, 0)
+	formatTime = (seconds) => {
+		const fullSeconds = h.pad(Math.floor(seconds % 60), 2)
+		const minutes = h.pad(Math.floor(seconds / 60), 2)
+
+		return `${minutes}:${fullSeconds}`
+	}
+
+	getDuration = (beforeIndex?: number) => {
+		return this.recordings.slice(0, beforeIndex).reduce((previousValue, currentValue) => {
+			return previousValue + currentValue.duration
+		}, 0) + ( beforeIndex ? 0 : this.recordingInfo.duration)
 	}
 
 	toggleRecording = () => {
 		if (RecordingStateMachine.is(RecordingStates.Recording)) {
 			RecordingStateMachine.go(RecordingStates.Paused)
+
+			clearInterval(this.recordingInfo.updateInterval)
 
 			this.recordingFile.stopRecord()
 			this.recordingFile.release()
@@ -246,7 +319,24 @@ export class TopicComponent {
 			const currentRecording = this.media.create(this.getRecordingFileName())
 			currentRecording.seekTo(0)
 
-			this.recordings.push(currentRecording)
+			currentRecording.onStatusUpdate.subscribe(this.statusListener)
+
+			const recordingInfo = {
+				fileName: this.getRecordingFileName(),
+				recording: currentRecording,
+				duration: this.recordingInfo.duration
+			}
+
+			this.recordings.push(recordingInfo)
+
+			this.recordingInfo.duration = 0
+
+			const intervalID = window.setInterval(() => {
+				if (currentRecording.getDuration() !== -1) {
+					recordingInfo.duration = currentRecording.getDuration()
+					clearInterval(intervalID)
+				}
+			}, 50)
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)
 
@@ -258,20 +348,39 @@ export class TopicComponent {
 		if (this.recordingFile) {
 			this.recordingFile.release()
 			this.recordingFile = null
-
-			// TODO delete all files created!
 		}
 
+		this.resetPlayback()
+
+		this.recordings.forEach(({ recording, fileName }) => {
+			recording.release()
+
+			// TODO delete file created!
+			console.warn("TODO: delete file:", fileName)
+		})
+
+		this.recordings = []
+
 		RecordingStateMachine.go(RecordingStates.NotRecording)
+	}
+
+	getPosition = () => {
+		return this.getDuration(this.playback.recordIndex) + this.playback.position
 	}
 
 	togglePlayback = () => {
 		if (RecordingStateMachine.is(RecordingStates.Paused)) {
 			RecordingStateMachine.go(RecordingStates.Playing)
-			this.recordings[0].play()
+			this.recordings[this.playback.recordIndex].recording.play()
+
+			this.playback.interval = window.setInterval(() => {
+				this.recordings[this.playback.recordIndex].recording.getCurrentPosition().then((pos) => {
+					this.playback.position = pos
+				})
+			}, 250)
 		} else {
 			RecordingStateMachine.go(RecordingStates.Paused)
-			this.recordings[0].pause()
+			this.recordings[this.playback.recordIndex].recording.pause()
 		}
 	}
 
