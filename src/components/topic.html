@@ -66,8 +66,7 @@
 								</div>
 								<span class="message__file__info">
 									<span class="message__file__name">{{file.name}}</span>
-									<!-- TODO: convert file size to kb / mb / gb as fit -->
-									<span class="message__file__size">[{{file.size / 1024}} KB]</span>
+									<span class="message__file__size">[{{formatSize(file.size)}}]</span>
 								</span>
 							</div>
 							<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>

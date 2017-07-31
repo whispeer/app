@@ -13,6 +13,8 @@ import { TranslateService } from '@ngx-translate/core';
 import ImageUpload from "../lib/services/imageUpload.service"
 import h from "../lib/helper/helper";
 
+const prettysize = require("prettysize")
+
 const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
@@ -84,6 +86,10 @@ export class TopicComponent {
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
+	}
+
+	formatSize(size) {
+		return prettysize(size, false, false, 2)
 	}
 
 	mutationListener = (mutations) => {
