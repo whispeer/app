@@ -11,9 +11,9 @@ import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
 
-const ImageUpload = require("../lib/services/imageUploadService")
-import h from "../lib/helper/helper"
+import ImageUpload from "../lib/services/imageUpload.service"
 
+import h from "../lib/helper/helper";
 import { TypeState } from "typestate"
 
 import uuidv4 from 'uuid/v4'
@@ -33,6 +33,8 @@ RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording)
 RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused)
 RecordingStateMachine.from(RecordingStates.Paused).to(RecordingStates.Playing)
 RecordingStateMachine.from(RecordingStates.Playing).to(RecordingStates.Paused)
+
+const prettysize = require("prettysize")
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -178,6 +180,10 @@ export class TopicComponent {
 
 			this.recordings[this.playback.recordIndex].recording.play()
 		}
+	}
+
+	formatSize(size) {
+		return prettysize(size, false, false, 2)
 	}
 
 	mutationListener = (mutations) => {

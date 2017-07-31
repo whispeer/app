@@ -169,6 +169,68 @@ topicWithBursts {
 	font-size: 0.85em;
 }
 
+.messages__wrap--file {
+	padding: 10px 0;
+}
+
+.message__file {
+	overflow: visible;
+	padding-left: 40px;
+}
+
+.message__file__hexagon-wrap {
+	position: absolute;
+
+	width: 40px;
+
+	top: -6px;
+	left: -10px;
+	.border, .content {
+		fill: map-get($colors, grey);
+	}
+	svg {
+		width: 100%;
+	}
+}
+
+.message__file__hexagon {
+	display: block;
+	width: 100%;
+}
+
+// this might not work out 100% well, but using flexbox was a real pain here :/
+.message__file__hexagon-icon {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+
+	margin-top: -11px;
+	margin-left: -6px;
+}
+
+.message__file__info {
+	display: inline-flex;
+	width: 100%;
+	white-space: nowrap;
+}
+
+.message__file__name {
+	display: inline-block;
+	width: 100%;
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.message__file__size {
+	display: inline-block;
+
+	width: 30%;
+	padding-right: 5px;
+	text-overflow: initial;
+}
+
 .burst--me {
 	a {
 		color: white;
