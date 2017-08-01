@@ -93,7 +93,7 @@ export class NewMessagePage {
 		})
 	}
 
-	sendMessage = ({ images, text }) => {
+	sendMessage = ({ images = [], text }) => {
 		this.bursts = []
 		this.messagesLoading = true
 

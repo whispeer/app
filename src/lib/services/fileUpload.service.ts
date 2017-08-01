@@ -2,11 +2,12 @@ import * as Bluebird from "bluebird"
 
 import h from "../helper/helper"
 import Progress from "../asset/Progress"
-import blobService from "./blobService"
+import blobService, { BlobType } from "./blobService"
 var Queue = require("asset/Queue");
 
 const defaultUploadOptions = {
-	encrypt: true
+	encrypt: true,
+	extraInfo: {}
 }
 
 const uploadQueue = new Queue(3);
@@ -18,7 +19,7 @@ encryptionQueue.start();
 class FileUpload {
 	private progress: Progress
 	protected options
-	private blob
+	private blob: BlobType
 
 	constructor(protected file, options?) {
 		this.progress = new Progress()
@@ -31,17 +32,17 @@ class FileUpload {
 		return this.progress.getProgress();
 	};
 
-	protected uploadAndEncryptPreparedBlob = (encryptionKey, blob) => {
-		this.progress.addDepend(blob._uploadProgress)
-		this.progress.addDepend(blob._encryptProgress)
+	protected uploadAndEncryptPreparedBlob = (encryptionKey, blob: BlobType) => {
+		this.progress.addDepend(blob.uploadProgress)
+		this.progress.addDepend(blob.encryptProgress)
 
 		return encryptionQueue.enqueue(blob.getSize(), () => {
 			return blob.encryptAndUpload(encryptionKey)
 		})
 	}
 
-	protected uploadPreparedBlob = (blob) => {
-		this.progress.addDepend(blob._uploadProgress)
+	protected uploadPreparedBlob = (blob: BlobType) => {
+		this.progress.addDepend(blob.uploadProgress)
 
 		return blob.upload()
 	}
@@ -76,7 +77,8 @@ class FileUpload {
 		return {
 			name: this.file.name,
 			size: this.file.size,
-			type: this.file.type
+			type: this.file.type,
+			...this.options.extraInfo
 		}
 	}
 

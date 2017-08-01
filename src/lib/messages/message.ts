@@ -11,7 +11,10 @@ import ObjectLoader from "../services/objectLoader"
 import ChunkLoader, { Chunk } from "./chatChunk"
 import { Chat } from "./chat"
 
-type attachments = { images: any[], files: any[] }
+import FileUpload from "../services/fileUpload.service"
+import ImageUpload from "../services/imageUpload.service"
+
+type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
 
 export class Message {
 	private _hasBeenSent: boolean
@@ -102,6 +105,13 @@ export class Message {
 			}
 		}))
 
+		this.data.voicemails = attachments.voicemails.map((voicemail) => ({
+			...voicemail.getInfo(),
+			getProgress: () => {
+				return voicemail.getProgress()
+			}
+		}))
+
 		this.loadSender();
 		this.prepareAttachments();
 	};
@@ -115,15 +125,21 @@ export class Message {
 	private prepareFiles = h.cacheResult<Bluebird<any>>(() => {
 		return Bluebird.resolve(this.attachments.files).map((file: any) => {
 			return file.prepare();
-		});
+		})
+	})
+
+	private prepareVoicemails = h.cacheResult<Bluebird<any>>(() => {
+		return Bluebird.resolve(this.attachments.voicemails).map((file: any) => {
+			return file.prepare();
+		})
 	})
 
 	hasAttachments = () => {
-		return this.attachments.images.length !== 0 || this.attachments.files.length !== 0
+		return this.attachments.images.length !== 0 || this.attachments.files.length !== 0 || this.attachments.voicemails.length !== 0
 	}
 
 	private prepareAttachments = () => {
-		return Bluebird.all([this.prepareFiles(), this.prepareImages()])
+		return Bluebird.all([this.prepareFiles(), this.prepareImages(), this.prepareVoicemails()])
 	}
 
 	setData = () => {
@@ -160,7 +176,7 @@ export class Message {
 
 	uploadAttachments = h.cacheResult<Bluebird<any>>((chunkKey) => {
 		return this.prepareAttachments().then(() => {
-			const attachments = [...this.attachments.images, ...this.attachments.files]
+			const attachments = [...this.attachments.images, ...this.attachments.files, ...this.attachments.voicemails]
 
 			return Bluebird.all(attachments.map((attachment) => {
 				return attachment.upload(chunkKey);
@@ -189,6 +205,7 @@ export class Message {
 			this._securedData.setParent(chunk.getSecuredData());
 
 			const imagesInfo = await this.prepareImages()
+			const voicemailsInfo = await this.prepareVoicemails()
 			const filesInfo = await this.prepareFiles()
 
 			const extractImagesInfo = (infos, key) => {
@@ -197,18 +214,14 @@ export class Message {
 				)
 			}
 
-			const filesContent = filesInfo.map((info) => info.content)
-			const filesMeta = filesInfo.map((info) => info.meta)
+			this._securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
+			this._securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
+			this._securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
+			this._securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
+			this._securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
+			this._securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
 
-			const imagesContent = extractImagesInfo(imagesInfo, "content")
-			const imagesMeta = extractImagesInfo(imagesInfo, "meta")
-
-			this._securedData.metaSetAttr("images", imagesMeta)
-			this._securedData.contentSetAttr("images", imagesContent)
-			this._securedData.metaSetAttr("files", filesMeta)
-			this._securedData.contentSetAttr("files", filesContent)
-
-			if (filesContent.length === 0 && imagesContent.length === 0) {
+			if (filesInfo.length === 0 && imagesInfo.length === 0 && voicemailsInfo.length === 0) {
 				this._securedData.contentSet(this._securedData.contentGet().message)
 			}
 

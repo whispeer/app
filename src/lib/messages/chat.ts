@@ -444,7 +444,7 @@ export class Chat extends Observer {
 			return Bluebird.resolve()
 		}
 
-		if (attachments.images.length > 0 && attachments.files.length > 0) {
+		if (message.hasAttachments()) {
 			return Bluebird.resolve()
 		}
 

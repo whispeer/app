@@ -12,6 +12,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera'
 import { TranslateService } from '@ngx-translate/core'
 
 import ImageUpload from "../lib/services/imageUpload.service"
+import FileUpload from "../lib/services/fileUpload.service"
 
 import h from "../lib/helper/helper";
 import { TypeState } from "typestate"
@@ -24,6 +25,21 @@ enum RecordingStates {
 	Paused,
 	Playing
 }
+
+declare type recordingType = {
+	file: {
+		name: string,
+		directory: string,
+	},
+	recording: MediaObject,
+	duration: number
+}
+
+const path = ({ name, directory }: { name: string, directory: string }) => {
+	return `${directory}${name}`
+}
+
+declare type recordingsType = recordingType[]
 
 var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording);
 
@@ -43,6 +59,17 @@ const ImagePickerOptions = {
 };
 
 const INFINITE_SCROLLING_THRESHOLD = 1000
+
+const awaitVoicemailLoading = (voicemails:recordingsType) => {
+	return new Bluebird((resolve) => {
+		const intID = setInterval(() => {
+			if (!voicemails.some((v) => v.recording.getDuration() === -1)) {
+				clearInterval(intID)
+				resolve()
+			}
+		}, 50)
+	})
+}
 
 @Component({
 	selector: "topicWithBursts",
@@ -75,11 +102,7 @@ export class TopicComponent {
 
 	bursts: any[]
 
-	private recordings : {
-		fileName: string,
-		recording: MediaObject,
-		duration: number
-	}[] = []
+	private recordings : recordingsType = []
 
 	private recordingInfo = {
 		UUID: "",
@@ -214,10 +237,53 @@ export class TopicComponent {
 		this.stabilizeScroll()
 	}
 
+	private sendVoicemail = (voicemails:recordingsType) => {
+		// create new message with voicemails as attachments
+		// send message!
+
+		this.resetRecordingState()
+
+		awaitVoicemailLoading(voicemails).thenReturn(voicemails).map(({ file: { name, directory }, recording, duration }:recordingType) =>
+			this.file.moveFile(
+				directory,
+				name,
+				this.file.cacheDirectory,
+				name
+			).then(() => ({
+				file: {
+					directory: this.file.cacheDirectory,
+					name
+				}, duration, recording
+			}))
+		).map((voicemail:recordingType) => {
+			const { file, duration } = voicemail
+
+			return this.getFile(path(file), "").then((fileObject) =>
+				new FileUpload(fileObject, { encrypt: true, extraInfo: { duration } })
+			)
+		}).then((voicemails) => {
+			this.sendMessage.emit({
+				text: "",
+				voicemails,
+			})
+		}).catch((e) => {
+			// TODO
+		})
+	}
+
 	sendMessageToChat = () => {
+		if (this.isRecordingUIVisible()) {
+			if (this.isRecording()) {
+				this.toggleRecording()
+			}
+
+			this.sendVoicemail(this.recordings)
+
+			return
+		}
+
 		this.sendMessage.emit({
-			text: this.newMessageText,
-			images: []
+			text: this.newMessageText
 		});
 
 		this.newMessageText = "";
@@ -270,9 +336,10 @@ export class TopicComponent {
 	getRecordingFileName = () => {
 		const recordingID = this.recordings.length;
 
-		(<any>window).rs = this.recordings
-
-		return `${this.file.externalRootDirectory}recording_${this.recordingInfo.UUID}_${recordingID}.aac`
+		return {
+			directory: this.file.externalRootDirectory,
+			name: `recording_${this.recordingInfo.UUID}_${recordingID}.aac`,
+		}
 	}
 
 	private startRecording() {
@@ -284,7 +351,7 @@ export class TopicComponent {
 			this.recordingInfo.UUID = uuidv4()
 		}
 
-		this.recordingFile = this.media.create(this.getRecordingFileName())
+		this.recordingFile = this.media.create(path(this.getRecordingFileName()))
 
 		this.recordingInfo.startTime = Date.now()
 
@@ -332,13 +399,13 @@ export class TopicComponent {
 			this.recordingFile.release()
 			this.recordingFile = null
 
-			const currentRecording = this.media.create(this.getRecordingFileName())
+			const currentRecording = this.media.create(path(this.getRecordingFileName()))
 			currentRecording.seekTo(0)
 
 			currentRecording.onStatusUpdate.subscribe(this.statusListener)
 
 			const recordingInfo = {
-				fileName: this.getRecordingFileName(),
+				file: this.getRecordingFileName(),
 				recording: currentRecording,
 				duration: this.recordingInfo.duration
 			}
@@ -360,7 +427,7 @@ export class TopicComponent {
 		}
 	}
 
-	discardRecording = () => {
+	resetRecordingState = () => {
 		if (this.recordingFile) {
 			this.recordingFile.release()
 			this.recordingFile = null
@@ -370,16 +437,20 @@ export class TopicComponent {
 
 		this.resetPlayback()
 
-		this.recordings.forEach(({ recording, fileName }) => {
-			recording.release()
-
-			// TODO delete file created!
-			console.warn("TODO: delete file:", fileName)
-		})
-
 		this.recordings = []
 
 		RecordingStateMachine.go(RecordingStates.NotRecording)
+	}
+
+	discardRecording = () => {
+		this.recordings.forEach(({ recording, file }) => {
+			recording.release()
+
+			// TODO delete file created!
+			console.warn("TODO: delete file:", file)
+		})
+
+		this.resetRecordingState()
 	}
 
 	getPosition = () => {
@@ -423,7 +494,7 @@ export class TopicComponent {
 							return new ImageUpload(file);
 						}).then((images) => {
 							this.sendMessage.emit({
-								images: images,
+								images,
 								text: ""
 							});
 						});

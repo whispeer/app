@@ -54,9 +54,9 @@ class MyBlob {
 	private decrypted: boolean
 	private preReservedID: string
 
-	private uploadProgress
-	private encryptProgress
-	private decryptProgress
+	public uploadProgress
+	public encryptProgress
+	public decryptProgress
 
 	constructor(blobData, blobID?, options?) {
 		this.blobData = blobData;
@@ -114,7 +114,7 @@ class MyBlob {
 		});
 	}
 
-	encryptAndUpload (key, cb) {
+	encryptAndUpload (key, cb?) {
 		return Bluebird.try(async () => {
 			const blobKey = await this.encrypt();
 			await keyStore.sym.symEncryptKey(blobKey, key);
@@ -321,5 +321,7 @@ const blobService = {
 		return knownBlobs[blobID]
 	}
 }
+
+export type BlobType = MyBlob
 
 export default blobService

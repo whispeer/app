@@ -33,6 +33,7 @@ type options = {
 	gifSizes: size[],
 	gif: boolean,
 	encrypt: boolean,
+	extraInfo: Object
 }
 
 var defaultOptions: options = {
@@ -73,7 +74,8 @@ var defaultOptions: options = {
 		}
 	],
 	gif: true,
-	encrypt: true
+	encrypt: true,
+	extraInfo: {}
 };
 
 /* TODO:
