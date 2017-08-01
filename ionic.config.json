@@ -1,6 +1,5 @@
 {
   "name": "whispeerMessenger",
   "app_id": "27db744f",
-  "v2": true,
-  "typescript": true
+  "type": "ionic-angular"
 }
