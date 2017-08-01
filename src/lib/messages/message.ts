@@ -116,23 +116,11 @@ export class Message {
 		this.prepareAttachments();
 	};
 
-	private prepareImages = h.cacheResult<Bluebird<any>>(() => {
-		return Bluebird.resolve(this.attachments.images).map((image: any) => {
-			return image.prepare();
-		});
-	})
+	private prepare = (uploads) => Bluebird.resolve(uploads).map((upload: any) => upload.prepare())
 
-	private prepareFiles = h.cacheResult<Bluebird<any>>(() => {
-		return Bluebird.resolve(this.attachments.files).map((file: any) => {
-			return file.prepare();
-		})
-	})
-
-	private prepareVoicemails = h.cacheResult<Bluebird<any>>(() => {
-		return Bluebird.resolve(this.attachments.voicemails).map((file: any) => {
-			return file.prepare();
-		})
-	})
+	private prepareImages = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.images))
+	private prepareFiles = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.files))
+	private prepareVoicemails = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.voicemails))
 
 	hasAttachments = () => {
 		return this.attachments.images.length !== 0 || this.attachments.files.length !== 0 || this.attachments.voicemails.length !== 0
