@@ -15,7 +15,7 @@ const debug = require("debug")
 import h from "../helper/helper"
 import Progress from "../asset/Progress"
 
-import Cache from "./Cache"
+import blobCache from "../asset/blobCache"
 
 import socketService from "./socket.service"
 import BlobDownloader from "./blobDownloader.service"
@@ -44,8 +44,6 @@ const timeEnd = (name) => {
 		console.timeEnd(name);
 	}
 }
-
-const blobCache = new Cache("blobs");
 
 class MyBlob {
 	private blobData: deviceBlob
@@ -292,7 +290,7 @@ const loadBlobFromServer = (blobID, downloadProgress) => {
 		}).then((data) => {
 			const blob = new MyBlob(data.blob, blobID, { meta: data.meta });
 
-			blobCache.store(blob.getBlobID(), blob.getMeta(), blob.getBlobData());
+			blobCache.store(blob)
 
 			return blob;
 		});
@@ -300,18 +298,8 @@ const loadBlobFromServer = (blobID, downloadProgress) => {
 }
 
 const loadBlobFromDB = (blobID) => {
-	return blobCache.get(blobID).then((data) => {
-		if (typeof data.blob === "undefined" || data.blob === false) {
-			throw new Error("cache invalid!");
-		}
-
-		var blob;
-
-		if (typeof data.blob === "string") {
-			blob = h.dataURItoBlob(data.blob);
-		}
-
-		return new MyBlob(blob || data.blob, blobID, { meta: data.data });
+	return blobCache.get(blobID).then(({ blob, blobID, meta }) => {
+		return new MyBlob(blob, blobID, { meta });
 	});
 }
 
