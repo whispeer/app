@@ -123,6 +123,23 @@
     ws "1.1.1"
     xml2js "0.4.17"
 
+"@ionic/cli-plugin-cordova@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@ionic/cli-plugin-cordova/-/cli-plugin-cordova-1.5.0.tgz#9c8669d19aaae2a8f7a3400a910d5c4ca20efc0d"
+  dependencies:
+    "@ionic/cli-utils" "1.6.0"
+    chalk "^2.0.0"
+    tslib "^1.7.1"
+    xml2js "^0.4.17"
+
+"@ionic/cli-plugin-ionic-angular@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@ionic/cli-plugin-ionic-angular/-/cli-plugin-ionic-angular-1.4.0.tgz#aa793121b2f0a271ea20e53c4f312aba299c0dfc"
+  dependencies:
+    "@ionic/cli-utils" "1.6.0"
+    chalk "^2.0.0"
+    tslib "^1.7.1"
+
 "@ionic/cli-utils@1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@ionic/cli-utils/-/cli-utils-1.6.0.tgz#33909ec8bdbb086121aac6fcf5c2db951e204e7d"
