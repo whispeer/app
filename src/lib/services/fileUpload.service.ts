@@ -2,9 +2,8 @@ import * as Bluebird from "bluebird"
 
 import h from "../helper/helper"
 import Progress from "../asset/Progress"
+import blobService from "./blobService"
 var Queue = require("asset/Queue");
-
-var blobService = require("services/blobService");
 
 const defaultUploadOptions = {
 	encrypt: true

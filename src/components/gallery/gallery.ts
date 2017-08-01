@@ -3,7 +3,7 @@ import { Component, Input } from "@angular/core";
 import { DomSanitizer } from '@angular/platform-browser';
 
 import errorService from "../../lib/services/error.service";
-const blobService = require("../../lib/services/blobService");
+import blobService from "../../lib/services/blobService"
 
 import * as Bluebird from "bluebird";
 

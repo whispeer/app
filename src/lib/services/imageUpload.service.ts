@@ -3,11 +3,10 @@ import $ from "jquery"
 import h from "../helper/helper"
 import screenSizeService from "./screenSize.service"
 import FileUpload from "./fileUpload.service"
+import blobService from "./blobService"
 
 var Queue = require("asset/Queue");
 var imageLib = require("imageLib");
-
-var blobService = require("services/blobService");
 
 var canvasToBlob : any = Bluebird.promisify(h.canvasToBlob.bind(h));
 

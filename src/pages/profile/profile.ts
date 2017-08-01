@@ -6,7 +6,7 @@ import * as Bluebird from 'bluebird';
 
 const userService = require("user/userService")
 const friendsService = require("services/friendsService")
-const blobService = require("services/blobService")
+import blobService from "../../lib/services/blobService"
 import ImageUpload from "../../lib/services/imageUpload.service"
 
 import { ImagePicker } from "@ionic-native/image-picker";
