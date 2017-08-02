@@ -58,7 +58,7 @@ class MyBlob {
 	public encryptProgress
 	public decryptProgress
 
-	constructor(blobData, blobID?, options?) {
+	constructor(blobData, blobID?, options?: { meta?, decrypted? }) {
 		this.blobData = blobData;
 		options = options || {};
 
@@ -71,11 +71,15 @@ class MyBlob {
 
 		this.meta = options.meta || {};
 		this.key = this.meta.key;
-		this.decrypted = !this.key;
+		this.decrypted = options.decrypted || !this.key;
 
 		this.uploadProgress = new Progress({ total: this.getSize() });
 		this.encryptProgress = new Progress({ total: this.getSize() });
 		this.decryptProgress = new Progress({ total: this.getSize() });
+	}
+
+	isDecrypted() {
+		return this.decrypted
 	}
 
 	isUploaded() {

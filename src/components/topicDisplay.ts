@@ -238,9 +238,6 @@ export class TopicComponent {
 	}
 
 	private sendVoicemail = (voicemails:recordingsType) => {
-		// create new message with voicemails as attachments
-		// send message!
-
 		this.resetRecordingState()
 
 		awaitVoicemailLoading(voicemails).thenReturn(voicemails).map(({ file: { name, directory }, recording, duration }:recordingType) =>
