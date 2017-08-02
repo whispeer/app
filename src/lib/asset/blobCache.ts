@@ -37,9 +37,19 @@ const blobCache = {
 			file: `cache-blob-file-${blobID}`
 		}
 
-		return writeBlobToFile(info.path, info.file, blob.getBlobData()).then(() =>
-			writeJSONToFile(info.path, generateInfoFileName(blobID), info)
-		)
+		const infoFileName = generateInfoFileName(blobID)
+
+		return Bluebird.try(async () => {
+			const exists = await file.checkFile(file.cacheDirectory, infoFileName)
+
+			if (exists) {
+				debugger
+				return
+			}
+
+			await writeBlobToFile(info.path, info.file, blob.getBlobData())
+			await writeJSONToFile(info.path, infoFileName, info)
+		})
 	},
 	get: (blobID) => {
 		const fileName = generateInfoFileName(blobID)

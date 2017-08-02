@@ -176,6 +176,8 @@ class MyBlob {
 			this.decrypted = true;
 
 			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
+
+			blobCache.store(this)
 		}).nodeify(cb);
 	}
 

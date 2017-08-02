@@ -47,8 +47,8 @@
 
 				<span *ngIf="burst.isMessageBurst()">
 					<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
-					<template ngFor let-message [ngForOf]="burst.items">
-						<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.data.text.length > 0">
+					<ng-template ngFor let-message [ngForOf]="burst.items">
+						<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.data.text.length > 0 || message.data.images.length > 0">
 							<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
 								<span whispeerSyntaxify content="{{message.data.text}}"></span>
 								<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
@@ -71,7 +71,7 @@
 							</div>
 							<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 						</div>
-					</template>
+					</ng-template>
 				</span>
 				<div class="messages_message" *ngIf="burst.isChatUpdate()">
 					<div class="burst-seperator burst-seperator-update">
