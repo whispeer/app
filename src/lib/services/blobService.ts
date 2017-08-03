@@ -86,12 +86,6 @@ class MyBlob {
 		return this.uploaded;
 	}
 
-	setMeta (meta) {
-		if (!this.isUploaded()) {
-			this.meta = meta;
-		}
-	}
-
 	getSize() {
 		return this.blobData.size;
 	}
@@ -100,7 +94,7 @@ class MyBlob {
 		return this.meta;
 	}
 
-	getArrayBuffer() {
+	private getArrayBuffer() {
 		return new Bluebird((resolve) => {
 			const reader = new FileReader();
 
@@ -118,17 +112,17 @@ class MyBlob {
 		});
 	}
 
-	encryptAndUpload (key, cb?) {
+	encryptAndUpload (key) {
 		return Bluebird.try(async () => {
 			const blobKey = await this.encrypt();
 			await keyStore.sym.symEncryptKey(blobKey, key);
 			await this.upload();
 
 			return blobKey;
-		}).nodeify(cb);
+		})
 	}
 
-	encrypt (cb?) {
+	encrypt () {
 		return Bluebird.resolve().then(() => {
 			if (this.uploaded || !this.decrypted) {
 				throw new Error("trying to encrypt an already encrypted or public blob. add a key decryptor if you want to give users access");
@@ -154,7 +148,7 @@ class MyBlob {
 			this.blobData = new Blob([encryptedData], {type: this.blobData.type});
 
 			return this.key;
-		}).nodeify(cb);
+		})
 	}
 
 	decrypt () {
@@ -181,12 +175,6 @@ class MyBlob {
 		})
 	}
 
-	getBase64Representation() {
-		return this.getStringRepresentation().then((blobValue) => {
-			return blobValue.split(",")[1];
-		});
-	}
-
 	upload () {
 		return Bluebird.try(() => {
 			if (this.uploaded) {
@@ -211,7 +199,7 @@ class MyBlob {
 		return this.blobData
 	}
 
-	reserveID () {
+	private reserveID () {
 		return Bluebird.try(() => {
 			const meta = this.meta;
 			meta.key = this.key;
@@ -250,36 +238,6 @@ class MyBlob {
 
 			throw new Error("got no blobid");
 		})
-	}
-
-	toURL() {
-		return Bluebird.try(() => {
-			if (this.blobData.localURL) {
-				return this.blobData.localURL;
-			}
-
-			if (typeof window.URL !== "undefined") {
-				return window.URL.createObjectURL(this.blobData);
-			}
-
-			if (typeof webkitURL !== "undefined") {
-				return window.webkitURL.createObjectURL(this.blobData);
-			}
-
-			return Bluebird.fromCallback((cb) => {
-				h.blobToDataURI(this.blobData, cb)
-			})
-		}).catch(() => {
-			return "";
-		})
-	}
-
-	getStringRepresentation() {
-		return Bluebird.try(() => {
-			return Bluebird.fromCallback((cb) => {
-				h.blobToDataURI(this.blobData, cb)
-			})
-		});
 	}
 
 	getHash() {
