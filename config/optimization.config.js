@@ -1,5 +1,4 @@
 var path = require("path");
-var webpack = require("webpack");
 var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
 module.exports = {
