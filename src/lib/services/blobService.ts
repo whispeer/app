@@ -157,9 +157,9 @@ class MyBlob {
 		}).nodeify(cb);
 	}
 
-	decrypt (cb) {
+	decrypt () {
 		if (this.decrypted) {
-			return Bluebird.resolve().nodeify(cb);
+			return Bluebird.resolve()
 		}
 
 		return Bluebird.try(() => {
@@ -177,8 +177,8 @@ class MyBlob {
 
 			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
 
-			blobCache.store(this)
-		}).nodeify(cb);
+			return blobCache.store(this)
+		})
 	}
 
 	getBase64Representation() {
@@ -187,7 +187,7 @@ class MyBlob {
 		});
 	}
 
-	upload (cb?) {
+	upload () {
 		return Bluebird.try(() => {
 			if (this.uploaded) {
 				return this.blobID;
@@ -200,7 +200,7 @@ class MyBlob {
 			this.uploaded = true;
 
 			return this.blobID;
-		}).nodeify(cb);
+		})
 	}
 
 	getBlobID() {
@@ -238,7 +238,7 @@ class MyBlob {
 		})
 	}
 
-	preReserveID (cb) {
+	preReserveID () {
 		return Bluebird.try(() => {
 			return socketService.emit("blob.preReserveID", {});
 		}).then((data) => {
@@ -249,7 +249,7 @@ class MyBlob {
 			}
 
 			throw new Error("got no blobid");
-		}).nodeify(cb);
+		})
 	}
 
 	toURL() {
@@ -290,22 +290,23 @@ class MyBlob {
 }
 
 const loadBlobFromServer = (blobID, downloadProgress) => {
-	return downloadBlobQueue.enqueue(1, () => {
-		return initService.awaitLoading().then(() => {
-			return new BlobDownloader(socketService, blobID, downloadProgress).download()
-		}).then((data) => {
-			const blob = new MyBlob(data.blob, blobID, { meta: data.meta });
+	return downloadBlobQueue.enqueue(1, async () => {
+		await initService.awaitLoading()
+		const data = await new BlobDownloader(socketService, blobID, downloadProgress).download()
 
-			blobCache.store(blob)
+		const blob = new MyBlob(data.blob, blobID, { meta: data.meta });
 
-			return blob;
-		});
-	});
+		if (blob.isDecrypted()) {
+			await blobCache.store(blob)
+		}
+
+		return blob;
+	})
 }
 
 const loadBlobFromDB = (blobID) => {
 	return blobCache.get(blobID).then(({ blob, blobID, meta }) => {
-		return new MyBlob(blob, blobID, { meta });
+		return new MyBlob(blob, blobID, { meta, decrypted: true });
 	});
 }
 
@@ -315,17 +316,25 @@ const loadBlob = (blobID, downloadProgress) => {
 	});
 }
 
+const getBlob = (blobID, downloadProgress?: Progress) => {
+	if (!knownBlobs[blobID]) {
+		knownBlobs[blobID] = loadBlob(blobID, downloadProgress)
+	}
+
+	return knownBlobs[blobID]
+}
+
 const blobService = {
 	createBlob: (blob) => {
 		return new MyBlob(blob);
 	},
-	getBlob: (blobID, downloadProgress?: Progress) => {
-		if (!knownBlobs[blobID]) {
-			knownBlobs[blobID] = loadBlob(blobID, downloadProgress)
-		}
-
-		return knownBlobs[blobID]
-	}
+	getBlobUrl: (blobID) => {
+		return blobCache.getBlobUrl(blobID).catch(() =>
+			getBlob(blobID).then((blob) =>
+				blob.decrypt()
+			)
+		)
+	},
 }
 
 export type BlobType = MyBlob

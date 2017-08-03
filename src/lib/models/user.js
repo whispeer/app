@@ -678,9 +678,7 @@ function User (providedData) {
 				return "assets/img/user.png";
 			}
 
-			return blobService.getBlob(imageBlob.blobid).then(function (blob) {
-				return blob.toURL();
-			});
+			return blobService.getBlobUrl(imageBlob.blobid)
 		}).nodeify(cb);
 	};
 

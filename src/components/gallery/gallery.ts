@@ -39,23 +39,11 @@ export class GalleryComponent {
 		}
 
 		data.loading = true;
-		data.decrypting = false;
-		data.downloading = false;
 
-		let blob;
 		Bluebird.try(() => {
-			data.downloading = true;
-			return blobService.getBlob(blobid);
-		}).then((_blob) => {
-			data.downloading = false;
-			data.decrypting = true;
-			blob = _blob;
-			return blob.decrypt();
-		}).then(() => {
-			return blob.toURL();
+			return blobService.getBlobUrl(blobid);
 		}).then((url) => {
 			data.loading = false;
-			data.decrypting = false;
 			data.loaded = true;
 			data.url = this.sanitizer.bypassSecurityTrustUrl(url);
 		}).catch(errorService.criticalError);
@@ -90,13 +78,9 @@ export class GalleryComponent {
 
 		const blobID = image.lowest.blobID;
 
-		blobService.getBlob(blobID).then((blob) => {
-			return blob.decrypt().then(() => {
-				return blob.getStringRepresentation();
-			});
-		}).then((base64) => {
-			this.photoViewer.show(base64);
-		});
+		blobService.getBlobUrl(blobID).then((url) =>
+			this.photoViewer.show(url)
+		)
 	}
 
 	loadMoreImages() {

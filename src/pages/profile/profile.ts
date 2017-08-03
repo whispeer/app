@@ -372,13 +372,9 @@ export class ProfilePage {
 				text: this.translate.instant("profile.image.view"),
 				handler: () => {
 					this.userObject.getProfileAttribute("imageBlob").then(({ blobid }) => {
-						return blobService.getBlob(blobid)
-					}).then((blob) => {
-						return blob.decrypt().thenReturn(blob)
-					}).then((blob) => {
-						return blob.getStringRepresentation();
-					}).then((base64) => {
-						this.photoViewer.show(base64);
+						return blobService.getBlobUrl(blobid)
+					}).then((url) => {
+						this.photoViewer.show(url);
 					});
 					console.log("view image")
 				}

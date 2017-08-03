@@ -19,7 +19,7 @@ export default class BlobDownloader extends Observer {
 
 	private blobParts: ArrayBuffer[] = []
 	private blobid: string
-	private downloadPromise: Bluebird<void>
+	private downloadPromise: Bluebird<{ blob: Blob, meta: any }>
 	private socket: SocketService
 	private partSize: number = BlobDownloader.STARTPARTSIZE
 	private doneBytes: number = 0
