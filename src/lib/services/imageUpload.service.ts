@@ -1,5 +1,4 @@
 import * as Bluebird from "bluebird"
-import $ from "jquery"
 import h from "../helper/helper"
 import screenSizeService from "./screenSize.service"
 import FileUpload from "./fileUpload.service"
@@ -23,7 +22,8 @@ type size = {
 	name: string,
 	restrictions?: {
 		maxWidth: number,
-		maxHeight: number
+		maxHeight: number,
+		square?: boolean
 	}
 }
 
@@ -301,7 +301,10 @@ class ImageUpload extends FileUpload {
 					data.content.width = resizedImage.width
 					data.content.height = resizedImage.height
 
-					return $.extend({}, data, { size: size });
+					return {
+						...data,
+						size,
+					}
 				})
 			})
 		});
@@ -344,7 +347,10 @@ class ImageUpload extends FileUpload {
 			return Bluebird.resolve(this.file);
 		}
 
-		var options = $.extend({}, sizeOptions.restrictions || {}, { canvas: true });
+		var options: any = {
+			...sizeOptions.restrictions || {},
+			canvas: true
+		}
 
 		return this._getImage().then((img) => {
 			if (options.square) {
