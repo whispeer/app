@@ -14,6 +14,8 @@ import { Chat } from "./chat"
 import FileUpload from "../services/fileUpload.service"
 import ImageUpload from "../services/imageUpload.service"
 
+import blobService from "../services/blobService"
+
 type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
 
 export class Message {
@@ -29,7 +31,7 @@ export class Message {
 	private sendTime: number
 	private senderID: number
 
-	private data: any
+	public data: any
 
 	private chunkID: number
 
@@ -357,8 +359,19 @@ export class Message {
 
 		this.data[attr] = content.map((file, index) => ({
 			...file,
-			...meta[index]
+			...meta[index],
+			loaded: false
 		}))
+
+		Bluebird.resolve(this.data[attr]).filter((ele: any) => {
+			return blobService.isBlobLoaded(ele.blobID)
+		}).each((loadedAttachment: any) => {
+			loadedAttachment.loaded = true
+		})
+	}
+
+	downloadVoicemail = () => {
+
 	}
 
 	private setImagesInfo = () => {

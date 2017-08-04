@@ -1,0 +1,45 @@
+<span>
+  <div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
+  <!-- <Message [message]="message" *ngFor="let message of burst.items"></Message> -->
+  <ng-template ngFor let-message [ngForOf]="burst.items">
+    <div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.data.text.length > 0 || message.data.images.length > 0">
+      <div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
+        <span whispeerSyntaxify content="{{message.data.text}}"></span>
+        <gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
+      </div>
+      <span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+    </div>
+    <div *ngFor="let file of message.data.files" class="messages__wrap messages__wrap--file">
+      <div class="messages__message message__file">
+        <div class="message__file__hexagon-wrap">
+          <hexagon class="message__file__hexagon"></hexagon>
+          <!-- TODO: icon states.
+            maybe we should use different svgs with
+            icons built in them... -->
+          <ion-icon name="md-download" class="message__file__hexagon-icon"></ion-icon>
+        </div>
+        <span class="message__file__info">
+          <span class="message__file__name">{{file.name}}</span>
+          <span class="message__file__size">[{{formatSize(file.size)}}]</span>
+        </span>
+      </div>
+      <span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+    </div>
+    <div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
+      <div class="messages__message message__file">
+        <div class="message__file__hexagon-wrap">
+          <hexagon class="message__file__hexagon"></hexagon>
+          <ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!voicemailsLoaded(message)" (click)="downloadVoicemail(message)"></ion-icon>
+          <ion-icon name="md-play" class="message__file__hexagon-icon" *ngIf="voicemailsLoaded(message) && voicemailsPaused(message)" (click)="toggleVoicemailPlayback()"></ion-icon>
+          <ion-icon name="md-pause" class="message__file__hexagon-icon" *ngIf="voicemailsLoaded(message) && voicemailsPlaying(message)" (click)="toggleVoicemailPlayback()"></ion-icon>
+        </div>
+        <span class="message__file__info">
+          {{ voicemailsLoaded(message) }}
+          Duration: {{add(message.data.voicemails, 'duration')}}
+          [{{formatSize(add(message.data.voicemails, 'size'))}}]
+        </span>
+      </div>
+      <span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+    </div>
+  </ng-template>
+</span>

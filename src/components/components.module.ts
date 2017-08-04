@@ -12,6 +12,7 @@ import { MainMenu } from "./mainMenu";
 import { HexagonModule } from "./hexagonModule";
 import { TopicComponent } from "./topicDisplay"
 import { BurstDifferenceComponent } from "./burstDifference"
+import { MessageBurstComponent } from "./messageBurst"
 import { SyntaxifyDirective } from "./syntaxify"
 import { ChooseFriends } from "./chooseFriends"
 import { GalleryComponent } from "./gallery/gallery"
@@ -29,6 +30,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		UserImageComponent,
 		TopicComponent,
 		BurstDifferenceComponent,
+		MessageBurstComponent,
 		SyntaxifyDirective,
 		GalleryComponent,
 		ChooseFriends,
@@ -49,6 +51,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		UserImageComponent,
 		TopicComponent,
 		BurstDifferenceComponent,
+		MessageBurstComponent,
 		SyntaxifyDirective,
 		GalleryComponent,
 		ChooseFriends,

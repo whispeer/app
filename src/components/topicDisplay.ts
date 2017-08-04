@@ -50,8 +50,6 @@ RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused)
 RecordingStateMachine.from(RecordingStates.Paused).to(RecordingStates.Playing)
 RecordingStateMachine.from(RecordingStates.Playing).to(RecordingStates.Paused)
 
-const prettysize = require("prettysize")
-
 const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
@@ -203,10 +201,6 @@ export class TopicComponent {
 
 			this.recordings[this.playback.recordIndex].recording.play()
 		}
-	}
-
-	formatSize(size) {
-		return prettysize(size, false, false, 2)
 	}
 
 	mutationListener = (mutations) => {
