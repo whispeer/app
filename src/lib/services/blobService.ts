@@ -171,9 +171,32 @@ class MyBlob {
 
 			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
 
-			return blobCache.store(this)
+			return blobCache.store(this).catch(() => this.toURL())
 		})
 	}
+
+	toURL() {
+		return Bluebird.try(() => {
+			if (this.blobData.localURL) {
+				return this.blobData.localURL;
+			}
+
+			if (typeof window.URL !== "undefined") {
+				return window.URL.createObjectURL(this.blobData);
+			}
+
+			if (typeof webkitURL !== "undefined") {
+				return window.webkitURL.createObjectURL(this.blobData);
+			}
+
+			return Bluebird.fromCallback((cb) => {
+				h.blobToDataURI(this.blobData, cb)
+			})
+		}).catch(() => {
+			return "";
+		})
+	}
+
 
 	upload () {
 		return Bluebird.try(() => {
@@ -248,7 +271,7 @@ class MyBlob {
 }
 
 const loadBlobFromServer = (blobID, downloadProgress) => {
-	return downloadBlobQueue.enqueue(1, async () => {
+	return downloadBlobQueue.enqueue(1, () => Bluebird.try(async () => {
 		await initService.awaitLoading()
 		const data = await new BlobDownloader(socketService, blobID, downloadProgress).download()
 
@@ -259,7 +282,7 @@ const loadBlobFromServer = (blobID, downloadProgress) => {
 		}
 
 		return blob;
-	})
+	}))
 }
 
 const loadBlobFromDB = (blobID) => {
@@ -285,6 +308,9 @@ const getBlob = (blobID, downloadProgress?: Progress) => {
 const blobService = {
 	createBlob: (blob) => {
 		return new MyBlob(blob);
+	},
+	isBlobLoaded: (blobID) => {
+		return blobCache.isLoaded(blobID)
 	},
 	getBlobUrl: (blobID) => {
 		return blobCache.getBlobUrl(blobID).catch(() =>

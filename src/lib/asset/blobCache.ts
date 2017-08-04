@@ -113,6 +113,27 @@ const blobCache = {
 			return `${path}${file}`
 		})
 	},
+	isLoaded: (blobID) => {
+		return Bluebird.try(async () => {
+			const exists = await existsCacheInfoFile(blobID)
+
+			if (!exists) {
+				return false
+			}
+
+			const { path, file } = await readCacheInfoFile(blobID)
+
+			const blobFileExists = await existsFile(path, file)
+
+			if (!blobFileExists) {
+				await removeCacheInfoFile(blobID)
+
+				return false
+			}
+
+			return true
+		})
+	},
 	get: (blobID) => {
 		const fileName = generateInfoFileName(blobID)
 

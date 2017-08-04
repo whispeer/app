@@ -252,7 +252,8 @@ export class Message {
 				this._hasBeenSent = true
 				this.data.sent = true
 
-				this.setFilesInfo()
+				this.setAttachmentInfo("files")
+				this.setAttachmentInfo("voicemails")
 				this.setImagesInfo()
 			}
 
@@ -340,23 +341,23 @@ export class Message {
 		return this.data.text
 	}
 
-	private setFilesInfo = () => {
-		const content = this._securedData.contentGet()
+	private setAttachmentInfo = (attr) => {
+		const fullContent = this._securedData.contentGet()
 
-		if (typeof content === "string") {
+		if (typeof fullContent === "string") {
 			return
 		}
 
-		const filesContent = content.files
-		const filesMeta = this._securedData.metaAttr("files")
+		const content = fullContent[attr]
+		const meta = this._securedData.metaAttr(attr)
 
-		if (!filesContent) {
+		if (!content) {
 			return
 		}
 
-		this.data.files = filesContent.map((file, index) => ({
+		this.data[attr] = content.map((file, index) => ({
 			...file,
-			...filesMeta[index]
+			...meta[index]
 		}))
 	}
 
@@ -404,7 +405,8 @@ export class Message {
 				this.data.text = content.message
 			}
 
-			this.setFilesInfo()
+			this.setAttachmentInfo("files")
+			this.setAttachmentInfo("voicemails")
 			this.setImagesInfo()
 
 			return content

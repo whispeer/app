@@ -71,7 +71,23 @@
 							</div>
 							<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 						</div>
-					</ng-template>
+						<div *ngFor="let voicemail of message.data.voicemails" class="messages__wrap messages__wrap--file">
+							<div class="messages__message message__file">
+								<div class="message__file__hexagon-wrap">
+									<hexagon class="message__file__hexagon"></hexagon>
+									<!-- TODO: icon states.
+										maybe we should use different svgs with
+										icons built in them... -->
+									<ion-icon name="md-download" class="message__file__hexagon-icon"></ion-icon>
+								</div>
+								<span class="message__file__info">
+									<span class="message__file__name">{{voicemail.name}}</span>
+									<span class="message__file__size">[{{formatSize(voicemail.size)}}]</span>
+								</span>
+							</div>
+							<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+						</div>
+				</ng-template>
 				</span>
 				<div class="messages_message" *ngIf="burst.isChatUpdate()">
 					<div class="burst-seperator burst-seperator-update">
