@@ -6,7 +6,7 @@ import { SeperatorDatePipe } from "../../lib/pipes/seperatorDate";
 
 import { TopicComponent } from "./topicDisplay"
 import { BurstDifferenceComponent } from "./burstDifference"
-import { MessageBurstComponent } from "./messageBurst"
+import { MessageComponent } from "./message"
 
 import { SyntaxifyDirective } from "../syntaxify"
 
@@ -21,9 +21,9 @@ import { TranslateModule } from '@ngx-translate/core';
 		SeperatorDatePipe,
 		TopicComponent,
 		BurstDifferenceComponent,
-		MessageBurstComponent,
 		SyntaxifyDirective,
 		GalleryComponent,
+		MessageComponent,
 	],
 	imports: [
 		ComponentsModule,
@@ -35,9 +35,9 @@ import { TranslateModule } from '@ngx-translate/core';
 		SeperatorDatePipe,
 		TopicComponent,
 		BurstDifferenceComponent,
-		MessageBurstComponent,
 		SyntaxifyDirective,
 		GalleryComponent,
+		MessageComponent,
 
 		CommonModule,
 	]
