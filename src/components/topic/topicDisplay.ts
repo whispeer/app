@@ -11,10 +11,10 @@ import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
 
-import ImageUpload from "../lib/services/imageUpload.service"
-import FileUpload from "../lib/services/fileUpload.service"
+import ImageUpload from "../../lib/services/imageUpload.service"
+import FileUpload from "../../lib/services/fileUpload.service"
 
-import h from "../lib/helper/helper";
+import h from "../../lib/helper/helper";
 import { TypeState } from "typestate"
 
 import uuidv4 from 'uuid/v4'

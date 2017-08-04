@@ -2,8 +2,8 @@ import { Component, Input } from "@angular/core";
 
 const prettysize = require("prettysize")
 
-import Burst from "../lib/messages/burst"
-import { Message } from "../lib/messages/message"
+import Burst from "../../lib/messages/burst"
+import { Message } from "../../lib/messages/message"
 
 @Component({
 	selector: "MessageBurst",

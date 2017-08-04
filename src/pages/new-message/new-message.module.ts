@@ -4,6 +4,7 @@ import { IonicPageModule } from 'ionic-angular';
 import { NewMessagePage } from './new-message'
 
 import { ComponentsModule } from "../../components/components.module";
+import { TopicComponentsModule } from "../../components/topic/topicComponentsModule";
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
@@ -13,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 	imports: [
 		IonicPageModule.forChild(NewMessagePage),
 		ComponentsModule,
+		TopicComponentsModule,
 		TranslateModule.forChild(),
 	],
 	entryComponents: [
