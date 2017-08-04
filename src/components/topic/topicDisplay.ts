@@ -19,14 +19,15 @@ import { TypeState } from "typestate"
 
 import uuidv4 from 'uuid/v4'
 
+import VoicemailPlayer from "../../lib/asset/voicemailPlayer"
+
 enum RecordingStates {
 	NotRecording,
 	Recording,
-	Paused,
-	Playing
+	Paused
 }
 
-declare type recordingType = {
+type recordingType = {
 	file: {
 		name: string,
 		directory: string,
@@ -39,7 +40,7 @@ const path = ({ name, directory }: { name: string, directory: string }) => {
 	return `${directory}${name}`
 }
 
-declare type recordingsType = recordingType[]
+type recordingsType = recordingType[]
 
 var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording);
 
@@ -47,8 +48,6 @@ RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.Recording)
 RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording)
 
 RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused)
-RecordingStateMachine.from(RecordingStates.Paused).to(RecordingStates.Playing)
-RecordingStateMachine.from(RecordingStates.Playing).to(RecordingStates.Paused)
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -57,17 +56,6 @@ const ImagePickerOptions = {
 };
 
 const INFINITE_SCROLLING_THRESHOLD = 1000
-
-const awaitVoicemailLoading = (voicemails:recordingsType) => {
-	return new Bluebird((resolve) => {
-		const intID = setInterval(() => {
-			if (!voicemails.some((v) => v.recording.getDuration() === -1)) {
-				clearInterval(intID)
-				resolve()
-			}
-		}, 50)
-	})
-}
 
 @Component({
 	selector: "topicWithBursts",
@@ -86,6 +74,8 @@ export class TopicComponent {
 	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
 
+	recordingPlayer: VoicemailPlayer
+
 	private recordingFile: MediaObject
 
 	firstRender: Boolean = true
@@ -100,19 +90,11 @@ export class TopicComponent {
 
 	bursts: any[]
 
-	private recordings : recordingsType = []
-
 	private recordingInfo = {
 		UUID: "",
 		duration: 0,
 		startTime: 0,
 		updateInterval: 0
-	}
-
-	private playback = {
-		recordIndex: 0,
-		position: 0,
-		interval: 0
 	}
 
 	constructor(
@@ -135,6 +117,8 @@ export class TopicComponent {
 			correctOrientation: true
 		}
 
+		this.recordingPlayer = new VoicemailPlayer([])
+
 		RecordingStateMachine.on(RecordingStates.NotRecording, () => {
 			if (!this.recordingFile) {
 				return
@@ -145,32 +129,9 @@ export class TopicComponent {
 		})
 
 		RecordingStateMachine.onExit(RecordingStates.Paused, (to) => {
-			if (to !== RecordingStates.Playing) {
-				this.resetPlayback()
-			}
-
+			this.recordingPlayer.reset()
 			return true
 		})
-
-		RecordingStateMachine.onExit(RecordingStates.Playing, (to) => {
-			if (to !== RecordingStates.Paused) {
-				this.resetPlayback()
-			}
-
-			return true
-		})
-	}
-
-	resetPlayback = () => {
-		clearInterval(this.playback.interval)
-
-		this.recordings.forEach(({ recording }) => recording.stop())
-
-		this.playback = {
-			recordIndex: 0,
-			position: 0,
-			interval: 0
-		}
 	}
 
 	ngAfterViewInit() {
@@ -186,21 +147,6 @@ export class TopicComponent {
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
-	}
-
-	statusListener = (status) => {
-		if (status === this.media.MEDIA_STOPPED && this.isPlayback()) {
-			this.playback.recordIndex += 1
-			this.playback.position = 0
-
-			if (this.playback.recordIndex >= this.recordings.length) {
-				this.resetPlayback()
-				RecordingStateMachine.go(RecordingStates.Paused)
-				return
-			}
-
-			this.recordings[this.playback.recordIndex].recording.play()
-		}
 	}
 
 	mutationListener = (mutations) => {
@@ -234,7 +180,7 @@ export class TopicComponent {
 	private sendVoicemail = (voicemails:recordingsType) => {
 		this.resetRecordingState()
 
-		awaitVoicemailLoading(voicemails).thenReturn(voicemails).map(({ file: { name, directory }, recording, duration }:recordingType) =>
+		VoicemailPlayer.awaitVoicemailLoading(voicemails).thenReturn(voicemails).map(({ file: { name, directory }, recording, duration }:recordingType) =>
 			this.file.moveFile(
 				directory,
 				name,
@@ -268,7 +214,7 @@ export class TopicComponent {
 				this.toggleRecording()
 			}
 
-			this.sendVoicemail(this.recordings)
+			this.sendVoicemail(this.recordingPlayer.getRecordings())
 
 			return
 		}
@@ -299,7 +245,7 @@ export class TopicComponent {
 	}
 
 	takeImage = () => {
-		this.camera.getPicture(this.cameraOptions).then((url) => {
+		this.camera.getPicture(this.cameraOptions).then((url: any) => {
 			return this.getFile(url, "image/png");
 		}).then((file: any) => {
 			return new ImageUpload(file);
@@ -315,17 +261,16 @@ export class TopicComponent {
 		!RecordingStateMachine.is(RecordingStates.NotRecording)
 
 	isPlayback = () =>
-		RecordingStateMachine.is(RecordingStates.Playing)
+		RecordingStateMachine.is(RecordingStates.Paused) && this.recordingPlayer.isPlaying()
 
 	isRecording = () =>
 		RecordingStateMachine.is(RecordingStates.Recording)
 
 	isPaused = () =>
-		RecordingStateMachine.is(RecordingStates.Paused) ||
-		RecordingStateMachine.is(RecordingStates.Playing)
+		RecordingStateMachine.is(RecordingStates.Paused)
 
 	getRecordingFileName = () => {
-		const recordingID = this.recordings.length;
+		const recordingID = this.recordingPlayer.getRecordings().length;
 
 		return {
 			directory: this.file.externalRootDirectory,
@@ -375,9 +320,7 @@ export class TopicComponent {
 	}
 
 	getDuration = (beforeIndex?: number) => {
-		return this.recordings.slice(0, beforeIndex).reduce((previousValue, currentValue) => {
-			return previousValue + currentValue.duration
-		}, 0) + this.getCurrentDuration()
+		return this.recordingPlayer.getDuration() + this.getCurrentDuration()
 	}
 
 	toggleRecording = () => {
@@ -390,27 +333,9 @@ export class TopicComponent {
 			this.recordingFile.release()
 			this.recordingFile = null
 
-			const currentRecording = this.media.create(path(this.getRecordingFileName()))
-			currentRecording.seekTo(0)
-
-			currentRecording.onStatusUpdate.subscribe(this.statusListener)
-
-			const recordingInfo = {
-				file: this.getRecordingFileName(),
-				recording: currentRecording,
-				duration: this.recordingInfo.duration
-			}
-
-			this.recordings.push(recordingInfo)
+			this.recordingPlayer.addRecording(this.getRecordingFileName(), this.recordingInfo.duration)
 
 			this.recordingInfo.duration = 0
-
-			const intervalID = window.setInterval(() => {
-				if (currentRecording.getDuration() !== -1) {
-					recordingInfo.duration = currentRecording.getDuration()
-					clearInterval(intervalID)
-				}
-			}, 50)
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)
 
@@ -426,44 +351,25 @@ export class TopicComponent {
 
 		clearInterval(this.recordingInfo.updateInterval)
 
-		this.resetPlayback()
-
-		this.recordings = []
+		this.recordingPlayer.reset()
 
 		RecordingStateMachine.go(RecordingStates.NotRecording)
 	}
 
 	discardRecording = () => {
-		this.recordings.forEach(({ recording, file }) => {
-			recording.release()
+		this.recordingPlayer.destroy()
 
-			// TODO delete file created!
-			console.warn("TODO: delete file:", file)
-		})
+		this.recordingPlayer = new VoicemailPlayer([])
 
 		this.resetRecordingState()
 	}
 
 	getPosition = () => {
-		return this.getDuration(this.playback.recordIndex) + this.playback.position
+		return this.recordingPlayer.getPosition()
 	}
 
 	togglePlayback = () => {
-		if (RecordingStateMachine.is(RecordingStates.Paused)) {
-			RecordingStateMachine.go(RecordingStates.Playing)
-			this.recordings[this.playback.recordIndex].recording.play()
-
-			clearInterval(this.playback.interval)
-
-			this.playback.interval = window.setInterval(() => {
-				this.recordings[this.playback.recordIndex].recording.getCurrentPosition().then((pos) => {
-					this.playback.position = pos
-				})
-			}, 250)
-		} else {
-			RecordingStateMachine.go(RecordingStates.Paused)
-			this.recordings[this.playback.recordIndex].recording.pause()
-		}
+		this.recordingPlayer.toggle()
 	}
 
 	presentActionSheet = () => {
