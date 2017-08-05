@@ -19,7 +19,7 @@ import { TypeState } from "typestate"
 
 import uuidv4 from 'uuid/v4'
 
-import VoicemailPlayer from "../../lib/asset/voicemailPlayer"
+import VoicemailPlayer, { recordingType, recordingsType } from "../../lib/asset/voicemailPlayer"
 
 enum RecordingStates {
 	NotRecording,
@@ -27,20 +27,14 @@ enum RecordingStates {
 	Paused
 }
 
-type recordingType = {
-	file: {
-		name: string,
-		directory: string,
-	},
-	recording: MediaObject,
-	duration: number
-}
+const unpath = (path: string): { name: string, directory: string } => {
+	const index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"))
 
-const path = ({ name, directory }: { name: string, directory: string }) => {
-	return `${directory}${name}`
+	return {
+		directory: path.substr(0, index),
+		name: path.substr(index)
+	}
 }
-
-type recordingsType = recordingType[]
 
 var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording);
 
@@ -180,8 +174,10 @@ export class TopicComponent {
 	private sendVoicemail = (voicemails:recordingsType) => {
 		this.resetRecordingState()
 
-		VoicemailPlayer.awaitVoicemailLoading(voicemails).thenReturn(voicemails).map(({ file: { name, directory }, recording, duration }:recordingType) =>
-			this.file.moveFile(
+		VoicemailPlayer.awaitVoicemailLoading(voicemails).thenReturn(voicemails).map(({ path, recording, duration }:recordingType) => {
+			const { directory, name } = unpath(path)
+
+			return this.file.moveFile(
 				directory,
 				name,
 				this.file.cacheDirectory,
@@ -192,10 +188,10 @@ export class TopicComponent {
 					name
 				}, duration, recording
 			}))
-		).map((voicemail:recordingType) => {
-			const { file, duration } = voicemail
+		}).map((voicemail:recordingType) => {
+			const { path, duration } = voicemail
 
-			return this.getFile(path(file), "").then((fileObject) =>
+			return this.getFile(path, "").then((fileObject) =>
 				new FileUpload(fileObject, { encrypt: true, extraInfo: { duration } })
 			)
 		}).then((voicemails) => {
@@ -272,10 +268,7 @@ export class TopicComponent {
 	getRecordingFileName = () => {
 		const recordingID = this.recordingPlayer.getRecordings().length;
 
-		return {
-			directory: this.file.externalRootDirectory,
-			name: `recording_${this.recordingInfo.UUID}_${recordingID}.aac`,
-		}
+		return `${this.file.externalRootDirectory}recording_${this.recordingInfo.UUID}_${recordingID}.aac`
 	}
 
 	private startRecording() {
@@ -287,7 +280,7 @@ export class TopicComponent {
 			this.recordingInfo.UUID = uuidv4()
 		}
 
-		this.recordingFile = this.media.create(path(this.getRecordingFileName()))
+		this.recordingFile = this.media.create(this.getRecordingFileName())
 
 		this.recordingInfo.startTime = Date.now()
 

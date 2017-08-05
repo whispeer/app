@@ -6,13 +6,13 @@ type FileType = {
 	directory: string
 }
 
-type recordingType = {
-	file: FileType,
+export type recordingType = {
+	path: string,
 	recording: MediaObject,
 	duration: number
 }
 
-type recordingsType = recordingType[]
+export type recordingsType = recordingType[]
 
 const media = new Media()
 
@@ -84,14 +84,14 @@ export default class VoicemailPlayer {
 		this.playing = false
 	}
 
-	addRecording(file: FileType, estimatedDuration: number) {
-		const currentRecording = media.create(this.path(file))
+	addRecording(path: string, estimatedDuration: number) {
+		const currentRecording = media.create(path)
 		currentRecording.seekTo(0)
 
 		currentRecording.onStatusUpdate.subscribe(this.statusListener)
 
 		const recordingInfo = {
-			file: file,
+			path,
 			recording: currentRecording,
 			duration: estimatedDuration
 		}
@@ -107,31 +107,16 @@ export default class VoicemailPlayer {
 	}
 
 	destroy() {
-		this.recordings.forEach(({ recording, file }) => {
+		this.recordings.forEach(({ recording, path }) => {
 			recording.release()
 
 			// TODO delete file created!
-			console.warn("TODO: delete file:", file)
+			console.warn("TODO: delete file:", path)
 		})
 	}
 
 	getRecordings() {
 		return [...this.recordings]
-	}
-
-	static awaitVoicemailLoading = (voicemails:recordingsType) => {
-		return new Bluebird((resolve) => {
-			const intID = setInterval(() => {
-				if (!voicemails.some((v) => v.recording.getDuration() === -1)) {
-					clearInterval(intID)
-					resolve()
-				}
-			}, 50)
-		})
-	}
-
-	private path = ({ name, directory }: { name: string, directory: string }) => {
-		return `${directory}${name}`
 	}
 
 	private statusListener = (status) => {
@@ -146,5 +131,16 @@ export default class VoicemailPlayer {
 
 			this.recordings[this.recordPlayingIndex].recording.play()
 		}
+	}
+
+	static awaitVoicemailLoading = (voicemails:recordingsType) => {
+		return new Bluebird((resolve) => {
+			const intID = setInterval(() => {
+				if (!voicemails.some((v) => v.recording.getDuration() === -1)) {
+					clearInterval(intID)
+					resolve()
+				}
+			}, 50)
+		})
 	}
 }

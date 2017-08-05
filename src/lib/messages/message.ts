@@ -371,7 +371,12 @@ export class Message {
 	}
 
 	downloadVoicemail = () => {
-
+		return Bluebird.resolve(this.data.voicemails).each((voicemail: any) =>
+			blobService.getBlobUrl(voicemail.blobID).then((url) => {
+				voicemail.url = url
+				voicemail.loaded = true
+			})
+		)
 	}
 
 	private setImagesInfo = () => {
