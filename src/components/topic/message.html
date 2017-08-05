@@ -31,7 +31,7 @@
 		</div>
 		<span class="message__file__info">
 			{{ voicemailLoaded() }}
-			Duration: {{voicemailDuration()}}
+			{{ voicemailPosition() }} / {{voicemailDuration()}}
 			[{{formatSize(voicemailSize())}}]
 		</span>
 	</div>

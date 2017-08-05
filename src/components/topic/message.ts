@@ -2,8 +2,12 @@ import { Component, Input } from "@angular/core";
 
 const prettysize = require("prettysize")
 
+import * as Bluebird from "bluebird"
+
 import { Message } from "../../lib/messages/message"
 import VoicemailPlayer from "../../lib/asset/voicemailPlayer"
+
+import h from "../../lib/helper/helper"
 
 @Component({
 	selector: "Message",
@@ -34,8 +38,21 @@ export class MessageComponent {
 		return arr.reduce((prev, next) => prev + next[attr], 0)
 	}
 
-	voicemailDuration = () =>
-		this.message.data.voicemails.reduce((prev, next) => prev + next.duration, 0)
+	voicemailDuration = () => {
+		if (this.voicemailPlayer.getDuration() > 0) {
+			return this.voicemailPlayer.getDuration()
+		}
+
+		return this.message.data.voicemails.reduce((prev, next) => prev + next.duration, 0)
+	}
+
+	voicemailPosition = () => {
+		if (!this.voicemailPlayer) {
+			return 0
+		}
+
+		return this.voicemailPlayer.getPosition()
+	}
 
 	voicemailSize = () =>
 		this.message.data.voicemails.reduce((prev, next) => prev + next.size, 0)
@@ -43,29 +60,27 @@ export class MessageComponent {
 	voicemailLoaded = () =>
 		this.message.data.voicemails.reduce((prev, next) => prev && next.loaded, true)
 
-	downloadVoicemail = () => {
-		this.message.downloadVoicemail().then((files) => {
+	downloadVoicemail = h.cacheResult<Bluebird<void>>(() =>
+		this.message.downloadVoicemail().then((files) =>
 			files.forEach((file) => {
 				this.voicemailPlayer.addRecording(file.url, file.duration)
 			})
-		})
-	}
+		)
+	)
 
-	voicemailPaused = () => {
-		return false
-	}
+	voicemailPaused = () =>
+		this.voicemailPlayer.isPaused()
 
-	voicemailPlaying = () => {
-		return true
-	}
+	voicemailPlaying = () =>
+		this.voicemailPlayer.isPlaying()
 
-	playVoicemail = () => {
+	playVoicemail = () =>
+		this.downloadVoicemail().then(() =>
+			this.voicemailPlayer.play()
+		)
 
-	}
-
-	pauseVoicemail = () => {
-
-	}
+	pauseVoicemail = () =>
+		this.voicemailPlayer.pause()
 
 	formatSize(size) {
 		return prettysize(size, false, false, 2)
