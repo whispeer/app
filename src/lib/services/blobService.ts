@@ -3,7 +3,8 @@ interface MyWindow extends Window {
 }
 
 interface deviceBlob extends Blob {
-	localURL?: string
+	localURL?: string,
+	originalUrl?: string
 }
 
 declare var window: MyWindow
@@ -19,6 +20,10 @@ import blobCache from "../asset/blobCache"
 
 import socketService from "./socket.service"
 import BlobDownloader from "./blobDownloader.service"
+
+import { File } from '@ionic-native/file';
+
+const file = new File()
 
 const initService = require("services/initService");
 const Queue = require("asset/Queue");
@@ -42,6 +47,15 @@ const timeEnd = (name) => {
 	if (debug.enabled(debugName)) {
 		// eslint-disable-next-line no-console
 		console.timeEnd(name);
+	}
+}
+
+export const unpath = (path: string): { name: string, directory: string } => {
+	const index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1
+
+	return {
+		directory: path.substr(0, index),
+		name: path.substr(index)
 	}
 }
 
@@ -95,6 +109,12 @@ class MyBlob {
 	}
 
 	private getArrayBuffer() {
+		if (this.blobData.originalUrl) {
+			const { directory, name } = unpath(this.blobData.originalUrl)
+
+			return Bluebird.resolve(file.readAsArrayBuffer(directory, name))
+		}
+
 		return new Bluebird((resolve) => {
 			const reader = new FileReader();
 
@@ -171,7 +191,10 @@ class MyBlob {
 
 			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
 
-			return blobCache.store(this).catch(() => this.toURL())
+			return blobCache.store(this).catch((e) => {
+				console.log("Could not store blob", e)
+				return this.toURL()
+			})
 		})
 	}
 

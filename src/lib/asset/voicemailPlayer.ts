@@ -1,6 +1,10 @@
 import { Media, MediaObject } from '@ionic-native/media';
 import * as Bluebird from "bluebird"
 
+import { Platform } from "ionic-angular"
+
+const platform = new Platform()
+
 type FileType = {
 	name: string,
 	directory: string
@@ -85,7 +89,10 @@ export default class VoicemailPlayer {
 	}
 
 	addRecording(path: string, estimatedDuration: number) {
-		const currentRecording = media.create(path)
+		const isIOS = (<any>window).device.platform === "iOS"
+
+		const currentRecording = media.create(isIOS ? path.replace(/^file:\/\//, '') : path)
+
 		currentRecording.seekTo(0)
 
 		currentRecording.onStatusUpdate.subscribe(this.statusListener)

@@ -21,19 +21,12 @@ import uuidv4 from 'uuid/v4'
 
 import VoicemailPlayer, { recordingType, recordingsType } from "../../lib/asset/voicemailPlayer"
 
+import { unpath } from "../../lib/services/blobService"
+
 enum RecordingStates {
 	NotRecording,
 	Recording,
 	Paused
-}
-
-const unpath = (path: string): { name: string, directory: string } => {
-	const index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1
-
-	return {
-		directory: path.substr(0, index),
-		name: path.substr(index)
-	}
 }
 
 var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording);
@@ -178,7 +171,7 @@ export class TopicComponent {
 			const { directory, name } = unpath(path)
 
 			return this.file.moveFile(
-				directory,
+				this.platform.is("ios") ? "file://" + directory : directory,
 				name,
 				this.file.cacheDirectory,
 				name
@@ -198,6 +191,7 @@ export class TopicComponent {
 				voicemails,
 			})
 		}).catch((e) => {
+			console.error("Sending voicemail failed", e)
 			// TODO
 		})
 	}
@@ -263,10 +257,20 @@ export class TopicComponent {
 	isPaused = () =>
 		RecordingStateMachine.is(RecordingStates.Paused)
 
+	getRecordingDir = () => {
+		if (!this.platform.is("ios")) {
+			return this.file.externalRootDirectory
+		}
+
+		return this.file.tempDirectory.replace(/^file:\/\//, '')
+	}
+
 	getRecordingFileName = () => {
 		const recordingID = this.recordingPlayer.getRecordings().length;
+		const extension = this.platform.is("ios") ? "m4a" : "aac"
+		const dir = this.getRecordingDir()
 
-		return `${this.file.externalRootDirectory}recording_${this.recordingInfo.UUID}_${recordingID}.aac`
+		return `${dir}recording_${this.recordingInfo.UUID}_${recordingID}.${extension}`
 	}
 
 	private startRecording() {
