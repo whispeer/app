@@ -27,23 +27,28 @@ export default class VoicemailPlayer {
 	private recordPlayingIndex = 0
 	private position = 0
 	private interval = 0
+	private loadingPromises : Bluebird<any>[] = []
 
 	constructor(recordings: recordingsType) {
 		this.recordings = recordings
 	}
 
 	play() {
-		this.recordings[this.recordPlayingIndex].recording.play()
+		console.log("play")
+		this.awaitLoading().then(() => {
+			console.log("play ready")
+			this.recordings[this.recordPlayingIndex].recording.play()
 
-		clearInterval(this.interval)
+			clearInterval(this.interval)
 
-		this.interval = window.setInterval(() => {
-			this.recordings[this.recordPlayingIndex].recording.getCurrentPosition().then((pos: number) => {
-				this.position = pos
-			})
-		}, 250)
+			this.interval = window.setInterval(() => {
+				this.recordings[this.recordPlayingIndex].recording.getCurrentPosition().then((pos: number) => {
+					this.position = pos
+				})
+			}, 250)
 
-		this.playing = true
+			this.playing = true
+		})
 	}
 
 	pause() {
@@ -88,14 +93,16 @@ export default class VoicemailPlayer {
 		this.playing = false
 	}
 
+	awaitLoading = () => {
+		return Bluebird.all(this.loadingPromises)
+	}
+
 	addRecording(path: string, estimatedDuration: number) {
 		const isIOS = (<any>window).device.platform === "iOS"
 
 		const currentRecording = media.create(isIOS ? path.replace(/^file:\/\//, '') : path)
 
-		currentRecording.seekTo(0)
-
-		currentRecording.onStatusUpdate.subscribe(this.statusListener)
+		currentRecording.play()
 
 		const recordingInfo = {
 			path,
@@ -103,12 +110,25 @@ export default class VoicemailPlayer {
 			duration: estimatedDuration
 		}
 
-		const intervalID = window.setInterval(() => {
-			if (currentRecording.getDuration() !== -1) {
-				recordingInfo.duration = currentRecording.getDuration()
-				clearInterval(intervalID)
-			}
-		}, 50)
+		const loadingPromise = new Bluebird((resolve) => {
+			const subscription = currentRecording.onStatusUpdate.subscribe((s) => {
+				console.log("status update in ", s)
+				if (s === media.MEDIA_RUNNING) {
+					currentRecording.stop()
+				}
+
+				if (s === media.MEDIA_STOPPED) {
+					subscription.unsubscribe()
+					resolve()
+				}
+			})
+		}).then(() => {
+			recordingInfo.duration = currentRecording.getDuration()
+
+			currentRecording.onStatusUpdate.subscribe(this.statusListener)
+		})
+
+		this.loadingPromises.push(loadingPromise)
 
 		this.recordings.push(recordingInfo)
 	}
@@ -127,6 +147,8 @@ export default class VoicemailPlayer {
 	}
 
 	private statusListener = (status) => {
+		console.log("Status update: " + status)
+
 		if (status === media.MEDIA_STOPPED && this.isPlaying()) {
 			this.recordPlayingIndex += 1
 			this.position = 0
@@ -138,16 +160,5 @@ export default class VoicemailPlayer {
 
 			this.recordings[this.recordPlayingIndex].recording.play()
 		}
-	}
-
-	static awaitVoicemailLoading = (voicemails:recordingsType) => {
-		return new Bluebird((resolve) => {
-			const intID = setInterval(() => {
-				if (!voicemails.some((v) => v.recording.getDuration() === -1)) {
-					clearInterval(intID)
-					resolve()
-				}
-			}, 50)
-		})
 	}
 }

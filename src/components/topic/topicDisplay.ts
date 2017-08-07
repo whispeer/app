@@ -164,10 +164,10 @@ export class TopicComponent {
 		this.stabilizeScroll()
 	}
 
-	private sendVoicemail = (voicemails:recordingsType) => {
-		this.resetRecordingState()
+	private sendVoicemail = () => {
+		const voicemails = this.recordingPlayer.getRecordings()
 
-		VoicemailPlayer.awaitVoicemailLoading(voicemails).thenReturn(voicemails).map(({ path, recording, duration }:recordingType) => {
+		this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(({ path, recording, duration }:recordingType) => {
 			const { directory, name } = unpath(path)
 
 			return this.file.moveFile(
@@ -194,6 +194,8 @@ export class TopicComponent {
 			console.error("Sending voicemail failed", e)
 			// TODO
 		})
+
+		this.resetRecordingState()
 	}
 
 	sendMessageToChat = () => {
@@ -202,7 +204,7 @@ export class TopicComponent {
 				this.toggleRecording()
 			}
 
-			this.sendVoicemail(this.recordingPlayer.getRecordings())
+			this.sendVoicemail()
 
 			return
 		}
