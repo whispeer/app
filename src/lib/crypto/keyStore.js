@@ -1467,7 +1467,7 @@ ObjectPadder.prototype._unpadString = function (val) {
 	var unpadded = val.substr(paddingIndex + 2);
 
 	if (isNumber) {
-		return h.parseDecimal(unpadded);
+		return parseFloat(unpadded, 10);
 	}
 
 	return unpadded;
