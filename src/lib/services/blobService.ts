@@ -294,7 +294,7 @@ const loadBlobFromDB = (blobID) => {
 const loadBlob = (blobID, downloadProgress) => {
 	return loadBlobFromDB(blobID).catch(() => {
 		return loadBlobFromServer(blobID, downloadProgress);
-	});
+	})
 }
 
 const getBlob = (blobID, downloadProgress?: Progress) => {
@@ -312,12 +312,12 @@ const blobService = {
 	isBlobLoaded: (blobID) => {
 		return blobCache.isLoaded(blobID)
 	},
-	getBlobUrl: (blobID) => {
+	getBlobUrl: (blobID, progress?: Progress) => {
 		return blobCache.getBlobUrl(blobID).catch(() =>
-			getBlob(blobID).then((blob) =>
+			getBlob(blobID, progress).then((blob) =>
 				blob.decrypt()
 			)
-		)
+		).finally(() => progress.progress(progress.getTotal()))
 	},
 }
 
