@@ -8,6 +8,7 @@ import { Message } from "../../lib/messages/message"
 import VoicemailPlayer from "../../lib/asset/voicemailPlayer"
 
 import h from "../../lib/helper/helper"
+import Progress from "../../lib/asset/Progress"
 
 @Component({
 	selector: "Message",
@@ -15,6 +16,7 @@ import h from "../../lib/helper/helper"
 })
 export class MessageComponent {
 	_message: Message
+	voicemailDownloadProgress: Progress
 
 	@Input() set message(_message: Message) {
 		const voicemails = _message.data.voicemails
@@ -36,6 +38,14 @@ export class MessageComponent {
 
 	add = (arr, attr) => {
 		return arr.reduce((prev, next) => prev + next[attr], 0)
+	}
+
+	voicemailProgress = () => {
+		if (!this.voicemailDownloadProgress) {
+			return 0
+		}
+
+		return this.voicemailDownloadProgress.getProgress()
 	}
 
 	voicemailDuration = () => {
@@ -60,13 +70,15 @@ export class MessageComponent {
 	voicemailLoaded = () =>
 		this.message.data.voicemails.reduce((prev, next) => prev && next.loaded, true)
 
-	downloadVoicemail = h.cacheResult<Bluebird<void>>(() =>
-		this.message.downloadVoicemail().then((files) =>
+	downloadVoicemail = h.cacheResult<Bluebird<void>>(() => {
+		this.voicemailDownloadProgress = new Progress()
+
+		return this.message.downloadVoicemail(this.voicemailDownloadProgress).then((files) =>
 			files.forEach((file) => {
 				this.voicemailPlayer.addRecording(file.url, file.duration)
 			})
 		)
-	)
+	})
 
 	voicemailPaused = () =>
 		this.voicemailPlayer.isPaused()

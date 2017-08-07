@@ -312,12 +312,28 @@ const blobService = {
 	isBlobLoaded: (blobID) => {
 		return blobCache.isLoaded(blobID)
 	},
-	getBlobUrl: (blobID, progress?: Progress) => {
-		return blobCache.getBlobUrl(blobID).catch(() =>
-			getBlob(blobID, progress).then((blob) =>
-				blob.decrypt()
-			)
-		).finally(() => progress.progress(progress.getTotal()))
+	getBlobUrl: (blobID, progress?: Progress, estimatedSize?: number,) => {
+		return blobCache.getBlobUrl(blobID).catch(() => {
+			if (!progress) {
+				return getBlob(blobID).then((blob) => blob.decrypt())
+			}
+
+			const decryptProgressStub = new Progress({ total: estimatedSize || 0 })
+			const downloadProgress = new Progress({ total: estimatedSize || 0 })
+
+			const loadProgress = new Progress({ depends: [ downloadProgress, decryptProgressStub ] })
+
+			progress.addDepend(loadProgress)
+
+			return getBlob(blobID, downloadProgress).then((blob: MyBlob) => {
+				downloadProgress.progress(downloadProgress.getTotal())
+
+				loadProgress.removeDepend(decryptProgressStub)
+				loadProgress.addDepend(blob.decryptProgress)
+
+				return blob.decrypt()
+			})
+		})
 	},
 }
 

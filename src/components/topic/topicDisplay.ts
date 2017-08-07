@@ -28,7 +28,7 @@ enum RecordingStates {
 }
 
 const unpath = (path: string): { name: string, directory: string } => {
-	const index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"))
+	const index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1
 
 	return {
 		directory: path.substr(0, index),
@@ -183,10 +183,8 @@ export class TopicComponent {
 				this.file.cacheDirectory,
 				name
 			).then(() => ({
-				file: {
-					directory: this.file.cacheDirectory,
-					name
-				}, duration, recording
+				path: `${this.file.cacheDirectory}${name}`,
+				duration, recording
 			}))
 		}).map((voicemail:recordingType) => {
 			const { path, duration } = voicemail
@@ -345,15 +343,13 @@ export class TopicComponent {
 		clearInterval(this.recordingInfo.updateInterval)
 
 		this.recordingPlayer.reset()
+		this.recordingPlayer = new VoicemailPlayer([])
 
 		RecordingStateMachine.go(RecordingStates.NotRecording)
 	}
 
 	discardRecording = () => {
 		this.recordingPlayer.destroy()
-
-		this.recordingPlayer = new VoicemailPlayer([])
-
 		this.resetRecordingState()
 	}
 

@@ -16,6 +16,8 @@ import ImageUpload from "../services/imageUpload.service"
 
 import blobService from "../services/blobService"
 
+import Progress from "../asset/Progress"
+
 type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
 
 export class Message {
@@ -370,13 +372,17 @@ export class Message {
 		})
 	}
 
-	downloadVoicemail = () => {
-		return Bluebird.resolve(this.data.voicemails).each((voicemail: any) =>
-			blobService.getBlobUrl(voicemail.blobID).then((url) => {
+	downloadVoicemail = (voicemailDownloadProgress: Progress) => {
+		return Bluebird.resolve(this.data.voicemails).each((voicemail: any) => {
+			const progress = new Progress()
+
+			voicemailDownloadProgress.addDepend(progress)
+
+			return blobService.getBlobUrl(voicemail.blobID, voicemail.progress).then((url) => {
 				voicemail.url = url
 				voicemail.loaded = true
 			})
-		)
+		})
 	}
 
 	private setImagesInfo = () => {
