@@ -4,62 +4,92 @@ import { File } from '@ionic-native/file';
 import Cache from "../services/Cache"
 import h from "../helper/helper"
 
-const FILE = new File()
-const PATH = `${FILE.cacheDirectory}/Blobs`
+const cache = new Cache("blobs");
 
-const readFileAsBlob = (path, fileName, type) =>
-	FILE.readAsArrayBuffer(path, fileName)
-		.then((buf) => new Blob([buf], { type }))
+const uriToBlob = (blob) => {
+	if (typeof blob === "string") {
+		return h.dataURItoBlob(blob);
+	}
 
-const writeToFile = (path, fileName, data: Blob) =>
-	FILE.writeFile(path, fileName, data)
+	return blob
+}
+
+cache.deleteAll()
+
+const file = new File()
+
+const readFileAsBlob = (path, fileName, type) => file.readAsArrayBuffer(path, fileName).then((buf) => new Blob([buf], { type }))
+
+const writeToFile = (path, fileName, data: Blob) => file.writeFile(path, fileName, data)
 
 const existsFile = (path, fileName) =>
-	FILE.checkFile(path, fileName).catch(e =>
-		e.code === 1 ? false : Bluebird.reject(e))
+	file.checkFile(path, fileName).catch((e) => {
+		if (e.code === 1) {
+			return false
+		}
+
+		return Bluebird.reject(e)
+	})
 
 const blobCache = {
 
-	store: (blob) => Bluebird.try( async () => {
-		const blobID = blob.getBlobID()
-		const filename = `${blobID}.blob`
-		const exists = await existsFile(PATH, filename)
-		if (!blob.isDecrypted()) {
-			console.warn('Cannot store an encrypted blob')
-			throw new Error('Cannot store an encrypted blob')
-		}
-		if (!exists) {
-			console.info('saving blob...')
-			await writeToFile(PATH, filename, blob.getBlobData())
-			console.info('blob saved')
-		}
-		console.info(`blob is in ${filename}`)
-		return `${filename}`
-	}),
+	store: (blob) => {
+		// can throw
+		return Bluebird.try(async () => {
+			const blobID = blob.getBlobID()
 
-	getBlobUrl: (blobID) => Bluebird.try( async () => {
-		const filename = `${blobID}.blob`
-		const exists = await existsFile(PATH, filename)
-		if (!exists) {
-			console.warn(`cannot get blob url, blob does not exist: ${filename}`)
-			throw new Error(`cannot get blob url, blob does not exist: ${filename}`)
-		}
-		return `${PATH}${filename}`
-	}),
+			if (!blob.isDecrypted()) {
+				throw new Error("trying to store an undecrypted blob")
+			}
 
-	isLoaded: (blobID) =>
-		blobCache.getBlobUrl(blobID).then(() => true).catch(() => false),
+			const path = file.cacheDirectory
+			const filename = `${blobID}.blob`
 
-	get: (blobID) => Bluebird.try( async () => {
-		const filename = `${blobID}.blob`
-		console.warn(`reading blob from file ${filename}...`)
-		const blob = await readFileAsBlob(PATH, filename, "")
-		console.warn(`successfully read blob from file ${filename}...`)
-		return { blob, blobID, decrypted: true, meta: {} }
-	})
+			const exists = await existsFile(path, filename)
+
+			if (!exists) {
+				console.info('saving blob...')
+				await writeToFile(path, filename, blob.getBlobData())
+				console.info('blob saved')
+			}
+
+			console.info(`blob is in ${filename}`)
+			return `${path}${filename}`
+
+		})
+	},
+
+	getBlobUrl: (blobID) => {
+		// can throw
+		return Bluebird.try(async () => {
+			const path = file.cacheDirectory
+			const filename = `${blobID}.blob`
+			const exists = await existsFile(path, filename)
+
+			if (!exists) {
+				console.warn(`cannot get blob url, blob does not exist: ${filename}`)
+				throw new Error(`cannot get blob url, blob does not exist: ${filename}`)
+			}
+
+			return `${path}${filename}`
+		})
+	},
+
+	isLoaded: (blobID) => blobCache.getBlobUrl(blobID).then(() => true).catch(() => false),
+
+	get: (blobID) => {
+
+		return Bluebird.try(async () => {
+			const path = file.cacheDirectory
+			const filename = `${blobID}.blob`
+
+			console.warn(`reading blob from file ${filename}...`)
+			const blob = await readFileAsBlob(path, filename, "")
+			console.warn(`successfully read blob from file ${filename}...`)
+
+			return { blob, blobID, decrypted: true, meta: {} }
+		})
+	}
 }
 
 export default blobCache
-
-// empty legacy cache
-;(new Cache("blobs")).deleteAll()
