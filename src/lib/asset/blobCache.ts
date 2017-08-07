@@ -5,7 +5,7 @@ import Cache from "../services/Cache"
 import h from "../helper/helper"
 
 const FILE = new File()
-const PATH = `${FILE.cacheDirectory}/Blobs`
+const PATH = FILE.cacheDirectory
 
 const readFileAsBlob = (path, fileName, type) =>
 	FILE.readAsArrayBuffer(path, fileName)
