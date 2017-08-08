@@ -41,14 +41,38 @@ const existsFile = (path, filename) =>
 
 const idToFileName = (blobID) => `${blobID}.blob`
 
+let clearing = false
+let storing = 0
+const noPendingStorageOperations = () => {
+	return new Bluebird((resolve) => {
+		const busyWait = setInterval(() => {
+			if (storing === 0) {
+				resolve()
+				clearInterval(busyWait)
+			}
+		}, 10)
+	})
+}
+
 const blobCache = {
 
 	clear: () => {
-		console.error('Clearing the cache is not implemented')
+		return Bluebird.try(async () => {
+			clearing = true
+			await noPendingStorageOperations()
+			return FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
+				.catch(error => {
+					// There really is little we can do here, but logouts, e.g., should not
+					// fail because we failed to clear.
+					console.warn('Cannot remove cache, resolving promise anyway.')
+					return true
+				})
+		}).finally(() => clearing = false)
 	},
 
 	moveFileToBlob: (currentDirectory, currentFilename, blobID) => {
 		return Bluebird.try(async () => {
+			if (clearing) throw new Error('Cannot get blob, currently clearing cache.')
 			const path = await getCacheDirectory()
 			const filename = idToFileName(blobID)
 			return FILE.moveFile(currentDirectory, currentFilename, path, filename)
@@ -57,6 +81,8 @@ const blobCache = {
 
 	store: (blob) => {
 		return Bluebird.try(async () => {
+			if (clearing) throw new Error('Cannot store blob, currently clearing cache.')
+			storing++
 			const blobID = blob.getBlobID()
 
 			if (!blob.isDecrypted()) {
@@ -72,12 +98,12 @@ const blobCache = {
 			}
 
 			return `${path}${filename}`
-
-		})
+		}).finally(() => storing--)
 	},
 
 	getBlobUrl: (blobID) => {
 		return Bluebird.try(async () => {
+			if (clearing) throw new Error('Cannot get blob URL, currently clearing cache.')
 			const path = await getCacheDirectory()
 			const filename = idToFileName(blobID)
 			const exists = await existsFile(path, filename)
@@ -93,8 +119,8 @@ const blobCache = {
 	isLoaded: (blobID) => blobCache.getBlobUrl(blobID).then(() => true).catch(() => false),
 
 	get: (blobID) => {
-
 		return Bluebird.try(async () => {
+			if (clearing) throw new Error('Cannot get blob, currently clearing cache.')
 			const path = await getCacheDirectory()
 			const filename = idToFileName(blobID)
 			const blob = await readFileAsBlob(path, filename, "")
@@ -107,4 +133,3 @@ export default blobCache
 
 // delete previous cache
 ;(new Cache("blobs")).deleteAll()
-
