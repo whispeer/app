@@ -4,12 +4,11 @@ import { File } from '@ionic-native/file'
 import Cache from "../services/Cache"
 import h from "../helper/helper"
 
-const uriToBlob = (blob) =>
-	typeof blob === "string" ? h.dataURItoBlob(blob) : blob
-
 const file = new File()
-const readFileAsBlob = (path, fileName, type) => file.readAsArrayBuffer(path, fileName).then((buf) => new Blob([buf], { type }))
-const writeToFile = (path, fileName, data: Blob) => file.writeFile(path, fileName, data)
+const readFileAsBlob = (path, fileName, type) =>
+	file.readAsArrayBuffer(path, fileName).then((buf) => new Blob([buf], { type }))
+const writeToFile = (path, fileName, data: Blob) =>
+	file.writeFile(path, fileName, data)
 const existsFile = (path, fileName) =>
 	file.checkFile(path, fileName).catch((e) => {
 		if (e.code === 1) {
