@@ -293,7 +293,13 @@ class MyBlob {
 	}
 }
 
-const loadBlobFromServer = (blobID, downloadProgress) => {
+const loadBlob = (blobID, progress, estimatedSize) => {
+	const decryptProgressStub = new Progress({ total: estimatedSize })
+	const downloadProgress = new Progress({ total: estimatedSize })
+
+	progress.addDepend(downloadProgress)
+	progress.addDepend(decryptProgressStub)
+
 	return downloadBlobQueue.enqueue(1, () => Bluebird.try(async () => {
 		await initService.awaitLoading()
 		const data = await new BlobDownloader(socketService, blobID, downloadProgress).download()
@@ -301,28 +307,21 @@ const loadBlobFromServer = (blobID, downloadProgress) => {
 		const blob = new MyBlob(data.blob, blobID, { meta: data.meta });
 
 		if (blob.isDecrypted()) {
-			await blobCache.store(blob)
+			return blobCache.store(blob)
 		}
 
-		return blob;
+		downloadProgress.progress(downloadProgress.getTotal())
+
+		progress.removeDepend(decryptProgressStub)
+		progress.addDepend(blob.decryptProgress)
+
+		return blob.decrypt()
 	}))
 }
 
-const loadBlobFromDB = (blobID) => {
-	return blobCache.get(blobID).then(({ blob, blobID, meta }) => {
-		return new MyBlob(blob, blobID, { meta, decrypted: true });
-	});
-}
-
-const loadBlob = (blobID, downloadProgress) => {
-	return loadBlobFromDB(blobID).catch(() => {
-		return loadBlobFromServer(blobID, downloadProgress);
-	})
-}
-
-const getBlob = (blobID, downloadProgress?: Progress) => {
+const getBlob = (blobID, downloadProgress: Progress, estimatedSize: number) => {
 	if (!knownBlobs[blobID]) {
-		knownBlobs[blobID] = loadBlob(blobID, downloadProgress)
+		knownBlobs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize)
 	}
 
 	return knownBlobs[blobID]
@@ -335,27 +334,9 @@ const blobService = {
 	isBlobLoaded: (blobID) => {
 		return blobCache.isLoaded(blobID)
 	},
-	getBlobUrl: (blobID, progress?: Progress, estimatedSize?: number,) => {
+	getBlobUrl: (blobID, progress: Progress = new Progress(), estimatedSize = 0) => {
 		return blobCache.getBlobUrl(blobID).catch(() => {
-			if (!progress) {
-				return getBlob(blobID).then((blob) => blob.decrypt())
-			}
-
-			const decryptProgressStub = new Progress({ total: estimatedSize || 0 })
-			const downloadProgress = new Progress({ total: estimatedSize || 0 })
-
-			const loadProgress = new Progress({ depends: [ downloadProgress, decryptProgressStub ] })
-
-			progress.addDepend(loadProgress)
-
-			return getBlob(blobID, downloadProgress).then((blob: MyBlob) => {
-				downloadProgress.progress(downloadProgress.getTotal())
-
-				loadProgress.removeDepend(decryptProgressStub)
-				loadProgress.addDepend(blob.decryptProgress)
-
-				return blob.decrypt()
-			})
+			return getBlob(blobID, progress, estimatedSize)
 		})
 	},
 }
