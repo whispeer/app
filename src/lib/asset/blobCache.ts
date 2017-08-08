@@ -7,6 +7,26 @@ import h from "../helper/helper"
 const BLOB_CACHE_DIR = "blobCache"
 const FILE = new File()
 
+
+let cacheDirectoryPromise:Bluebird<string> = null
+const getCacheDirectory = () => {
+	if (!cacheDirectoryPromise) {
+		const basePath = FILE.cacheDirectory
+		const desiredPath = `${basePath}${BLOB_CACHE_DIR}/`
+		cacheDirectoryPromise = Bluebird.resolve(FILE.checkDir(basePath, BLOB_CACHE_DIR)).then(success => {
+			return desiredPath
+		}).catch(error => {
+			return FILE.createDir(basePath, BLOB_CACHE_DIR, true).then(dirEntry => {
+				return desiredPath
+			}).catch(error => {
+				throw new Error('Could not create blob cache directory.')
+			})
+		})
+	}
+
+	return cacheDirectoryPromise
+}
+
 const readFileAsBlob = (path, filename, type) =>
 	FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
 const writeToFile = (path, filename, data: Blob) =>
@@ -20,9 +40,6 @@ const existsFile = (path, filename) =>
 	})
 
 const idToFileName = (blobID) => `${blobID}.blob`
-const getCacheDirectory = () => {
-	return Bluebird.resolve(FILE.cacheDirectory)
-}
 
 const blobCache = {
 
