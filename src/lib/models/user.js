@@ -675,8 +675,8 @@ function User (providedData) {
 			return getProfileAttribute("imageBlob")
 		}).then(blob => blob ?
 			blobService.getBlobUrl(blob.blobid) : "assets/img/user.png"
-		).then(url => window.device.platform === 'iOS' ?
-			url.replace('file://', '') : url
+		).then(url => window.device && window.device.platform === "iOS" ?
+			url.replace("file://", "") : url
 		)
 	}
 

@@ -46,7 +46,7 @@ export class GalleryComponent {
 			data.loading = false
 			data.loaded = true
 			data.url = this.sanitizer.bypassSecurityTrustUrl(
-				(<any>window).device.platform === 'iOS' ? url.replace('file://', '') : url
+				(<any>window).device && (<any>window).device.platform === 'iOS' ? url.replace('file://', '') : url
 			)
 		}).catch(errorService.criticalError)
 	}

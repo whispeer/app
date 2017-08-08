@@ -7,7 +7,7 @@ class FeatureToggles {
 
 	constructor() {
 		sessionService.loadLogin().then(() =>
-			socketService.definitlyEmit("featureToggles", {})
+			socketService.definitlyEmit("featureToggles", { blockageToken: socketService._token })
 		).then((response) => {
 			if (response.toggles) {
 				this.config = response.toggles
@@ -21,7 +21,7 @@ class FeatureToggles {
 
 	isFeatureEnabled(featureName) {
 		if (!this.config.hasOwnProperty(featureName)) {
-			console.warn(`Unknown feature: ${featureName}`)
+			// console.warn(`Unknown feature: ${featureName}`)
 
 			return false
 		}

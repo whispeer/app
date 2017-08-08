@@ -22,6 +22,7 @@ import uuidv4 from 'uuid/v4'
 import VoicemailPlayer, { recordingType, recordingsType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
+import featureToggles from "../../lib/services/featureToggles"
 
 enum RecordingStates {
 	NotRecording,
@@ -216,6 +217,14 @@ export class TopicComponent {
 		this.newMessageText = "";
 
 		this.change();
+	}
+
+	showRecordIcon() {
+		if (!featureToggles.isFeatureEnabled("chat.voiceMail")) {
+			return false
+		}
+
+		return this.newMessageText.length === 0
 	}
 
 	getFile = (url: string, type: string) : Bluebird<any> => {

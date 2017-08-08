@@ -105,11 +105,11 @@
 			</span>
 		</div>
 		<button ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"
-		*ngIf="newMessageText.length > 0 || isRecordingUIVisible()">
+		*ngIf="!showRecordIcon() && !isRecordingUIVisible()">
 			<ion-icon name="md-arrow-round-up"></ion-icon>
 		</button>
 		<button ion-button icon-only class="ios__messages__send-message" (click)="toggleRecording()"
-		*ngIf="newMessageText.length === 0 && !isRecordingUIVisible()">
+		*ngIf="showRecordIcon() && !isRecordingUIVisible()">
 			<ion-icon name="mic"></ion-icon>
 		</button>
 	</div>
@@ -131,13 +131,13 @@
 		<button
 			ion-button icon-only clear (click)="sendMessageToChat()"
 			class="messages__send-message"
-			*ngIf="newMessageText.length > 0 || recording">
+			*ngIf="!showRecordIcon() && !isRecordingUIVisible()">
 			<ion-icon name="send"></ion-icon>
 		</button>
 		<button
 			ion-button icon-only clear (click)="startRecording()"
 			class="messages__send-message"
-			*ngIf="newMessageText.length === 0 && !recording">
+			*ngIf="showRecordIcon() && !isRecordingUIVisible()">
 			<ion-icon name="mic"></ion-icon>
 		</button>
 	</div>
