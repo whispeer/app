@@ -378,7 +378,7 @@ export class Message {
 
 			voicemailDownloadProgress.addDepend(progress)
 
-			return blobService.getBlobUrl(voicemail.blobID, voicemail.progress).then((url) => {
+			return blobService.getBlobUrl(voicemail.blobID, voicemailDownloadProgress, voicemail.size).then((url) => {
 				voicemail.url = url
 				voicemail.loaded = true
 			})
