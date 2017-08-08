@@ -1,64 +1,66 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input } from "@angular/core"
 
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser'
 
-import errorService from "../../lib/services/error.service";
+import errorService from "../../lib/services/error.service"
 import blobService from "../../lib/services/blobService"
 
-import * as Bluebird from "bluebird";
+import * as Bluebird from "bluebird"
 
-import { PhotoViewer } from '@ionic-native/photo-viewer';
+import { PhotoViewer } from '@ionic-native/photo-viewer'
 
 @Component({
 	selector: "gallery",
 	templateUrl: "gallery.html"
 })
 export class GalleryComponent {
-	_images;
+	_images
 
 	@Input() set images(value: string) {
-		this._images = value;
+		this._images = value
 
 		this.loadPreviews()
 	}
 
 	get images(): string {
-		return this._images;
+		return this._images
 	}
 
 	previewChunk: number = 2
-	preview: number = this.previewChunk;
+	preview: number = this.previewChunk
 
 	constructor(private sanitizer:DomSanitizer, private photoViewer: PhotoViewer){}
 
 	loadImage(data) {
-		const blobid = data.blobID;
+		const blobid = data.blobID
 
 		if (data.loaded) {
-			return;
+			return
 		}
 
-		data.loading = true;
+		data.loading = true
 
 		Bluebird.try(() => {
-			return blobService.getBlobUrl(blobid);
+			return blobService.getBlobUrl(blobid)
 		}).then((url) => {
-			data.loading = false;
-			data.loaded = true;
-			data.url = this.sanitizer.bypassSecurityTrustUrl(url);
-		}).catch(errorService.criticalError);
+			data.loading = false
+			data.loaded = true
+			data.url = this.sanitizer.bypassSecurityTrustUrl(
+				(<any>window).device.platform === 'iOS' ? url.replace('file://', '') : url
+			)
+		}).catch(errorService.criticalError)
 	}
 
 	loadImagePreviews(images) {
 		images.forEach((image) => {
 			if (image.upload && typeof image.lowest.url === "string") {
-				image.highest.url = this.sanitizer.bypassSecurityTrustUrl(image.highest.url);
-				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(image.lowest.url);
-				return;
+				image.highest.url = this.sanitizer.bypassSecurityTrustUrl(image.highest.url)
+				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(image.lowest.url)
+				return
 			}
 
 			if (!image.lowest.url && image.lowest.width && image.lowest.height) {
-				const canvas = document.createElement("canvas");
+				const canvas = document.createElement("canvas")
 
 				canvas.width = image.lowest.width
 				canvas.height = image.lowest.height
@@ -66,17 +68,17 @@ export class GalleryComponent {
 				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(canvas.toDataURL())
 			}
 
-			this.loadImage(image.lowest);
-		});
+			this.loadImage(image.lowest)
+		})
 	}
 
 	displayImage = (image) => {
 		if (image.upload) {
-			this.photoViewer.show(image.upload._file.originalUrl);
-			return;
+			this.photoViewer.show(image.upload._file.originalUrl)
+			return
 		}
 
-		const blobID = image.lowest.blobID;
+		const blobID = image.lowest.blobID
 
 		blobService.getBlobUrl(blobID).then((url) =>
 			this.photoViewer.show(url)
@@ -84,16 +86,16 @@ export class GalleryComponent {
 	}
 
 	loadMoreImages() {
-		this.loadImagePreviews(this.images.slice(this.preview, this.preview + this.previewChunk));
-		this.preview += this.previewChunk;
+		this.loadImagePreviews(this.images.slice(this.preview, this.preview + this.previewChunk))
+		this.preview += this.previewChunk
 	}
 
 	runGif() {
-		return false;
+		return false
 	}
 
 	loadPreviews() {
-		this.loadImagePreviews(this.images.slice(0, this.preview));
+		this.loadImagePreviews(this.images.slice(0, this.preview))
 	}
 
 	ngOnInit() {
