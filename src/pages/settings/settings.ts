@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
 import sessionService from "../../lib/services/session.service";
 import Tutorial from "../../app/tutorial";
+import blobCache from "../../lib/asset/blobCache"
 
 import { TranslateService } from '@ngx-translate/core';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
@@ -55,7 +56,7 @@ export class SettingsPage {
 				{ text: 'Cancel', role: 'cancel' },
 				{ text: 'Logout',
 					handler: () => {
-						sessionService.logout();
+						blobCache.clear().finally(() => sessionService.logout())
 					}
 				}
 			]
