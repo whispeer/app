@@ -2,7 +2,8 @@ import * as Bluebird from "bluebird"
 
 import h from "../helper/helper"
 import Progress from "../asset/Progress"
-import blobService, { BlobType } from "./blobService"
+import blobService, { BlobType, unpath } from "./blobService"
+import blobCache from "../asset/blobCache"
 var Queue = require("asset/Queue");
 
 const defaultUploadOptions = {
@@ -59,6 +60,10 @@ class FileUpload {
 			}
 
 			return this.uploadPreparedBlob(this.blob)
+		}).then((keys) => {
+			const { directory, name } = unpath(this.file.originalUrl)
+
+			return blobCache.moveFileToBlob(directory, name, this.blob.getBlobID()).then(() => keys)
 		})
 	}
 

@@ -31,7 +31,12 @@ const existsFile = (path, fileName) =>
 		return Bluebird.reject(e)
 	})
 
+const idToFileName = (blobID) => `${blobID}.blob`
+
 const blobCache = {
+	moveFileToBlob: (fileDirectory, fileName, blobID) => {
+		return file.moveFile(fileDirectory, fileName, file.cacheDirectory, idToFileName(blobID))
+	},
 
 	store: (blob) => {
 		// can throw
@@ -43,7 +48,7 @@ const blobCache = {
 			}
 
 			const path = file.cacheDirectory
-			const filename = `${blobID}.blob`
+			const filename = idToFileName(blobID)
 
 			const exists = await existsFile(path, filename)
 
@@ -63,7 +68,7 @@ const blobCache = {
 		// can throw
 		return Bluebird.try(async () => {
 			const path = file.cacheDirectory
-			const filename = `${blobID}.blob`
+			const filename = idToFileName(blobID)
 			const exists = await existsFile(path, filename)
 
 			if (!exists) {
@@ -81,7 +86,7 @@ const blobCache = {
 
 		return Bluebird.try(async () => {
 			const path = file.cacheDirectory
-			const filename = `${blobID}.blob`
+			const filename = idToFileName(blobID)
 
 			console.warn(`reading blob from file ${filename}...`)
 			const blob = await readFileAsBlob(path, filename, "")
