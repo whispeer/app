@@ -192,8 +192,8 @@ initService = {
 	/** get via api, also check cache in before!
 	* @param domain: domain to get from
 	*/
-	awaitLoading: function (cb) {
-		return loadingPromise.nodeify(cb);
+	awaitLoading: function () {
+		return loadingPromise
 	},
 	get: function (domain, cb, options) {
 		initRequestsList.push({

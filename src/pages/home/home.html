@@ -16,7 +16,7 @@
 		<img class="home__no-content-image" src="assets/images/no_conversations_{{lang}}.png">
 	</div>
 	<ion-list class="space-for-fab">
-		<ion-item *ngFor="let chat of getChats(); let i = index" class="topic" [ngClass]="{'topic--new': chat.unread}" (click)="openChat(chat.id)">
+		<ion-item *ngFor="let chat of getChats(); let i = index" class="topic" [ngClass]="{'topic--new': chat.unread}" tappable (click)="openChat(chat.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of chat.partnersDisplay"

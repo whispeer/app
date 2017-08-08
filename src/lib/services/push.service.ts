@@ -67,10 +67,14 @@ export class PushService {
 		]).then(() => {
 			const pushKey = this.getOrCreatePushkey();
 
+			if (!type) {
+				return
+			}
+
 			return socketService.definitlyEmit("pushNotification.subscribe", {
 				token: data.registrationId,
 				key: sjcl.codec.hex.fromBits(pushKey),
-				type: type
+				type
 			});
 		}).catch(errorService.criticalError);
 	}

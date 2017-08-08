@@ -30,7 +30,7 @@
 
 		<ion-item-sliding #item *ngFor="let receiver of getReceivers();">
 
-			<ion-item (click)="goToUser(receiver.id)">
+			<ion-item tappable (click)="goToUser(receiver.id)">
 				<ion-avatar class="hexagon--border" item-left>
 					<user-image [id]="receiver.id" [image]="receiver.basic.image"></user-image>
 				</ion-avatar>
@@ -55,7 +55,7 @@
 			</ion-item-options>
 		</ion-item-sliding>
 
-		<ion-item detail-push (click)="addContact()" *ngIf="featureEnabled('chat.addReceiver') && amIAdmin()">
+		<ion-item detail-push tappable (click)="addContact()" *ngIf="featureEnabled('chat.addReceiver') && amIAdmin()">
 			Add more contacts...
 		</ion-item>
 	</ion-list>
