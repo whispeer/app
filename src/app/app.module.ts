@@ -1,6 +1,7 @@
 require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
+require("toBlob")
 
 import * as moment from 'moment';
 
