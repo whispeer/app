@@ -1,11 +1,12 @@
+import * as Bluebird from "bluebird"
+
 import Observer from "../asset/observer";
 import Storage from "./Storage";
-import { withPrefix } from "./storage.service";
-import keyStore from "./keyStore.service";
-
-import { landingPage } from "./location.manager";
+import blobCache from "../../lib/asset/blobCache"
 import h from "../helper/helper"
-import * as Bluebird from "bluebird"
+import keyStore from "./keyStore.service";
+import { landingPage } from "./location.manager";
+import { withPrefix } from "./storage.service";
 
 export class SessionService extends Observer {
 	sid: string = "";
@@ -61,13 +62,14 @@ export class SessionService extends Observer {
 
 	logout = () => {
 		if (this.loggedin) {
-			this.sessionStorage.clear().then(() => {
-				landingPage();
-
-				if (window.indexedDB) {
-					window.indexedDB.deleteDatabase("whispeerCache");
-				}
-			});
+			blobCache.clear().then(() => {
+				this.sessionStorage.clear().then(() => {
+					landingPage();
+					if (window.indexedDB) {
+						window.indexedDB.deleteDatabase("whispeerCache");
+					}
+				});
+			})
 		}
 	}
 
