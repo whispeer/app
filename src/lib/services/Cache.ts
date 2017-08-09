@@ -182,6 +182,14 @@ export default class Cache {
 		return this._db.cache.where("id").equals(this._name + "/" + id).delete();
 	}
 
+	deleteAll(): Bluebird<any> {
+		if (this._cacheDisabled) {
+			return Bluebird.resolve();
+		}
+
+		this._db.cache.where("id").startsWith(`${this._name}/`).delete()
+	}
+
 	cleanUp() {
 		if (this._cacheDisabled) {
 			return Bluebird.resolve();

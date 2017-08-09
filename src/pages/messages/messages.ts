@@ -258,12 +258,12 @@ export class MessagesPage {
 		}, 0)
 	}
 
-	sendMessage = ({ images, text }) => {
-		if (text.length === 0 && images.length === 0) {
+	sendMessage = ({ images = [], text, voicemails = [] }) => {
+		if (text.length === 0 && images.length === 0 && voicemails.length === 0) {
 			return;
 		}
 
-		messageService.sendMessage(this.chat.getID(), text, images).then(() => {
+		messageService.sendMessage(this.chat.getID(), text, { images, files: [], voicemails }).then(() => {
 			this.chat.newMessage = "";
 			this.markRead();
 		});

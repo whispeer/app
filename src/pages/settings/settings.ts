@@ -1,10 +1,11 @@
 import { Component } from "@angular/core";
-import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
-import sessionService from "../../lib/services/session.service";
-import Tutorial from "../../app/tutorial";
-
-import { TranslateService } from '@ngx-translate/core';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
+import { TranslateService } from '@ngx-translate/core';
+
+import Tutorial from "../../app/tutorial";
+import blobCache from "../../lib/asset/blobCache"
+import sessionService from "../../lib/services/session.service";
 
 @IonicPage({
 	name: "Settings",
@@ -54,10 +55,7 @@ export class SettingsPage {
 			buttons: [
 				{ text: 'Cancel', role: 'cancel' },
 				{ text: 'Logout',
-					handler: () => {
-						sessionService.logout();
-					}
-				}
+					handler: () => sessionService.logout() }
 			]
 		});
 		// there seems to be a bug in current ionic, which prevents

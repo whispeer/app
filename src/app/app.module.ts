@@ -1,6 +1,7 @@
 require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
+require("toBlob")
 
 import * as moment from 'moment';
 
@@ -25,6 +26,7 @@ import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { Media } from '@ionic-native/media';
 
 import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -33,7 +35,6 @@ import { HttpModule, Http } from '@angular/http';
 import { isBusinessVersion } from "../lib/services/location.manager";
 
 import "../lib/services/featureToggles"
-
 import "../lib/services/settings.service"
 
 (window as any).startup = new Date().getTime();
@@ -78,7 +79,8 @@ const DEFAULT_LANG = "de"
 		ImagePicker,
 		File,
 		Camera,
-		InAppBrowser
+		InAppBrowser,
+		Media,
 	]
 })
 export class AppModule {
@@ -129,7 +131,13 @@ export class AppModule {
 		fn()
 	}
 
-	constructor(private zone: NgZone, private translate: TranslateService, private globalization: Globalization, private config: Config, private platform: Platform) {
+	constructor(
+		private zone: NgZone,
+		private translate: TranslateService,
+		private globalization: Globalization,
+		private config: Config,
+		private platform: Platform
+	) {
 		translate.setDefaultLang("en");
 
 		platform.ready().then(() => {

@@ -6,8 +6,8 @@ import * as Bluebird from 'bluebird';
 
 const userService = require("user/userService")
 const friendsService = require("services/friendsService")
-const blobService = require("services/blobService")
-const ImageUpload = require("services/imageUploadService")
+import blobService from "../../lib/services/blobService"
+import ImageUpload from "../../lib/services/imageUpload.service"
 
 import { ImagePicker } from "@ionic-native/image-picker";
 import { File } from "@ionic-native/file";
@@ -372,13 +372,9 @@ export class ProfilePage {
 				text: this.translate.instant("profile.image.view"),
 				handler: () => {
 					this.userObject.getProfileAttribute("imageBlob").then(({ blobid }) => {
-						return blobService.getBlob(blobid)
-					}).then((blob) => {
-						return blob.decrypt().thenReturn(blob)
-					}).then((blob) => {
-						return blob.getStringRepresentation();
-					}).then((base64) => {
-						this.photoViewer.show(base64);
+						return blobService.getBlobUrl(blobid)
+					}).then((url) => {
+						this.photoViewer.show(url);
 					});
 					console.log("view image")
 				}

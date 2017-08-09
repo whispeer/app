@@ -1,17 +1,41 @@
-import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core";
+import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core"
+import { Media, MediaObject } from '@ionic-native/media';
 
-import { NavController, ActionSheetController, Platform } from "ionic-angular";
+import { NavController, ActionSheetController, Platform } from "ionic-angular"
 
-import * as Bluebird from "bluebird";
+import * as Bluebird from "bluebird"
 
-import { ImagePicker } from '@ionic-native/image-picker';
-import { File } from '@ionic-native/file';
-import { Camera, CameraOptions } from '@ionic-native/camera';
+import { ImagePicker } from '@ionic-native/image-picker'
+import { File } from '@ionic-native/file'
+import { Camera, CameraOptions } from '@ionic-native/camera'
 
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core'
 
-const ImageUpload = require("../lib/services/imageUploadService");
-import h from "../lib/helper/helper";
+import ImageUpload from "../../lib/services/imageUpload.service"
+import FileUpload from "../../lib/services/fileUpload.service"
+
+import h from "../../lib/helper/helper";
+import { TypeState } from "typestate"
+
+import uuidv4 from 'uuid/v4'
+
+import VoicemailPlayer, { recordingType, recordingsType } from "../../lib/asset/voicemailPlayer"
+
+import { unpath } from "../../lib/services/blobService"
+import featureToggles from "../../lib/services/featureToggles"
+
+enum RecordingStates {
+	NotRecording,
+	Recording,
+	Paused
+}
+
+var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording);
+
+RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.Recording)
+RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording)
+
+RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused)
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -35,11 +59,14 @@ export class TopicComponent {
 
 	@Output() sendMessage = new EventEmitter();
 
-	firstRender: Boolean = true
-
 	@ViewChild('content') content: ElementRef;
 	@ViewChild('footer') footer: ElementRef;
 
+	recordingPlayer: VoicemailPlayer
+
+	private recordingFile: MediaObject
+
+	firstRender: Boolean = true
 	newMessageText = "";
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
@@ -51,6 +78,13 @@ export class TopicComponent {
 
 	bursts: any[]
 
+	private recordingInfo = {
+		UUID: "",
+		duration: 0,
+		startTime: 0,
+		updateInterval: 0
+	}
+
 	constructor(
 		public navCtrl: NavController,
 		private actionSheetCtrl: ActionSheetController,
@@ -58,7 +92,8 @@ export class TopicComponent {
 		private imagePicker: ImagePicker,
 		private file: File,
 		private camera: Camera,
-		private translate: TranslateService
+		private translate: TranslateService,
+		private media: Media
 	) {
 		this.cameraOptions = {
 			quality: 50,
@@ -69,6 +104,22 @@ export class TopicComponent {
 			allowEdit: !this.platform.is('ios'),
 			correctOrientation: true
 		}
+
+		this.recordingPlayer = new VoicemailPlayer([])
+
+		RecordingStateMachine.on(RecordingStates.NotRecording, () => {
+			if (!this.recordingFile) {
+				return
+			}
+
+			this.recordingFile.release()
+			this.recordingFile = null
+		})
+
+		RecordingStateMachine.onExit(RecordingStates.Paused, (to) => {
+			this.recordingPlayer.reset()
+			return true
+		})
 	}
 
 	ngAfterViewInit() {
@@ -114,15 +165,66 @@ export class TopicComponent {
 		this.stabilizeScroll()
 	}
 
+	private sendVoicemail = () => {
+		const voicemails = this.recordingPlayer.getRecordings()
+
+		this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(({ path, recording, duration }:recordingType) => {
+			const { directory, name } = unpath(path)
+
+			return this.file.moveFile(
+				this.platform.is("ios") ? "file://" + directory : directory,
+				name,
+				this.file.cacheDirectory,
+				name
+			).then(() => ({
+				path: `${this.file.cacheDirectory}${name}`,
+				duration, recording
+			}))
+		}).map((voicemail:recordingType) => {
+			const { path, duration } = voicemail
+
+			return this.getFile(path, "").then((fileObject) =>
+				new FileUpload(fileObject, { encrypt: true, extraInfo: { duration } })
+			)
+		}).then((voicemails) => {
+			this.sendMessage.emit({
+				text: "",
+				voicemails,
+			})
+		}).catch((e) => {
+			console.error("Sending voicemail failed", e)
+			// TODO
+		})
+
+		this.resetRecordingState()
+	}
+
 	sendMessageToChat = () => {
+		if (this.isRecordingUIVisible()) {
+			if (this.isRecording()) {
+				this.toggleRecording()
+			}
+
+			this.sendVoicemail()
+
+			return
+		}
+
 		this.sendMessage.emit({
-			text: this.newMessageText,
-			images: []
+			text: this.newMessageText
 		});
 
 		this.newMessageText = "";
 
 		this.change();
+	}
+
+	showRecordIcon() {
+		if (!featureToggles.isFeatureEnabled("chat.voiceMail")) {
+			return false
+		}
+
+		return this.newMessageText.length === 0
 	}
 
 	getFile = (url: string, type: string) : Bluebird<any> => {
@@ -141,6 +243,139 @@ export class TopicComponent {
 		});
 	}
 
+	takeImage = () => {
+		this.camera.getPicture(this.cameraOptions).then((url: any) => {
+			return this.getFile(url, "image/png");
+		}).then((file: any) => {
+			return new ImageUpload(file);
+		}).then((image) => {
+			this.sendMessage.emit({
+				images: [image],
+				text: ""
+			});
+		});
+	};
+
+	isRecordingUIVisible = () =>
+		!RecordingStateMachine.is(RecordingStates.NotRecording)
+
+	isPlayback = () =>
+		RecordingStateMachine.is(RecordingStates.Paused) && this.recordingPlayer.isPlaying()
+
+	isRecording = () =>
+		RecordingStateMachine.is(RecordingStates.Recording)
+
+	isPaused = () =>
+		RecordingStateMachine.is(RecordingStates.Paused)
+
+	getRecordingDir = () => {
+		if (!this.platform.is("ios")) {
+			return this.file.externalRootDirectory
+		}
+
+		return this.file.tempDirectory.replace(/^file:\/\//, '')
+	}
+
+	getRecordingFileName = () => {
+		const recordingID = this.recordingPlayer.getRecordings().length;
+		const extension = this.platform.is("ios") ? "m4a" : "aac"
+		const dir = this.getRecordingDir()
+
+		return `${dir}recording_${this.recordingInfo.UUID}_${recordingID}.${extension}`
+	}
+
+	private startRecording() {
+		if (this.recordingFile) {
+			return
+		}
+
+		if (!this.recordingInfo.UUID) {
+			this.recordingInfo.UUID = uuidv4()
+		}
+
+		this.recordingFile = this.media.create(this.getRecordingFileName())
+
+		this.recordingInfo.startTime = Date.now()
+
+		this.recordingFile.startRecord();
+
+		clearInterval(this.recordingInfo.updateInterval)
+
+		this.recordingInfo.updateInterval = window.setInterval(() => {
+			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
+		}, 100)
+	}
+
+	formatTime = (seconds) => {
+		const fullSeconds = h.pad(Math.floor(seconds % 60), 2)
+		const minutes = h.pad(Math.floor(seconds / 60), 2)
+
+		return `${minutes}:${fullSeconds}`
+	}
+
+	getCurrentDuration = (beforeIndex?: number) => {
+		if (beforeIndex) {
+			return 0
+		}
+
+		if (!RecordingStateMachine.is(RecordingStates.Recording)) {
+			return 0
+		}
+
+		return this.recordingInfo.duration
+	}
+
+	getDuration = (beforeIndex?: number) => {
+		return this.recordingPlayer.getDuration() + this.getCurrentDuration()
+	}
+
+	toggleRecording = () => {
+		if (RecordingStateMachine.is(RecordingStates.Recording)) {
+			RecordingStateMachine.go(RecordingStates.Paused)
+
+			clearInterval(this.recordingInfo.updateInterval)
+
+			this.recordingFile.stopRecord()
+			this.recordingFile.release()
+			this.recordingFile = null
+
+			this.recordingPlayer.addRecording(this.getRecordingFileName(), this.recordingInfo.duration)
+
+			this.recordingInfo.duration = 0
+		} else {
+			RecordingStateMachine.go(RecordingStates.Recording)
+
+			this.startRecording()
+		}
+	}
+
+	resetRecordingState = () => {
+		if (this.recordingFile) {
+			this.recordingFile.release()
+			this.recordingFile = null
+		}
+
+		clearInterval(this.recordingInfo.updateInterval)
+
+		this.recordingPlayer.reset()
+		this.recordingPlayer = new VoicemailPlayer([])
+
+		RecordingStateMachine.go(RecordingStates.NotRecording)
+	}
+
+	discardRecording = () => {
+		this.recordingPlayer.destroy()
+		this.resetRecordingState()
+	}
+
+	getPosition = () => {
+		return this.recordingPlayer.getPosition()
+	}
+
+	togglePlayback = () => {
+		this.recordingPlayer.toggle()
+	}
+
 	presentActionSheet = () => {
 		let actionSheet = this.actionSheetCtrl.create({
 			buttons: [
@@ -148,16 +383,7 @@ export class TopicComponent {
 					text: this.translate.instant("topic.takePhoto"),
 					icon: !this.platform.is("ios") ? "camera": null,
 					handler: () => {
-						this.camera.getPicture(this.cameraOptions).then((url) => {
-							return this.getFile(url, "image/png");
-						}).then((file: any) => {
-							return new ImageUpload(file);
-						}).then((image) => {
-							this.sendMessage.emit({
-								images: [image],
-								text: ""
-							});
-						});
+						this.takeImage();
 					}
 				}, {
 					text: this.translate.instant("topic.selectGallery"),
@@ -169,7 +395,7 @@ export class TopicComponent {
 							return new ImageUpload(file);
 						}).then((images) => {
 							this.sendMessage.emit({
-								images: images,
+								images,
 								text: ""
 							});
 						});

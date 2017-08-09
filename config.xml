@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version='1.0' encoding='utf-8'?>
 <widget id="whispeer.app" version="0.2.15" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
 	<name>whispeer Messenger</name>
 	<description>Whispeer Messenger.</description>
@@ -121,5 +121,9 @@
 	<plugin name="cordova-plugin-inappbrowser" spec="~1.7.1"/>
 	<engine name="android" spec="~6.2.1"/>
 	<engine name="ios" spec="~4.3.1"/>
-	<hook type="after_prepare" src="scripts/copyPushIcon.js"/>
+	<hook src="scripts/copyPushIcon.js" type="after_prepare"/>
+	<hook src="scripts/correctIOSSimVersion.sh" type="after_platform_add"/>
+	<plugin name="cordova-plugin-media" spec="~3.0.1">
+		<variable name="MICROPHONE_USAGE_DESCRIPTION" value=" "/>
+	</plugin>
 </widget>

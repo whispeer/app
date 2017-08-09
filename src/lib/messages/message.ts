@@ -11,6 +11,15 @@ import ObjectLoader from "../services/objectLoader"
 import ChunkLoader, { Chunk } from "./chatChunk"
 import { Chat } from "./chat"
 
+import FileUpload from "../services/fileUpload.service"
+import ImageUpload from "../services/imageUpload.service"
+
+import blobService from "../services/blobService"
+
+import Progress from "../asset/Progress"
+
+type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
+
 export class Message {
 	private _hasBeenSent: boolean
 	private _isDecrypted: boolean
@@ -19,24 +28,24 @@ export class Message {
 	private _serverID: number
 	private _clientID: any
 	private _securedData: any
-	private _images: any[]
+	private attachments: attachments
 
 	private sendTime: number
 	private senderID: number
 
-	private data: any
+	public data: any
 
 	private chunkID: number
 
 	private chat: Chat
 
-	constructor(messageData, chat?: Chat, images?, id?) {
+	constructor(messageData, chat?: Chat, attachments?: attachments, id?) {
 		if (!chat) {
 			this.fromSecuredData(messageData);
 			return
 		}
 
-		this.fromDecryptedData(chat, messageData, images, id);
+		this.fromDecryptedData(chat, messageData, attachments, id);
 	}
 
 	fromSecuredData = (data) => {
@@ -63,13 +72,13 @@ export class Message {
 		this.setData();
 	};
 
-	fromDecryptedData = (chat: Chat, message, images, id) => {
+	fromDecryptedData = (chat: Chat, message, attachments, id) => {
 		this._hasBeenSent = false;
 		this._isDecrypted = true;
 		this._isOwnMessage = true;
 
 		this.chat = chat;
-		this._images = images;
+		this.attachments = attachments
 
 		this._clientID = id || h.generateUUID();
 
@@ -85,7 +94,7 @@ export class Message {
 		this.setData();
 
 		this.data.text = message;
-		this.data.images = images.map((image) => {
+		this.data.images = attachments.images.map((image) => {
 			if (!image.convertForGallery) {
 				return image;
 			}
@@ -93,15 +102,37 @@ export class Message {
 			return image.convertForGallery();
 		});
 
+		this.data.files = attachments.files.map((file) => ({
+			...file.getInfo(),
+			getProgress: () => {
+				return file.getProgress()
+			}
+		}))
+
+		this.data.voicemails = attachments.voicemails.map((voicemail) => ({
+			...voicemail.getInfo(),
+			getProgress: () => {
+				return voicemail.getProgress()
+			}
+		}))
+
 		this.loadSender();
-		this._prepareImages();
+		this.prepareAttachments();
 	};
 
-	_prepareImages = h.cacheResult<Bluebird<any>>(() => {
-		return Bluebird.resolve(this._images).map((image: any) => {
-			return image.prepare();
-		});
-	})
+	private prepare = (uploads) => Bluebird.resolve(uploads).map((upload: any) => upload.prepare())
+
+	private prepareImages = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.images))
+	private prepareFiles = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.files))
+	private prepareVoicemails = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.voicemails))
+
+	hasAttachments = () => {
+		return this.attachments.images.length !== 0 || this.attachments.files.length !== 0 || this.attachments.voicemails.length !== 0
+	}
+
+	private prepareAttachments = () => {
+		return Bluebird.all([this.prepareFiles(), this.prepareImages(), this.prepareVoicemails()])
+	}
 
 	setData = () => {
 		this.data = {
@@ -135,10 +166,12 @@ export class Message {
 		return this._hasBeenSent;
 	};
 
-	uploadImages = h.cacheResult<Bluebird<any>>((chunkKey) => {
-		return this._prepareImages().then(() => {
-			return Bluebird.all(this._images.map((image) => {
-				return image.upload(chunkKey);
+	uploadAttachments = h.cacheResult<Bluebird<any>>((chunkKey) => {
+		return this.prepareAttachments().then(() => {
+			const attachments = [...this.attachments.images, ...this.attachments.files, ...this.attachments.voicemails]
+
+			return Bluebird.all(attachments.map((attachment) => {
+				return attachment.upload(chunkKey);
 			}));
 		}).then((imageKeys) => {
 			return h.array.flatten(imageKeys);
@@ -163,11 +196,26 @@ export class Message {
 
 			this._securedData.setParent(chunk.getSecuredData());
 
-			await chunk.awaitEarlierSend(this.getTime());
+			const imagesInfo = await this.prepareImages()
+			const voicemailsInfo = await this.prepareVoicemails()
+			const filesInfo = await this.prepareFiles()
 
-			const imagesMeta = await this._prepareImages()
+			const extractImagesInfo = (infos, key) => {
+				return infos.map((info) =>
+					h.objectMap(info, (val) => val[key])
+				)
+			}
 
-			this._securedData.metaSetAttr("images", imagesMeta);
+			this._securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
+			this._securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
+			this._securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
+			this._securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
+			this._securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
+			this._securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
+
+			if (filesInfo.length === 0 && imagesInfo.length === 0 && voicemailsInfo.length === 0) {
+				this._securedData.contentSet(this._securedData.contentGet().message)
+			}
 
 			const chunkKey = chunk.getKey();
 
@@ -195,21 +243,22 @@ export class Message {
 			}
 
 			const signAndEncryptPromise = this._securedData._signAndEncrypt(userService.getown().getSignKey(), chunkKey);
-
-			const imageKeys = await this.uploadImages(chunkKey)
-
+			const keys = await this.uploadAttachments(chunkKey)
 			const request = await signAndEncryptPromise
-
-			request.imageKeys = imageKeys.map(keyStore.upload.getKey);
 
 			const response = await socket.emit("chat.message.create", {
 				chunkID: chunk.getID(),
-				message: request
+				message: request,
+				keys: keys.map(keyStore.upload.getKey)
 			});
 
 			if (response.success) {
-				this._hasBeenSent = true;
-				this.data.sent = true;
+				this._hasBeenSent = true
+				this.data.sent = true
+
+				this.setAttachmentInfo("files")
+				this.setAttachmentInfo("voicemails")
+				this.setImagesInfo()
 			}
 
 			if (response.server) {
@@ -296,9 +345,77 @@ export class Message {
 		return this.data.text
 	}
 
+	private setAttachmentInfo = (attr) => {
+		const fullContent = this._securedData.contentGet()
+
+		if (typeof fullContent === "string") {
+			return
+		}
+
+		const content = fullContent[attr]
+		const meta = this._securedData.metaAttr(attr)
+
+		if (!content) {
+			return
+		}
+
+		this.data[attr] = content.map((file, index) => ({
+			...file,
+			...meta[index],
+			loaded: false
+		}))
+
+		Bluebird.resolve(this.data[attr]).filter((ele: any) => {
+			return blobService.isBlobLoaded(ele.blobID)
+		}).each((loadedAttachment: any) => {
+			loadedAttachment.loaded = true
+		})
+	}
+
+	downloadVoicemail = (voicemailDownloadProgress: Progress) => {
+		return Bluebird.resolve(this.data.voicemails).each((voicemail: any) => {
+			const progress = new Progress()
+
+			voicemailDownloadProgress.addDepend(progress)
+
+			return blobService.getBlobUrl(voicemail.blobID, voicemailDownloadProgress, voicemail.size).then((url) => {
+				voicemail.url = url
+				voicemail.loaded = true
+			})
+		})
+	}
+
+	private setImagesInfo = () => {
+		const content = this._securedData.contentGet()
+
+		if (typeof content === "string") {
+			return
+		}
+
+		const imagesContent = content.images
+		const imagesMeta = this._securedData.metaAttr("images")
+
+		if (!imagesContent) {
+			return
+		}
+
+		this.data.images = imagesContent.map((imageContent, index) => {
+			const imageMeta = imagesMeta[index]
+
+			const data =  h.objectMap(imageMeta, (val, key) => {
+				return {
+					...val,
+					...imageContent[key]
+				}
+			})
+
+			return data
+		})
+	}
+
 	decrypt = () => {
 		if (this._isDecrypted) {
-			return Bluebird.resolve(this.data.text)
+			return Bluebird.resolve(this._securedData.contentGet())
 		}
 
 		return Bluebird.try(() => {
@@ -312,12 +429,16 @@ export class Message {
 				this.data.text = content.message
 			}
 
+			this.setAttachmentInfo("files")
+			this.setAttachmentInfo("voicemails")
+			this.setImagesInfo()
+
 			return content
 		})
 	}
 
 	static createRawSecuredData(message, meta, chunk?: Chunk) {
-		var secured = SecuredData.createRaw(message, meta, {
+		var secured = SecuredData.createRaw({ message }, meta, {
 			type: "message",
 		});
 

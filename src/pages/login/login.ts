@@ -6,7 +6,6 @@ import sessionService from '../../lib/services/session.service';
 import { failureCodes } from "../../lib/services/login.service";
 import loginService from "../../lib/services/login.service";
 import passwordStrengthService from '../../lib/services/passwordStrength.service'
-import jQuery from "jquery";
 
 const registerService = require('../../lib/services/registerService');
 import whispeerHelper from "../../lib/helper/helper"
@@ -14,6 +13,14 @@ import whispeerHelper from "../../lib/helper/helper"
 import { TranslateService } from '@ngx-translate/core';
 
 import { isBusinessVersion, goToPrivateHome, goToBusinessVersion } from '../../lib/services/location.manager'
+
+const focusSelector = (selector) => {
+	const e = document.querySelector(selector)
+
+	if (e) {
+		e.focus()
+	}
+}
 
 @IonicPage({
 	name: "Login",
@@ -41,8 +48,8 @@ export class LoginPage {
 		loginService.loadedStorage.then(() => {
 			this.checkUserNameExistance();
 			(loginService.identifier
-				? jQuery("#password input")
-				: jQuery("#mail input")).focus();
+				? focusSelector("#password input")
+				: focusSelector("#mail input"))
 		});
 	}
 
@@ -132,11 +139,7 @@ export class LoginPage {
 	}
 
 	focusInput(id, repeated = false) {
-		const input = jQuery(`#${id} .text-input`)
-
-		if (input.length) {
-			return input.focus();
-		}
+		focusSelector(`#${id} .text-input`)
 
 		if (repeated) {
 			return

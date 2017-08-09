@@ -1,24 +1,24 @@
 import { Directive, ElementRef, Input } from '@angular/core';
 // const EmojifyConverter = require("emojify");
 
-import jQuery from "jquery";
-
 /*const emojify = new EmojifyConverter();
 emojify.img_sets.apple.sheet = "assets/img/sheet_apple_64.png";
 emojify.use_sheet = true;
 emojify.include_title = true;*/
 
-const ignoreAsLastCharacter = ["'", ")", "\"", "."];
-const linkElement = jQuery("<a>").attr("target", "_blank");
 /*const emojiElementOuter = jQuery("<span>").addClass("emoji-outer").addClass("emoji-sizer");
 const emojiElementInner = jQuery("<span>").addClass("emoji-inner").css("background", "url(" + emojify.img_sets.apple.sheet + ")");*/
 
+const ignoreAsLastCharacter = ["'", ")", "\"", "."];
+
+type syntaxifierType = (elm: HTMLElement, content: string, remainingTextCallback?: Function) => any
+
 @Directive({ selector: '[whispeerSyntaxify]' })
 export class SyntaxifyDirective {
-	syntaxifier: Function[] = [];
-	el: JQuery;
+	syntaxifier: syntaxifierType[] = [];
+	el: HTMLElement;
 
-	private appendUrl = (elm, url, remainingTextCallback) => {
+	private appendUrl: syntaxifierType = (elm: HTMLElement, url, remainingTextCallback) => {
 		var i, removeUntil = 0;
 		for (i = -1; i > -5; i -= 1) {
 			//if i:=-1 than i+1 would be 0 and thus the slice would be empty.
@@ -36,14 +36,19 @@ export class SyntaxifyDirective {
 			url = url.slice(0, removeUntil);
 		}
 
-		elm.append(linkElement.clone().attr("href", url).text(url));
+		const linkElement = document.createElement("a")
+		linkElement.setAttribute("target", "_blank")
+		linkElement.setAttribute("href", url)
+		linkElement.textContent = url
+
+		elm.appendChild(linkElement);
 
 		if (removeUntil) {
 			remainingTextCallback(removedCharacters);
 		}
 	}
 
-	urlify = (elm, text, remainingTextCallback) => {
+	urlify: syntaxifierType = (elm, text, remainingTextCallback) => {
 		/*
 		/                                   # Start at the beginning of the text
 		(?:ftp|http|https):\/\/              # Look for ftp, http, or https
@@ -73,16 +78,36 @@ export class SyntaxifyDirective {
 		}
 	}
 
-	newlines = (elm, text, remainingTextCallback) => {
+	newlines: syntaxifierType = (elm, text, remainingTextCallback) => {
 		var parts = text.split(/\r\n|\n\r|\r|\n|\w*\[br\]\w*/);
 
-		var i, br = jQuery("<br>");
+		var i;
 		for (i = 0; i < parts.length; i += 1) {
-			elm.append(remainingTextCallback(parts[i]));
+			remainingTextCallback(parts[i])
 			if (i !== parts.length - 1) {
-				elm.append(br.clone());
+				elm.appendChild(document.createElement("br"))
 			}
 		}
+	}
+
+	createTextNode: syntaxifierType = (elm, text) => {
+		elm.appendChild(document.createTextNode(text));
+	}
+
+	callSyntaxifier = (number: number, elm: HTMLElement, text: string) => {
+		this.syntaxifier[number](elm, text, (text) => {
+			this.callSyntaxifier(number + 1, elm, text);
+		});
+	}
+
+	@Input()
+	set content(content: string) {
+		this.callSyntaxifier(0, this.el, content);
+	}
+
+	constructor(el: ElementRef) {
+		this.syntaxifier = [this.urlify, this.newlines, this.createTextNode];
+		this.el = el.nativeElement
 	}
 
 	/* emojifyReplacer = (elm, text: string, remainingTextCallback: Function) => {
@@ -124,24 +149,4 @@ export class SyntaxifyDirective {
 			);
 		});
 	} */
-
-	createTextNode = (elm, text) => {
-		elm.append(document.createTextNode(text));
-	}
-
-	callSyntaxifier = (number, elm, text) => {
-		this.syntaxifier[number](elm, text, (text) => {
-			this.callSyntaxifier(number + 1, elm, text);
-		});
-	}
-
-	@Input()
-	set content(content: string) {
-		this.callSyntaxifier(0, this.el, content);
-	}
-
-	constructor(el: ElementRef) {
-		this.syntaxifier = [this.urlify, this.newlines, this.createTextNode];
-		this.el = jQuery(el.nativeElement);
-	}
 }

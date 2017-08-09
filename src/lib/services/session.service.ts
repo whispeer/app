@@ -1,11 +1,12 @@
+import * as Bluebird from "bluebird"
+
 import Observer from "../asset/observer";
 import Storage from "./Storage";
-import { withPrefix } from "./storage.service";
-import keyStore from "./keyStore.service";
-
-import { landingPage } from "./location.manager";
+import blobCache from "../../lib/asset/blobCache"
 import h from "../helper/helper"
-import * as Bluebird from "bluebird"
+import keyStore from "./keyStore.service";
+import { landingPage } from "./location.manager";
+import { withPrefix } from "./storage.service";
 
 export class SessionService extends Observer {
 	sid: string = "";
@@ -40,7 +41,7 @@ export class SessionService extends Observer {
 		return this.sessionStorage.awaitLoading().then(() => {
 			const loggedin = this.sessionStorage.get("loggedin") === "true" && this.sessionStorage.get("password");
 			if (!loggedin) {
-				return this.sessionStorage.clear().thenReturn(false);
+				return this.clear().thenReturn(false);
 			}
 
 			this.setPassword(this.sessionStorage.get("password"));
@@ -59,16 +60,20 @@ export class SessionService extends Observer {
 		return parseFloat(this.userid);
 	}
 
-	logout = () => {
-		if (this.loggedin) {
-			this.sessionStorage.clear().then(() => {
-				landingPage();
-
+	clear = () => {
+		return Bluebird.all([
+			blobCache.clear(),
+			this.sessionStorage.clear(),
+			Bluebird.try(() => {
 				if (window.indexedDB) {
 					window.indexedDB.deleteDatabase("whispeerCache");
 				}
-			});
-		}
+			})
+		].map(p => p.reflect()))
+	}
+
+	logout = () => {
+		this.clear().finally(landingPage)
 	}
 
 	isLoggedin = () => {

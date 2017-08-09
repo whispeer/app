@@ -1,10 +1,10 @@
 import { Component, Input } from "@angular/core";
 
-import h from "../lib/helper/helper";
+import h from "../../lib/helper/helper";
 
-import ChunkLoader, { Chunk } from "../lib/messages/chatChunk"
-import { Chat } from "../lib/messages/chat"
-import Burst from "../lib/messages/burst"
+import ChunkLoader, { Chunk } from "../../lib/messages/chatChunk"
+import { Chat } from "../../lib/messages/chat"
+import Burst from "../../lib/messages/burst"
 
 @Component({
 	selector: "BurstDifference",
