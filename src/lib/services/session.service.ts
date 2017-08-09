@@ -41,7 +41,7 @@ export class SessionService extends Observer {
 		return this.sessionStorage.awaitLoading().then(() => {
 			const loggedin = this.sessionStorage.get("loggedin") === "true" && this.sessionStorage.get("password");
 			if (!loggedin) {
-				return this.sessionStorage.clear().thenReturn(false);
+				return this.clear().thenReturn(false);
 			}
 
 			this.setPassword(this.sessionStorage.get("password"));
@@ -73,7 +73,7 @@ export class SessionService extends Observer {
 	}
 
 	logout = () => {
-		this.clear().finally(() => landingPage())
+		this.clear().finally(landingPage)
 	}
 
 	isLoggedin = () => {
