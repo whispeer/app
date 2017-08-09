@@ -2539,6 +2539,10 @@ idb-wrapper@^1.5.0:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/idb-wrapper/-/idb-wrapper-1.7.1.tgz#6a32670122e173a84ecc5cfa9668fa2ceb221b04"
 
+idb@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/idb/-/idb-2.0.3.tgz#705ce38f57525c7b3e9949d6b2aad7d8ddc08dce"
+
 ieee754@^1.1.4:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
