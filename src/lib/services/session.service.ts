@@ -60,17 +60,20 @@ export class SessionService extends Observer {
 		return parseFloat(this.userid);
 	}
 
-	logout = () => {
-		if (this.loggedin) {
-			blobCache.clear().then(() => {
-				this.sessionStorage.clear().then(() => {
-					landingPage();
-					if (window.indexedDB) {
-						window.indexedDB.deleteDatabase("whispeerCache");
-					}
-				});
+	clear = () => {
+		return Bluebird.all([
+			blobCache.clear(),
+			this.sessionStorage.clear(),
+			Bluebird.try(() => {
+				if (window.indexedDB) {
+					window.indexedDB.deleteDatabase("whispeerCache");
+				}
 			})
-		}
+		].map(p => p.reflect()))
+	}
+
+	logout = () => {
+		this.clear().finally(() => landingPage())
 	}
 
 	isLoggedin = () => {
