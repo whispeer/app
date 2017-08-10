@@ -7,7 +7,7 @@ class FeatureToggles {
 
 	constructor() {
 		sessionService.loadLogin().then(() =>
-			socketService.definitlyEmit("featureToggles", { blockageToken: socketService._token })
+			socketService.definitlyEmit("featureToggles", {})
 		).then((response) => {
 			if (response.toggles) {
 				this.config = response.toggles

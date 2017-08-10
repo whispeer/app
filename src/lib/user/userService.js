@@ -354,11 +354,10 @@ initService.registerCacheCallback(function () {
 	});
 });
 
-initService.registerCallback(function (blockageToken) {
+initService.registerCallback(function () {
 	return socketService.definitlyEmit("user.get", {
 		id: sessionService.getUserID(),
 		//TODO: use cachedInfo: getInfoFromCacheEntry(cachedInfo),
-		blockageToken: blockageToken
 	}).then(function (data) {
 		return loadOwnUser(data, true).thenReturn(data);
 	}).then(function (userData) {

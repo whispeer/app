@@ -132,7 +132,7 @@ class SettingsService extends Observer {
 		return result;
 	}
 
-	migrateToFormat2 = (givenOldSettings: any, blockageToken: any, cb?: Function) => {
+	migrateToFormat2 = (givenOldSettings: any) => {
 		console.warn("migrating settings to format 2");
 
 		return Bluebird.try(() => {
@@ -162,17 +162,16 @@ class SettingsService extends Observer {
 
 			return socketService.emit("settings.setSettings", {
 				settings: signedAndEncryptedSettings,
-				blockageToken: blockageToken
 			}).thenReturn(this.settings);
-		}).nodeify(cb);
+		})
 	}
 
-	loadSettings = (givenSettings: any, blockageToken?: any) => {
+	loadSettings = (givenSettings: any) => {
 		this.serverSettings = givenSettings.server || {};
 
 		return Bluebird.try(() => {
 			if (givenSettings.ct) {
-				return this.migrateToFormat2(givenSettings, blockageToken);
+				return this.migrateToFormat2(givenSettings);
 			} else {
 				return SecuredData.load(givenSettings.content, givenSettings.meta, this.options);
 			}
@@ -187,20 +186,20 @@ class SettingsService extends Observer {
 		});
 	}
 
-	loadFromCache = (cacheEntry: any, blockageToken: any) => {
+	loadFromCache = (cacheEntry: any) => {
 		var userService = require("user/userService");
 
 		this.loadCachePromise = Bluebird.race([
 			userService.ownLoadedCache(),
 			userService.ownLoaded()
 		]).then(() => {
-			return this.loadSettings(cacheEntry.data, blockageToken);
+			return this.loadSettings(cacheEntry.data);
 		});
 
 		return this.loadCachePromise;
 	}
 
-	loadFromServer = (data: any, blockageToken: any) => {
+	loadFromServer = (data: any) => {
 		return this.loadCachePromise.then(() => {
 			if (data.unChanged) {
 				return Bluebird.resolve();
@@ -211,7 +210,7 @@ class SettingsService extends Observer {
 
 			var userService = require("user/userService");
 			return userService.ownLoaded().then(() => {
-				return this.loadSettings(givenSettings, blockageToken);
+				return this.loadSettings(givenSettings);
 			}).thenReturn(toCache);
 		});
 	}

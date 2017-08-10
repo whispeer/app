@@ -109,9 +109,9 @@ export class AppModule {
 
 			const dateDiff = Date.now() - tasksStarted
 
-			if (dateDiff > 50) {
+			/*if (dateDiff > 50) {
 				console.error(`Long running task detected ${dateDiff}`, task)
-			}
+			}*/
 
 			if (i + 1 !== maxTaskCount && dateDiff > 20) {
 				// console.warn(`Breaking out of tasks loop ${i+1} / ${maxTaskCount} / ${this.tasks.length}: ${dateDiff}`)

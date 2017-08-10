@@ -10,7 +10,6 @@ const keyStore = require("crypto/keyStore");
 const MAXCACHETIME  = 7 * 24 * 60 * 60 * 1000;
 
 const keyStoreDebug = debug("whispeer:keyStore");
-let blockageToken = "";
 
 const THROTTLE = 20;
 
@@ -67,15 +66,10 @@ class RequestKeyService {
 			}
 
 			return socketService.definitlyEmit("key.getMultiple", {
-				blockageToken: blockageToken,
 				loaded: [],
 				realids: identifiers
 			}).thenReturn(identifiers);
 		}).nodeify(cb);
-	}
-
-	setBlockageToken (_blockageToken: string) {
-		blockageToken = _blockageToken;
 	}
 
 	getKey = (keyID: string, callback: Function) => {

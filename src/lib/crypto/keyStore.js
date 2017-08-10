@@ -798,7 +798,7 @@ function symKeyGenerate(comment) {
 		return new SymKey();
 	}).then(function (key) {
 		if (symKeys[key.getRealID()]) {
-			return symKeyGenerate();
+			return symKeyGenerate(comment);
 		}
 
 		symKeys[key.getRealID()] = key;
@@ -1467,7 +1467,7 @@ ObjectPadder.prototype._unpadString = function (val) {
 	var unpadded = val.substr(paddingIndex + 2);
 
 	if (isNumber) {
-		return parseFloat(unpadded, 10);
+		return parseFloat(unpadded);
 	}
 
 	return unpadded;

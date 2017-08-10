@@ -48,8 +48,6 @@ class SocketService extends Observer {
 	_autoConnect: boolean = config.socket.autoConnect;
 
 	_socket: SocketIOClient.Socket;
-	_blockedWithToken = false;
-	_token: number;
 
 	_lastRequestTime = 0;
 	_loading = 0;
@@ -98,7 +96,7 @@ class SocketService extends Observer {
 
 		this._socket.on("connect", () => {
 			socketDebug("socket connected");
-			this.emit("whispeerPing", { blockageToken: this._token });
+			this.emit("whispeerPing", {});
 		});
 	}
 
@@ -160,23 +158,7 @@ class SocketService extends Observer {
 		return this._socket.connected;
 	}
 
-	blockEmitWithToken () {
-		this._blockedWithToken = true;
-		this._token = Math.random();
-		return this._token;
-	}
-
-	allowEmit (accessToken: number) {
-		if (this._blockedWithToken && accessToken === this._token) {
-			this._blockedWithToken = false;
-		}
-	}
-
 	emit (channel: string, request: any, cb?: Function) {
-		if (this._blockedWithToken && request.blockageToken !== this._token) {
-			throw new DisconnectError("request blocked by token (channel: " + channel + ")");
-		}
-
 		if (!this.isConnected()) {
 			throw new DisconnectError("no connection");
 		}
@@ -198,7 +180,7 @@ class SocketService extends Observer {
 		this._loading++;
 		this.notify(null, "request");
 
-		var resultPromise = this._emit(channel, request).timeout(SOCKET_TIMEOUT).then((response) => {
+		return this._emit(channel, request).timeout(SOCKET_TIMEOUT).then((response) => {
 			socketDebug("Answer on " + channel);
 			log.timerEnd(timer);
 
@@ -231,9 +213,7 @@ class SocketService extends Observer {
 		}).finally(() => {
 			this._loading--;
 			this.notify(null, "response");
-		});
-
-		return resultPromise.nodeify(cb);
+		}).nodeify(cb)
 	}
 
 	awaitNoRequests() {

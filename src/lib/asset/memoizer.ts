@@ -23,7 +23,7 @@ export default class Memoizer {
 		})
 
 		if (index > -1) {
-			console.warn(`Memoizer recalculated at ${index}`, this.values, newValues)
+			// console.warn(`Memoizer recalculated at ${index}`, this.values, newValues)
 		}
 
 		return index > -1
