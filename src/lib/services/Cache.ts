@@ -31,8 +31,6 @@ const followCursorUntilDone = (cursorPromise: Promise<Cursor>, action) => {
 
 export default class Cache {
 	private options: any
-	private lastCleaned: number = 0
-
 	private cacheDisabled: boolean = false
 
 	constructor(private name : string, options?: any) {
@@ -41,16 +39,6 @@ export default class Cache {
 		this.options.maxBlobSize = this.options.maxBlobSize || 1*1024*1024;
 
 		dbPromise.catch(() => this.disable())
-	}
-
-	entryCount() : Bluebird<any> {
-		if (this.cacheDisabled) {
-			return Bluebird.reject("");
-		}
-
-		let count = 0
-
-		return this.cursorEach((cursor) => count++, "readonly").then(() => count)
 	}
 
 	static sumSize (arr: any[]) {
@@ -71,10 +59,6 @@ export default class Cache {
 		if (blobs && this.options.maxBlobSize !== -1 && Cache.sumSize(blobs) > this.options.maxBlobSize) {
 			return Bluebird.resolve();
 		}
-
-		Bluebird.delay(0).then(() => {
-			return this.cleanUp();
-		}).catch(errorServiceInstance.criticalError);
 
 		var cacheEntry = {
 			data: JSON.stringify(data),
@@ -200,32 +184,6 @@ export default class Cache {
 			await followCursorUntilDone(cursorPromise, action)
 		})
 	}
-
-	cleanUp() {
-		if (this.cacheDisabled) {
-			return Bluebird.resolve();
-		}
-
-		if (this.options.maxEntries === -1) {
-			return;
-		}
-
-		if (this.lastCleaned > Date.now() - 1 * 60 * 1000) {
-			return
-		}
-
-		this.lastCleaned = Date.now()
-
-		return Bluebird.resolve(
-			this.entryCount().bind(this).then((count) => {
-				console.log(`Contains: ${count} Entries (${this.name})`);
-				if (count > this.options.maxEntries) {
-					console.warn(`todo: clean up cache ${this.name}`);
-					// TODO: this._db.cache.orderBy("used").limit(count - this.options.maxEntries).delete();
-				}
-			})
-		);
-	};
 
 	private disable() {
 		this.cacheDisabled = true;
