@@ -359,6 +359,8 @@ export class Message {
 		const content = this.securedData.contentGet()
 
 		if (typeof content === "string") {
+			this.data.images = this.securedData.metaAttr("images")
+
 			return
 		}
 
