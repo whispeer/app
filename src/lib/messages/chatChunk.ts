@@ -112,29 +112,28 @@ export class Chunk extends Observer {
 		chunk.getSecuredData().checkParent(this.getSecuredData())
 	}
 
-	verify = () => {
+	static verify = (securedData) => {
 		return Bluebird.try(() => {
-			return userService.get(this.securedData.metaAttr("creator"));
+			return userService.get(securedData.metaAttr("creator"));
 		}).then((creator) => {
 			if (creator.isNotExistingUser()) {
-				// TODO this.data.disabled = true;
+				// TODO data.disabled = true;
 				return false;
 			}
 
-			return this.securedData.verify(creator.getSignKey()).thenReturn(true);
+			return securedData.verify(creator.getSignKey()).thenReturn(true);
 		}).then((addEncryptionIdentifier) => {
 			if (addEncryptionIdentifier) {
-				keyStore.security.addEncryptionIdentifier(this.securedData.metaAttr("_key"));
+				keyStore.security.addEncryptionIdentifier(securedData.metaAttr("_key"));
 			}
 		})
 	};
 
-	loadReceiverNames = h.cacheResult<Bluebird<any>>(() => {
-		return Bluebird.try(() => {
-			return userService.getMultipleFormatted(this.receiver)
-		}).then((receiverObjects) => {
-			this.receiverObjects = receiverObjects
-		})
+	loadReceiverNames = h.cacheResult<Bluebird<any>>((securedData) => {
+		return userService.getMultipleFormatted(securedData.metaAttr("receiver").map(h.parseDecimal))
+			.then((receiverObjects) => {
+				this.receiverObjects = receiverObjects
+			})
 	});
 
 	getReceivers = () => {
@@ -169,13 +168,13 @@ export class Chunk extends Observer {
 		return this.receiver
 	}
 
-	decryptContent = () => {
-		if (!this.securedData.hasContent()) {
+	decryptContent = (securedData) => {
+		if (!securedData.hasContent()) {
 			this.title = ""
 			return
 		}
 
-		return this.securedData.decrypt().then((content) => {
+		return securedData.decrypt().then((content) => {
 			this.title = content.title
 		})
 	}
@@ -190,9 +189,9 @@ export class Chunk extends Observer {
 
 	load = () => {
 		return Bluebird.all([
-			this.verify(),
-			this.loadReceiverNames(),
-			this.decryptContent(),
+			Chunk.verify(this.securedData),
+			this.loadReceiverNames(this.securedData),
+			this.decryptContent(this.securedData),
 		]).then(() => {
 			var predecessorID = this.getPredecessorID()
 
@@ -428,25 +427,19 @@ const loadLegacyTitle = (latestTitleUpdateResponse) => {
 	return latestTitleUpdate.getTitle().thenReturn(latestTitleUpdate)
 }
 
-const loadHook = (chunkResponse) : Bluebird<Chunk> => {
-	const chunk = new Chunk(chunkResponse)
-
-	return Bluebird.all<any>([
-		loadLegacyTitle(chunkResponse.latestTitleUpdate),
-		chunk.load()
-	]).then(([latestTitleUpdate]) => {
-		chunk.setLatestTitleUpdate(latestTitleUpdate)
-	}).thenReturn(chunk)
-}
-
-const downloadHook = (id) => {
-	return socket.emit("chat.chunk.get", { id })
-}
-
-const idHook = (response) => response.server.id
-
 const hooks = {
-	downloadHook, loadHook, idHook
+	downloadHook: id => socket.emit("chat.chunk.get", { id }),
+	loadHook: (chunkResponse) : Bluebird<Chunk> => {
+		const chunk = new Chunk(chunkResponse)
+
+		return Bluebird.all<any>([
+			loadLegacyTitle(chunkResponse.latestTitleUpdate),
+			chunk.load()
+		]).then(([latestTitleUpdate]) => {
+			chunk.setLatestTitleUpdate(latestTitleUpdate)
+		}).thenReturn(chunk)
+	},
+	idHook: response => response.server.id
 }
 
 export default class ChunkLoader extends ObjectLoader(hooks) {}
