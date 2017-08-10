@@ -30,10 +30,11 @@ const cursorUntilDone = (cursorPromise: Promise<Cursor>, action) => {
 }
 
 export default class Cache {
-	private _name: string;
-	private _options: any;
+	private _name: string
+	private _options: any
+	private lastCleaned: number = 0
 
-	private _cacheDisabled: boolean = false;
+	private _cacheDisabled: boolean = false
 
 	constructor(name : string, options?: any) {
 		this._name = name;
@@ -52,8 +53,6 @@ export default class Cache {
 		let count = 0
 
 		return this.cursorAll((cursor) => count++, "readonly").then(() => count)
-
-		// return Bluebird.resolve(this._db.cache.where("type").equals(this._name).count());
 	}
 
 	static sumSize (arr: any[]) {
@@ -75,7 +74,7 @@ export default class Cache {
 			return Bluebird.resolve();
 		}
 
-		Bluebird.delay(0).bind(this).then(function () {
+		Bluebird.delay(0).then(() => {
 			return this.cleanUp();
 		}).catch(errorServiceInstance.criticalError);
 
@@ -144,32 +143,6 @@ export default class Cache {
 
 			return data;
 		})
-
-		/*
-		return Bluebird.resolve(cacheResult.first().then((data: any) => {
-			if (typeof data !== "undefined") {
-				data.data = JSON.parse(data.data);
-
-				data.blobs = data.blobs || [];
-
-				data.blobs = data.blobs.map((blob: any) => {
-					if (typeof blob === "string") {
-						return h.dataURItoBlob(blob);
-					}
-
-					return blob;
-				});
-
-				if (data.blobs.length === 1) {
-					data.blob = data.blobs[0];
-				}
-
-				return data;
-			}
-
-			throw new Error("cache miss for " + this._name + "/" + id);
-		}));
-		*/
 	}
 
 	/**
@@ -184,8 +157,6 @@ export default class Cache {
 		const entries = []
 
 		return this.cursorAll((cursor) => entries.push(cursor.value), "readonly").then(() => entries)
-
-		// return this._db.cache.where("id").startsWith(this._name + "/");
 	}
 
 	getID(id) {
@@ -209,8 +180,6 @@ export default class Cache {
 
 			await tx.objectStore("cache").delete(this.getID(id))
 		})
-
-		// return this._db.cache.where("id").equals(this._name + "/" + id).delete();
 	}
 
 	deleteAll(): Bluebird<any> {
@@ -218,9 +187,9 @@ export default class Cache {
 			return Bluebird.resolve();
 		}
 
-		return this.cursorAll((cursor) => cursor.delete(), "readwrite")
+		const deleteRequests = []
 
-		// this._db.cache.where("id").startsWith(`${this._name}/`).delete()
+		return this.cursorAll((cursor) => deleteRequests.push(cursor.delete()), "readwrite").then(() => Bluebird.all(deleteRequests))
 	}
 
 	private cursorAll(action, transactionType: "readonly" | "readwrite") {
@@ -243,13 +212,18 @@ export default class Cache {
 			return;
 		}
 
-		//remove data which hasn't been used in a long time
+		if (this.lastCleaned > Date.now() - 1 * 60 * 1000) {
+			return
+		}
+
+		this.lastCleaned = Date.now()
+
 		return Bluebird.resolve(
 			this.entryCount().bind(this).then((count) => {
-				console.log("Contains: " + count + " Entries (" + this._name + ")");
+				console.log(`Contains: ${count} Entries (${this._name})`);
 				if (count > this._options.maxEntries) {
-					console.warn("cleaning up cache " + this._name);
-					// this._db.cache.orderBy("used").limit(count - this._options.maxEntries).delete();
+					console.warn(`todo: clean up cache ${this._name}`);
+					// TODO: this._db.cache.orderBy("used").limit(count - this._options.maxEntries).delete();
 				}
 			})
 		);
