@@ -30,23 +30,21 @@ const cursorUntilDone = (cursorPromise: Promise<Cursor>, action) => {
 }
 
 export default class Cache {
-	private _name: string
-	private _options: any
+	private options: any
 	private lastCleaned: number = 0
 
-	private _cacheDisabled: boolean = false
+	private cacheDisabled: boolean = false
 
-	constructor(name : string, options?: any) {
-		this._name = name;
-		this._options = options || {};
-		this._options.maxEntries = this._options.maxEntries || 100;
-		this._options.maxBlobSize = this._options.maxBlobSize || 1*1024*1024;
+	constructor(private name : string, options?: any) {
+		this.options = options || {};
+		this.options.maxEntries = this.options.maxEntries || 100;
+		this.options.maxBlobSize = this.options.maxBlobSize || 1*1024*1024;
 
 		dbPromise.catch(() => this.disable())
 	}
 
 	entryCount() : Bluebird<any> {
-		if (this._cacheDisabled) {
+		if (this.cacheDisabled) {
 			return Bluebird.reject("");
 		}
 
@@ -62,7 +60,7 @@ export default class Cache {
 	}
 
 	store(id: string, data: any, blobs?: any): Bluebird<any> {
-		if (this._cacheDisabled) {
+		if (this.cacheDisabled) {
 			return Bluebird.resolve();
 		}
 
@@ -70,7 +68,7 @@ export default class Cache {
 			blobs = [blobs];
 		}
 
-		if (blobs && this._options.maxBlobSize !== -1 && Cache.sumSize(blobs) > this._options.maxBlobSize) {
+		if (blobs && this.options.maxBlobSize !== -1 && Cache.sumSize(blobs) > this.options.maxBlobSize) {
 			return Bluebird.resolve();
 		}
 
@@ -83,7 +81,7 @@ export default class Cache {
 			created: new Date().getTime(),
 			used: new Date().getTime(),
 			id: this.getID(id),
-			type: this._name,
+			type: this.name,
 			size: 0,
 			blobs: <any>[]
 		};
@@ -106,20 +104,20 @@ export default class Cache {
 	}
 
 	get(id: string): Bluebird<any> {
-		if (this._cacheDisabled) {
+		if (this.cacheDisabled) {
 			return Bluebird.reject(new Error("Cache is disabled"));
 		}
 
 		/*
-		var cacheResult = this._db.cache.where("id").equals(this._name + "/" + id);
+		var cacheResult = this._db.cache.where("id").equals(this.name + "/" + id);
 
-		this._db.cache.where("id").equals(this._name + "/" + id).modify({ used: new Date().getTime() });
+		this._db.cache.where("id").equals(this.name + "/" + id).modify({ used: new Date().getTime() });
 		*/
 
 		return Bluebird.try(async () => {
 			const db = await dbPromise
 			const tx = db.transaction("cache", "readonly")
-			const data = await tx.objectStore("cache").get(`${this._name}/${id}`)
+			const data = await tx.objectStore("cache").get(`${this.name}/${id}`)
 
 			if (typeof data === "undefined") {
 				throw new Error(`cache miss for ${this.getID(id)}`);
@@ -150,7 +148,7 @@ export default class Cache {
 	 * @return {Bluebird<any>} Promise containing all cache entries as a dexie collection.
 	 */
 	all(): any {
-		if (this._cacheDisabled) {
+		if (this.cacheDisabled) {
 			return Bluebird.resolve([]);
 		}
 
@@ -160,7 +158,7 @@ export default class Cache {
 	}
 
 	getID(id) {
-		return `${this._name}/${id}`
+		return `${this.name}/${id}`
 	}
 
 	/**
@@ -169,7 +167,7 @@ export default class Cache {
 	 * @return {Bluebird<any>}    [description]
 	 */
 	delete(id: string): Bluebird<any> {
-		if (this._cacheDisabled) {
+		if (this.cacheDisabled) {
 			return Bluebird.resolve();
 		}
 
@@ -183,7 +181,7 @@ export default class Cache {
 	}
 
 	deleteAll(): Bluebird<any> {
-		if (this._cacheDisabled) {
+		if (this.cacheDisabled) {
 			return Bluebird.resolve();
 		}
 
@@ -197,18 +195,18 @@ export default class Cache {
 			const db = await dbPromise
 
 			const tx = db.transaction("cache", transactionType)
-			const cursorPromise = tx.objectStore("cache").index("type").openCursor(this._name)
+			const cursorPromise = tx.objectStore("cache").index("type").openCursor(this.name)
 
 			await cursorUntilDone(cursorPromise, action)
 		})
 	}
 
 	cleanUp() {
-		if (this._cacheDisabled) {
+		if (this.cacheDisabled) {
 			return Bluebird.resolve();
 		}
 
-		if (this._options.maxEntries === -1) {
+		if (this.options.maxEntries === -1) {
 			return;
 		}
 
@@ -220,16 +218,16 @@ export default class Cache {
 
 		return Bluebird.resolve(
 			this.entryCount().bind(this).then((count) => {
-				console.log(`Contains: ${count} Entries (${this._name})`);
-				if (count > this._options.maxEntries) {
-					console.warn(`todo: clean up cache ${this._name}`);
-					// TODO: this._db.cache.orderBy("used").limit(count - this._options.maxEntries).delete();
+				console.log(`Contains: ${count} Entries (${this.name})`);
+				if (count > this.options.maxEntries) {
+					console.warn(`todo: clean up cache ${this.name}`);
+					// TODO: this._db.cache.orderBy("used").limit(count - this.options.maxEntries).delete();
 				}
 			})
 		);
 	};
 
 	private disable() {
-		this._cacheDisabled = true;
+		this.cacheDisabled = true;
 	}
 }
