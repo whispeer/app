@@ -1,43 +1,20 @@
 import * as Bluebird from "bluebird"
+
+const userService = require("user/userService")
+const keyStore = require("services/keyStore.service").default
+const SecuredData = require("asset/securedDataWithMetaData")
+
 import h from "../helper/helper"
-
-var userService = require("user/userService")
-var socket = require("services/socket.service").default
-var keyStore = require("services/keyStore.service").default
-
-var SecuredData = require("asset/securedDataWithMetaData")
-import ObjectLoader from "../services/objectLoader"
-
+import socket from "../services/socket.service"
+import ObjectLoader from "../services/cachedObjectLoader"
 import ChunkLoader, { Chunk } from "./chatChunk"
 import { Chat } from "./chat"
-
 import FileUpload from "../services/fileUpload.service"
 import ImageUpload from "../services/imageUpload.service"
-
 import blobService from "../services/blobService"
-
 import Progress from "../asset/Progress"
 
 type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
-
-const loadMessageSender = (senderID) => {
-	return userService.get(senderID).then((sender) => {
-		return sender.loadBasicData().thenReturn(sender)
-	})
-}
-
-const load = (senderID, securedData) => {
-	return Bluebird.try(async () => {
-		const sender = await loadMessageSender(senderID)
-
-		await Bluebird.all([
-			securedData.decrypt(),
-			securedData.verify(sender.getSignKey())
-		])
-
-		return sender
-	})
-}
 
 export class Message {
 	private wasSent: boolean
@@ -95,7 +72,7 @@ export class Message {
 
 		this.clientID = id || h.generateUUID()
 
-		var meta = {
+		const meta = {
 			createTime: new Date().getTime(),
 			messageUUID: this.clientID
 		}
@@ -384,7 +361,7 @@ export class Message {
 	}
 
 	static createRawSecuredData(message, meta, chunk?: Chunk) {
-		var secured = SecuredData.createRaw({ message }, meta, {
+		const secured = SecuredData.createRaw({ message }, meta, {
 			type: "message",
 		})
 
@@ -396,13 +373,13 @@ export class Message {
 	}
 
 	static createRawData(message, meta, chunk: Chunk) {
-		var secured = Message.createRawSecuredData(message, meta, chunk)
+		const secured = Message.createRawSecuredData(message, meta, chunk)
 		return secured._signAndEncrypt(userService.getOwn().getSignKey(), chunk.getKey())
 	}
 
 	static idFromData(server) {
-		var serverID = h.parseDecimal(server.id)
-		var clientID = server.uuid
+		const serverID = h.parseDecimal(server.id)
+		const clientID = server.uuid
 
 		return {
 			serverID,
@@ -411,32 +388,44 @@ export class Message {
 	}
 }
 
-const loadHook = (messageResponse) => {
-	const { content, meta, server } = messageResponse
+type MessageCacheType = {
+	content: any,
+	meta: any,
+	server: any
+}
 
-	const secured = SecuredData.load(content, meta, { type: "message" })
-	const senderID = h.parseDecimal(server.sender)
+const loadMessageSender = senderID =>
+	userService.get(senderID)
+		.then(sender => sender.loadBasicData().thenReturn(sender))
 
-	return load(senderID, secured).then((sender) => {
-		return new Message({
-			content: secured.contentGet(),
-			meta: secured.metaGet(),
-			sender,
-			server: messageResponse.server
+export default class MessageLoader extends ObjectLoader<Message, MessageCacheType>({
+	cacheName: "message",
+	getID: ({ server }) => server.uuid,
+	download: id => socket.emit("chat.message.get", { id }),
+	load: (messageResponse): Bluebird<MessageCacheType> => {
+		const { content, meta, server } = messageResponse
+		const _this = null
+
+		const securedData = SecuredData.load(content, meta, { type: "message" })
+		const senderID = server.sender
+
+		// !! Typescript is broken for async arrow functions without a this context !!
+		return Bluebird.try<MessageCacheType>(async function () {
+			const sender = await loadMessageSender(senderID)
+
+			await Bluebird.all([
+				securedData.decrypt(),
+				securedData.verify(sender.getSignKey())
+			])
+
+			return {
+				content: securedData.contentGet(),
+				meta: securedData.metaGet(),
+				server: messageResponse.server,
+			}
 		})
-	})
-}
-
-const downloadHook = (id) => {
-	return socket.emit("chat.message.get", { id })
-}
-
-const idHook = (response) => {
-	return response.server.uuid
-}
-
-const hooks = {
-	downloadHook, loadHook, idHook
-}
-
-export default class MessageLoader extends ObjectLoader<Message>(hooks) {}
+	},
+	restore: (messageInfo: MessageCacheType) =>
+		loadMessageSender(messageInfo.server.sender)
+			.then((sender) => new Message({ ...messageInfo, sender })),
+}) {}
