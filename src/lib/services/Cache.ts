@@ -38,7 +38,11 @@ export default class Cache {
 		this.options.maxEntries = this.options.maxEntries || 100;
 		this.options.maxBlobSize = this.options.maxBlobSize || 1*1024*1024;
 
-		dbPromise.catch(() => this.disable())
+		dbPromise.catch((e) => {
+			console.warn("Disabling indexedDB caching due to error", e)
+
+			this.disable()
+		})
 	}
 
 	static sumSize (arr: any[]) {
@@ -131,7 +135,7 @@ export default class Cache {
 	 * get all cache entries as a dexie collection.<
 	 * @return {Bluebird<any>} Promise containing all cache entries as a dexie collection.
 	 */
-	all(): any {
+	all(): Bluebird<any> {
 		if (this.cacheDisabled) {
 			return Bluebird.resolve([]);
 		}

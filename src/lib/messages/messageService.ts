@@ -108,7 +108,7 @@ messageService = {
 	sendUnsentMessages: function () {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
 
-		return Bluebird.resolve(messageSendCache.all().toArray()).map(function (unsentMessage: any) {
+		return messageSendCache.all().map(function (unsentMessage: any) {
 			var data = JSON.parse(unsentMessage.data);
 
 			return messageService.getChat(data.chatID).then(function (chat) {
