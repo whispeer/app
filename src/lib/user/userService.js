@@ -325,8 +325,10 @@ function loadOwnUser(data, server) {
 		var verifyKeys = Bluebird.promisify(user.verifyKeys.bind(user));
 		return verifyKeys().thenReturn(user);
 	}).then(function (user) {
-		requestKeyService.cacheKey(user.getSignKey(), "user-sign-" + user.getID(), requestKeyService.MAXCACHETIME);
-		requestKeyService.cacheKey(user.getMainKey(), "user-main-" + user.getID(), requestKeyService.MAXCACHETIME);
+		requestKeyService.cacheKey(user.getSignKey(), "user-sign-" + user.getID(), requestKeyService.MAXCACHETIME)
+		requestKeyService.cacheKey(user.getMainKey(), "user-main-" + user.getID(), requestKeyService.MAXCACHETIME)
+
+		return null
 	}).catch(function (e) {
 		if (e instanceof sjcl.exception.corrupt) {
 			alert("Password did not match. Logging out")

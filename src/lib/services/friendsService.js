@@ -385,8 +385,6 @@ friendsService = {
 			removed = data.removed.map(h.parseDecimal);
 			deleted = data.deleted.map(h.parseDecimal);
 
-			console.log(friends, requests, requested, ignored, removed, deleted)
-
 			updateCounters();
 
 			signedList = SecuredData.load(undefined, data.signedList || {}, { type: "signedFriendList" });
