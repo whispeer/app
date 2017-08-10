@@ -1,4 +1,5 @@
 import * as Bluebird from "bluebird"
+import idb from "idb"
 
 import Observer from "../asset/observer";
 import Storage from "./Storage";
@@ -64,11 +65,7 @@ export class SessionService extends Observer {
 		return Bluebird.all([
 			blobCache.clear(),
 			this.sessionStorage.clear(),
-			Bluebird.try(() => {
-				if (window.indexedDB) {
-					window.indexedDB.deleteDatabase("whispeerCache");
-				}
-			})
+			Bluebird.resolve(idb.delete("whispeerCache"))
 		].map(p => p.reflect()))
 	}
 
