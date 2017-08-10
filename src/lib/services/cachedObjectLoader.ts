@@ -1,5 +1,7 @@
 import * as Bluebird from "bluebird"
 
+import Cache from "../services/Cache"
+
 type hookType<ObjectType, CachedObjectType> = {
 	download: (id: any) => Bluebird<any>,
 	load: (response: any) => Bluebird<CachedObjectType>,
@@ -12,11 +14,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 	let loading: { [s: string]: Bluebird<ObjectType> } = {}
 	let byId: { [s: string]: ObjectType } = {}
 
-	// const cache = new Cache(cacheName)
-
-	const getFromCache = (id) => Bluebird.reject("getFromCache(id): not yet implemented")
-
-	const storeInCache = (cacheableData) => cacheableData
+	const cache = new Cache(cacheName)
 
 	const considerLoaded = (id) => {
 		loading = { ...loading }
@@ -24,24 +22,20 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 	}
 
 	const cacheInMemory = (id, instance) => {
-		byId = {
-			...byId,
-			[id]: instance
-		}
-
+		byId = { ...byId, [id]: instance }
 		return instance
 	}
 
-	const loadFromCache = (id) => {
-		return getFromCache(id)
+	const loadFromCache = (id) =>
+		cache.get(id)
+			.then((cacheResponse) => cacheResponse.data)
 			.then(restore)
 			.then((instance) => cacheInMemory(id, instance))
-			.finally(() => considerLoaded(id))
-	}
+			// .finally(() => considerLoaded(id)
 
 	const serverResponseToInstance = (response, id) => {
 		return load(response)
-			.then(storeInCache)
+			.then((cacheableData) => cache.store(id, cacheableData).thenReturn(cacheableData))
 			.then(restore)
 			.then((instance) => cacheInMemory(id, instance))
 			.finally(() => considerLoaded(id))
@@ -68,11 +62,9 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			}
 
 			if (!loading[id]) {
-				let promise = serverResponseToInstance(response, id)
-
 				loading = {
 					...loading,
-					[id]: promise
+					[id]: loadFromCache(id).catch((e) => serverResponseToInstance(response, id))
 				}
 			}
 
@@ -85,7 +77,9 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			}
 
 			if (!loading[id]) {
-				let promise = download(id).then((response) => serverResponseToInstance(response, id))
+				let promise = loadFromCache(id).catch((e) =>
+					download(id).then((response) => serverResponseToInstance(response, id))
+				)
 
 				loading = {
 					...loading,
