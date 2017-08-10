@@ -58,14 +58,14 @@ export class Message {
 
 	constructor(messageData, chat?: Chat, attachments?: attachments, id?) {
 		if (!chat) {
-			this.fromVerifiedAndDecryptedData(messageData);
+			this.initialize(messageData);
 			return
 		}
 
-		this.fromDecryptedData(chat, messageData, attachments, id);
+		this.initializePending(chat, messageData, attachments, id);
 	}
 
-	private fromVerifiedAndDecryptedData = ({ meta, content, server, sender }) => {
+	private initialize = ({ meta, content, server, sender }) => {
 		this.wasSent = true;
 
 		const { serverID, clientID } = Message.idFromData(server)
@@ -88,7 +88,7 @@ export class Message {
 		this.setImagesInfo()
 	};
 
-	private fromDecryptedData = (chat: Chat, message, attachments, id) => {
+	private initializePending = (chat: Chat, message, attachments, id) => {
 		this.wasSent = false;
 
 		this.chat = chat;
