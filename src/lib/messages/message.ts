@@ -358,21 +358,18 @@ export class Message {
 	private setImagesInfo = () => {
 		const content = this.securedData.contentGet()
 
+		const imagesMeta = this.securedData.metaAttr("images") || []
+
 		if (typeof content === "string") {
-			this.data.images = this.securedData.metaAttr("images")
+			this.data.images = imagesMeta
 
 			return
 		}
 
 		const imagesContent = content.images
-		const imagesMeta = this.securedData.metaAttr("images")
 
-		if (!imagesContent) {
-			return
-		}
-
-		this.data.images = imagesContent.map((imageContent, index) => {
-			const imageMeta = imagesMeta[index]
+		this.data.images = imagesMeta.map((imageMeta, index) => {
+			const imageContent = imagesContent[index]
 
 			const data =  h.objectMap(imageMeta, (val, key) => {
 				return {
