@@ -90,7 +90,6 @@ export class Message {
 
 	private fromDecryptedData = (chat: Chat, message, attachments, id) => {
 		this.wasSent = false;
-		this.isOwnMessage = true;
 
 		this.chat = chat;
 		this.attachments = attachments
@@ -105,6 +104,9 @@ export class Message {
 		this.securedData = Message.createRawSecuredData(message, meta);
 
 		this.setDefaultData();
+
+		this.data.sender = userService.getOwn().data
+		this.isOwnMessage = true;
 
 		this.data.images = attachments.images.map((image) => {
 			if (!image.convertForGallery) {
