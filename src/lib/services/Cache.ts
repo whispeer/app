@@ -17,7 +17,7 @@ try {
 	indexedDB.deleteDatabase("whispeer");
 } catch (e) {}
 
-const cursorUntilDone = (cursorPromise: Promise<Cursor>, action) => {
+const followCursorUntilDone = (cursorPromise: Promise<Cursor>, action) => {
 	return Bluebird.try(async () => {
 		let cursor = await cursorPromise
 
@@ -50,7 +50,7 @@ export default class Cache {
 
 		let count = 0
 
-		return this.cursorAll((cursor) => count++, "readonly").then(() => count)
+		return this.cursorEach((cursor) => count++, "readonly").then(() => count)
 	}
 
 	static sumSize (arr: any[]) {
@@ -154,7 +154,7 @@ export default class Cache {
 
 		const entries = []
 
-		return this.cursorAll((cursor) => entries.push(cursor.value), "readonly").then(() => entries)
+		return this.cursorEach((cursor) => entries.push(cursor.value), "readonly").then(() => entries)
 	}
 
 	getID(id) {
@@ -187,17 +187,17 @@ export default class Cache {
 
 		const deleteRequests = []
 
-		return this.cursorAll((cursor) => deleteRequests.push(cursor.delete()), "readwrite").then(() => Bluebird.all(deleteRequests))
+		return this.cursorEach((cursor) => deleteRequests.push(cursor.delete()), "readwrite").then(() => Bluebird.all(deleteRequests))
 	}
 
-	private cursorAll(action, transactionType: "readonly" | "readwrite") {
+	private cursorEach(action, transactionType: "readonly" | "readwrite") {
 		return Bluebird.try(async () => {
 			const db = await dbPromise
 
 			const tx = db.transaction("cache", transactionType)
 			const cursorPromise = tx.objectStore("cache").index("type").openCursor(this.name)
 
-			await cursorUntilDone(cursorPromise, action)
+			await followCursorUntilDone(cursorPromise, action)
 		})
 	}
 
