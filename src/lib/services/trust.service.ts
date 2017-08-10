@@ -77,9 +77,9 @@ class TrustService {
 			]).thenReturn(signatureCacheData);
 		}).then((signatureCacheData: any) => {
 			if (signatureCacheData) {
-				signatureCache.load(signatureCacheData.data, userService.getown().getSignKey());
+				signatureCache.load(signatureCacheData.data, userService.getOwn().getSignKey());
 			} else {
-				signatureCache.initialize(userService.getown().getSignKey());
+				signatureCache.initialize(userService.getOwn().getSignKey());
 			}
 		});
 	}
@@ -165,7 +165,7 @@ class TrustService {
 
 	private createTrustDatabase = (cb?: Function) => {
 		Bluebird.try(() => {
-			trustManager.createDatabase(userService.getown());
+			trustManager.createDatabase(userService.getOwn());
 
 			this.uploadDatabase().catch(errorServiceInstance.criticalError);
 

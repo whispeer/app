@@ -244,7 +244,7 @@ export class Message {
 				this.securedData.setAfterRelationShip(newest.getSecuredData());
 			}
 
-			const signAndEncryptPromise = this.securedData._signAndEncrypt(userService.getown().getSignKey(), chunkKey);
+			const signAndEncryptPromise = this.securedData._signAndEncrypt(userService.getOwn().getSignKey(), chunkKey);
 			const keys = await this.uploadAttachments(chunkKey)
 			const request = await signAndEncryptPromise
 
@@ -396,7 +396,7 @@ export class Message {
 
 	static createRawData(message, meta, chunk: Chunk) {
 		var secured = Message.createRawSecuredData(message, meta, chunk);
-		return secured._signAndEncrypt(userService.getown().getSignKey(), chunk.getKey());
+		return secured._signAndEncrypt(userService.getOwn().getSignKey(), chunk.getKey());
 	};
 
 	static idFromData(server) {

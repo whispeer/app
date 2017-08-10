@@ -110,11 +110,11 @@ function addAsFriend(uid) {
 		return userService.get(uid);
 	}).then(function (u) {
 		otherUser = u;
-		return createBasicData(userService.getown(), otherUser);
+		return createBasicData(userService.getOwn(), otherUser);
 	}).then(function (result) {
 		friendShipKey = result.key;
 
-		var friendsKey = userService.getown().getFriendsKey();
+		var friendsKey = userService.getOwn().getFriendsKey();
 		result.data.decryptors = keyStore.upload.getDecryptors([friendsKey], [friendShipKey]);
 
 		return socket.emit("friends.add", result.data);
@@ -175,7 +175,7 @@ function checkAndRemove(uid) {
 		]);
 	}).spread(function (user, data) {
 		var signedData = data.signedData;
-		if (h.parseDecimal(signedData.user) !== userService.getown().getID() || signedData.initial === "false") {
+		if (h.parseDecimal(signedData.user) !== userService.getOwn().getID() || signedData.initial === "false") {
 			throw new Error("invalid signed removal");
 		}
 
@@ -229,7 +229,7 @@ friendsService = {
 		}
 
 		var userService = require("user/userService"), circleService = require("circles/circleService");
-		var otherUser, ownUser = userService.getown(), userCircles = circleService.inWhichCircles(uid);
+		var otherUser, ownUser = userService.getOwn(), userCircles = circleService.inWhichCircles(uid);
 
 		return Bluebird.try(function () {
 			return userService.get(uid);
@@ -397,7 +397,7 @@ friendsService = {
 			return userService.verifyOwnKeysDone().thenReturn(data);
 		}).then(function (data) {
 			if (data.signedList) {
-				return signedList.verify(userService.getown().getSignKey(), "user");
+				return signedList.verify(userService.getOwn().getSignKey(), "user");
 			}
 		}).then(function () {
 			friendsServiceLoaded = true;
@@ -444,7 +444,7 @@ socket.channel("notify.signedList", function (e, data) {
 		var updatedSignedList = SecuredData.load(undefined, data, { type: "signedFriendList" });
 
 		Bluebird.try(function () {
-			return updatedSignedList.verify(userService.getown().getSignKey(), null, "user");
+			return updatedSignedList.verify(userService.getOwn().getSignKey(), null, "user");
 		}).then(function () {
 			signedList = updatedSignedList;
 		});

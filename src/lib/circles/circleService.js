@@ -34,7 +34,7 @@ function encryptKeyForUsers(key, users, cb) {
 
 function generateNewKey(cb) {
 	return keyStore.sym.generateKey(null, "CircleKey").then(function (key) {
-		var mainKey = userService.getown().getMainKey();
+		var mainKey = userService.getOwn().getMainKey();
 
 		return keyStore.sym.symEncryptKey(key, mainKey).thenReturn(key);
 	}).nodeify(cb);
@@ -110,7 +110,7 @@ var Circle = function (data) {
 				circleKey: newKey
 			});
 
-			return circleSec.getUpdatedData(userService.getown().getSignKey());
+			return circleSec.getUpdatedData(userService.getOwn().getSignKey());
 		}).then(function (newData) {
 			var update = {
 				id: id,
@@ -136,7 +136,7 @@ var Circle = function (data) {
 			theCircle.data.userids = circleUsers;
 
 			if (removing) {
-				var ownUser = userService.getown();
+				var ownUser = userService.getOwn();
 
 				var uploadChangedProfileAsync = Bluebird.promisify(ownUser.uploadChangedProfile.bind(ownUser));
 
@@ -171,7 +171,7 @@ var Circle = function (data) {
 	this.load = function (cb) {
 		return Bluebird.all([
 			circleSec.decrypt(),
-			circleSec.verify(userService.getown().getSignKey(), undefined, id)
+			circleSec.verify(userService.getOwn().getSignKey(), undefined, id)
 		]).spread(function (content) {
 			keyStore.security.addEncryptionIdentifier(circleSec.metaAttr("circleKey"));
 			theCircle.data.name = content.name;
@@ -250,7 +250,7 @@ var circleService = {
 
 		return generateNewKey().then(function (symKey) {
 			return encryptKeyForUsers(symKey, users).then(function () {
-				var own = userService.getown();
+				var own = userService.getOwn();
 				var mainKey = own.getMainKey();
 
 				return SecuredData.createAsync({ name: name }, {
