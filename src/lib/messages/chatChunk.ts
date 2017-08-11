@@ -298,13 +298,7 @@ export class Chunk extends Observer {
 	static createRawData(receiver, { content = {}, meta = {}, givenKey, predecessorChunk } : { content: any, givenKey?: any, meta?: any, predecessorChunk?: Chunk}) {
 		return Bluebird.try(async () => {
 
-			const receiverIDs = receiver.map((val) => {
-				if (typeof val === "object") {
-					return val.getID();
-				} else {
-					return h.parseDecimal(val);
-				}
-			})
+			const receiverIDs = receiver.map((val) => h.parseDecimal(val))
 
 			if (receiverIDs.indexOf(sessionService.getUserID()) === -1) {
 				receiverIDs.push(sessionService.getUserID())
@@ -342,9 +336,7 @@ export class Chunk extends Observer {
 	};
 
 	static createData(receiver, message, images) {
-		return Bluebird.reject("CreateData not implemented")
-
-		/*var imagePreparation = Bluebird.resolve(images).map((image: any) => {
+		var imagePreparation = Bluebird.resolve(images).map((image: any) => {
 			return image.prepare()
 		})
 
@@ -354,6 +346,9 @@ export class Chunk extends Observer {
 			}))
 		}
 
+		return Bluebird.reject("CreateData not implemented")
+
+		/*
 		return Bluebird.all([Chunk.createRawData(receiver, { content: {} }), imagePreparation]).spread((chunkData: any, imagesMeta) => {
 			var chunk = new Chunk({
 				meta: chunkData.chunk.meta,
