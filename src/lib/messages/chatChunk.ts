@@ -7,7 +7,7 @@ const debug = require("debug");
 
 const userService = require("user/userService");
 import socket from "../services/socket.service"
-import ObjectLoader from "../services/objectLoader"
+import ObjectLoader from "../services/cachedObjectLoader"
 const keyStore = require("services/keyStore.service").default;
 const sessionService = require("services/session.service").default;
 
@@ -391,13 +391,36 @@ const loadLegacyTitle = (latestTitleUpdateResponse) => {
 	return latestTitleUpdate.getTitle().thenReturn(latestTitleUpdate)
 }
 
-const hooks = {
-	downloadHook: id => socket.emit("chat.chunk.get", { id }),
-	loadHook: ({ content, meta, server, latestTitleUpdate }) : Bluebird<Chunk> => {
+type ChunkCache = {
+	content: any,
+	meta: any,
+	server: any,
+	latestTitleUpdate: any
+}
+
+export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
+	cacheName: "chunk",
+	download: id => socket.emit("chat.chunk.get", { id }),
+	restore: (chunkInfo: ChunkCache) => {
+		return Bluebird.try(async () => {
+			const titleUpdate = await loadLegacyTitle(chunkInfo.latestTitleUpdate)
+			const loadReceiverPromise = userService.getMultipleFormatted(chunkInfo.meta.receiver.sort().map(h.parseDecimal))
+
+			const chunk = new Chunk({
+				...chunkInfo,
+				receiverObjects: await loadReceiverPromise
+			})
+
+			if (titleUpdate) {
+				chunk.setLatestTitleUpdate(titleUpdate)
+			}
+
+			return chunk
+		})
+	},
+	load: ({ content, meta, server, latestTitleUpdate }) : Bluebird<ChunkCache> => {
 		return Bluebird.try(async () => {
 			const securedData = SecuredData.load(content, meta, { type: "topic", alternativeType: "chatChunk" })
-
-			const loadReceiverPromise = userService.getMultipleFormatted(securedData.metaAttr("receiver").map(h.parseDecimal))
 
 			const creator = await userService.get(securedData.metaAttr("creator"));
 
@@ -411,23 +434,13 @@ const hooks = {
 
 			await securedData.decrypt()
 
-			const titleUpdate = await loadLegacyTitle(latestTitleUpdate)
-
-			const chunk = new Chunk({
+			return {
 				content: securedData.contentGet(),
 				meta: securedData.metaGet(),
 				server,
-				receiverObjects: await loadReceiverPromise
-			})
-
-			if (titleUpdate) {
-				chunk.setLatestTitleUpdate(titleUpdate)
+				latestTitleUpdate
 			}
-
-			return chunk
 		})
 	},
-	idHook: response => response.server.id
-}
-
-export default class ChunkLoader extends ObjectLoader(hooks) {}
+	getID: response => response.server.id
+}) {}

@@ -388,7 +388,7 @@ export class Message {
 	}
 }
 
-type MessageCacheType = {
+type MessageCache = {
 	content: any,
 	meta: any,
 	server: any
@@ -398,18 +398,18 @@ const loadMessageSender = senderID =>
 	userService.get(senderID)
 		.then(sender => sender.loadBasicData().thenReturn(sender))
 
-export default class MessageLoader extends ObjectLoader<Message, MessageCacheType>({
+export default class MessageLoader extends ObjectLoader<Message, MessageCache>({
 	cacheName: "message",
 	getID: ({ server }) => server.uuid,
 	download: id => socket.emit("chat.message.get", { id }),
-	load: (messageResponse): Bluebird<MessageCacheType> => {
+	load: (messageResponse): Bluebird<MessageCache> => {
 		const { content, meta, server } = messageResponse
 
 		const securedData = SecuredData.load(content, meta, { type: "message" })
 		const senderID = server.sender
 
 		// !! Typescript is broken for async arrow functions without a this context !!
-		return Bluebird.try<MessageCacheType>(async function () {
+		return Bluebird.try<MessageCache>(async function () {
 			const sender = await loadMessageSender(senderID)
 
 			await Bluebird.all([
@@ -424,7 +424,7 @@ export default class MessageLoader extends ObjectLoader<Message, MessageCacheTyp
 			}
 		})
 	},
-	restore: (messageInfo: MessageCacheType) =>
+	restore: (messageInfo: MessageCache) =>
 		loadMessageSender(messageInfo.server.sender)
 			.then((sender) => new Message({ ...messageInfo, sender })),
 }) {}
