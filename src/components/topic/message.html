@@ -25,15 +25,14 @@
 	<div class="messages__message message__file">
 		<div class="message__file__hexagon-wrap">
 			<hexagon class="message__file__hexagon"></hexagon>
-			<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!voicemailLoaded()" (click)="downloadVoicemail()"></ion-icon>
+			<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress" (click)="downloadVoicemail()"></ion-icon>
 			<ion-icon name="md-play" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPaused()" (click)="playVoicemail()"></ion-icon>
+			<ion-spinner *ngIf="!voicemailLoaded() && voicemailDownloadProgress !== undefined" class="message__file__hexagon-spinner"></ion-spinner>
 			<ion-icon name="md-pause" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
 		</div>
 		<span class="message__file__info">
-			{{ voicemailLoaded() }}
-			{{ voicemailProgress() }}
-			{{ voicemailPosition() }} / {{voicemailDuration()}}
-			[{{formatSize(voicemailSize())}}]
+			<span>{{ voicemailPosition() * 1000 | date: 'mm:ss' }} / {{ voicemailDuration() * 1000 | date: 'mm:ss' }}</span>
+			<span *ngIf="!voicemailLoaded()">&nbsp;[{{formatSize(voicemailSize())}}]</span>
 		</span>
 	</div>
 	<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
