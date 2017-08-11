@@ -183,7 +183,7 @@ topicWithBursts {
 
 	width: 40px;
 
-	top: -8px;
+	top: -6px;
 	left: -10px;
 
 	z-index: 3;
@@ -236,6 +236,7 @@ topicWithBursts {
 
 .message__file__progress {
 	position: absolute;
+	left: 0;
 	bottom: 3px;
 
 	height: 2px;
@@ -475,6 +476,8 @@ topicWithBursts {
 
 .ios__messages__recording-overlay {
 	position: absolute;
+	top: 50%;
+	margin-top: -8px;
 	width: 200px;
 	left: 115px;
 	color: map-get($colors, dark);
