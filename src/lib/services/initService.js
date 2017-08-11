@@ -1,4 +1,5 @@
 console.warn(`Whispeer startup at ${Date.now()}`)
+console.time("Spinner on Home")
 
 var errorService = require("./error.service").errorServiceInstance;
 var keyStore = require("crypto/keyStore");

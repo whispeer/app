@@ -198,7 +198,7 @@ userService = {
 	* @param cb called with results
 	* this function is asynchronous and returns immediatly. requests are also batched.
 	*/
-	get: function getF(identifier, cb) {
+	get: function (identifier, cb) {
 		return loadUser(identifier).nodeify(cb);
 	},
 
