@@ -404,7 +404,6 @@ export default class MessageLoader extends ObjectLoader<Message, MessageCacheTyp
 	download: id => socket.emit("chat.message.get", { id }),
 	load: (messageResponse): Bluebird<MessageCacheType> => {
 		const { content, meta, server } = messageResponse
-		const _this = null
 
 		const securedData = SecuredData.load(content, meta, { type: "message" })
 		const senderID = server.sender
