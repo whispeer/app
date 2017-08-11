@@ -129,13 +129,6 @@ export class Chunk extends Observer {
 		})
 	};
 
-	loadReceiverNames = h.cacheResult<Bluebird<any>>((securedData) => {
-		return userService.getMultipleFormatted(securedData.metaAttr("receiver").map(h.parseDecimal))
-			.then((receiverObjects) => {
-				this.receiverObjects = receiverObjects
-			})
-	});
-
 	getReceivers = () => {
 		return this.receiverObjects
 	}
@@ -168,17 +161,6 @@ export class Chunk extends Observer {
 		return this.receiver
 	}
 
-	decryptContent = (securedData) => {
-		if (!securedData.hasContent()) {
-			this.title = ""
-			return
-		}
-
-		return securedData.decrypt().then((content) => {
-			this.title = content.title
-		})
-	}
-
 	getTitle = () => {
 		if (this.titleUpdate) {
 			return this.titleUpdate.state.title
@@ -188,11 +170,20 @@ export class Chunk extends Observer {
 	}
 
 	load = () => {
-		return Bluebird.all([
-			Chunk.verify(this.securedData),
-			this.loadReceiverNames(this.securedData),
-			this.decryptContent(this.securedData),
-		]).then(() => {
+		return Bluebird.try(async () => {
+			const verifyPromise = Chunk.verify(this.securedData)
+			const loadReceiverPromise = userService.getMultipleFormatted(this.securedData.metaAttr("receiver").map(h.parseDecimal))
+
+			if (this.securedData.hasContent()) {
+				this.title = (await this.securedData.decrypt()).title
+			} else {
+				this.title = ""
+			}
+
+			this.receiverObjects = await loadReceiverPromise
+
+			await verifyPromise
+
 			var predecessorID = this.getPredecessorID()
 
 			if (predecessorID && ChunkLoader.isLoaded(predecessorID)) {
@@ -201,7 +192,7 @@ export class Chunk extends Observer {
 		}).finally(() => {
 			chunkDebug(`Chunk loaded (${this.getID()}):${new Date().getTime() - startup}`);
 		})
-	};
+	}
 
 	isAdmin = (user) => {
 		return this.getAdmins().indexOf(user.getID()) > -1
