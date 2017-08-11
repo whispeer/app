@@ -243,8 +243,6 @@ topicWithBursts {
 	width: 100%;
 	-webkit-appearance: none;
 
-	padding-right: 40px;
-
 	&::-webkit-progress-bar {
 		background: map-get($colors, primaryDarker) !important;
 	}
@@ -321,6 +319,11 @@ topicWithBursts {
 	.message__file__info {
 		padding-left: 10px;
 		padding-right: 15px;
+	}
+
+	.message__file__progress {
+		padding-left: 25px;
+		padding-right: 20px;
 	}
 
 	.message__file__memo-play-icon {
