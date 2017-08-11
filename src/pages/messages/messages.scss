@@ -175,7 +175,7 @@ topicWithBursts {
 
 .message__file {
 	overflow: visible;
-	padding-left: 40px;
+	padding: 5px 0 5px 25px;
 }
 
 .message__file__hexagon-wrap {
@@ -228,7 +228,8 @@ topicWithBursts {
 	width: 100%;
 	white-space: nowrap;
 
-	padding-left: 5px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 .message__file__name {
@@ -335,8 +336,7 @@ topicWithBursts {
 		}
 	}
 	.message__file {
-		padding-left: 0;
-		padding-right: 40px;
+		padding: 5px 25px 5px 0;
 	}
 	.message__file__hexagon-wrap {
 		left: auto;
