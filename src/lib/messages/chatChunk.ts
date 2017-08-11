@@ -171,11 +171,15 @@ export class Chunk extends Observer {
 
 	load = () => {
 		return Bluebird.try(async () => {
-			const verifyPromise = Chunk.verify(this.securedData)
-			const loadReceiverPromise = userService.getMultipleFormatted(this.securedData.metaAttr("receiver").map(h.parseDecimal))
+			const securedData = this.securedData
 
-			if (this.securedData.hasContent()) {
-				this.title = (await this.securedData.decrypt()).title
+			const verifyPromise = Chunk.verify(securedData)
+			const loadReceiverPromise = userService.getMultipleFormatted(securedData.metaAttr("receiver").map(h.parseDecimal))
+
+			await securedData.decrypt()
+
+			if (securedData.hasContent()) {
+				this.title = securedData.contentGet().title
 			} else {
 				this.title = ""
 			}
