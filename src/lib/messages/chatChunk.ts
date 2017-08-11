@@ -19,6 +19,11 @@ const chunkDebug = debug(debugName);
 
 declare const startup: number
 
+const CHUNK_SECURED_DATA_OPTIONS = {
+	type: "topic", // Keep topic for now until lots of clients have picked up the change
+	alternativeType: "chatChunk" // Allow for chatChunk already
+}
+
 export class Chunk extends Observer {
 	private securedData
 	private receiver
@@ -42,10 +47,7 @@ export class Chunk extends Observer {
 
 		meta.receiver.sort();
 
-		this.securedData = SecuredData.createRaw(content, meta, {
-			type: "topic", // Keep topic for now until lots of clients have picked up the change
-			alternativeType: "chatChunk" // Allow for chatChunk already
-		});
+		this.securedData = SecuredData.createRaw(content, meta, CHUNK_SECURED_DATA_OPTIONS);
 
 		this.id = server.id
 		this.chatID = server.chatID
@@ -406,6 +408,14 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 			const titleUpdate = await loadLegacyTitle(chunkInfo.latestTitleUpdate)
 			const loadReceiverPromise = userService.getMultipleFormatted(chunkInfo.meta.receiver.sort().map(h.parseDecimal))
 
+			const creator = await userService.get(chunkInfo.meta.creator)
+
+			if (!creator.isNotExistingUser()) {
+				keyStore.security.addEncryptionIdentifier(chunkInfo.meta._key)
+			} else {
+				// TODO data.disabled = true;
+			}
+
 			const chunk = new Chunk({
 				...chunkInfo,
 				receiverObjects: await loadReceiverPromise
@@ -420,18 +430,10 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 	},
 	load: ({ content, meta, server, latestTitleUpdate }) : Bluebird<ChunkCache> => {
 		return Bluebird.try(async () => {
-			const securedData = SecuredData.load(content, meta, { type: "topic", alternativeType: "chatChunk" })
+			const securedData = SecuredData.load(content, meta, CHUNK_SECURED_DATA_OPTIONS)
 
-			const creator = await userService.get(securedData.metaAttr("creator"));
-
+			const creator = await userService.get(securedData.metaAttr("creator"))
 			await securedData.verify(creator.getSignKey())
-
-			if (!creator.isNotExistingUser()) {
-				keyStore.security.addEncryptionIdentifier(securedData.metaAttr("_key"));
-			} else {
-				// TODO data.disabled = true;
-			}
-
 			await securedData.decrypt()
 
 			return {
