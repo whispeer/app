@@ -31,9 +31,11 @@
 			<ion-icon name="md-pause" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
 		</div>
 		<span class="message__file__info">
+			<ion-icon icon name="ios-barcode-outline" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': voicemailPlaying()}"></ion-icon>&nbsp;
 			<span>{{ voicemailPosition() * 1000 | date: 'mm:ss' }} / {{ voicemailDuration() * 1000 | date: 'mm:ss' }}</span>
 			<span *ngIf="!voicemailLoaded()">&nbsp;[{{formatSize(voicemailSize())}}]</span>
 		</span>
+		<progress class="message__file__progress" max="{{voicemailDuration()}}" value="{{voicemailPosition()}}"></progress>
 	</div>
 	<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
 </div>
