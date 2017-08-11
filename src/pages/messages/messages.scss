@@ -186,7 +186,7 @@ topicWithBursts {
 	top: -8px;
 	left: -10px;
 	.border, .content {
-		fill: map-get($colors, grey);
+		fill: map-get($colors, dark_grey);
 	}
 	svg {
 		width: 100%;
