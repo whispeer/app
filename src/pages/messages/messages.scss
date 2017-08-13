@@ -226,6 +226,24 @@ topicWithBursts {
 	}
 }
 
+.message__file--sending {
+	background: map-get($colors, other_grey) !important;
+
+	&:before {
+		border-right-color: map-get($colors, other_grey) !important;
+	}
+
+	.message__file__hexagon-spinner * {
+		stroke: map-get($colors, dark) !important;
+	}
+
+	.message__file__hexagon {
+		.content, .border {
+			fill: map-get($colors, light_grey);
+		}
+	}
+}
+
 .message__file__info {
 	display: flex;
 	align-items: center;
