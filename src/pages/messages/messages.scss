@@ -227,11 +227,16 @@ topicWithBursts {
 }
 
 .message__file__info {
-	display: inline-flex;
+	display: inline-block;
 	width: 100%;
-	white-space: nowrap;
+	//white-space: nowrap;
 
 	padding-bottom: 2px;
+}
+
+.message__file__info__size {
+	white-space: nowrap;
+	color: map-get($colors, border_grey);
 }
 
 .message__file__progress {
@@ -240,15 +245,50 @@ topicWithBursts {
 	bottom: 3px;
 
 	height: 2px;
-	width: 100%;
-	-webkit-appearance: none;
+	width: calc(100% - 40px);
 
-	&::-webkit-progress-bar {
-		background: map-get($colors, primaryDarker) !important;
+	background: map-get($colors, primaryDarker) !important;
+}
+
+.message__file__progress__bar {
+	position: relative;
+	height: 100%;
+
+	background: map-get($colors, light);
+
+	transition: width 0.1s ease;
+}
+
+.message__file__progress__icon {
+	position: absolute;
+	top: -2.5px; // this kinda breaks the hexagons height but -3 is too high and -2 too low.
+	left: -3px;
+
+	display: block;
+	height: 6px;
+	width: 6px;
+
+	transition: margin 0.1s ease;
+}
+
+.message__file__progress__icon__hex {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	.border, .content {
+		fill: map-get($colors, light);
 	}
 
-	&::-webkit-progress-value {
-		background: map-get($colors, light);
+	svg {
+		width: 100%;
+
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 }
 
@@ -322,8 +362,8 @@ topicWithBursts {
 	}
 
 	.message__file__progress {
-		padding-left: 25px;
-		padding-right: 20px;
+		margin-left: 25px;
+		margin-right: 20px;
 	}
 
 	.message__file__memo-play-icon {
@@ -384,6 +424,9 @@ topicWithBursts {
 		padding-left: 15px;
 		padding-right: 10px;
 	}
+	.message__file__info__size {
+		color: map-get($colors, grey);
+	}
 	.message__file__memo-play-icon {
 		color: map-get($colors, dark);
 	}
@@ -391,15 +434,16 @@ topicWithBursts {
 		color: map-get($colors, kelly_green);
 	}
 	.message__file__progress {
-		padding-left: 15px;
-		padding-right: 25px;
-
-		&::-webkit-progress-bar {
-			background: map-get($colors, light) !important;
-		}
-
-		&::-webkit-progress-value {
-			background: map-get($colors, grey);
+		margin-left: 15px;
+		margin-right: 25px;
+		background: map-get($colors, light) !important;
+	}
+	.message__file__progress__bar {
+		background: map-get($colors, grey);
+	}
+	.message__file__progress__icon__hex {
+		.border, .content {
+			fill: map-get($colors, grey) !important;
 		}
 	}
 }
