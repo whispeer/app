@@ -822,7 +822,7 @@ SymKey.get = function (realKeyID) {
 			return symKeys[realKeyID];
 		}
 
-		throw new errors.InvalidDataError("keychain not found (sym)");
+		throw new errors.InvalidDataError("keychain not found (sym) " + realKeyID);
 	});
 };
 
