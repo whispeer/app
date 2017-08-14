@@ -4,6 +4,8 @@ import Dexie from "dexie";
 import h from "../helper/helper"
 import idb, { Cursor } from "idb"
 
+let cachesDisabled = false
+
 const dbPromise = idb.open("whispeerCache", 10, upgradeDB => {
 	const objectStore = upgradeDB.createObjectStore('cache', { keyPath: "id" });
 
@@ -29,12 +31,20 @@ const followCursorUntilDone = (cursorPromise: Promise<Cursor>, action) => {
 	})
 }
 
+dbPromise.catch(() => cachesDisabled = true)
+
 export default class Cache {
 	private options: any
 	private cacheDisabled: boolean = false
 
 	static deleteDatabase() {
-		return dbPromise.then(() => idb.delete("whispeerCache"))
+		cachesDisabled = true
+
+		return dbPromise.then((db) =>
+			db.close()
+		).then(() =>
+			idb.delete("whispeerCache")
+		)
 	}
 
 	constructor(private name : string, options?: any) {
@@ -56,7 +66,7 @@ export default class Cache {
 	}
 
 	store(id: string, data: any, blobs?: any): Bluebird<any> {
-		if (this.cacheDisabled) {
+		if (this.isDisabled()) {
 			return Bluebird.resolve();
 		}
 
@@ -96,7 +106,7 @@ export default class Cache {
 	}
 
 	get(id: string): Bluebird<any> {
-		if (this.cacheDisabled) {
+		if (this.isDisabled()) {
 			return Bluebird.reject(new Error("Cache is disabled"));
 		}
 
@@ -140,7 +150,7 @@ export default class Cache {
 	 * @return {Bluebird<any>} Promise containing all cache entries as a dexie collection.
 	 */
 	all(): Bluebird<any> {
-		if (this.cacheDisabled) {
+		if (this.isDisabled()) {
 			return Bluebird.resolve([]);
 		}
 
@@ -159,7 +169,7 @@ export default class Cache {
 	 * @return {Bluebird<any>}    [description]
 	 */
 	delete(id: string): Bluebird<any> {
-		if (this.cacheDisabled) {
+		if (this.isDisabled()) {
 			return Bluebird.resolve();
 		}
 
@@ -173,7 +183,7 @@ export default class Cache {
 	}
 
 	deleteAll(): Bluebird<any> {
-		if (this.cacheDisabled) {
+		if (this.isDisabled()) {
 			return Bluebird.resolve();
 		}
 
@@ -191,6 +201,10 @@ export default class Cache {
 
 			await followCursorUntilDone(cursorPromise, action)
 		})
+	}
+
+	private isDisabled() {
+		return cachesDisabled || this.cacheDisabled
 	}
 
 	private disable() {
