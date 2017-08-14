@@ -4,6 +4,7 @@ import idb from "idb"
 import Observer from "../asset/observer";
 import Storage from "./Storage";
 import blobCache from "../../lib/asset/blobCache"
+import Cache from "../services/Cache"
 import h from "../helper/helper"
 import keyStore from "./keyStore.service";
 import { landingPage } from "./location.manager";
@@ -65,7 +66,7 @@ export class SessionService extends Observer {
 		return Bluebird.all([
 			blobCache.clear(),
 			this.sessionStorage.clear(),
-			Bluebird.resolve(idb.delete("whispeerCache"))
+			Bluebird.resolve(Cache.deleteDatabase()),
 		].map(p => p.reflect()))
 	}
 
