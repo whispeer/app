@@ -20,18 +20,35 @@ import Progress from "../asset/Progress"
 
 type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
 
-export class Message {
-	private _hasBeenSent: boolean
-	private _isDecrypted: boolean
-	private _isOwnMessage: boolean
+const loadMessageSender = (senderID) => {
+	return userService.get(senderID).then((sender) => {
+		return sender.loadBasicData().thenReturn(sender)
+	})
+}
 
-	private _serverID: number
-	private _clientID: any
-	private _securedData: any
+const load = (senderID, securedData) => {
+	return Bluebird.try(async () => {
+		const sender = await loadMessageSender(senderID)
+
+		await Bluebird.all([
+			securedData.decrypt(),
+			securedData.verify(sender.getSignKey())
+		])
+
+		return sender
+	})
+}
+
+export class Message {
+	private wasSent: boolean
+	private isOwnMessage: boolean
+
+	private serverID: number
+	private clientID: any
+	private securedData: any
 	private attachments: attachments
 
 	private sendTime: number
-	private senderID: number
 
 	public data: any
 
@@ -41,59 +58,54 @@ export class Message {
 
 	constructor(messageData, chat?: Chat, attachments?: attachments, id?) {
 		if (!chat) {
-			this.fromSecuredData(messageData);
+			this.fromVerifiedAndDecryptedData(messageData);
 			return
 		}
 
 		this.fromDecryptedData(chat, messageData, attachments, id);
 	}
 
-	fromSecuredData = (data) => {
-		const { meta, content, server } = data
+	private fromVerifiedAndDecryptedData = ({ meta, content, server, sender }) => {
+		this.wasSent = true;
 
-		this._hasBeenSent = true;
-		this._isDecrypted = false;
-
-		var id = Message.idFromData(data)
+		const { serverID, clientID } = Message.idFromData(server)
+		this.serverID = serverID
+		this.clientID = clientID
 
 		this.chunkID = server.chunkID
 
 		this.sendTime = h.parseDecimal(server.sendTime)
-		this.senderID = h.parseDecimal(server.sender)
 
-		this._serverID = id.serverID
-		this._clientID = id.clientID
+		this.securedData = SecuredData.createRaw(content, meta, { type: "message" });
 
-		var metaCopy = h.deepCopyObj(meta);
-		this._securedData = SecuredData.load(content, metaCopy, {
-			type: "message"
-		});
+		this.setDefaultData()
 
-		this.setData();
+		this.data.sender = sender.data;
+		this.isOwnMessage = sender.isOwn();
+
+		this.setAttachmentInfo("files")
+		this.setAttachmentInfo("voicemails")
+		this.setImagesInfo()
 	};
 
-	fromDecryptedData = (chat: Chat, message, attachments, id) => {
-		this._hasBeenSent = false;
-		this._isDecrypted = true;
-		this._isOwnMessage = true;
+	private fromDecryptedData = (chat: Chat, message, attachments, id) => {
+		this.wasSent = false;
+		this.isOwnMessage = true;
 
 		this.chat = chat;
 		this.attachments = attachments
 
-		this._clientID = id || h.generateUUID();
-
-		this.senderID = h.parseDecimal(userService.getown().getID())
+		this.clientID = id || h.generateUUID();
 
 		var meta = {
 			createTime: new Date().getTime(),
-			messageUUID: this._clientID
+			messageUUID: this.clientID
 		};
 
-		this._securedData = Message.createRawSecuredData(message, meta);
+		this.securedData = Message.createRawSecuredData(message, meta);
 
-		this.setData();
+		this.setDefaultData();
 
-		this.data.text = message;
 		this.data.images = attachments.images.map((image) => {
 			if (!image.convertForGallery) {
 				return image;
@@ -116,7 +128,6 @@ export class Message {
 			}
 		}))
 
-		this.loadSender();
 		this.prepareAttachments();
 	};
 
@@ -134,26 +145,17 @@ export class Message {
 		return Bluebird.all([this.prepareFiles(), this.prepareImages(), this.prepareVoicemails()])
 	}
 
-	setData = () => {
+	private setDefaultData = () => {
+		const content = this.securedData.contentGet()
+
 		this.data = {
-			text: "",
+			text: typeof content === "string" ? content : content.message,
 			timestamp: this.getTime(),
 			date: new Date(this.getTime()),
 
-			loading: true,
-			loaded: false,
-			sent: this._hasBeenSent,
+			sent: this.wasSent,
 
-			sender: {
-				"id": this.senderID,
-				"name": "",
-				"url": "",
-				"image": "assets/img/user.png"
-			},
-
-			images: this._securedData.metaAttr("images"),
-
-			id: this._clientID,
+			id: this.clientID,
 			obj: this
 		};
 	};
@@ -163,7 +165,7 @@ export class Message {
 	}
 
 	hasBeenSent = () => {
-		return this._hasBeenSent;
+		return this.wasSent;
 	};
 
 	uploadAttachments = h.cacheResult<Bluebird<any>>((chunkKey) => {
@@ -185,7 +187,7 @@ export class Message {
 	})
 
 	send = () => {
-		if (this._hasBeenSent) {
+		if (this.wasSent) {
 			throw new Error("trying to send an already sent message");
 		}
 
@@ -194,7 +196,7 @@ export class Message {
 
 			const chunk = await ChunkLoader.get(this.chat.getLatestChunk())
 
-			this._securedData.setParent(chunk.getSecuredData());
+			this.securedData.setParent(chunk.getSecuredData());
 
 			const imagesInfo = await this.prepareImages()
 			const voicemailsInfo = await this.prepareVoicemails()
@@ -206,15 +208,15 @@ export class Message {
 				)
 			}
 
-			this._securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
-			this._securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
-			this._securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
-			this._securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
-			this._securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
-			this._securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
+			this.securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
+			this.securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
+			this.securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
+			this.securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
+			this.securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
+			this.securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
 
 			if (filesInfo.length === 0 && imagesInfo.length === 0 && voicemailsInfo.length === 0) {
-				this._securedData.contentSet(this._securedData.contentGet().message)
+				this.securedData.contentSet(this.securedData.contentGet().message)
 			}
 
 			const chunkKey = chunk.getKey();
@@ -239,10 +241,10 @@ export class Message {
 			const newest = h.array.last(sentMessages)
 
 			if (newest && newest.getChunkID() === this.chat.getLatestChunk()) {
-				this._securedData.setAfterRelationShip(newest.getSecuredData());
+				this.securedData.setAfterRelationShip(newest.getSecuredData());
 			}
 
-			const signAndEncryptPromise = this._securedData._signAndEncrypt(userService.getown().getSignKey(), chunkKey);
+			const signAndEncryptPromise = this.securedData._signAndEncrypt(userService.getown().getSignKey(), chunkKey);
 			const keys = await this.uploadAttachments(chunkKey)
 			const request = await signAndEncryptPromise
 
@@ -253,7 +255,7 @@ export class Message {
 			});
 
 			if (response.success) {
-				this._hasBeenSent = true
+				this.wasSent = true
 				this.data.sent = true
 
 				this.setAttachmentInfo("files")
@@ -263,7 +265,7 @@ export class Message {
 
 			if (response.server) {
 				this.sendTime = h.parseDecimal(response.server.sendTime)
-				this._serverID = h.parseDecimal(response.server.id)
+				this.serverID = h.parseDecimal(response.server.id)
 				this.chunkID = h.parseDecimal(response.server.chunkID)
 				this.data.timestamp = this.getTime();
 			}
@@ -278,15 +280,15 @@ export class Message {
 	};
 
 	getSecuredData = () => {
-		return this._securedData;
+		return this.securedData;
 	};
 
 	getServerID = () => {
-		return this._serverID;
+		return this.serverID;
 	};
 
 	getClientID = () => {
-		return this._clientID;
+		return this.clientID;
 	};
 
 	getTopicID = () => {
@@ -298,47 +300,15 @@ export class Message {
 			return this.sendTime;
 		}
 
-		return h.parseDecimal(this._securedData.metaAttr("createTime"));
+		return h.parseDecimal(this.securedData.metaAttr("createTime"));
 	};
 
 	isOwn = () => {
-		return this._isOwnMessage;
-	};
-
-	loadSender = () => {
-		return Bluebird.try(() => {
-			return userService.get(this.senderID);
-		}).then((sender) => {
-			return sender.loadBasicData().thenReturn(sender);
-		}).then((sender) => {
-			this.data.sender = sender.data;
-			this._isOwnMessage = sender.isOwn();
-
-			return sender;
-		});
-	};
-
-	load = () => {
-		return this.loadSender().then((sender) => {
-			return Bluebird.all([
-				this.decrypt(),
-				this.verify(sender.getSignKey())
-			]);
-		}).then(() => {
-			return;
-		})
+		return this.isOwnMessage;
 	};
 
 	verifyParent = (chunk) => {
-		this._securedData.checkParent(chunk.getSecuredData())
-	};
-
-	verify = (signKey) => {
-		if (!this._hasBeenSent) {
-			throw new Error("verifying unsent message")
-		}
-
-		return this._securedData.verify(signKey)
+		this.securedData.checkParent(chunk.getSecuredData())
 	};
 
 	getText = () => {
@@ -346,14 +316,14 @@ export class Message {
 	}
 
 	private setAttachmentInfo = (attr) => {
-		const fullContent = this._securedData.contentGet()
+		const fullContent = this.securedData.contentGet()
 
 		if (typeof fullContent === "string") {
 			return
 		}
 
 		const content = fullContent[attr]
-		const meta = this._securedData.metaAttr(attr)
+		const meta = this.securedData.metaAttr(attr)
 
 		if (!content) {
 			return
@@ -386,14 +356,14 @@ export class Message {
 	}
 
 	private setImagesInfo = () => {
-		const content = this._securedData.contentGet()
+		const content = this.securedData.contentGet()
 
 		if (typeof content === "string") {
 			return
 		}
 
 		const imagesContent = content.images
-		const imagesMeta = this._securedData.metaAttr("images")
+		const imagesMeta = this.securedData.metaAttr("images")
 
 		if (!imagesContent) {
 			return
@@ -410,30 +380,6 @@ export class Message {
 			})
 
 			return data
-		})
-	}
-
-	decrypt = () => {
-		if (this._isDecrypted) {
-			return Bluebird.resolve(this._securedData.contentGet())
-		}
-
-		return Bluebird.try(() => {
-			return this._securedData.decrypt();
-		}).then(() => {
-			const content = this._securedData.contentGet()
-
-			if (typeof content === "string") {
-				this.data.text = content
-			} else {
-				this.data.text = content.message
-			}
-
-			this.setAttachmentInfo("files")
-			this.setAttachmentInfo("voicemails")
-			this.setImagesInfo()
-
-			return content
 		})
 	}
 
@@ -454,9 +400,9 @@ export class Message {
 		return secured._signAndEncrypt(userService.getown().getSignKey(), chunk.getKey());
 	};
 
-	static idFromData(data) {
-		var serverID = h.parseDecimal(data.server.id)
-		var clientID = data.server.uuid
+	static idFromData(server) {
+		var serverID = h.parseDecimal(server.id)
+		var clientID = server.uuid
 
 		return {
 			serverID,
@@ -466,9 +412,19 @@ export class Message {
 }
 
 const loadHook = (messageResponse) => {
-	const message = new Message(messageResponse)
+	const { content, meta, server } = messageResponse
 
-	return message.load().thenReturn(message)
+	const secured = SecuredData.load(content, meta, { type: "message" })
+	const senderID = h.parseDecimal(server.sender)
+
+	return load(senderID, secured).then((sender) => {
+		return new Message({
+			content: secured.contentGet(),
+			meta: secured.metaGet(),
+			sender,
+			server: messageResponse.server
+		})
+	})
 }
 
 const downloadHook = (id) => {

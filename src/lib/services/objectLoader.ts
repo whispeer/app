@@ -23,10 +23,6 @@ function createLoader<ObjectType>({ downloadHook, loadHook, idHook }: hookType<O
 			return byId.hasOwnProperty(id)
 		}
 
-		static isLoading(id) {
-			return loading.hasOwnProperty(id)
-		}
-
 		static load(response): Bluebird<ObjectType> {
 			const id = idHook(response)
 

@@ -307,7 +307,7 @@ const loadBlob = (blobID, progress, estimatedSize) => {
 		const blob = new MyBlob(data.blob, blobID, { meta: data.meta });
 
 		if (blob.isDecrypted()) {
-			return blobCache.store(blob)
+			return blobCache.store(blob).catch(() => blob.toURL())
 		}
 
 		downloadProgress.progress(downloadProgress.getTotal())

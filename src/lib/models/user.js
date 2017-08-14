@@ -1,4 +1,4 @@
-var errorServiceInstance = require("services/error.service").errorServiceInstance
+var errorService = require("services/error.service").default
 var keyStoreService = require("crypto/keyStore")
 var socketService = require("services/socket.service").default
 
@@ -558,7 +558,7 @@ function User (providedData) {
 	this.loadImage = function () {
 		return theUser.getImage().then(function (imageUrl) {
 			theUser.data.basic.image = imageUrl
-		}).catch(errorServiceInstance.criticalError)
+		}).catch((e) => errorService.criticalError(e))
 	}
 
 	this.reLoadBasicData = function (cb) {
@@ -726,7 +726,7 @@ function User (providedData) {
 	this.ignoreFriendShip = function () {
 		ignoreFriendState.pending()
 		if (!this.isOwn()) {
-			friendsService.ignoreFriendShip(this.getID(), errorServiceInstance.failOnError(ignoreFriendState))
+			friendsService.ignoreFriendShip(this.getID(), errorService.failOnError(ignoreFriendState))
 		} else {
 			ignoreFriendState.failed()
 		}
@@ -735,7 +735,7 @@ function User (providedData) {
 	this.acceptFriendShip = function () {
 		addFriendState.pending()
 		if (!this.isOwn()) {
-			friendsService.acceptFriendShip(this.getID(), errorServiceInstance.failOnError(addFriendState))
+			friendsService.acceptFriendShip(this.getID(), errorService.failOnError(addFriendState))
 		} else {
 			addFriendState.failed()
 		}
@@ -747,7 +747,7 @@ function User (providedData) {
 
 	this.removeAsFriend = function () {
 		if (!this.isOwn()) {
-			friendsService.removeFriend(this.getID(), errorServiceInstance.criticalError)
+			friendsService.removeFriend(this.getID(), errorService.criticalError)
 		} else {
 			addFriendState.failed()
 		}
@@ -756,7 +756,7 @@ function User (providedData) {
 	this.addAsFriend = function () {
 		addFriendState.pending()
 		if (!this.isOwn()) {
-			friendsService.friendship(this.getID(), errorServiceInstance.failOnError(addFriendState))
+			friendsService.friendship(this.getID(), errorService.failOnError(addFriendState))
 		} else {
 			addFriendState.failed()
 		}
