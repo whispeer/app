@@ -87,7 +87,8 @@ export class MessageComponent {
 		this.voicemailPlayer.isPlaying()
 
 	voicemailSending = () =>
-		false
+		!this.message.data.sent
+
 
 	playVoicemail = () =>
 		this.downloadVoicemail().then(() =>

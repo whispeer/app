@@ -45,7 +45,7 @@ export default class VoicemailPlayer {
 				this.recordings[this.recordPlayingIndex].recording.getCurrentPosition().then((pos: number) => {
 					this.position = pos
 				})
-			}, 250)
+			}, 100)
 
 			this.playing = true
 		})
