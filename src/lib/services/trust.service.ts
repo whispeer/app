@@ -14,7 +14,7 @@ import h from "../helper/helper";
 const trustManager = require("crypto/trustManager");
 const signatureCache = require("crypto/signatureCache");
 
-const userService = require("user/userService");
+const userService = require("users/userService");
 
 const debug = require("debug");
 

@@ -5,7 +5,7 @@ const SecuredData = require("asset/securedDataWithMetaData");
 import * as Bluebird from "bluebird"
 const debug = require("debug");
 
-const userService = require("user/userService");
+const userService = require("users/userService");
 import socket from "../services/socket.service"
 import ObjectLoader from "../services/cachedObjectLoader"
 const keyStore = require("services/keyStore.service").default;

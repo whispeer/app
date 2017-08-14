@@ -75,7 +75,7 @@ function makeUser(data) {
 		return new NotExistingUser();
 	}
 
-	var User = require("models/user");
+	var User = require("users/user").default
 	var theUser = new User(data);
 
 	var id = theUser.getID();

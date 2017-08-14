@@ -3,7 +3,7 @@ const errors = require("../asset/errors.js");
 
 import keyStore from "./keyStore.service";
 
-var userService = require("user/userService");
+var userService = require("users/userService");
 const circleService = require("circles/circleService");
 
 var localize = require("i18n/localizationConfig");

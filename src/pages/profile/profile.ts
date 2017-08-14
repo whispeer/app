@@ -4,7 +4,7 @@ import sessionService from '../../lib/services/session.service';
 import reportService from "../../lib/services/reportService";
 import * as Bluebird from 'bluebird';
 
-const userService = require("user/userService")
+const userService = require("users/userService")
 const friendsService = require("services/friendsService")
 import blobService from "../../lib/services/blobService"
 import ImageUpload from "../../lib/services/imageUpload.service"

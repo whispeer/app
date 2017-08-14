@@ -4,18 +4,18 @@ const SecuredData = require("asset/securedDataWithMetaData")
 
 import Observer from '../asset/observer';
 
-interface ProfileServiceOptions {
+interface ProfileOptions {
 	isPublicProfile?: boolean,
 	isDecrypted?: boolean
 }
 
-export default class ProfileService extends Observer {
+export default class Profile extends Observer {
 	private securedData: any;
 	private isPublicProfile: boolean;
 	private isDecrypted: boolean;
 	private id: String | number;
 
-	constructor(data: any, options?: ProfileServiceOptions) {
+	constructor(data: any, options?: ProfileOptions) {
 		super();
 
 		options = options || {};

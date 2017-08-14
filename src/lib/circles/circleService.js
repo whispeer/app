@@ -11,7 +11,7 @@ var socket = require("services/socket.service").default;
 var keyStore = require("services/keyStore.service").default;
 var initService = require("services/initService");
 
-var userService = require("user/userService");
+var userService = require("users/userService");
 var settingsService = require("services/settings.service").default;
 
 var friendsService = require("services/friendsService");

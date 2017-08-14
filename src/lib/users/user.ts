@@ -11,7 +11,7 @@ const keyStoreService = require("crypto/keyStore")
 
 import sessionService from "../services/session.service"
 import blobService from "../services/blobService"
-import ProfileService from "../services/profile.service"
+import Profile from "../users/profile"
 import trustService from "../services/trust.service"
 import settingsService from "../services/settings.service"
 import filterService from "../services/filter.service"
@@ -150,7 +150,7 @@ function User (providedData) {
 		if (!isMe) {
 			if (userData.profile.pub) {
 				userData.profile.pub.profileid = userData.profile.pub.profileid || id
-				publicProfile = new ProfileService(userData.profile.pub, { isPublicProfile: true })
+				publicProfile = new Profile(userData.profile.pub, { isPublicProfile: true })
 			}
 
 			privateProfiles = []
@@ -159,11 +159,11 @@ function User (providedData) {
 				var priv = userData.profile.priv
 
 				privateProfiles = priv.map(function (profile) {
-					return new ProfileService(profile)
+					return new Profile(profile)
 				})
 			}
 		} else {
-			myProfile = new ProfileService(userData.profile.me)
+			myProfile = new Profile(userData.profile.me)
 		}
 
 		theUser.data = {
@@ -273,7 +273,7 @@ function User (providedData) {
 
 		var profiles = privateProfiles.concat([publicProfile])
 
-		return Bluebird.resolve(profiles).map(function (profile: ProfileService) {
+		return Bluebird.resolve(profiles).map(function (profile: Profile) {
 			return profile.getAttribute(attribute)
 		}).filter(function (value) {
 			return typeof value !== "undefined" && value !== ""
@@ -319,11 +319,11 @@ function User (providedData) {
 				key: keys.slice(0, keys.length - 1)
 			})
 
-			var pub = new ProfileService({ content: applicablePublicParts(privacySettings, profile) }, { isPublicProfile: true })
+			var pub = new Profile({ content: applicablePublicParts(privacySettings, profile) }, { isPublicProfile: true })
 			var pubPromise = pub.sign(theUser.getSignKey())
 
 			var privatePromises = scopeData.map(function (scope) {
-				var newProfile = new ProfileService({
+				var newProfile = new Profile({
 					content: applicableParts(scope.name, privacySettings, profile)
 				}, { isDecrypted: true })
 
@@ -760,4 +760,4 @@ function User (providedData) {
 	}
 }
 
-module.exports = User
+export default User
