@@ -209,7 +209,7 @@ export class Chunk extends Observer {
 	}
 
 	amIAdmin = () => {
-		return this.isAdmin(userService.getown())
+		return this.isAdmin(userService.getOwn())
 	}
 
 	getCreator = () => {
@@ -303,7 +303,7 @@ export class Chunk extends Observer {
 
 	private static createChunkKey = () => {
 		return keyStore.sym.generateKey(null, "chunkMain").then((chunkKey) => {
-			return keyStore.sym.symEncryptKey(chunkKey, userService.getown().getMainKey()).thenReturn(chunkKey)
+			return keyStore.sym.symEncryptKey(chunkKey, userService.getOwn().getMainKey()).thenReturn(chunkKey)
 		})
 	}
 
@@ -360,7 +360,7 @@ export class Chunk extends Observer {
 				...meta,
 				createTime: new Date().getTime(),
 				receiver: receiverIDs,
-				creator: userService.getown().getID(),
+				creator: userService.getOwn().getID(),
 			}
 
 			const secured = SecuredData.createRaw(content, chunkMeta, { type: "topic" })
@@ -369,7 +369,7 @@ export class Chunk extends Observer {
 				secured.setParent(predecessorChunk.getSecuredData())
 			}
 
-			const cData = await secured.signAndEncrypt(userService.getown().getSignKey(), chunkKey)
+			const cData = await secured.signAndEncrypt(userService.getOwn().getSignKey(), chunkKey)
 
 			return Object.assign({
 				chunk: cData,

@@ -246,7 +246,7 @@ userService = {
 	},
 
 	/** get own user. synchronous */
-	getown: function getownF() {
+	getOwn: function () {
 		return users[sessionService.getUserID()];
 	}
 };
@@ -259,7 +259,7 @@ function improvementListener(identifier) {
 
 		if (improve.length === 1) {
 			Bluebird.resolve().timeout(5000).then(function () {
-				var own = userService.getown();
+				var own = userService.getOwn();
 				if (!own || own.getNickOrMail() !== identifier) {
 					throw new Error("user changed so no improvement update!");
 				}

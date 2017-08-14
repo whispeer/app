@@ -14,7 +14,7 @@ class FilterService {
 	alwaysFilterToKey(filter: any) {
 		switch (filter) {
 			case "allfriends":
-				return userService.getown().getFriendsKey();
+				return userService.getOwn().getFriendsKey();
 			case "everyone":
 				//we do not encrypt it anyhow .... this needs to be checked in before!
 				throw new Error("should never be here");
@@ -66,7 +66,7 @@ class FilterService {
 				}
 			});
 
-			filterPromises.push(userService.getown().getMainKey());
+			filterPromises.push(userService.getOwn().getMainKey());
 
 			return Bluebird.all(filterPromises);
 		}).nodeify(cb);
@@ -99,7 +99,7 @@ class FilterService {
 			throw new Error("Invalid Always id");
 		}
 
-		var key = userService.getown().getFriendsKey();
+		var key = userService.getOwn().getFriendsKey();
 
 		return {
 			name: localize.getLocalizedString("directives.allfriends"),

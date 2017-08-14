@@ -144,7 +144,7 @@ class SettingsService extends Observer {
 
 			data.meta.initialLanguage = h.getLanguageFromPath();
 
-			var ownUser = require("user/userService").getown();
+			var ownUser = require("user/userService").getOwn();
 
 			return SecuredData.createAsync(data.content,
 				data.meta,
@@ -238,7 +238,7 @@ class SettingsService extends Observer {
 
 	decrypt = (cb: Function) => {
 		return Bluebird.try(() => {
-			var ownUser = require("user/userService").getown();
+			var ownUser = require("user/userService").getOwn();
 
 			return Bluebird.all([
 				this.settings.decrypt(),
@@ -289,7 +289,7 @@ class SettingsService extends Observer {
 				}
 
 				var userService = require("user/userService");
-				return userService.getown().uploadChangedProfile();
+				return userService.getOwn().uploadChangedProfile();
 			}).nodeify(cb);
 		},
 
@@ -317,7 +317,7 @@ class SettingsService extends Observer {
 		var userService = require("user/userService");
 
 		return this.settings.getUpdatedData(
-				userService.getown().getSignKey()
+				userService.getOwn().getSignKey()
 			).then((newEncryptedSettings: any) => {
 				newEncryptedSettings.server = this.serverSettings;
 
