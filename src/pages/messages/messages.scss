@@ -345,6 +345,10 @@ topicWithBursts {
 
 		background: $message-bubble-color;
 		color: #fff;
+
+		&.message__file{
+			margin-left: 20px;
+		}
 	}
 
 	.messages__wrap:last-child {
@@ -401,6 +405,10 @@ topicWithBursts {
 		color: map-get($colors, dark);
 
 		margin: auto 10px 1px 5px;
+
+		&.message__file{
+			margin-right: 20px;
+		}
 	}
 	.messages__time {
 		margin: auto auto auto 0;
