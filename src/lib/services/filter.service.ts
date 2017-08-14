@@ -47,7 +47,7 @@ class FilterService {
 		});
 	}
 
-	public filterToKeys(filters: any, cb: any) {
+	public filterToKeys(filters: any, cb?: any) {
 		return Bluebird.try(() => {
 			var filterPromises = filters.map((filter: any) => {
 				var map = filter.split(":");

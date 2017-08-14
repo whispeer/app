@@ -1,3 +1,7 @@
+declare global {
+	interface Window { device: any; }
+}
+
 require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");

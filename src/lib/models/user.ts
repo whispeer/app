@@ -1,22 +1,24 @@
-var errorService = require("services/error.service").default
-var keyStoreService = require("crypto/keyStore")
-var socketService = require("services/socket.service").default
+import errorService from "../services/error.service"
+import socketService from "../services/socket.service"
 
-var h = require("../helper/helper").default
-var State = require("asset/state")
-var SecuredData = require("asset/securedDataWithMetaData")
-var Bluebird = require("bluebird")
+import h from "../helper/helper"
+import * as Bluebird from "bluebird"
 
-var sessionService = require("services/session.service").default
-var initService = require("services/initService")
-var blobService = require("services/blobService").default
-var ProfileService = require("services/profile.service").default
-var trustService = require("services/trust.service").default
-var settingsService = require("services/settings.service").default
-var friendsService = require("services/friendsService")
-var filterService = require("services/filter.service").default
+const initService = require("services/initService")
+const State = require("asset/state")
+const SecuredData = require("asset/securedDataWithMetaData")
+const keyStoreService = require("crypto/keyStore")
 
-var advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"]
+import sessionService from "../services/session.service"
+import blobService from "../services/blobService"
+import ProfileService from "../services/profile.service"
+import trustService from "../services/trust.service"
+import settingsService from "../services/settings.service"
+import filterService from "../services/filter.service"
+
+const friendsService = require("services/friendsService")
+
+const advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"]
 
 function applicableParts(scope, privacy, profile) {
 	var result = {}
@@ -271,7 +273,7 @@ function User (providedData) {
 
 		var profiles = privateProfiles.concat([publicProfile])
 
-		return Bluebird.resolve(profiles).map(function (profile) {
+		return Bluebird.resolve(profiles).map(function (profile: ProfileService) {
 			return profile.getAttribute(attribute)
 		}).filter(function (value) {
 			return typeof value !== "undefined" && value !== ""
@@ -311,7 +313,7 @@ function User (providedData) {
 				filterToKeysPromise,
 				myProfile.getFull()
 			])
-		}).spread(function (keys, profile) {
+		}).spread(function (keys: any, profile: any) {
 			var scopeData = h.joinArraysToObject({
 				name: scopes,
 				key: keys.slice(0, keys.length - 1)
@@ -358,7 +360,7 @@ function User (providedData) {
 				theUser.rebuildProfiles(),
 				myProfile.getUpdatedData(theUser.getSignKey())
 			])
-		}).spread(function (profileData, myProfile) {
+		}).spread(function (profileData, myProfile: any) {
 			profileData.me = myProfile
 
 			return socketService.emit("user.profile.update", profileData)
@@ -388,7 +390,7 @@ function User (providedData) {
 	}
 
 	this.setAdvancedProfile = function (advancedProfile, cb) {
-		return Bluebird.resolve(advancedBranches).map(function (branch) {
+		return Bluebird.resolve(advancedBranches).map(function (branch: string) {
 			return myProfile.setAttribute(branch, advancedProfile[branch])
 		}).nodeify(cb)
 	}
@@ -561,11 +563,6 @@ function User (providedData) {
 		}).catch((e) => errorService.criticalError(e))
 	}
 
-	this.reLoadBasicData = function (cb) {
-		loadBasicDataPromise = null
-		this.loadBasicData(cb)
-	}
-
 	this.loadBasicData = function (cb) {
 		if (!loadBasicDataPromise) {
 			loadBasicDataPromise = Bluebird.try(function () {
@@ -575,7 +572,7 @@ function User (providedData) {
 					theUser.getTrustLevel(),
 					theUser.verify()
 				])
-			}).spread(function (shortname, names, trustLevel, signatureValid) {
+			}).spread(function (shortname, names: any, trustLevel, signatureValid) {
 				theUser.data.signatureValid = signatureValid
 
 				theUser.data.me = theUser.isOwn()

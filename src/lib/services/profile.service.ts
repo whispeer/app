@@ -15,7 +15,7 @@ export default class ProfileService extends Observer {
 	private isDecrypted: boolean;
 	private id: String | number;
 
-	constructor(data: any, options: ProfileServiceOptions) {
+	constructor(data: any, options?: ProfileServiceOptions) {
 		super();
 
 		options = options || {};
@@ -65,7 +65,7 @@ export default class ProfileService extends Observer {
 		return this.isPublicProfile ? "public-" + this.id : "private-" + this.id;
 	};
 
-	getUpdatedData = (signKey: string, cb?: Function) => {
+	getUpdatedData = (signKey: string) => {
 		//pad updated profile
 		//merge paddedProfile and updatedPaddedProfile
 		//sign/hash merge
@@ -77,7 +77,7 @@ export default class ProfileService extends Observer {
 			} else {
 				return this.securedData.getUpdatedData(signKey);
 			}
-		}).nodeify(cb);
+		})
 	};
 
 	sign = (signKey: string, cb?: Function) => {
@@ -99,12 +99,12 @@ export default class ProfileService extends Observer {
 		}).nodeify(cb);
 	};
 
-	signAndEncrypt = (signKey: string, cryptKey: string, cb?: Function) => {
+	signAndEncrypt = (signKey: string, cryptKey: string) => {
 		if (this.isPublicProfile) {
 			throw new Error("no encrypt for public profiles!");
 		}
 
-		return this.securedData._signAndEncrypt(signKey, cryptKey).nodeify(cb);
+		return this.securedData._signAndEncrypt(signKey, cryptKey)
 	};
 
 	updated = () => {
