@@ -17,6 +17,8 @@ var sessionService = require("services/session.service").default;
 
 var userService, knownIDs = [], users = {}, ownUserStatus = {};
 
+const Profile = require("../users/profile").default
+
 var promises = ["verifyOwnKeysDone", "verifyOwnKeysCacheDone", "loadedCache", "loaded"];
 
 promises.forEach(function (promiseName) {
@@ -66,6 +68,31 @@ var NotExistingUser = function (identifier) {
 	};
 };
 
+const getProfiles = (userData, isMe) => {
+	const profiles = {}
+
+	if (!isMe) {
+		if (userData.profile.pub) {
+			userData.profile.pub.profileid = userData.profile.pub.profileid || userData.id
+			profiles.public = new Profile(userData.profile.pub, { isPublicProfile: true })
+		}
+
+		profiles.private = []
+
+		if (userData.profile.priv && userData.profile.priv instanceof Array) {
+			var priv = userData.profile.priv
+
+			profiles.private = priv.map((profile) => {
+				return new Profile(profile)
+			})
+		}
+	} else {
+		profiles.me = new Profile(userData.profile.me)
+	}
+
+	return profiles
+}
+
 function makeUser(data) {
 	if (data.userNotExisting) {
 		return new NotExistingUser(data.identifier);
@@ -76,14 +103,23 @@ function makeUser(data) {
 	}
 
 	var User = require("users/user").default
-	var theUser = new User(data);
+
+	// decrypt / verify profiles
+	// verify signed keys
+
+	const isMe = sessionService.isOwnUserID(data.id)
+	const profiles = getProfiles(data, isMe)
+
+	console.warn(data)
+
+	var theUser = new User(data, profiles);
 
 	var id = theUser.getID();
 	var mail = theUser.getMail();
 	var nickname = theUser.getNickname();
 
 	if (users[id]) {
-		users[id].update(data);
+		users[id].update(data, profiles);
 		return users[id];
 	}
 
@@ -143,25 +179,20 @@ function loadUser(identifier, cb) {
 
 userService = {
 	/** search your friends */
-	queryFriends: function queryFriendsF(query, cb) {
+	queryFriends: function (query, cb) {
 		return Bluebird.try(function () {
 			return socketService.emit("user.searchFriends", {
 				text: query,
 				known: knownIDs
 			});
-		}).then(function (data) {
-			var result = [], user = data.results;
-
-			var i;
-			for (i = 0; i < user.length; i += 1) {
-				if (typeof user[i] === "object") {
-					result.push(makeUser(user[i]));
-				} else {
-					result.push(users[user[i]]);
-				}
+		}).then((data) => {
+			return data.results
+		}).map((user) => {
+			if (typeof user === "object") {
+				return makeUser(user)
+			} else {
+				return users[user]
 			}
-
-			return result;
 		}).nodeify(cb);
 	},
 
@@ -169,28 +200,21 @@ userService = {
 	* @param query query string to search for
 	* @param cb user objects
 	*/
-	query: function queryF(query, cb) {
+	query: function (query, cb) {
 		return initService.awaitLoading().then(function () {
 			return socketService.definitlyEmit("user.search", {
 				text: query,
 				known: knownIDs
 			});
-		}).then(function (data) {
-			var result = [], user = data.results;
-
-			if (user) {
-				var i;
-				for (i = 0; i < user.length; i += 1) {
-					if (typeof user[i] === "object") {
-						result.push(makeUser(user[i]));
-					} else {
-						result.push(users[user[i]]);
-					}
-				}
+		}).then((data) => {
+			return data.results
+		}).map((user) => {
+			if (typeof user === "object") {
+				return makeUser(user)
+			} else {
+				return users[user]
 			}
-
-			return result;
-		}).nodeify(cb);
+		}).nodeify(cb)
 	},
 
 	/** load a user
@@ -280,25 +304,6 @@ function improvementListener(identifier) {
 }
 
 Observer.extend(userService);
-
-/*function getInfoFromCacheEntry(userData) {
-	var profile = userData.profile;
-
-	var profileIDs = [];
-
-	if (profile.priv) {
-		profileIDs = profile.priv.map(function (profile) {
-			return profile.profileid;
-		});
-	}
-
-	profileIDs.push(profile.me.profileid);
-
-	return {
-		profiles: profileIDs,
-		signedKeys: userData.signedKeys._signature
-	};
-}*/
 
 function loadOwnUser(data, server) {
 	return Bluebird.try(function () {

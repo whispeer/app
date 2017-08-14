@@ -26,7 +26,7 @@ export class SessionService extends Observer {
 
 	setLoginData = (_sid: string, _userid: any) => {
 		this.sid = _sid;
-		this.userid = _userid;
+		this.userid = parseInt(_userid, 10)
 		this.loggedin = true;
 
 		setTimeout(() => {
@@ -57,10 +57,9 @@ export class SessionService extends Observer {
 		return this.sid;
 	}
 
-	getUserID = () => {
-		// parseFloat is slightly faster than parseInt
-		return parseFloat(this.userid);
-	}
+	getUserID = () => this.userid
+
+	isOwnUserID = (id) => parseInt(id, 10) === this.userid
 
 	clear = () => {
 		return Bluebird.all([

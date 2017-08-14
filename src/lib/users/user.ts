@@ -107,9 +107,15 @@ class User {
 	private id
 	private mail
 	private nickname
-	private publicProfile
-	private privateProfiles = []
-	private myProfile
+	private profiles : {
+		private: Profile[],
+		me: Profile,
+		public: Profile
+	} = {
+		private: [],
+		me: null,
+		public: null,
+	}
 	private mutualFriends
 
 	private addFriendState = new State()
@@ -119,35 +125,18 @@ class User {
 
 	data: any = {}
 
-	constructor (providedData) {
-		this.update(providedData)
-	}
-
-	update = (userData) => {
-		if (this.id && h.parseDecimal(userData.id) !== h.parseDecimal(this.id)) {
-			throw new Error("user update invalid")
-		}
-
-		this.mutualFriends = userData.mutualFriends
-
+	constructor (userData, profiles) {
 		this.id = h.parseDecimal(userData.id)
-		this.mail = userData.mail
-		this.nickname = userData.nickname
-
-		var isMe = (this.id === sessionService.getUserID())
-
-		this.migrationState = userData.migrationState || 0
+		this.mainKey = userData.mainKey
 
 		this.signedKeys = SecuredData.load(undefined, userData.signedKeys, { type: "signedKeys" })
 		this.signedOwnKeys = userData.signedOwnKeys
 
-		if (!this.mainKey && userData.mainKey) {
-			this.mainKey = userData.mainKey
-		}
-
 		//all keys we get from the signedKeys object:
 		this.signKey = this.signedKeys.metaAttr("sign")
 		this.cryptKey = this.signedKeys.metaAttr("crypt")
+
+		const isMe = (this.id === sessionService.getUserID())
 
 		if (isMe) {
 			this.friendsKey = this.signedKeys.metaAttr("friends")
@@ -165,24 +154,22 @@ class User {
 			})
 		}
 
-		if (!isMe) {
-			if (userData.profile.pub) {
-				userData.profile.pub.profileid = userData.profile.pub.profileid || this.id
-				this.publicProfile = new Profile(userData.profile.pub, { isPublicProfile: true })
-			}
+		this.update(userData, profiles)
+	}
 
-			this.privateProfiles = []
-
-			if (userData.profile.priv && userData.profile.priv instanceof Array) {
-				var priv = userData.profile.priv
-
-				this.privateProfiles = priv.map((profile) => {
-					return new Profile(profile)
-				})
-			}
-		} else {
-			this.myProfile = new Profile(userData.profile.me)
+	update = (userData, profiles) => {
+		if (this.id && h.parseDecimal(userData.id) !== h.parseDecimal(this.id)) {
+			throw new Error("user update invalid")
 		}
+
+		this.mutualFriends = userData.mutualFriends
+
+		this.mail = userData.mail
+		this.nickname = userData.nickname
+
+		this.migrationState = userData.migrationState || 0
+
+		this.profiles = profiles
 
 		this.data = {
 			notExisting: false,
@@ -225,8 +212,6 @@ class User {
 			}
 		}
 	}
-
-	// updateUser(providedData)
 
 	generateNewFriendsKey = () => {
 		var newFriendsKey
@@ -285,11 +270,11 @@ class User {
 	* @param cb
 	*/
 	getProfileAttribute = (attribute) => {
-		if (this.myProfile) {
-			return this.myProfile.getAttribute(attribute)
+		if (this.profiles.me) {
+			return this.profiles.me.getAttribute(attribute)
 		}
 
-		var profiles = this.privateProfiles.concat([this.publicProfile])
+		var profiles = this.profiles.private.concat([this.profiles.public])
 
 		return Bluebird.resolve(profiles).map((profile: Profile) => {
 			return profile.getAttribute(attribute)
@@ -327,7 +312,7 @@ class User {
 
 			return Bluebird.all([
 				filterToKeysPromise,
-				this.myProfile.getFull()
+				this.profiles.me.getFull()
 			])
 		}).spread((keys: any, profile: any) => {
 			var scopeData = h.joinArraysToObject({
@@ -374,14 +359,14 @@ class User {
 		return Bluebird.try(() => {
 			return Bluebird.all([
 				this.rebuildProfiles(),
-				this.myProfile.getUpdatedData(this.getSignKey())
+				this.profiles.me.getUpdatedData(this.getSignKey())
 			])
 		}).spread((profileData, myProfile: any) => {
 			profileData.me = myProfile
 
 			return socketService.emit("user.profile.update", profileData)
 		}).then(() => {
-			this.myProfile.updated()
+			this.profiles.me.updated()
 
 			this.loadBasicDataPromise = null
 			return this.loadFullData()
@@ -394,11 +379,11 @@ class User {
 	* @param cb
 	*/
 	setProfileAttribute = (attribute, value) => {
-		return this.myProfile.setAttribute(attribute, value)
+		return this.profiles.me.setAttribute(attribute, value)
 	}
 
-	removeProfileAttribute = (attribute, value) => {
-		return this.myProfile.removeAttribute(attribute, value)
+	removeProfileAttribute = (attribute) => {
+		return this.profiles.me.removeAttribute(attribute)
 	}
 
 	getFingerPrint = () => {
@@ -407,7 +392,7 @@ class User {
 
 	setAdvancedProfile = (advancedProfile, cb) => {
 		return Bluebird.resolve(advancedBranches).map((branch: string) => {
-			return this.myProfile.setAttribute(branch, advancedProfile[branch])
+			return this.profiles.me.setAttribute(branch, advancedProfile[branch])
 		}).nodeify(cb)
 	}
 
@@ -443,14 +428,14 @@ class User {
 			promises.push(this.verifyKeys())
 
 			if (this.isOwn()) {
-				promises.push(this.myProfile.verify(this.signKey))
+				promises.push(this.profiles.me.verify(this.signKey))
 			} else {
-				promises = promises.concat(this.privateProfiles.map((priv) => {
+				promises = promises.concat(this.profiles.private.map((priv) => {
 					return priv.verify(this.signKey)
 				}))
 
-				if (this.publicProfile) {
-					promises.push(this.publicProfile.verify(this.signKey))
+				if (this.profiles.public) {
+					promises.push(this.profiles.public.verify(this.signKey))
 				}
 			}
 
@@ -537,7 +522,7 @@ class User {
 			])
 		}).spread((signedOwnKeys, salt, decryptor) => {
 			return socketService.emit("user.changePassword", {
-				signedOwnKeys: signedOwnKeys,
+				signedOwnKeys,
 				password: {
 					salt: salt,
 					hash: keyStoreService.hash.hashPW(newPassword, salt),
