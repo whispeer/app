@@ -30,16 +30,18 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 		cache.get(id)
 			.then((cacheResponse) => cacheResponse.data)
 			.then(restore)
-			.then((instance) => cacheInMemory(id, instance))
-			.then(() => considerLoaded(id))
+			.then((instance) => {
+				cacheInMemory(id, instance)
+				considerLoaded(id)
+				return instance
+			})
 
-	const serverResponseToInstance = (response, id) => {
-		return load(response)
+	const serverResponseToInstance = (response, id) =>
+		load(response)
 			.then((cacheableData) => cache.store(id, cacheableData).thenReturn(cacheableData))
 			.then(restore)
 			.then((instance) => cacheInMemory(id, instance))
 			.finally(() => considerLoaded(id))
-	}
 
 	return class ObjectLoader {
 		static getLoaded(id): ObjectType {
