@@ -5,7 +5,7 @@ import h from "../helper/helper"
 import * as Bluebird from "bluebird"
 
 const initService = require("services/initService")
-const State = require("asset/state")
+import State from "../asset/state"
 const SecuredData = require("asset/securedDataWithMetaData")
 const keyStoreService = require("crypto/keyStore")
 
@@ -27,7 +27,7 @@ function applicableParts(scope, privacy, profile) {
 		throw new Error("dafuq")
 	}
 
-	h.objectEach(privacy, function (key, val) {
+	h.objectEach(privacy, (key, val) => {
 		if (profile[key]) {
 			if (typeof val.encrypt !== "undefined") {
 				if (!val.encrypt || val.visibility.indexOf(scope) > -1) {
@@ -49,7 +49,7 @@ function applicablePublicParts(privacy, profile) {
 		throw new Error("dafuq")
 	}
 
-	h.objectEach(privacy, function (key, value) {
+	h.objectEach(privacy, (key, value) => {
 		if (profile[key]) {
 			if (typeof value.encrypt !== "undefined") {
 				if (!value.encrypt) {
@@ -66,7 +66,7 @@ function applicablePublicParts(privacy, profile) {
 
 function getAllProfileTypes(privacySettings) {
 	var profileTypes = []
-	advancedBranches.forEach(function (branch) {
+	advancedBranches.forEach((branch) => {
 		if (privacySettings[branch].encrypt) {
 			profileTypes = profileTypes.concat(privacySettings[branch].visibility)
 		}
@@ -84,8 +84,8 @@ function getAllProfileTypes(privacySettings) {
 }
 
 function deleteCache() {
-	return Bluebird.try(function () {
-		return new Bluebird(function (resolve) {
+	return Bluebird.try(() => {
+		return new Bluebird((resolve) => {
 			var deleteRequest = indexedDB.deleteDatabase("whispeerCache")
 
 			deleteRequest.onerror = resolve
@@ -94,89 +94,107 @@ function deleteCache() {
 	})
 }
 
-function User (providedData) {
-	var theUser = this, mainKey, signKey, cryptKey, friendShipKey, friendsKey, migrationState, signedKeys, signedOwnKeys
-	var id, mail, nickname, publicProfile, privateProfiles = [], myProfile, mutualFriends
+class User {
+	private mainKey
+	private signKey
+	private cryptKey
+	private friendShipKey
+	private friendsKey
+	private migrationState
+	private signedKeys
+	private signedOwnKeys
 
-	var addFriendState = new State.default()
-	var ignoreFriendState = new State.default()
+	private id
+	private mail
+	private nickname
+	private publicProfile
+	private privateProfiles = []
+	private myProfile
+	private mutualFriends
 
-	var loadBasicDataPromise
+	private addFriendState = new State()
+	private ignoreFriendState = new State()
 
-	this.data = {}
+	private loadBasicDataPromise
 
-	function updateUser(userData) {
-		if (id && h.parseDecimal(userData.id) !== h.parseDecimal(id)) {
+	data: any = {}
+
+	constructor (providedData) {
+		this.update(providedData)
+	}
+
+	update = (userData) => {
+		if (this.id && h.parseDecimal(userData.id) !== h.parseDecimal(this.id)) {
 			throw new Error("user update invalid")
 		}
 
-		mutualFriends = userData.mutualFriends
+		this.mutualFriends = userData.mutualFriends
 
-		id = h.parseDecimal(userData.id)
-		mail = userData.mail
-		nickname = userData.nickname
+		this.id = h.parseDecimal(userData.id)
+		this.mail = userData.mail
+		this.nickname = userData.nickname
 
-		var isMe = (id === sessionService.getUserID())
+		var isMe = (this.id === sessionService.getUserID())
 
-		migrationState = userData.migrationState || 0
+		this.migrationState = userData.migrationState || 0
 
-		signedKeys = SecuredData.load(undefined, userData.signedKeys, { type: "signedKeys" })
-		signedOwnKeys = userData.signedOwnKeys
+		this.signedKeys = SecuredData.load(undefined, userData.signedKeys, { type: "signedKeys" })
+		this.signedOwnKeys = userData.signedOwnKeys
 
-		if (!mainKey && userData.mainKey) {
-			mainKey = userData.mainKey
+		if (!this.mainKey && userData.mainKey) {
+			this.mainKey = userData.mainKey
 		}
 
 		//all keys we get from the signedKeys object:
-		signKey = signedKeys.metaAttr("sign")
-		cryptKey = signedKeys.metaAttr("crypt")
+		this.signKey = this.signedKeys.metaAttr("sign")
+		this.cryptKey = this.signedKeys.metaAttr("crypt")
 
 		if (isMe) {
-			friendsKey = signedKeys.metaAttr("friends")
+			this.friendsKey = this.signedKeys.metaAttr("friends")
 		}
 
 		if (!isMe) {
-			friendsService.awaitLoading().then(function () {
-				if (friendsService.didOtherRequest(id)) {
-					friendsKey = signedKeys.metaAttr("friends")
+			friendsService.awaitLoading().then(() => {
+				if (friendsService.didOtherRequest(this.id)) {
+					this.friendsKey = this.signedKeys.metaAttr("friends")
 				}
 
-				if (friendsService.didIRequest(id)) {
-					friendShipKey = friendsService.getUserFriendShipKey(id)
+				if (friendsService.didIRequest(this.id)) {
+					this.friendShipKey = friendsService.getUserFriendShipKey(this.id)
 				}
 			})
 		}
 
 		if (!isMe) {
 			if (userData.profile.pub) {
-				userData.profile.pub.profileid = userData.profile.pub.profileid || id
-				publicProfile = new Profile(userData.profile.pub, { isPublicProfile: true })
+				userData.profile.pub.profileid = userData.profile.pub.profileid || this.id
+				this.publicProfile = new Profile(userData.profile.pub, { isPublicProfile: true })
 			}
 
-			privateProfiles = []
+			this.privateProfiles = []
 
 			if (userData.profile.priv && userData.profile.priv instanceof Array) {
 				var priv = userData.profile.priv
 
-				privateProfiles = priv.map(function (profile) {
+				this.privateProfiles = priv.map((profile) => {
 					return new Profile(profile)
 				})
 			}
 		} else {
-			myProfile = new Profile(userData.profile.me)
+			this.myProfile = new Profile(userData.profile.me)
 		}
 
-		theUser.data = {
+		this.data = {
 			notExisting: false,
-			user: theUser,
-			id: id,
+			user: this,
+			id: this.id,
 			trustLevel: 0,
-			fingerprint: keyStoreService.format.fingerPrint(signKey),
+			fingerprint: keyStoreService.format.fingerPrint(this.signKey),
 			basic: {
 				age: "?",
 				location: "?",
-				mutualFriends: mutualFriends,
-				url: "user/" + nickname,
+				mutualFriends: this.mutualFriends,
+				url: "user/" + this.nickname,
 				image: "assets/img/user.png"
 			},
 			advanced: {
@@ -208,40 +226,40 @@ function User (providedData) {
 		}
 	}
 
-	updateUser(providedData)
+	// updateUser(providedData)
 
-	this.generateNewFriendsKey = function () {
+	generateNewFriendsKey = () => {
 		var newFriendsKey
-		return Bluebird.try(function () {
-			if (!theUser.isOwn()) {
+		return Bluebird.try(() => {
+			if (!this.isOwn()) {
 				throw new Error("not my own user")
 			}
 
 			//generate new key
 			return keyStoreService.sym.generateKey(null, "friends")
-		}).then(function (_newFriendsKey) {
+		}).then((_newFriendsKey) => {
 			newFriendsKey = _newFriendsKey
 
 			//encrypt with all friendShipKeys
 			var keys = friendsService.getAllFriendShipKeys()
 
-			var keysPromises = keys.map(function (key) {
+			var keysPromises = keys.map((key) => {
 				return keyStoreService.sym.symEncryptKey(newFriendsKey, key)
 			})
 
 			return Bluebird.all([
 				Bluebird.all(keysPromises),
-				keyStoreService.sym.symEncryptKey(newFriendsKey, mainKey),
+				keyStoreService.sym.symEncryptKey(newFriendsKey, this.mainKey),
 
 				//encrypt old friends key with new friends key
-				keyStoreService.sym.symEncryptKey(friendsKey, newFriendsKey),
+				keyStoreService.sym.symEncryptKey(this.friendsKey, newFriendsKey),
 			])
-		}).then(function () {
+		}).then(() => {
 			//update signedKeys
-			signedKeys.metaSetAttr("friends", newFriendsKey)
-			return signedKeys.getUpdatedData(signKey)
-		}).then(function (updatedSignedKeys) {
-			friendsKey = newFriendsKey
+			this.signedKeys.metaSetAttr("friends", newFriendsKey)
+			return this.signedKeys.getUpdatedData(this.signKey)
+		}).then((updatedSignedKeys) => {
+			this.friendsKey = newFriendsKey
 			return {
 				updatedSignedKeys: updatedSignedKeys,
 				newFriendsKey: newFriendsKey
@@ -249,9 +267,9 @@ function User (providedData) {
 		})
 	}
 
-	this.setFriendShipKey = function (key) {
-		if (!friendShipKey) {
-			friendShipKey = key
+	setFriendShipKey = (key) => {
+		if (!this.friendShipKey) {
+			this.friendShipKey = key
 		}
 	}
 
@@ -266,23 +284,23 @@ function User (providedData) {
 	* @param attribute attribute to set
 	* @param cb
 	*/
-	function getProfileAttribute(attribute) {
-		if (myProfile) {
-			return myProfile.getAttribute(attribute)
+	getProfileAttribute = (attribute) => {
+		if (this.myProfile) {
+			return this.myProfile.getAttribute(attribute)
 		}
 
-		var profiles = privateProfiles.concat([publicProfile])
+		var profiles = this.privateProfiles.concat([this.publicProfile])
 
-		return Bluebird.resolve(profiles).map(function (profile: Profile) {
+		return Bluebird.resolve(profiles).map((profile: Profile) => {
 			return profile.getAttribute(attribute)
-		}).filter(function (value) {
+		}).filter((value) => {
 			return typeof value !== "undefined" && value !== ""
-		}).then(function (values) {
+		}).then((values) => {
 			if (values.length === 0) {
 				return ""
 			}
 
-			values.sort(function (val1, val2) {
+			values.sort((val1, val2) => {
 				if (typeof val1 === "object" && typeof val2 === "object") {
 					return Object.keys(val2).length - Object.keys(val1).length
 				}
@@ -294,13 +312,11 @@ function User (providedData) {
 		})
 	}
 
-	this.getProfileAttribute = getProfileAttribute
-
 	/** uses the me profile to generate new profiles */
-	this.rebuildProfiles = function () {
+	rebuildProfiles = () => {
 		var scopes, privacySettings
-		return Bluebird.try(function () {
-			if (!theUser.isOwn()) {
+		return Bluebird.try(() => {
+			if (!this.isOwn()) {
 				throw new Error("update on another user failed")
 			}
 
@@ -311,30 +327,30 @@ function User (providedData) {
 
 			return Bluebird.all([
 				filterToKeysPromise,
-				myProfile.getFull()
+				this.myProfile.getFull()
 			])
-		}).spread(function (keys: any, profile: any) {
+		}).spread((keys: any, profile: any) => {
 			var scopeData = h.joinArraysToObject({
 				name: scopes,
 				key: keys.slice(0, keys.length - 1)
 			})
 
 			var pub = new Profile({ content: applicablePublicParts(privacySettings, profile) }, { isPublicProfile: true })
-			var pubPromise = pub.sign(theUser.getSignKey())
+			var pubPromise = pub.sign(this.getSignKey())
 
-			var privatePromises = scopeData.map(function (scope) {
+			var privatePromises = scopeData.map((scope) => {
 				var newProfile = new Profile({
 					content: applicableParts(scope.name, privacySettings, profile)
 				}, { isDecrypted: true })
 
-				return newProfile.signAndEncrypt(theUser.getSignKey(), scope.key)
+				return newProfile.signAndEncrypt(this.getSignKey(), scope.key)
 			})
 
 			return Bluebird.all([
 				pubPromise,
 				Bluebird.all(privatePromises)
 			])
-		}).spread(function (pub, profileData) {
+		}).spread((pub, profileData) => {
 			return {
 				pub: pub,
 				priv: profileData
@@ -343,32 +359,32 @@ function User (providedData) {
 
 	}
 
-	this.setMail = function (newMail, cb) {
-		if (newMail === mail) {
+	setMail = (newMail, cb) => {
+		if (newMail === this.mail) {
 			return Bluebird.resolve().nodeify(cb)
 		}
 
-		return socketService.emit("user.mailChange", { mail: newMail }).then(function () {
-			mail = newMail
+		return socketService.emit("user.mailChange", { mail: newMail }).then(() => {
+			this.mail = newMail
 		}).nodeify(cb)
 	}
 
 	/** uploads all profiles (also recreates them) */
-	this.uploadChangedProfile = function (cb) {
-		return Bluebird.try(function () {
+	uploadChangedProfile = (cb) => {
+		return Bluebird.try(() => {
 			return Bluebird.all([
-				theUser.rebuildProfiles(),
-				myProfile.getUpdatedData(theUser.getSignKey())
+				this.rebuildProfiles(),
+				this.myProfile.getUpdatedData(this.getSignKey())
 			])
-		}).spread(function (profileData, myProfile: any) {
+		}).spread((profileData, myProfile: any) => {
 			profileData.me = myProfile
 
 			return socketService.emit("user.profile.update", profileData)
-		}).then(function () {
-			myProfile.updated()
+		}).then(() => {
+			this.myProfile.updated()
 
-			loadBasicDataPromise = null
-			return theUser.loadFullData()
+			this.loadBasicDataPromise = null
+			return this.loadFullData()
 		}).nodeify(cb)
 	}
 
@@ -377,92 +393,90 @@ function User (providedData) {
 	* @param value value of the attribute
 	* @param cb
 	*/
-	this.setProfileAttribute = function (attribute, value) {
-		return myProfile.setAttribute(attribute, value)
+	setProfileAttribute = (attribute, value) => {
+		return this.myProfile.setAttribute(attribute, value)
 	}
 
-	this.removeProfileAttribute = function (attribute, value) {
-		return myProfile.removeAttribute(attribute, value)
+	removeProfileAttribute = (attribute, value) => {
+		return this.myProfile.removeAttribute(attribute, value)
 	}
 
-	this.getFingerPrint = function () {
-		return keyStoreService.format.fingerPrint(theUser.getSignKey())
+	getFingerPrint = () => {
+		return keyStoreService.format.fingerPrint(this.getSignKey())
 	}
 
-	this.setAdvancedProfile = function (advancedProfile, cb) {
-		return Bluebird.resolve(advancedBranches).map(function (branch: string) {
-			return myProfile.setAttribute(branch, advancedProfile[branch])
+	setAdvancedProfile = (advancedProfile, cb) => {
+		return Bluebird.resolve(advancedBranches).map((branch: string) => {
+			return this.myProfile.setAttribute(branch, advancedProfile[branch])
 		}).nodeify(cb)
 	}
 
 	/** end profile management */
 
-	this.verifyOwnKeys = function () {
-		keyStoreService.security.verifyWithPW(signedOwnKeys, {
-			main: theUser.getMainKey(),
-			sign: theUser.getSignKey()
+	verifyOwnKeys = () => {
+		keyStoreService.security.verifyWithPW(this.signedOwnKeys, {
+			main: this.getMainKey(),
+			sign: this.getSignKey()
 		})
 
-		keyStoreService.security.addEncryptionIdentifier(theUser.getMainKey())
-		keyStoreService.security.addEncryptionIdentifier(theUser.getSignKey())
+		keyStoreService.security.addEncryptionIdentifier(this.getMainKey())
+		keyStoreService.security.addEncryptionIdentifier(this.getSignKey())
 	}
 
-	this.verifyKeys = function (cb) {
-		return Bluebird.try(function () {
-			var signKey = theUser.getSignKey()
-			return signedKeys.verifyAsync(signKey, theUser.getID())
-		}).then(function () {
-			var friends = signedKeys.metaAttr("friends")
-			var crypt = signedKeys.metaAttr("crypt")
+	verifyKeys = () => {
+		return Bluebird.try(() => {
+			const signKey = this.getSignKey()
+			return this.signedKeys.verifyAsync(this.signKey, this.getID())
+		}).then(() => {
+			var friends = this.signedKeys.metaAttr("friends")
+			var crypt = this.signedKeys.metaAttr("crypt")
 
 			keyStoreService.security.addEncryptionIdentifier(friends)
 			keyStoreService.security.addEncryptionIdentifier(crypt)
-		}).nodeify(cb)
+		})
 	}
 
-	this.verify = function (cb) {
-		return Bluebird.try(function () {
+	verify = () => {
+		return Bluebird.try(() => {
 			var promises = []
 
-			promises.push(theUser.verifyKeys())
+			promises.push(this.verifyKeys())
 
-			if (theUser.isOwn()) {
-				promises.push(myProfile.verify(signKey))
+			if (this.isOwn()) {
+				promises.push(this.myProfile.verify(this.signKey))
 			} else {
-				promises = promises.concat(privateProfiles.map(function (priv) {
-					return priv.verify(signKey)
+				promises = promises.concat(this.privateProfiles.map((priv) => {
+					return priv.verify(this.signKey)
 				}))
 
-				if (publicProfile) {
-					promises.push(publicProfile.verify(signKey))
+				if (this.publicProfile) {
+					promises.push(this.publicProfile.verify(this.signKey))
 				}
 			}
 
 			return Bluebird.all(promises)
-		}).nodeify(cb)
+		})
 	}
 
-	this.verifyFingerPrint = function (fingerPrint, cb) {
-		return Bluebird.try(function () {
-			if (fingerPrint !== keyStoreService.format.fingerPrint(theUser.getSignKey())) {
+	verifyFingerPrint = (fingerPrint) => {
+		return Bluebird.try(() => {
+			if (fingerPrint !== keyStoreService.format.fingerPrint(this.getSignKey())) {
 				throw new Error("wrong code")
 			}
 
-			return trustService.verifyUser(theUser)
-		}).then(function () {
-			theUser.data.trustLevel = 2
-		}).nodeify(cb)
+			return trustService.verifyUser(this)
+		}).then(() => {
+			this.data.trustLevel = 2
+		})
 	}
 
-	this.update = updateUser
-
-	this.createBackupKey = function (cb) {
+	createBackupKey = () => {
 		var outerKey
-		return Bluebird.try(function () {
+		return Bluebird.try(() => {
 			return initService.awaitLoading()
-		}).then(function () {
-			return keyStoreService.sym.createBackupKey(mainKey)
-		}).then(function (backupKeyData) {
+		}).then(() => {
+			return keyStoreService.sym.createBackupKey(this.mainKey)
+		}).then((backupKeyData) => {
 			var decryptors = backupKeyData.decryptors
 			var innerKey = backupKeyData.innerKey
 
@@ -472,17 +486,17 @@ function User (providedData) {
 				innerKey: innerKey,
 				decryptors: decryptors
 			})
-		}).then(function (data) {
+		}).then((data) => {
 			if (data.error) {
 				throw new Error("server error")
 			}
 
 			return keyStoreService.format.base32(outerKey)
-		}).nodeify(cb)
+		})
 	}
 
-	this.getTrustLevel = function (cb) {
-		return theUser.getTrustData().then(function (trust) {
+	getTrustLevel = () => {
+		return this.getTrustData().then((trust) => {
 			if (trust.isOwn()) {
 				return -1
 			}
@@ -496,32 +510,32 @@ function User (providedData) {
 			}
 
 			return 0
-		}).nodeify(cb)
+		})
 	}
 
-	this.getTrustData = function () {
+	getTrustData = () => {
 		return Bluebird.resolve(
-			trustService.getKey(theUser.getSignKey())
+			trustService.getKey(this.getSignKey())
 		)
 	}
 
-	this.changePassword = function (newPassword, cb) {
-		return Bluebird.try(function () {
-			if (!theUser.isOwn()) {
+	changePassword = (newPassword, cb) => {
+		return Bluebird.try(() => {
+			if (!this.isOwn()) {
 				throw new Error("not my own user")
 			}
 
-			var ownKeys = {main: mainKey, sign: signKey}
+			var ownKeys = {main: this.mainKey, sign: this.signKey}
 
 			return Bluebird.all([
 				keyStoreService.security.makePWVerifiable(ownKeys, newPassword),
 				keyStoreService.random.hex(16),
 
-				keyStoreService.sym.pwEncryptKey(mainKey, newPassword),
+				keyStoreService.sym.pwEncryptKey(this.mainKey, newPassword),
 
 				deleteCache(),
 			])
-		}).spread(function (signedOwnKeys, salt, decryptor) {
+		}).spread((signedOwnKeys, salt, decryptor) => {
 			return socketService.emit("user.changePassword", {
 				signedOwnKeys: signedOwnKeys,
 				password: {
@@ -530,18 +544,18 @@ function User (providedData) {
 				},
 				decryptor: decryptor
 			})
-		}).then(function () {
+		}).then(() => {
 			sessionService.setPassword(newPassword)
 		}).nodeify(cb)
 	}
 
-	this.loadFullData = function (cb) {
-		return Bluebird.try(function () {
-			return theUser.loadBasicData().thenReturn(advancedBranches)
-		}).map(function (branch) {
-			return getProfileAttribute(branch)
-		}).then(function (result) {
-			var i, advanced = theUser.data.advanced, defaults = [{}, {}, {}, [], {}, {}, []]
+	loadFullData = () => {
+		return Bluebird.try(() => {
+			return this.loadBasicData().thenReturn(advancedBranches)
+		}).map((branch) => {
+			return this.getProfileAttribute(branch)
+		}).then((result) => {
+			var i, advanced = this.data.advanced, defaults = [{}, {}, {}, [], {}, {}, []]
 
 			for (i = 0; i < advancedBranches.length; i += 1) {
 				if (advancedBranches[i] === "gender" && typeof result[i] === "string") {
@@ -550,126 +564,126 @@ function User (providedData) {
 
 				advanced[advancedBranches[i]] = h.deepCopyObj(result[i] || defaults[i], 3)
 			}
-		}).nodeify(cb)
+		})
 	}
 
-	this.getFriends = function (cb) {
+	getFriends = (cb) => {
 		return friendsService.getUserFriends(this.getID(), cb)
 	}
 
-	this.loadImage = function () {
-		return theUser.getImage().then(function (imageUrl) {
-			theUser.data.basic.image = imageUrl
+	loadImage = () => {
+		return this.getImage().then((imageUrl) => {
+			this.data.basic.image = imageUrl
 		}).catch((e) => errorService.criticalError(e))
 	}
 
-	this.loadBasicData = function (cb) {
-		if (!loadBasicDataPromise) {
-			loadBasicDataPromise = Bluebird.try(function () {
+	loadBasicData = () => {
+		if (!this.loadBasicDataPromise) {
+			this.loadBasicDataPromise = Bluebird.try(() => {
 				return Bluebird.all([
-					theUser.getShortName(),
-					theUser.getName(),
-					theUser.getTrustLevel(),
-					theUser.verify()
+					this.getShortName(),
+					this.getName(),
+					this.getTrustLevel(),
+					this.verify()
 				])
-			}).spread(function (shortname, names: any, trustLevel, signatureValid) {
-				theUser.data.signatureValid = signatureValid
+			}).spread((shortname, names: any, trustLevel, signatureValid) => {
+				this.data.signatureValid = signatureValid
 
-				theUser.data.me = theUser.isOwn()
-				theUser.data.other = !theUser.isOwn()
+				this.data.me = this.isOwn()
+				this.data.other = !this.isOwn()
 
-				theUser.data.trustLevel = trustLevel
+				this.data.trustLevel = trustLevel
 
-				theUser.data.online = friendsService.onlineStatus(theUser.getID()) || 0
+				this.data.online = friendsService.onlineStatus(this.getID()) || 0
 
-				friendsService.listen(function (status) {
-					theUser.data.online = status
-				}, "online:" + theUser.getID())
+				friendsService.listen((status) => {
+					this.data.online = status
+				}, "online:" + this.getID())
 
-				theUser.data.name = names.name
-				theUser.data.names = names
+				this.data.name = names.name
+				this.data.names = names
 
-				theUser.data.basic.shortname = shortname
+				this.data.basic.shortname = shortname
 
-				friendsService.awaitLoading().then(function () {
-					theUser.data.added = friendsService.didIRequest(theUser.getID())
-					theUser.data.isMyFriend = friendsService.areFriends(theUser.getID())
+				friendsService.awaitLoading().then(() => {
+					this.data.added = friendsService.didIRequest(this.getID())
+					this.data.isMyFriend = friendsService.areFriends(this.getID())
 
-					friendsService.listen(function () {
-						theUser.data.added = friendsService.didIRequest(theUser.getID())
-						theUser.data.isMyFriend = friendsService.areFriends(theUser.getID())
+					friendsService.listen(() => {
+						this.data.added = friendsService.didIRequest(this.getID())
+						this.data.isMyFriend = friendsService.areFriends(this.getID())
 					})
 				})
 
-				theUser.data.addFriendState = addFriendState.data
-				theUser.data.ignoreFriendState = ignoreFriendState.data
+				this.data.addFriendState = this.addFriendState.data
+				this.data.ignoreFriendState = this.ignoreFriendState.data
 
-				theUser.loadImage()
+				this.loadImage()
 
 				return null
 			})
 		}
 
-		return loadBasicDataPromise.nodeify(cb)
+		return this.loadBasicDataPromise
 	}
 
-	this.setMigrationState = function (migrationState, cb) {
+	setMigrationState = (migrationState, cb) => {
 		return socketService.emit("user.setMigrationState", {
 				migrationState: migrationState
 		}).nodeify(cb)
 	}
 
-	this.getMigrationState = function () {
-		return Bluebird.resolve(migrationState)
+	getMigrationState = () => {
+		return Bluebird.resolve(this.migrationState)
 	}
 
-	this.isOwn = function () {
-		return theUser.getID() === sessionService.getUserID()
+	isOwn = () => {
+		return this.getID() === sessionService.getUserID()
 	}
 
-	this.getNickOrMail = function () {
-		return nickname || mail
+	getNickOrMail = () => {
+		return this.nickname || this.mail
 	}
 
-	this.getMainKey = function () {
-		return mainKey
+	getMainKey = () => {
+		return this.mainKey
 	}
 
-	this.getSignKey = function () {
-		return signKey
+	getSignKey = () => {
+		return this.signKey
 	}
 
-	this.getCryptKey = function () {
-		return cryptKey
+	getCryptKey = () => {
+		return this.cryptKey
 	}
 
-	this.getFriendShipKey = function () {
-		return friendShipKey
+	getFriendShipKey = () => {
+		return this.friendShipKey
 	}
 
-	this.getContactKey = function () {
-		return friendShipKey || cryptKey
+	getContactKey = () => {
+		return this.friendShipKey || this.cryptKey
 	}
 
-	this.getFriendsKey = function () {
-		return friendsKey
+	getFriendsKey = () => {
+		return this.friendsKey
 	}
 
-	this.getID = function () {
-		return parseInt(id, 10)
+	getID = () => {
+		return parseInt(this.id, 10)
 	}
 
-	this.getNickname = function () {
-		return nickname
+	getNickname = () => {
+		return this.nickname
 	}
 
-	this.getMail = function () {
-		return mail
+	getMail = () => {
+		return this.mail
 	}
 
-	this.getImage = function() {
-		return Bluebird.try(function () {
-			return getProfileAttribute("imageBlob")
+	getImage = () => {
+		return Bluebird.try(() => {
+			return this.getProfileAttribute("imageBlob")
 		}).then(blob => blob ?
 			blobService.getBlobUrl(blob.blobid) : "assets/img/user.png"
 		).then(url => window.device && window.device.platform === "iOS" ?
@@ -677,29 +691,29 @@ function User (providedData) {
 		)
 	}
 
-	this.getShortName = () => {
-		return getProfileAttribute("basic").then(function (basic) {
+	getShortName = () => {
+		return this.getProfileAttribute("basic").then((basic) => {
 			basic = basic || {}
-			var nickname = theUser.getNickname()
+			var nickname = this.getNickname()
 
-			return basic.firstname || basic.lastname || nickname || ""
+			return basic.firstname || basic.lastname || this.nickname || ""
 		})
 	}
 
-	this.getName = () => {
-		return getProfileAttribute("basic").then(function (basic) {
+	getName = () => {
+		return this.getProfileAttribute("basic").then((basic) => {
 			basic = basic || {}
-			var nickname = theUser.getNickname()
+			var nickname = this.getNickname()
 
-			var searchNames = [nickname]
+			var searchNames = [this.nickname]
 
 			var name = ""
 			if (basic.firstname && basic.lastname) {
 				name = basic.firstname + " " + basic.lastname
 			} else if (basic.firstname || basic.lastname) {
 				name = basic.firstname || basic.lastname
-			} else if (nickname) {
-				name = nickname
+			} else if (this.nickname) {
+				name = this.nickname
 			}
 
 			if (basic.firstname) {
@@ -715,47 +729,47 @@ function User (providedData) {
 				searchName: searchNames.join(" "),
 				firstname: basic.firstname || "",
 				lastname: basic.lastname || "",
-				nickname: nickname || ""
+				nickname: this.nickname || ""
 			}
 		})
 	}
 
-	this.ignoreFriendShip = function () {
-		ignoreFriendState.pending()
+	ignoreFriendShip = () => {
+		this.ignoreFriendState.pending()
 		if (!this.isOwn()) {
-			friendsService.ignoreFriendShip(this.getID(), errorService.failOnError(ignoreFriendState))
+			friendsService.ignoreFriendShip(this.getID(), errorService.failOnError(this.ignoreFriendState))
 		} else {
-			ignoreFriendState.failed()
+			this.ignoreFriendState.failed()
 		}
 	}
 
-	this.acceptFriendShip = function () {
-		addFriendState.pending()
+	acceptFriendShip = () => {
+		this.addFriendState.pending()
 		if (!this.isOwn()) {
-			friendsService.acceptFriendShip(this.getID(), errorService.failOnError(addFriendState))
+			friendsService.acceptFriendShip(this.getID(), errorService.failOnError(this.addFriendState))
 		} else {
-			addFriendState.failed()
+			this.addFriendState.failed()
 		}
 	}
 
-	this.isNotExistingUser = function () {
+	isNotExistingUser = () => {
 		return false
 	}
 
-	this.removeAsFriend = function () {
+	removeAsFriend = () => {
 		if (!this.isOwn()) {
 			friendsService.removeFriend(this.getID(), errorService.criticalError)
 		} else {
-			addFriendState.failed()
+			this.addFriendState.failed()
 		}
 	}
 
-	this.addAsFriend = function () {
-		addFriendState.pending()
+	addAsFriend = () => {
+		this.addFriendState.pending()
 		if (!this.isOwn()) {
-			friendsService.friendship(this.getID(), errorService.failOnError(addFriendState))
+			friendsService.friendship(this.getID(), errorService.failOnError(this.addFriendState))
 		} else {
-			addFriendState.failed()
+			this.addFriendState.failed()
 		}
 	}
 }

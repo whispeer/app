@@ -195,9 +195,8 @@ var Circle = function (data) {
 			return userService.getMultiple(loadableUsers.slice(0, limit));
 		}).map(function (user) {
 			persons.push(user.data);
-			return Bluebird.fromCallback(function (cb) {
-				user.loadBasicData(cb);
-			}).thenReturn(user);
+
+			return user.loadBasicData().thenReturn(user)
 		}).nodeify(cb);
 	};
 

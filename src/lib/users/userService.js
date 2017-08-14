@@ -322,8 +322,7 @@ function loadOwnUser(data, server) {
 
 		return signatureCache.awaitLoading().thenReturn(user);
 	}).then(function (user) {
-		var verifyKeys = Bluebird.promisify(user.verifyKeys.bind(user));
-		return verifyKeys().thenReturn(user);
+		return user.verifyKeys().thenReturn(user);
 	}).then(function (user) {
 		requestKeyService.cacheKey(user.getSignKey(), "user-sign-" + user.getID(), requestKeyService.MAXCACHETIME)
 		requestKeyService.cacheKey(user.getMainKey(), "user-main-" + user.getID(), requestKeyService.MAXCACHETIME)
