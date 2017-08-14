@@ -150,15 +150,18 @@ export default class VoicemailPlayer {
 		console.log("Status update: " + status)
 
 		if (status === media.MEDIA_STOPPED && this.isPlaying()) {
-			this.recordPlayingIndex += 1
-			this.position = 0
+			// Use a Promise to trigger the angular zone. Zones are bad. Angular DI is bad.
+			Bluebird.resolve().then(() => {
+				this.recordPlayingIndex += 1
+				this.position = 0
 
-			if (this.recordPlayingIndex >= this.recordings.length) {
-				this.reset()
-				return
-			}
+				if (this.recordPlayingIndex >= this.recordings.length) {
+					this.reset()
+					return
+				}
 
-			this.recordings[this.recordPlayingIndex].recording.play()
+				this.recordings[this.recordPlayingIndex].recording.play()
+			})
 		}
 	}
 }
