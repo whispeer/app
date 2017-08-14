@@ -31,7 +31,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			.then((cacheResponse) => cacheResponse.data)
 			.then(restore)
 			.then((instance) => cacheInMemory(id, instance))
-			// .finally(() => considerLoaded(id)
+			.then(() => considerLoaded(id))
 
 	const serverResponseToInstance = (response, id) => {
 		return load(response)
