@@ -181,7 +181,7 @@ class SocketService extends Observer {
 		this.notify(null, "request");
 
 		return this._emit(channel, request).timeout(SOCKET_TIMEOUT).then((response) => {
-			socketDebug("Answer on " + channel);
+			socketDebug("Answer on " + channel, response);
 			log.timerEnd(timer);
 
 			if (response.alert) {
@@ -200,8 +200,6 @@ class SocketService extends Observer {
 				socketError(response);
 				throw new ServerError("server returned an error!", { response });
 			}
-
-			socketDebug(response);
 
 			if (!isBusinessVersion()) {
 				if (response.isBusiness) {
