@@ -1,5 +1,9 @@
 declare global {
-	interface Window { device: any; }
+	interface Window {
+		device: any;
+		Zone: any;
+		whispeerGetStorage: any;
+	}
 }
 
 require("interceptors/addKeysInterceptor");
@@ -127,7 +131,7 @@ export class AppModule {
 	}
 
 	runInAngularZone(fn) {
-		if((<any>this.zone).inner !== (<any>window).Zone.current) {
+		if((<any>this.zone).inner !== window.Zone.current) {
 			this.zone.run(fn)
 			return
 		}

@@ -25,7 +25,7 @@ export const landingPage = () => {
 }
 
 export const isLoginPage = () => {
-	return (<any>window).top.location.pathname.indexOf("/login") !== -1;
+	return window.top.location.pathname.indexOf("/login") !== -1;
 }
 
 export const isBusinessVersion = () => {

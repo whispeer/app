@@ -98,7 +98,7 @@ export default class VoicemailPlayer {
 	}
 
 	addRecording(path: string, estimatedDuration: number) {
-		const isIOS = (<any>window).device.platform === "iOS"
+		const isIOS = window.device.platform === "iOS"
 
 		const currentRecording = media.create(isIOS ? path.replace(/^file:\/\//, '') : path)
 
