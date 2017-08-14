@@ -33,6 +33,10 @@ export default class Cache {
 	private options: any
 	private cacheDisabled: boolean = false
 
+	static deleteDatabase() {
+		return dbPromise.then(() => idb.delete("whispeerCache"))
+	}
+
 	constructor(private name : string, options?: any) {
 		this.options = options || {};
 		this.options.maxEntries = this.options.maxEntries || 100;
