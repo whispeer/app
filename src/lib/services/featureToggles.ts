@@ -6,9 +6,7 @@ class FeatureToggles {
 	config = {}
 
 	constructor() {
-		sessionService.loadLogin().then(() =>
-			socketService.definitlyEmit("featureToggles", {})
-		).then((response) => {
+		socketService.definitlyEmit("featureToggles", {}).then((response) => {
 			if (response.toggles) {
 				this.config = response.toggles
 			}

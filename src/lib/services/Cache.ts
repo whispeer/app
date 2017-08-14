@@ -4,16 +4,29 @@ import Dexie from "dexie";
 import h from "../helper/helper"
 import idb, { Cursor } from "idb"
 
-let cachesDisabled = false
+const REINIT_CACHE_TIMEOUT = 2000
+let dbPromise, cachesDisabled
 
-const dbPromise = idb.open("whispeerCache", 10, upgradeDB => {
-	const objectStore = upgradeDB.createObjectStore('cache', { keyPath: "id" });
+const initCache = () => {
+	cachesDisabled = false
 
-	objectStore.createIndex("created", "created", { unique: false });
-	objectStore.createIndex("used", "used", { unique: false });
-	objectStore.createIndex("type", "type", { unique: false });
-	objectStore.createIndex("size", "size", { unique: false });
-})
+	dbPromise = idb.open("whispeerCache", 10, upgradeDB => {
+		const objectStore = upgradeDB.createObjectStore('cache', { keyPath: "id" });
+
+		objectStore.createIndex("created", "created", { unique: false });
+		objectStore.createIndex("used", "used", { unique: false });
+		objectStore.createIndex("type", "type", { unique: false });
+		objectStore.createIndex("size", "size", { unique: false });
+	})
+
+	dbPromise.catch((e) => {
+		console.warn("Disabling indexedDB caching due to error", e)
+
+		cachesDisabled = true
+	})
+}
+
+initCache()
 
 try {
 	indexedDB.deleteDatabase("whispeer");
@@ -31,8 +44,6 @@ const followCursorUntilDone = (cursorPromise: Promise<Cursor>, action) => {
 	})
 }
 
-dbPromise.catch(() => cachesDisabled = true)
-
 export default class Cache {
 	private options: any
 	private cacheDisabled: boolean = false
@@ -44,19 +55,17 @@ export default class Cache {
 			db.close()
 		).then(() =>
 			idb.delete("whispeerCache")
-		)
+		).then(() => {
+			setTimeout(() => {
+				initCache()
+			}, REINIT_CACHE_TIMEOUT)
+		})
 	}
 
 	constructor(private name : string, options?: any) {
 		this.options = options || {};
 		this.options.maxEntries = this.options.maxEntries || 100;
 		this.options.maxBlobSize = this.options.maxBlobSize || 1*1024*1024;
-
-		dbPromise.catch((e) => {
-			console.warn("Disabling indexedDB caching due to error", e)
-
-			this.disable()
-		})
 	}
 
 	static sumSize (arr: any[]) {
@@ -207,7 +216,7 @@ export default class Cache {
 		return cachesDisabled || this.cacheDisabled
 	}
 
-	private disable() {
+	disable() {
 		this.cacheDisabled = true;
 	}
 }

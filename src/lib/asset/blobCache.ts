@@ -132,4 +132,4 @@ const blobCache = {
 export default blobCache
 
 // delete previous cache
-;(new Cache("blobs")).deleteAll()
+;(new Cache("blobs")).deleteAll().catch(() => console.warn("Could not delete legacy blobs from idb cache"))
