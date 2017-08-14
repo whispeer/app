@@ -175,7 +175,7 @@ topicWithBursts {
 
 .message__file {
 	overflow: visible;
-	padding-left: 40px;
+	padding: 5px 0 5px 25px;
 }
 
 .message__file__hexagon-wrap {
@@ -185,8 +185,11 @@ topicWithBursts {
 
 	top: -6px;
 	left: -10px;
+
+	z-index: 3;
+
 	.border, .content {
-		fill: map-get($colors, grey);
+		fill: map-get($colors, dark_grey);
 	}
 	svg {
 		width: 100%;
@@ -206,12 +209,107 @@ topicWithBursts {
 
 	margin-top: -11px;
 	margin-left: -6px;
+
+	color: map-get($colors, light) !important;
+}
+
+.message__file__hexagon-spinner {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+
+	margin-top: -15px;
+	margin-left: -14px;
+
+	* {
+		stroke: map-get($colors, light) !important;
+	}
+}
+
+.message__file--sending {
+	background: map-get($colors, other_grey) !important;
+
+	&:before {
+		border-right-color: map-get($colors, other_grey) !important;
+	}
+
+	.message__file__hexagon-spinner * {
+		stroke: map-get($colors, dark) !important;
+	}
+
+	.message__file__hexagon {
+		.content, .border {
+			fill: map-get($colors, light_grey);
+		}
+	}
 }
 
 .message__file__info {
-	display: inline-flex;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 100%;
+	//white-space: nowrap;
+
+	padding-bottom: 3px;
+}
+
+.message__file__info__size {
 	white-space: nowrap;
+	color: map-get($colors, border_grey);
+}
+
+.message__file__progress {
+	position: absolute;
+	left: 0;
+	bottom: 3px;
+
+	height: 2px;
+	width: calc(100% - 40px);
+
+	background: map-get($colors, primaryDarker) !important;
+}
+
+.message__file__progress__bar {
+	position: relative;
+	height: 100%;
+
+	background: map-get($colors, light);
+
+	transition: width 0.1s ease;
+}
+
+.message__file__progress__icon {
+	position: absolute;
+	top: -2.5px; // this kinda breaks the hexagons height but -3 is too high and -2 too low.
+	left: -3px;
+
+	display: block;
+	height: 6px;
+	width: 6px;
+
+	transition: margin 0.1s ease;
+}
+
+.message__file__progress__icon__hex {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	.border, .content {
+		fill: map-get($colors, light);
+	}
+
+	svg {
+		width: 100%;
+
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
 }
 
 .message__file__name {
@@ -247,6 +345,10 @@ topicWithBursts {
 
 		background: $message-bubble-color;
 		color: #fff;
+
+		&.message__file{
+			margin-left: 20px;
+		}
 	}
 
 	.messages__wrap:last-child {
@@ -277,6 +379,24 @@ topicWithBursts {
 			}
 		}
 	}
+
+	.message__file__info {
+		padding-left: 10px;
+		padding-right: 15px;
+	}
+
+	.message__file__progress {
+		margin-left: 25px;
+		margin-right: 20px;
+	}
+
+	.message__file__memo-play-icon {
+		color: map-get($colors, light);
+	}
+
+	.message__file__memo-play-icon--active {
+		color: map-get($colors, blue);
+	}
 }
 
 .burst--other {
@@ -285,6 +405,10 @@ topicWithBursts {
 		color: map-get($colors, dark);
 
 		margin: auto 10px 1px 5px;
+
+		&.message__file{
+			margin-right: 20px;
+		}
 	}
 	.messages__time {
 		margin: auto auto auto 0;
@@ -315,6 +439,39 @@ topicWithBursts {
 				border-bottom-right-radius: 10px;
 				transform:translate(-30px, -2px);
 			}
+		}
+	}
+	.message__file {
+		padding: 5px 25px 5px 0;
+	}
+	.message__file__hexagon-wrap {
+		left: auto;
+		right: -10px;
+	}
+	.message__file__info {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+	.message__file__info__size {
+		color: map-get($colors, grey);
+	}
+	.message__file__memo-play-icon {
+		color: map-get($colors, dark);
+	}
+	.message__file__memo-play-icon--active {
+		color: map-get($colors, kelly_green);
+	}
+	.message__file__progress {
+		margin-left: 15px;
+		margin-right: 25px;
+		background: map-get($colors, light) !important;
+	}
+	.message__file__progress__bar {
+		background: map-get($colors, grey);
+	}
+	.message__file__progress__icon__hex {
+		.border, .content {
+			fill: map-get($colors, grey) !important;
 		}
 	}
 }
@@ -394,6 +551,8 @@ topicWithBursts {
 
 .ios__messages__recording-overlay {
 	position: absolute;
+	top: 50%;
+	margin-top: -8px;
 	width: 200px;
 	left: 115px;
 	color: map-get($colors, dark);
