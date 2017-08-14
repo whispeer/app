@@ -346,14 +346,16 @@ export class Chunk extends Observer {
 			}))
 		}
 
-		return Bluebird.reject("CreateData not implemented")
-
-		/*
-		return Bluebird.all([Chunk.createRawData(receiver, { content: {} }), imagePreparation]).spread((chunkData: any, imagesMeta) => {
-			var chunk = new Chunk({
+		return Bluebird.all([
+			Chunk.createRawData(receiver, { content: {} }),
+			imagePreparation
+		]).spread((chunkData: any, imagesMeta) => {
+			// create chunk stub for empty chat so we can connect it to the first message
+			var chunkStub = new Chunk({
 				meta: chunkData.chunk.meta,
-				content: chunkData.chunk.content,
+				content: {},
 				server: {},
+				receiverObjects: []
 			});
 
 			var messageMeta = {
@@ -363,8 +365,8 @@ export class Chunk extends Observer {
 
 			return Bluebird.all([
 				chunkData,
-				Message.createRawData(message, messageMeta, chunk),
-				uploadImages(chunk.getKey())
+				Message.createRawData(message, messageMeta, chunkStub),
+				uploadImages(chunkStub.getKey())
 			]);
 		}).spread((chunkData, messageData, imageKeys: any) => {
 			imageKeys = h.array.flatten(imageKeys);
@@ -373,7 +375,7 @@ export class Chunk extends Observer {
 			chunkData.message = messageData;
 
 			return chunkData;
-		})*/
+		})
 	}
 }
 
