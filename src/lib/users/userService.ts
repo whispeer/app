@@ -2,7 +2,6 @@ import h from "../helper/helper"
 import Observer from "../asset/observer"
 import * as Bluebird from "bluebird"
 import socketService from "../services/socket.service"
-import requestKeyService from "../services/requestKey.service"
 import CacheService from "../services/Cache"
 import sessionService from "../services/session.service"
 import errorService from "../services/error.service"
@@ -96,52 +95,76 @@ const getProfiles = (userData, isMe) => {
 	return profiles
 }
 
-function makeUser(data) {
+function enhanceOwnUser(user, ownUserLoadedFromServer) {
+	var identifier = user.getNickOrMail()
+
+	keyStoreService.setKeyGenIdentifier(identifier)
+	improvementListener(identifier)
+	keyStoreService.sym.registerMainKey(user.getMainKey())
+
+	verifyOwnKeys(user)
+
+	ownUserStatus.verifyOwnKeysDoneResolve()
+	ownUserStatus.verifyOwnKeysCacheDoneResolve()
+
+	trustManager.setOwnSignKey(user.getSignKey())
+}
+
+function makeUser(data, ownUserLoadedFromServer = false) {
 	return Bluebird.try(async function () {
 		if (data.userNotExisting) {
-			return new NotExistingUser(data.identifier);
+			return new NotExistingUser(data.identifier)
 		}
 
 		if (data.error === true) {
-			return new NotExistingUser();
+			return new NotExistingUser()
 		}
 
-		var User = require("users/user").default
+		const User = require("users/user").default
 
 		// decrypt / verify profiles
 		// verify signed keys
-
-
 		const userID = h.parseDecimal(data.id)
 		const isMe = sessionService.isOwnUserID(userID)
+
 		const profiles = getProfiles(data, isMe)
+		console.log(`${userID} eins`)
 
 		if (users[userID]) {
-			users[userID].update(data, profiles);
-			return users[userID];
+			users[userID].update(data, profiles)
+			return users[userID]
 		}
 
-		var theUser = new User(data, profiles);
-		await verify(theUser)
+		const user = new User(data, profiles)
+		const mail = user.getMail()
+		const nickname = user.getNickname()
 
-		var mail = theUser.getMail();
-		var nickname = theUser.getNickname();
+		knownIDs.push(userID)
 
-		knownIDs.push(userID);
+		users[userID] = user
 
-		users[userID] = theUser;
-
+		console.log(`${userID} zwei`)
 		if (mail) {
-			users[mail] = theUser;
+			users[mail] = user
 		}
 
 		if (nickname) {
-			users[nickname] = theUser;
+			users[nickname] = user
 		}
 
-		userService.notify(theUser, "loadedUser");
+		console.log(`${userID} drei`)
+		userService.notify(user, "loadedUser")
 
-		return theUser;
+		console.log(`${userID} vier`)
+
+		if (isMe) {
+			enhanceOwnUser(user, ownUserLoadedFromServer)
+			await signatureCache.awaitLoading()
+		}
+		console.log(`${userID} fünf`)
+		await verify(user)
+		console.log(`${userID} sechs`)
+		return user
 	})
 }
 
@@ -353,34 +376,9 @@ function verify(user) {
 	})
 }
 
-function loadOwnUser(data, server) {
+function loadOwnUser(data, ownUserLoadedFromServer) {
 	return Bluebird.try(function () {
-		return makeUser(data);
-	}).then(function (user) {
-		var identifier = user.getNickOrMail();
-
-		keyStoreService.setKeyGenIdentifier(identifier);
-		improvementListener(identifier);
-		keyStoreService.sym.registerMainKey(user.getMainKey());
-
-		verifyOwnKeys(user);
-
-		if (server) {
-			ownUserStatus.verifyOwnKeysDoneResolve();
-		} else {
-			ownUserStatus.verifyOwnKeysCacheDoneResolve();
-		}
-
-		trustManager.setOwnSignKey(user.getSignKey());
-
-		return signatureCache.awaitLoading().thenReturn(user);
-	}).then(function (user) {
-		return verifyKeys(user).thenReturn(user);
-	}).then(function (user) {
-		requestKeyService.cacheKey(user.getSignKey(), "user-sign-" + user.getID(), requestKeyService.MAXCACHETIME)
-		requestKeyService.cacheKey(user.getMainKey(), "user-main-" + user.getID(), requestKeyService.MAXCACHETIME)
-
-		return null
+		return makeUser(data, ownUserLoadedFromServer);
 	}).catch(function (e) {
 		if (e instanceof sjcl.exception.corrupt) {
 			alert("Password did not match. Logging out")
