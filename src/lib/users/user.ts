@@ -398,16 +398,6 @@ class User {
 
 	/** end profile management */
 
-	verifyOwnKeys = () => {
-		keyStoreService.security.verifyWithPW(this.signedOwnKeys, {
-			main: this.getMainKey(),
-			sign: this.getSignKey()
-		})
-
-		keyStoreService.security.addEncryptionIdentifier(this.getMainKey())
-		keyStoreService.security.addEncryptionIdentifier(this.getSignKey())
-	}
-
 	verifyKeys = () => {
 		return Bluebird.try(() => {
 			const signKey = this.getSignKey()

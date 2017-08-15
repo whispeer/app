@@ -301,6 +301,16 @@ function improvementListener(identifier) {
 
 Observer.extend(userService);
 
+function verifyOwnKeys(ownUser) {
+	keyStoreService.security.verifyWithPW(ownUser.signedOwnKeys, {
+		main: ownUser.getMainKey(),
+		sign: ownUser.getSignKey()
+	})
+
+	keyStoreService.security.addEncryptionIdentifier(ownUser.getMainKey())
+	keyStoreService.security.addEncryptionIdentifier(ownUser.getSignKey())
+}
+
 function loadOwnUser(data, server) {
 	return Bluebird.try(function () {
 		return makeUser(data);
@@ -311,7 +321,7 @@ function loadOwnUser(data, server) {
 		improvementListener(identifier);
 		keyStoreService.sym.registerMainKey(user.getMainKey());
 
-		user.verifyOwnKeys();
+		verifyOwnKeys(user);
 
 		if (server) {
 			ownUserStatus.verifyOwnKeysDoneResolve();
