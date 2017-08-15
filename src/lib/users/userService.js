@@ -107,27 +107,23 @@ function makeUser(data) {
 	// decrypt / verify profiles
 	// verify signed keys
 
-	const isMe = sessionService.isOwnUserID(data.id)
+	const userID = h.parseDecimal(data.id)
+	const isMe = sessionService.isOwnUserID(userID)
 	const profiles = getProfiles(data, isMe)
 
-	console.warn(data)
+	if (users[userID]) {
+		users[userID].update(data, profiles);
+		return users[userID];
+	}
 
 	var theUser = new User(data, profiles);
 
-	var id = theUser.getID();
 	var mail = theUser.getMail();
 	var nickname = theUser.getNickname();
 
-	if (users[id]) {
-		users[id].update(data, profiles);
-		return users[id];
-	}
+	knownIDs.push(userID);
 
-	if (!users[id]) {
-		knownIDs.push(id);
-	}
-
-	users[id] = theUser;
+	users[userID] = theUser;
 
 	if (mail) {
 		users[mail] = theUser;
