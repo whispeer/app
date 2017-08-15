@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input } from '@angular/core';
+import { Directive, ElementRef, Input } from '@angular/core'; // tslint:disable-line:no-unused-variable
 // const EmojifyConverter = require("emojify");
 
 /*const emojify = new EmojifyConverter();

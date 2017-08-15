@@ -1,6 +1,6 @@
 import { Component, Input } from "@angular/core"
 
-import { DomSanitizer } from '@angular/platform-browser'
+import { DomSanitizer } from '@angular/platform-browser' // tslint:disable-line:no-unused-variable
 
 import errorService from "../../lib/services/error.service"
 import blobService from "../../lib/services/blobService"
