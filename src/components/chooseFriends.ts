@@ -21,7 +21,7 @@ export class ChooseFriends extends ContactsWithSearch {
 
 	@Output() chooseReceivers = new EventEmitter();
 
-	constructor(public navCtrl: NavController, private translate: TranslateService, private platform: Platform) {
+	constructor(public navCtrl: NavController, private translate: TranslateService, private platform: Platform) { // tslint:disable-line:no-unused-variable
 		super()
 
 		this.ios = platform.is("ios")

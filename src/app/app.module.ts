@@ -13,7 +13,7 @@ require("toBlob")
 
 import * as moment from 'moment';
 
-import { NgModule, ErrorHandler, NgZone } from '@angular/core';
+import { NgModule, ErrorHandler, NgZone } from '@angular/core'; // tslint:disable-line:no-unused-variable
 import { DatePipe } from "@angular/common";
 
 import { Platform, IonicApp, IonicErrorHandler, IonicModule, Config } from 'ionic-angular';
@@ -141,10 +141,10 @@ export class AppModule {
 
 	constructor(
 		private zone: NgZone,
-		private translate: TranslateService,
+		private translate: TranslateService, // tslint:disable-line:no-unused-variable
 		private globalization: Globalization,
-		private config: Config,
-		private platform: Platform
+		private config: Config, // tslint:disable-line:no-unused-variable
+		private platform: Platform // tslint:disable-line:no-unused-variable
 	) {
 		translate.setDefaultLang("en");
 

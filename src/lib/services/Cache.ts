@@ -1,7 +1,7 @@
 import { errorServiceInstance } from "./error.service";
 import * as Bluebird from "bluebird";
 import h from "../helper/helper"
-import idb, { Cursor } from "idb"
+import idb, { Cursor } from "idb" // tslint:disable-line:no-unused-variable
 
 const REINIT_CACHE_TIMEOUT = 2000
 let dbPromise, cachesDisabled

@@ -1,5 +1,5 @@
 import { Pipe } from "@angular/core";
-import { DatePipe } from "@angular/common";
+import { DatePipe } from "@angular/common"; // tslint:disable-line:no-unused-variable
 
 @Pipe({
 	name: "responsiveDate"

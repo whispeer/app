@@ -1,5 +1,5 @@
-import { Component, ElementRef } from "@angular/core";
-import { NavController, NavParams, IonicPage } from "ionic-angular";
+import { Component, ElementRef } from "@angular/core"; // tslint:disable-line:no-unused-variable
+import { NavController, NavParams, IonicPage } from "ionic-angular"; // tslint:disable-line:no-unused-variable
 
 import errorService from "../../lib/services/error.service";
 
