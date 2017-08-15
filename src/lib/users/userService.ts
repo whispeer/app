@@ -128,7 +128,6 @@ function makeUser(data, ownUserLoadedFromServer = false) {
 		const isMe = sessionService.isOwnUserID(userID)
 
 		const profiles = getProfiles(data, isMe)
-		console.log(`${userID} eins`)
 
 		if (users[userID]) {
 			users[userID].update(data, profiles)
@@ -143,7 +142,6 @@ function makeUser(data, ownUserLoadedFromServer = false) {
 
 		users[userID] = user
 
-		console.log(`${userID} zwei`)
 		if (mail) {
 			users[mail] = user
 		}
@@ -152,18 +150,13 @@ function makeUser(data, ownUserLoadedFromServer = false) {
 			users[nickname] = user
 		}
 
-		console.log(`${userID} drei`)
 		userService.notify(user, "loadedUser")
-
-		console.log(`${userID} vier`)
 
 		if (isMe) {
 			enhanceOwnUser(user, ownUserLoadedFromServer)
 			await signatureCache.awaitLoading()
 		}
-		console.log(`${userID} fünf`)
 		await verify(user)
-		console.log(`${userID} sechs`)
 		return user
 	})
 }
@@ -171,24 +164,15 @@ function makeUser(data, ownUserLoadedFromServer = false) {
 const THROTTLE = 20
 
 /** loads all the users in the batch */
-function doLoad(identifier, cb) {
+function doLoad(identifier) {
 	return initService.awaitLoading().then(function () {
 		return socketService.emit("user.getMultiple", {identifiers: identifier})
 	}).then(function (data) {
 		if (!data || !data.users) {
 			return []
 		}
-
 		return data.users
-	}).map(function (userData) {
-		return makeUser(userData)
-	}).map(function (user) {
-		if (!user.isNotExistingUser()) {
-			return verifyKeys(user).thenReturn(user)
-		}
-
-		return user
-	}).nodeify(cb)
+	}).map(makeUser)
 }
 
 const delay = h.delayMultiplePromise(Bluebird, THROTTLE, doLoad, 10)
