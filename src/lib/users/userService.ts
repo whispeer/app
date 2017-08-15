@@ -97,50 +97,52 @@ const getProfiles = (userData, isMe) => {
 }
 
 function makeUser(data) {
-	if (data.userNotExisting) {
-		return new NotExistingUser(data.identifier);
-	}
+	return Bluebird.try(async function () {
+		if (data.userNotExisting) {
+			return new NotExistingUser(data.identifier);
+		}
 
-	if (data.error === true) {
-		return new NotExistingUser();
-	}
+		if (data.error === true) {
+			return new NotExistingUser();
+		}
 
-	var User = require("users/user").default
+		var User = require("users/user").default
 
-	// decrypt / verify profiles
-	// verify signed keys
+		// decrypt / verify profiles
+		// verify signed keys
 
 
-	const userID = h.parseDecimal(data.id)
-	const isMe = sessionService.isOwnUserID(userID)
-	const profiles = getProfiles(data, isMe)
+		const userID = h.parseDecimal(data.id)
+		const isMe = sessionService.isOwnUserID(userID)
+		const profiles = getProfiles(data, isMe)
 
-	if (users[userID]) {
-		users[userID].update(data, profiles);
-		return users[userID];
-	}
+		if (users[userID]) {
+			users[userID].update(data, profiles);
+			return users[userID];
+		}
 
-	var theUser = new User(data, profiles);
-	verify(theUser)
+		var theUser = new User(data, profiles);
+		await verify(theUser)
 
-	var mail = theUser.getMail();
-	var nickname = theUser.getNickname();
+		var mail = theUser.getMail();
+		var nickname = theUser.getNickname();
 
-	knownIDs.push(userID);
+		knownIDs.push(userID);
 
-	users[userID] = theUser;
+		users[userID] = theUser;
 
-	if (mail) {
-		users[mail] = theUser;
-	}
+		if (mail) {
+			users[mail] = theUser;
+		}
 
-	if (nickname) {
-		users[nickname] = theUser;
-	}
+		if (nickname) {
+			users[nickname] = theUser;
+		}
 
-	userService.notify(theUser, "loadedUser");
+		userService.notify(theUser, "loadedUser");
 
-	return theUser;
+		return theUser;
+	})
 }
 
 var THROTTLE = 20;
