@@ -20,8 +20,8 @@ export const ServerError = h.createErrorType("serverError");
 const SOCKET_TIMEOUT = 60000;
 
 interface Interceptor {
-	transformRequest?: Function
-	transformResponse?: Function
+	transformRequest?: (request: any) => void
+	transformResponse?: (request: any, response: any) => void
 }
 
 const log = {
@@ -192,7 +192,7 @@ class SocketService extends Observer {
 
 			this._interceptors.forEach((interceptor) => {
 				if (interceptor.transformResponse) {
-					response = interceptor.transformResponse(response);
+					response = interceptor.transformResponse(response, request);
 				}
 			});
 
