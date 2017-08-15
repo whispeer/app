@@ -1,6 +1,6 @@
-import * as StorageService from "./storage.service";
-import Storage from "./Storage";
-import { Location } from "@angular/common";
+import * as StorageService from "./storage.service"
+import Storage from "./Storage"
+import { Location } from "@angular/common" // tslint:disable-line:no-unused-variable
 
 import { isBlockedReturnUrl } from "./location.manager";
 
