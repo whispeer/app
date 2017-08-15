@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular';
 
 const friendsService = require("../../lib/services/friendsService");
-const userService = require("../../lib/users/userService");
+const userService = require("../../lib/users/userService").default;
 
 import * as Bluebird from 'bluebird';
 

@@ -420,4 +420,4 @@ initService.registerCallback(function () {
 	});
 });
 
-module.exports = userService;
+export default userService;

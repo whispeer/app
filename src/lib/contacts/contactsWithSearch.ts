@@ -1,5 +1,5 @@
 const contactsService = require("../../lib/services/friendsService");
-const userService = require("../../lib/users/userService");
+const userService = require("../../lib/users/userService").default;
 import errorService from "../../lib/services/error.service";
 
 import * as Bluebird from 'bluebird';

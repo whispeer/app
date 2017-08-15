@@ -144,7 +144,7 @@ class SettingsService extends Observer {
 
 			data.meta.initialLanguage = h.getLanguageFromPath();
 
-			var ownUser = require("users/userService").getOwn();
+			var ownUser = require("users/userService").default.getOwn();
 
 			return SecuredData.createAsync(data.content,
 				data.meta,
@@ -187,7 +187,7 @@ class SettingsService extends Observer {
 	}
 
 	loadFromCache = (cacheEntry: any) => {
-		var userService = require("users/userService");
+		var userService = require("users/userService").default;
 
 		this.loadCachePromise = Bluebird.race([
 			userService.ownLoadedCache(),
@@ -208,7 +208,7 @@ class SettingsService extends Observer {
 			var givenSettings = data.content;
 			var toCache = h.deepCopyObj(givenSettings);
 
-			var userService = require("users/userService");
+			var userService = require("users/userService").default;
 			return userService.ownLoaded().then(() => {
 				return this.loadSettings(givenSettings);
 			}).thenReturn(toCache);
@@ -238,7 +238,7 @@ class SettingsService extends Observer {
 
 	decrypt = (cb: Function) => {
 		return Bluebird.try(() => {
-			var ownUser = require("users/userService").getOwn();
+			var ownUser = require("users/userService").default.getOwn();
 
 			return Bluebird.all([
 				this.settings.decrypt(),
@@ -288,7 +288,7 @@ class SettingsService extends Observer {
 					return;
 				}
 
-				var userService = require("users/userService");
+				var userService = require("users/userService").default;
 				return userService.getOwn().uploadChangedProfile();
 			}).nodeify(cb);
 		},
@@ -314,7 +314,7 @@ class SettingsService extends Observer {
 			return Bluebird.resolve(true).nodeify(cb);
 		}
 
-		var userService = require("users/userService");
+		var userService = require("users/userService").default;
 
 		return this.settings.getUpdatedData(
 				userService.getOwn().getSignKey()

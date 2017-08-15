@@ -103,7 +103,7 @@ function generateRemovalData(ownUser, otherUser) {
 }
 
 function addAsFriend(uid) {
-	var otherUser, friendShipKey, userService = require("users/userService");
+	var otherUser, friendShipKey, userService = require("users/userService").default;
 	return Bluebird.try(function () {
 		return friendsService.awaitLoading();
 	}).then(function () {
@@ -165,7 +165,7 @@ socket.channel("friendOnlineChange", function (e, requestData) {
 });
 
 function checkAndRemove(uid) {
-	var userService = require("users/userService");
+	var userService = require("users/userService").default;
 	return Bluebird.try(function () {
 		return Bluebird.all([
 			userService.get(uid),
@@ -186,7 +186,7 @@ function checkAndRemove(uid) {
 }
 
 function removeUnfriendedPersons() {
-	var userService = require("users/userService");
+	var userService = require("users/userService").default;
 	return Bluebird.try(function () {
 		return userService.getMultiple(removed);
 	}).then(function (removedFriends) {
@@ -228,7 +228,7 @@ friendsService = {
 			throw new Error("not a friend!");
 		}
 
-		var userService = require("users/userService"), circleService = require("circles/circleService");
+		var userService = require("users/userService").default, circleService = require("circles/circleService");
 		var otherUser, ownUser = userService.getOwn(), userCircles = circleService.inWhichCircles(uid);
 
 		return Bluebird.try(function () {
@@ -375,7 +375,7 @@ friendsService = {
 		return keys;
 	},
 	load: function () {
-		var userService = require("users/userService");
+		var userService = require("users/userService").default;
 
 		return socket.definitlyEmit("friends.all", {}).then(function (data) {
 			friends = data.friends.map(h.parseDecimal);
@@ -440,7 +440,7 @@ initService.awaitLoading().then(function () {
 
 socket.channel("notify.signedList", function (e, data) {
 	if (signedList.metaAttr("_signature") !== data._signature) {
-		var userService = require("users/userService");
+		var userService = require("users/userService").default;
 		var updatedSignedList = SecuredData.load(undefined, data, { type: "signedFriendList" });
 
 		Bluebird.try(function () {

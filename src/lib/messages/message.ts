@@ -1,6 +1,6 @@
 import * as Bluebird from "bluebird"
 
-const userService = require("users/userService")
+const userService = require("users/userService").default
 const keyStore = require("services/keyStore.service").default
 const SecuredData = require("asset/securedDataWithMetaData")
 

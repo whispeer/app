@@ -5,7 +5,7 @@ const SecuredData = require("asset/securedDataWithMetaData");
 import * as Bluebird from "bluebird"
 const debug = require("debug");
 
-const userService = require("users/userService");
+const userService = require("users/userService").default;
 import socket from "../services/socket.service"
 import ObjectLoader from "../services/cachedObjectLoader"
 const keyStore = require("services/keyStore.service").default;
@@ -401,7 +401,7 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 	cacheName: "chunk",
 	download: id => socket.emit("chat.chunk.get", { id }),
 	restore: (chunkInfo: ChunkCache) => {
-		return Bluebird.try(async () => {
+		return Bluebird.try(async function () {
 			const titleUpdate = await loadLegacyTitle(chunkInfo.latestTitleUpdate)
 			const loadReceiverPromise = userService.getMultipleFormatted(chunkInfo.meta.receiver.sort().map(h.parseDecimal))
 
@@ -428,7 +428,7 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 		})
 	},
 	load: ({ content, meta, server, latestTitleUpdate }) : Bluebird<ChunkCache> => {
-		return Bluebird.try(async () => {
+		return Bluebird.try(async function () {
 			const securedData = SecuredData.load(content, meta, CHUNK_SECURED_DATA_OPTIONS)
 
 			const creator = await userService.get(securedData.metaAttr("creator"))
