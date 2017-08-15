@@ -12,7 +12,9 @@
 		"moduleResolution": "node",
 		"types" : ["node", "webpack", "jquery"],
 		"sourceMap": true,
-		"target": "es5"
+		"target": "es5",
+		"noUnusedLocals": false,
+		"noUnusedParameters": false
 	},
 	"include": [
 		"src/**/*.ts"
