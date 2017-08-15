@@ -414,7 +414,9 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 			}
 
 			const chunk = new Chunk({
-				...chunkInfo,
+				meta: chunkInfo.meta,
+				content: chunkInfo.content,
+				server: chunkInfo.server,
 				receiverObjects: await loadReceiverPromise
 			})
 
