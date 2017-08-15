@@ -1,6 +1,5 @@
 import { errorServiceInstance } from "./error.service";
 import * as Bluebird from "bluebird";
-import Dexie from "dexie";
 import h from "../helper/helper"
 import idb, { Cursor } from "idb"
 
