@@ -6,30 +6,30 @@ import CacheService from "../services/Cache"
 import sessionService from "../services/session.service"
 import errorService from "../services/error.service"
 
-var signatureCache = require("crypto/signatureCache");
-var trustManager = require("crypto/trustManager");
+const signatureCache = require("crypto/signatureCache")
+const trustManager = require("crypto/trustManager")
 
-var sjcl = require("sjcl");
-var keyStoreService = require("crypto/keyStore");
-var initService = require("services/initService");
+const sjcl = require("sjcl")
+const keyStoreService = require("crypto/keyStore")
+const initService = require("services/initService")
 
-var userService, knownIDs = [], users = {}, ownUserStatus: any = {};
+let userService, knownIDs = [], users = {}, ownUserStatus: any = {}
 
 const Profile = require("../users/profile").default
 
-var promises = ["verifyOwnKeysDone", "verifyOwnKeysCacheDone", "loadedCache", "loaded"];
+const promises = ["verifyOwnKeysDone", "verifyOwnKeysCacheDone", "loadedCache", "loaded"]
 
 promises.forEach(function (promiseName) {
 	ownUserStatus[promiseName] = new Bluebird(function (resolve) {
 		ownUserStatus[promiseName + "Resolve"] = function () {
-			delete ownUserStatus[promiseName + "Resolve"];
-			resolve();
-		};
-	});
-});
+			delete ownUserStatus[promiseName + "Resolve"]
+			resolve()
+		}
+	})
+})
 
-var deletedUserName = "Deleted user"; //localize("user.deleted", {});
-var NotExistingUser = function (identifier?) {
+const deletedUserName = "Deleted user"; //localize("user.deleted", {})
+const NotExistingUser = function (identifier?) {
 	this.data = {
 		trustLevel: -1,
 		notExisting: true,
@@ -39,32 +39,32 @@ var NotExistingUser = function (identifier?) {
 		},
 		name: deletedUserName,
 		user: this
-	};
+	}
 
 	if (typeof identifier === "number") {
-		this.data.id = identifier;
+		this.data.id = identifier
 	}
 
 	this.isNotExistingUser = function () {
-		return true;
-	};
+		return true
+	}
 
 	this.loadBasicData = function (cb) {
 		return Bluebird.resolve().nodeify(cb)
-	};
+	}
 
 	this.reLoadBasicData = function (cb) {
 		return Bluebird.resolve().nodeify(cb)
-	};
+	}
 
 	this.loadFullData = function (cb) {
 		return Bluebird.resolve().nodeify(cb)
-	};
+	}
 
 	this.isOwn = function () {
-		return false;
-	};
-};
+		return false
+	}
+}
 
 const getProfiles = (userData, isMe) => {
 	const profiles = {
@@ -82,7 +82,7 @@ const getProfiles = (userData, isMe) => {
 		profiles.private = []
 
 		if (userData.profile.priv && userData.profile.priv instanceof Array) {
-			var priv = userData.profile.priv
+			const priv = userData.profile.priv
 
 			profiles.private = priv.map((profile) => {
 				return new Profile(profile)
@@ -96,7 +96,7 @@ const getProfiles = (userData, isMe) => {
 }
 
 function enhanceOwnUser(user, ownUserLoadedFromServer) {
-	var identifier = user.getNickOrMail()
+	const identifier = user.getNickOrMail()
 
 	keyStoreService.setKeyGenIdentifier(identifier)
 	improvementListener(identifier)
@@ -168,37 +168,37 @@ function makeUser(data, ownUserLoadedFromServer = false) {
 	})
 }
 
-var THROTTLE = 20;
+const THROTTLE = 20
 
 /** loads all the users in the batch */
 function doLoad(identifier, cb) {
 	return initService.awaitLoading().then(function () {
-		return socketService.emit("user.getMultiple", {identifiers: identifier});
+		return socketService.emit("user.getMultiple", {identifiers: identifier})
 	}).then(function (data) {
 		if (!data || !data.users) {
-			return [];
+			return []
 		}
 
-		return data.users;
+		return data.users
 	}).map(function (userData) {
-		return makeUser(userData);
+		return makeUser(userData)
 	}).map(function (user) {
 		if (!user.isNotExistingUser()) {
-			return verifyKeys(user).thenReturn(user);
+			return verifyKeys(user).thenReturn(user)
 		}
 
 		return user
-	}).nodeify(cb);
+	}).nodeify(cb)
 }
 
-var delay = h.delayMultiplePromise(Bluebird, THROTTLE, doLoad, 10);
+const delay = h.delayMultiplePromise(Bluebird, THROTTLE, doLoad, 10)
 
 function loadUser(identifier) {
 	return Bluebird.try(function () {
 		if (users[identifier]) {
-			return users[identifier];
+			return users[identifier]
 		} else {
-			return delay(identifier);
+			return delay(identifier)
 		}
 	})
 }
@@ -210,7 +210,7 @@ userService = {
 			return socketService.emit("user.searchFriends", {
 				text: query,
 				known: knownIDs
-			});
+			})
 		}).then((data) => {
 			return data.results
 		}).map((user: any) => {
@@ -219,7 +219,7 @@ userService = {
 			} else {
 				return users[user]
 			}
-		}).nodeify(cb);
+		}).nodeify(cb)
 	},
 
 	/** search for a user
@@ -231,7 +231,7 @@ userService = {
 			return socketService.definitlyEmit("user.search", {
 				text: query,
 				known: knownIDs
-			});
+			})
 		}).then((data) => {
 			return data.results
 		}).map((user) => {
@@ -249,7 +249,7 @@ userService = {
 	* this function is asynchronous and returns immediatly. requests are also batched.
 	*/
 	get: function (identifier, cb) {
-		return loadUser(identifier).nodeify(cb);
+		return loadUser(identifier).nodeify(cb)
 	},
 
 	/** load a user
@@ -259,8 +259,8 @@ userService = {
 	*/
 	getMultiple: function getMultipleF(identifiers, cb) {
 		return Bluebird.resolve(identifiers).map(function (id) {
-			return loadUser(id);
-		}).nodeify(cb);
+			return loadUser(id)
+		}).nodeify(cb)
 	},
 
 	/** gets multiple users and loads their basic data.
@@ -269,67 +269,67 @@ userService = {
 	*/
 	getMultipleFormatted: function (identifiers, cb) {
 		return Bluebird.try(function () {
-			return userService.getMultiple(identifiers);
+			return userService.getMultiple(identifiers)
 		}).map(function (user: any) {
-			return user.loadBasicData().thenReturn(user);
+			return user.loadBasicData().thenReturn(user)
 		}).then(function (users) {
 			return users.map(function (user) {
-				return user.data;
-			});
-		}).nodeify(cb);
+				return user.data
+			})
+		}).nodeify(cb)
 	},
 
 	verifyOwnKeysCacheDone: function () {
-		return ownUserStatus.verifyOwnKeysCacheDone;
+		return ownUserStatus.verifyOwnKeysCacheDone
 	},
 
 	verifyOwnKeysDone: function () {
-		return ownUserStatus.verifyOwnKeysDone;
+		return ownUserStatus.verifyOwnKeysDone
 	},
 
 	ownLoadedCache: function () {
-		return ownUserStatus.loadedCache;
+		return ownUserStatus.loadedCache
 	},
 
 	ownLoaded: function () {
-		return ownUserStatus.loaded;
+		return ownUserStatus.loaded
 	},
 
 	/** get own user. synchronous */
 	getOwn: function () {
-		return users[sessionService.getUserID()];
+		return users[sessionService.getUserID()]
 	}
-};
+}
 
 function improvementListener(identifier) {
-	var improve = [];
+	let improve = []
 
 	keyStoreService.addImprovementListener(function (rid) {
-		improve.push(rid);
+		improve.push(rid)
 
 		if (improve.length === 1) {
 			Bluebird.resolve().timeout(5000).then(function () {
-				var own = userService.getOwn();
+				const own = userService.getOwn()
 				if (!own || own.getNickOrMail() !== identifier) {
-					throw new Error("user changed so no improvement update!");
+					throw new Error("user changed so no improvement update!")
 				}
 
 				return Bluebird.all(improve.map(function (keyID) {
-					return keyStoreService.sym.symEncryptKey(keyID, own.getMainKey());
-				}));
+					return keyStoreService.sym.symEncryptKey(keyID, own.getMainKey())
+				}))
 			}).then(function () {
-				var toUpload = keyStoreService.upload.getDecryptors(improve);
+				const toUpload = keyStoreService.upload.getDecryptors(improve)
 				return socketService.emit("key.addFasterDecryptors", {
 					keys: toUpload
-				});
+				})
 			}).then(function () {
-				improve = [];
-			}).catch(errorService.criticalError);
+				improve = []
+			}).catch(errorService.criticalError)
 		}
-	});
+	})
 }
 
-Observer.extend(userService);
+Observer.extend(userService)
 
 function verifyOwnKeys(ownUser) {
 	keyStoreService.security.verifyWithPW(ownUser.signedOwnKeys, {
@@ -346,8 +346,8 @@ function verifyKeys(user) {
 		user.getSignKey()
 		return user.signedKeys.verifyAsync(user.signKey, user.getID())
 	}).then(() => {
-		var friends = user.signedKeys.metaAttr("friends")
-		var crypt = user.signedKeys.metaAttr("crypt")
+		const friends = user.signedKeys.metaAttr("friends")
+		const crypt = user.signedKeys.metaAttr("crypt")
 
 		keyStoreService.security.addEncryptionIdentifier(friends)
 		keyStoreService.security.addEncryptionIdentifier(crypt)
@@ -356,7 +356,7 @@ function verifyKeys(user) {
 
 function verify(user) {
 	return Bluebird.try(() => {
-		var promises = []
+		let promises = []
 
 		promises.push(verifyKeys(user))
 
@@ -378,46 +378,46 @@ function verify(user) {
 
 function loadOwnUser(data, ownUserLoadedFromServer) {
 	return Bluebird.try(function () {
-		return makeUser(data, ownUserLoadedFromServer);
+		return makeUser(data, ownUserLoadedFromServer)
 	}).catch(function (e) {
 		if (e instanceof sjcl.exception.corrupt) {
 			alert("Password did not match. Logging out")
 
-			sessionService.logout();
+			sessionService.logout()
 
-			return new Bluebird(function () {});
+			return new Bluebird(function () {})
 		}
 
 		return Bluebird.reject(e)
-	});
+	})
 }
 
-var ownUserCache = new CacheService("ownUser");
+const ownUserCache = new CacheService("ownUser")
 
 initService.registerCacheCallback(function () {
 	return ownUserCache.get(sessionService.getUserID().toString()).then(function (cacheEntry) {
 		if (!cacheEntry) {
-			throw new Error("No user Cache");
+			throw new Error("No user Cache")
 		}
 
-		return loadOwnUser(cacheEntry.data, false);
+		return loadOwnUser(cacheEntry.data, false)
 	}).then(function () {
-		ownUserStatus.loadedCacheResolve();
-	});
-});
+		ownUserStatus.loadedCacheResolve()
+	})
+})
 
 initService.registerCallback(function () {
 	return socketService.definitlyEmit("user.get", {
 		id: sessionService.getUserID(),
 		//TODO: use cachedInfo: getInfoFromCacheEntry(cachedInfo),
 	}).then(function (data) {
-		return loadOwnUser(data, true).thenReturn(data);
+		return loadOwnUser(data, true).thenReturn(data)
 	}).then(function (userData) {
-		ownUserCache.store(sessionService.getUserID().toString(), userData);
+		ownUserCache.store(sessionService.getUserID().toString(), userData)
 
-		ownUserStatus.loadedResolve();
-		return null;
-	});
-});
+		ownUserStatus.loadedResolve()
+		return null
+	})
+})
 
-export default userService;
+export default userService
