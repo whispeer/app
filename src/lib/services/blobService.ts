@@ -84,7 +84,7 @@ class MyBlob {
 		}
 
 		this.meta = options.meta || {};
-		this.key = this.meta.key;
+		this.key = this.meta._key;
 		this.decrypted = options.decrypted || !this.key;
 
 		this.uploadProgress = new Progress({ total: this.getSize() });
