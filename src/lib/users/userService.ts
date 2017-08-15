@@ -1,21 +1,20 @@
-var h = require("../helper/helper").default;
-var Observer = require("asset/observer");
+import h from "../helper/helper"
+import Observer from "../asset/observer"
+import * as Bluebird from "bluebird"
+import socketService from "../services/socket.service"
+import requestKeyService from "../services/requestKey.service"
+import CacheService from "../services/Cache"
+import sessionService from "../services/session.service"
+import errorService from "../services/error.service"
+
 var signatureCache = require("crypto/signatureCache");
-var Bluebird = require("bluebird");
 var trustManager = require("crypto/trustManager");
 
 var sjcl = require("sjcl");
-
-var errorService = require("services/error.service").errorServiceInstance;
 var keyStoreService = require("crypto/keyStore");
-var socketService = require("services/socket.service").default;
-var requestKeyService = require("services/requestKey.service").default;
-var CacheService = require("services/Cache").default;
 var initService = require("services/initService");
 
-var sessionService = require("services/session.service").default;
-
-var userService, knownIDs = [], users = {}, ownUserStatus = {};
+var userService, knownIDs = [], users = {}, ownUserStatus: any = {};
 
 const Profile = require("../users/profile").default
 
@@ -31,7 +30,7 @@ promises.forEach(function (promiseName) {
 });
 
 var deletedUserName = "Deleted user"; //localize("user.deleted", {});
-var NotExistingUser = function (identifier) {
+var NotExistingUser = function (identifier?) {
 	this.data = {
 		trustLevel: -1,
 		notExisting: true,
@@ -69,7 +68,11 @@ var NotExistingUser = function (identifier) {
 };
 
 const getProfiles = (userData, isMe) => {
-	const profiles = {}
+	const profiles = {
+		public: null,
+		private: null,
+		me: null
+	}
 
 	if (!isMe) {
 		if (userData.profile.pub) {
@@ -165,14 +168,14 @@ function doLoad(identifier, cb) {
 
 var delay = h.delayMultiplePromise(Bluebird, THROTTLE, doLoad, 10);
 
-function loadUser(identifier, cb) {
+function loadUser(identifier) {
 	return Bluebird.try(function () {
 		if (users[identifier]) {
 			return users[identifier];
 		} else {
 			return delay(identifier);
 		}
-	}).nodeify(cb);
+	})
 }
 
 userService = {
@@ -185,7 +188,7 @@ userService = {
 			});
 		}).then((data) => {
 			return data.results
-		}).map((user) => {
+		}).map((user: any) => {
 			if (typeof user === "object") {
 				return makeUser(user)
 			} else {
@@ -242,7 +245,7 @@ userService = {
 	getMultipleFormatted: function (identifiers, cb) {
 		return Bluebird.try(function () {
 			return userService.getMultiple(identifiers);
-		}).map(function (user) {
+		}).map(function (user: any) {
 			return user.loadBasicData().thenReturn(user);
 		}).then(function (users) {
 			return users.map(function (user) {
@@ -392,7 +395,7 @@ function loadOwnUser(data, server) {
 var ownUserCache = new CacheService("ownUser");
 
 initService.registerCacheCallback(function () {
-	return ownUserCache.get(sessionService.getUserID()).then(function (cacheEntry) {
+	return ownUserCache.get(sessionService.getUserID().toString()).then(function (cacheEntry) {
 		if (!cacheEntry) {
 			throw new Error("No user Cache");
 		}
@@ -410,7 +413,7 @@ initService.registerCallback(function () {
 	}).then(function (data) {
 		return loadOwnUser(data, true).thenReturn(data);
 	}).then(function (userData) {
-		ownUserCache.store(sessionService.getUserID(), userData);
+		ownUserCache.store(sessionService.getUserID().toString(), userData);
 
 		ownUserStatus.loadedResolve();
 		return null;
