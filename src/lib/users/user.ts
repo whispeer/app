@@ -398,41 +398,6 @@ class User {
 
 	/** end profile management */
 
-	verifyKeys = () => {
-		return Bluebird.try(() => {
-			const signKey = this.getSignKey()
-			return this.signedKeys.verifyAsync(this.signKey, this.getID())
-		}).then(() => {
-			var friends = this.signedKeys.metaAttr("friends")
-			var crypt = this.signedKeys.metaAttr("crypt")
-
-			keyStoreService.security.addEncryptionIdentifier(friends)
-			keyStoreService.security.addEncryptionIdentifier(crypt)
-		})
-	}
-
-	verify = () => {
-		return Bluebird.try(() => {
-			var promises = []
-
-			promises.push(this.verifyKeys())
-
-			if (this.isOwn()) {
-				promises.push(this.profiles.me.verify(this.signKey))
-			} else {
-				promises = promises.concat(this.profiles.private.map((priv) => {
-					return priv.verify(this.signKey)
-				}))
-
-				if (this.profiles.public) {
-					promises.push(this.profiles.public.verify(this.signKey))
-				}
-			}
-
-			return Bluebird.all(promises)
-		})
-	}
-
 	verifyFingerPrint = (fingerPrint) => {
 		return Bluebird.try(() => {
 			if (fingerPrint !== keyStoreService.format.fingerPrint(this.getSignKey())) {
@@ -558,8 +523,7 @@ class User {
 				return Bluebird.all([
 					this.getShortName(),
 					this.getName(),
-					this.getTrustLevel(),
-					this.verify()
+					this.getTrustLevel()
 				])
 			}).spread((shortname, names: any, trustLevel, signatureValid) => {
 				this.data.signatureValid = signatureValid

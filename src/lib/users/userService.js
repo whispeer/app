@@ -107,6 +107,7 @@ function makeUser(data) {
 	// decrypt / verify profiles
 	// verify signed keys
 
+
 	const userID = h.parseDecimal(data.id)
 	const isMe = sessionService.isOwnUserID(userID)
 	const profiles = getProfiles(data, isMe)
@@ -117,6 +118,7 @@ function makeUser(data) {
 	}
 
 	var theUser = new User(data, profiles);
+	verify(theUser)
 
 	var mail = theUser.getMail();
 	var nickname = theUser.getNickname();
@@ -154,7 +156,7 @@ function doLoad(identifier, cb) {
 		return makeUser(userData);
 	}).map(function (user) {
 		if (!user.isNotExistingUser()) {
-			return user.verifyKeys().thenReturn(user);
+			return verifyKeys(user).thenReturn(user);
 		}
 
 		return user
@@ -311,6 +313,41 @@ function verifyOwnKeys(ownUser) {
 	keyStoreService.security.addEncryptionIdentifier(ownUser.getSignKey())
 }
 
+function verifyKeys(user) {
+	return Bluebird.try(() => {
+		user.getSignKey()
+		return user.signedKeys.verifyAsync(user.signKey, user.getID())
+	}).then(() => {
+		var friends = user.signedKeys.metaAttr("friends")
+		var crypt = user.signedKeys.metaAttr("crypt")
+
+		keyStoreService.security.addEncryptionIdentifier(friends)
+		keyStoreService.security.addEncryptionIdentifier(crypt)
+	})
+}
+
+function verify(user) {
+	return Bluebird.try(() => {
+		var promises = []
+
+		promises.push(verifyKeys(user))
+
+		if (user.isOwn()) {
+			promises.push(user.profiles.me.verify(user.signKey))
+		} else {
+			promises = promises.concat(user.profiles.private.map((priv) => {
+				return priv.verify(user.signKey)
+			}))
+
+			if (user.profiles.public) {
+				promises.push(user.profiles.public.verify(user.signKey))
+			}
+		}
+
+		return Bluebird.all(promises)
+	})
+}
+
 function loadOwnUser(data, server) {
 	return Bluebird.try(function () {
 		return makeUser(data);
@@ -333,7 +370,7 @@ function loadOwnUser(data, server) {
 
 		return signatureCache.awaitLoading().thenReturn(user);
 	}).then(function (user) {
-		return user.verifyKeys().thenReturn(user);
+		return verifyKeys(user).thenReturn(user);
 	}).then(function (user) {
 		requestKeyService.cacheKey(user.getSignKey(), "user-sign-" + user.getID(), requestKeyService.MAXCACHETIME)
 		requestKeyService.cacheKey(user.getMainKey(), "user-main-" + user.getID(), requestKeyService.MAXCACHETIME)
