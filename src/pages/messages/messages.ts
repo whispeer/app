@@ -114,7 +114,7 @@ export class MessagesPage {
 
 	messages: any[];
 
-	constructor(public navParams: NavParams, private element: ElementRef, private navCtrl: NavController) {
+	constructor(public navParams: NavParams, private element: ElementRef) {
 	}
 
 	ngOnInit() {

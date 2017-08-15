@@ -1,4 +1,4 @@
-import { Component, ViewChild, NgZone } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController } from "ionic-angular";
 
 import { SplashScreen } from "@ionic-native/splash-screen";
@@ -78,7 +78,6 @@ export class MyApp {
 
 	constructor(
 		platform: Platform,
-		private zone: NgZone,
 		private splashScreen: SplashScreen,
 		private statusBar: StatusBar,
 		private globalization: Globalization,

@@ -17,8 +17,6 @@ import ChatTitleUpdate from "./chatTitleUpdate"
 const debugName = "whispeer:chunk";
 const chunkDebug = debug(debugName);
 
-declare const startup: number
-
 const CHUNK_SECURED_DATA_OPTIONS = {
 	type: "topic", // Keep topic for now until lots of clients have picked up the change
 	alternativeType: "chatChunk" // Allow for chatChunk already
@@ -206,7 +204,7 @@ export class Chunk extends Observer {
 	setSuccessor = (successorID) => {
 		this.successorID = successorID
 
-		console.warn("Set successor of chunk " , this.getID(), " succ: ", successorID)
+		chunkDebug("Set successor of chunk " , this.getID(), " succ: ", successorID)
 
 		this.notify({ successorID: successorID }, "successor")
 	}

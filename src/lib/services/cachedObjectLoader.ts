@@ -66,7 +66,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			if (!loading[id]) {
 				loading = {
 					...loading,
-					[id]: loadFromCache(id).catch((e) => serverResponseToInstance(response, id))
+					[id]: loadFromCache(id).catch(() => serverResponseToInstance(response, id))
 				}
 			}
 
@@ -79,7 +79,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			}
 
 			if (!loading[id]) {
-				let promise = loadFromCache(id).catch((e) =>
+				let promise = loadFromCache(id).catch(() =>
 					download(id).then((response) => serverResponseToInstance(response, id))
 				)
 

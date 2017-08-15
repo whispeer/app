@@ -1,10 +1,8 @@
 import * as Bluebird from "bluebird"
-import idb from "idb"
 
 import Storage from "./Storage";
 import blobCache from "../../lib/asset/blobCache"
 import Cache from "../services/Cache"
-import h from "../helper/helper"
 import keyStore from "./keyStore.service";
 import { landingPage } from "./location.manager";
 import { withPrefix } from "./storage.service";
