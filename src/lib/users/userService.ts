@@ -95,7 +95,7 @@ const getProfiles = (userData, isMe) => {
 	return profiles
 }
 
-function enhanceOwnUser(user, ownUserLoadedFromServer) {
+function enhanceOwnUser(user) {
 	const identifier = user.getNickOrMail()
 
 	keyStoreService.setKeyGenIdentifier(identifier)
@@ -110,7 +110,7 @@ function enhanceOwnUser(user, ownUserLoadedFromServer) {
 	trustManager.setOwnSignKey(user.getSignKey())
 }
 
-function makeUser(data, ownUserLoadedFromServer = false) {
+function makeUser(data) {
 	return Bluebird.try(async function () {
 		if (data.userNotExisting) {
 			return new NotExistingUser(data.identifier)
@@ -120,20 +120,23 @@ function makeUser(data, ownUserLoadedFromServer = false) {
 			return new NotExistingUser()
 		}
 
-		const User = require("users/user").default
-
 		// decrypt / verify profiles
 		// verify signed keys
 		const userID = h.parseDecimal(data.id)
-		const isMe = sessionService.isOwnUserID(userID)
-
-		const profiles = getProfiles(data, isMe)
 
 		if (users[userID]) {
-			users[userID].update(data, profiles)
 			return users[userID]
 		}
 
+		const isMe = sessionService.isOwnUserID(userID)
+
+		// enhance own user
+
+		const profiles = await getProfiles(data, isMe)
+
+		// const meProfile = ProfileLoader.load(data.profile.me)
+
+		const User = require("users/user").default
 		const user = new User(data, profiles)
 		const mail = user.getMail()
 		const nickname = user.getNickname()
@@ -153,7 +156,7 @@ function makeUser(data, ownUserLoadedFromServer = false) {
 		userService.notify(user, "loadedUser")
 
 		if (isMe) {
-			enhanceOwnUser(user, ownUserLoadedFromServer)
+			enhanceOwnUser(user)
 			await signatureCache.awaitLoading()
 		}
 		await verify(user)
@@ -338,31 +341,32 @@ function verifyKeys(user) {
 	})
 }
 
-function verify(user) {
-	return Bluebird.try(() => {
-		let promises = []
+function verifyProfiles(user) {
+	if (user.isOwn()) {
+		return user.profiles.me.verify(user.signKey)
+	}
 
-		promises.push(verifyKeys(user))
-
-		if (user.isOwn()) {
-			promises.push(user.profiles.me.verify(user.signKey))
-		} else {
-			promises = promises.concat(user.profiles.private.map((priv) => {
-				return priv.verify(user.signKey)
-			}))
-
-			if (user.profiles.public) {
-				promises.push(user.profiles.public.verify(user.signKey))
-			}
-		}
-
-		return Bluebird.all(promises)
+	const promises = user.profiles.private.map((priv) => {
+		return priv.verify(user.signKey)
 	})
+
+	if (user.profiles.public) {
+		promises.push(user.profiles.public.verify(user.signKey))
+	}
+
+	return Bluebird.all(promises)
 }
 
-function loadOwnUser(data, ownUserLoadedFromServer) {
+function verify(user) {
+	return Bluebird.all([
+		verifyKeys(user),
+		verifyProfiles(user)
+	])
+}
+
+function loadOwnUser(data) {
 	return Bluebird.try(function () {
-		return makeUser(data, ownUserLoadedFromServer)
+		return makeUser(data)
 	}).catch(function (e) {
 		if (e instanceof sjcl.exception.corrupt) {
 			alert("Password did not match. Logging out")
@@ -384,7 +388,7 @@ initService.registerCacheCallback(function () {
 			throw new Error("No user Cache")
 		}
 
-		return loadOwnUser(cacheEntry.data, false)
+		return loadOwnUser(cacheEntry.data)
 	}).then(function () {
 		ownUserStatus.loadedCacheResolve()
 	})
@@ -395,7 +399,7 @@ initService.registerCallback(function () {
 		id: sessionService.getUserID(),
 		//TODO: use cachedInfo: getInfoFromCacheEntry(cachedInfo),
 	}).then(function (data) {
-		return loadOwnUser(data, true).thenReturn(data)
+		return loadOwnUser(data).thenReturn(data)
 	}).then(function (userData) {
 		ownUserCache.store(sessionService.getUserID().toString(), userData)
 

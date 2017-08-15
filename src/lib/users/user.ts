@@ -140,9 +140,7 @@ class User {
 
 		if (isMe) {
 			this.friendsKey = this.signedKeys.metaAttr("friends")
-		}
-
-		if (!isMe) {
+		} else {
 			friendsService.awaitLoading().then(() => {
 				if (friendsService.didOtherRequest(this.id)) {
 					this.friendsKey = this.signedKeys.metaAttr("friends")
@@ -152,14 +150,6 @@ class User {
 					this.friendShipKey = friendsService.getUserFriendShipKey(this.id)
 				}
 			})
-		}
-
-		this.update(userData, profiles)
-	}
-
-	update = (userData, profiles) => {
-		if (this.id && h.parseDecimal(userData.id) !== h.parseDecimal(this.id)) {
-			throw new Error("user update invalid")
 		}
 
 		this.mutualFriends = userData.mutualFriends
