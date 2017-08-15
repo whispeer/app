@@ -635,7 +635,7 @@ class User {
 			basic = basic || {}
 			var nickname = this.getNickname()
 
-			return basic.firstname || basic.lastname || this.nickname || ""
+			return basic.firstname || basic.lastname || nickname || ""
 		})
 	}
 
@@ -644,15 +644,15 @@ class User {
 			basic = basic || {}
 			var nickname = this.getNickname()
 
-			var searchNames = [this.nickname]
+			var searchNames = [nickname]
 
 			var name = ""
 			if (basic.firstname && basic.lastname) {
 				name = basic.firstname + " " + basic.lastname
 			} else if (basic.firstname || basic.lastname) {
 				name = basic.firstname || basic.lastname
-			} else if (this.nickname) {
-				name = this.nickname
+			} else if (nickname) {
+				name = nickname
 			}
 
 			if (basic.firstname) {

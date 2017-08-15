@@ -1,4 +1,4 @@
-import { Component, ElementRef } from "@angular/core";
+import { Component } from "@angular/core";
 import { NavController, NavParams, IonicPage, AlertController } from "ionic-angular";
 
 import ChatLoader, { Chat } from "../../../lib/messages/chat"
@@ -30,7 +30,6 @@ export class DetailPage {
 	constructor(
 		private navCtrl: NavController,
 		private navParams: NavParams,
-		private element: ElementRef,
 		private alertCtrl: AlertController,
 		private translate: TranslateService
 	) {}

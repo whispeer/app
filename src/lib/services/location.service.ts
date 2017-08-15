@@ -5,12 +5,9 @@ import { Location } from "@angular/common";
 import { isBlockedReturnUrl } from "./location.manager";
 
 export default class LocationService {
-	location: Location;
 	loginStorage: Storage = StorageService.withPrefix("whispeer.login");
 
-	constructor(location: Location) {
-		this.location = location;
-	}
+	constructor(public location: Location) {}
 
 	loadInitialURL() {
 		var returnURL: string = this.loginStorage.get("returnUrl");
