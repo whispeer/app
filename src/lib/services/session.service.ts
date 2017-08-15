@@ -1,7 +1,6 @@
 import * as Bluebird from "bluebird"
 import idb from "idb"
 
-import Observer from "../asset/observer";
 import Storage from "./Storage";
 import blobCache from "../../lib/asset/blobCache"
 import Cache from "../services/Cache"
@@ -10,13 +9,18 @@ import keyStore from "./keyStore.service";
 import { landingPage } from "./location.manager";
 import { withPrefix } from "./storage.service";
 
-export class SessionService extends Observer {
+export class SessionService {
 	sid: string = "";
 	loggedin: boolean = false;
 	userid: any;
 	sessionStorage: Storage = withPrefix("whispeer.session");
 
 	keyStore: any; // This has to change as soon as we port crypto/keyStore
+
+	private loginResolve
+	private loginPromise = new Bluebird((loginResolve) => {
+		this.loginResolve = loginResolve
+	})
 
 	saveSession = () => {
 		this.sessionStorage.set("sid", this.sid);
@@ -29,9 +33,11 @@ export class SessionService extends Observer {
 		this.userid = parseInt(_userid, 10)
 		this.loggedin = true;
 
-		setTimeout(() => {
-			this.notify("", "ssn.login");
-		});
+		this.loginResolve()
+	}
+
+	awaitLogin = () => {
+		return this.loginPromise
 	}
 
 	setPassword = (password: string) => {

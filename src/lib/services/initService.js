@@ -18,13 +18,13 @@ var initServiceDebug = debug(debugName);
 
 function time(name) {
 	if (debug.enabled(debugName)) {
-		console.time(name);
+		console.time("init: " + name);
 	}
 }
 
 function timeEnd(name) {
 	if (debug.enabled(debugName)) {
-		console.timeEnd(name);
+		console.timeEnd("init: " + name);
 	}
 }
 
@@ -131,7 +131,7 @@ function loadData() {
 	var runningInitCallbacks;
 	var promise = Bluebird.resolve().then(function () {
 
-		time("cacheInitGet");
+		time("getCache");
 		return initRequestsList;
 	}).map(function (initRequest) {
 		if (initRequest.options.cache) {
@@ -140,8 +140,9 @@ function loadData() {
 			return initRequest;
 		}
 	}).then(function (initRequests) {
-		timeEnd("cacheInitGet");
-		time("runInitCacheCallbacks");
+		timeEnd("getCache");
+		time("runCacheCallbacks")
+
 		return Bluebird.all([
 			runInitCacheCallbacks(),
 			runCacheCallbacks(initRequests)
@@ -155,20 +156,20 @@ function loadData() {
 			return null;
 		}).catch(errorService.criticalError).thenReturn(initRequests);
 	}).then(function (initRequests) {
-		timeEnd("runInitCacheCallbacks");
+		timeEnd("runCacheCallbacks")
 		runningInitCallbacks = initCallbacks.map(runFunction);
 
-		time("serverInitGet");
+		time("getServer");
 		return getServerData(initRequests);
 	}).then(function (initResponses) {
-		timeEnd("serverInitGet");
-		time("init");
+		timeEnd("getServer");
+		time("runMainCallbacks");
 		return runCallbacks(initResponses);
 	}).then(function () {
 		initServiceDebug("Callbacks done!");
 		return Bluebird.all(runningInitCallbacks);
 	}).then(function () {
-		timeEnd("init");
+		timeEnd("runMainCallbacks");
 		keyStore.security.allowPrivateActions();
 
 		var migrationService = require("services/migrationService");
@@ -182,7 +183,7 @@ function loadData() {
 	return promise;
 }
 
-var loadingPromise = sessionService.listenPromise("ssn.login").then(function () {
+var loadingPromise = sessionService.awaitLogin().then(function () {
 	return loadData();
 });
 
