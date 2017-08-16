@@ -8,6 +8,7 @@ import errorService from "../services/error.service"
 
 const signatureCache = require("crypto/signatureCache")
 const trustManager = require("crypto/trustManager")
+const SecuredData = require("asset/securedDataWithMetaData")
 
 const sjcl = require("sjcl")
 const keyStoreService = require("crypto/keyStore")
@@ -66,63 +67,75 @@ const NotExistingUser = function (identifier?) {
 	}
 }
 
-const getProfiles = (userData, isMe) => {
-	const profiles = {
-		public: null,
-		private: null,
-		me: null
-	}
-
-	if (!isMe) {
-		if (userData.profile.pub) {
-			userData.profile.pub.profileid = userData.profile.pub.profileid || userData.id
-			profiles.public = new Profile(userData.profile.pub, { isPublicProfile: true })
+const getProfiles = (userData, signKey, isMe) => {
+	return Bluebird.try(async function () {
+		const profiles = {
+			public: null,
+			private: null,
+			me: null
 		}
 
-		profiles.private = []
+		if (!isMe) {
+			if (userData.profile.pub) {
+				userData.profile.pub.profileid = userData.profile.pub.profileid || userData.id
+				profiles.public = new Profile(userData.profile.pub, { isPublicProfile: true })
+			}
 
-		if (userData.profile.priv && userData.profile.priv instanceof Array) {
-			const priv = userData.profile.priv
+			profiles.private = []
 
-			profiles.private = priv.map((profile) => {
-				return new Profile(profile)
-			})
+			if (userData.profile.priv && userData.profile.priv instanceof Array) {
+				const priv = userData.profile.priv
+
+				profiles.private = priv.map((profile) => {
+					return new Profile(profile)
+				})
+			}
+		} else {
+			profiles.me = new Profile(userData.profile.me)
 		}
-	} else {
-		profiles.me = new Profile(userData.profile.me)
-	}
 
-	return profiles
+		await verifyProfiles(profiles, signKey, isMe)
+
+		return profiles
+	})
 }
 
-function enhanceOwnUser(user) {
-	const identifier = user.getNickOrMail()
+function enhanceOwnUser(userData) {
+	const nickname = userData.nickname
+	const mainKey = userData.mainKey
+	const signKey = userData.signedKeys.sign
 
-	keyStoreService.setKeyGenIdentifier(identifier)
-	improvementListener(identifier)
-	keyStoreService.sym.registerMainKey(user.getMainKey())
+	keyStoreService.setKeyGenIdentifier(nickname)
+	improvementListener(nickname)
+	keyStoreService.sym.registerMainKey(mainKey)
 
-	verifyOwnKeys(user)
+	keyStoreService.security.verifyWithPW(userData.signedOwnKeys, {
+		main: mainKey,
+		sign: signKey
+	})
 
-	ownUserStatus.verifyOwnKeysDoneResolve()
+	keyStoreService.security.addEncryptionIdentifier(mainKey)
+	keyStoreService.security.addEncryptionIdentifier(signKey)
+
+	ownUserStatus.verifyOwnKeysDoneResolve({ signKey, mainKey })
 	ownUserStatus.verifyOwnKeysCacheDoneResolve()
 
-	trustManager.setOwnSignKey(user.getSignKey())
+	trustManager.setOwnSignKey(signKey)
 }
 
-function makeUser(data) {
+function makeUser(userData) {
 	return Bluebird.try(async function () {
-		if (data.userNotExisting) {
-			return new NotExistingUser(data.identifier)
+		if (userData.userNotExisting) {
+			return new NotExistingUser(userData.identifier)
 		}
 
-		if (data.error === true) {
+		if (userData.error === true) {
 			return new NotExistingUser()
 		}
 
 		// decrypt / verify profiles
 		// verify signed keys
-		const userID = h.parseDecimal(data.id)
+		const userID = h.parseDecimal(userData.id)
 
 		if (users[userID]) {
 			return users[userID]
@@ -131,13 +144,20 @@ function makeUser(data) {
 		const isMe = sessionService.isOwnUserID(userID)
 
 		// enhance own user
+		if (isMe) {
+			enhanceOwnUser(userData)
+			await signatureCache.awaitLoading()
+		}
 
-		const profiles = await getProfiles(data, isMe)
+		const signedKeys = SecuredData.load(undefined, userData.signedKeys, { type: "signedKeys" })
+		const signKey = signedKeys.metaAttr("sign")
 
-		// const meProfile = ProfileLoader.load(data.profile.me)
+		await verifyKeys(signedKeys, signKey, userID)
+
+		const profiles = await getProfiles(userData, signKey, isMe)
 
 		const User = require("users/user").default
-		const user = new User(data, profiles)
+		const user = new User(userData, profiles)
 		const mail = user.getMail()
 		const nickname = user.getNickname()
 
@@ -155,11 +175,6 @@ function makeUser(data) {
 
 		userService.notify(user, "loadedUser")
 
-		if (isMe) {
-			enhanceOwnUser(user)
-			await signatureCache.awaitLoading()
-		}
-		await verify(user)
 		return user
 	})
 }
@@ -318,50 +333,30 @@ function improvementListener(identifier) {
 
 Observer.extend(userService)
 
-function verifyOwnKeys(ownUser) {
-	keyStoreService.security.verifyWithPW(ownUser.signedOwnKeys, {
-		main: ownUser.getMainKey(),
-		sign: ownUser.getSignKey()
-	})
-
-	keyStoreService.security.addEncryptionIdentifier(ownUser.getMainKey())
-	keyStoreService.security.addEncryptionIdentifier(ownUser.getSignKey())
-}
-
-function verifyKeys(user) {
-	return Bluebird.try(() => {
-		user.getSignKey()
-		return user.signedKeys.verifyAsync(user.signKey, user.getID())
-	}).then(() => {
-		const friends = user.signedKeys.metaAttr("friends")
-		const crypt = user.signedKeys.metaAttr("crypt")
+function verifyKeys(signedKeys, signKey, userID) {
+	return signedKeys.verifyAsync(signKey, userID).then(() => {
+		const friends = signedKeys.metaAttr("friends")
+		const crypt = signedKeys.metaAttr("crypt")
 
 		keyStoreService.security.addEncryptionIdentifier(friends)
 		keyStoreService.security.addEncryptionIdentifier(crypt)
 	})
 }
 
-function verifyProfiles(user) {
-	if (user.isOwn()) {
-		return user.profiles.me.verify(user.signKey)
+function verifyProfiles(profiles, signKey, isMe: boolean) {
+	if (isMe) {
+		return profiles.me.verify(signKey)
 	}
 
-	const promises = user.profiles.private.map((priv) => {
-		return priv.verify(user.signKey)
+	const promises = profiles.private.map((priv) => {
+		return priv.verify(signKey)
 	})
 
-	if (user.profiles.public) {
-		promises.push(user.profiles.public.verify(user.signKey))
+	if (profiles.public) {
+		promises.push(profiles.public.verify(signKey))
 	}
 
 	return Bluebird.all(promises)
-}
-
-function verify(user) {
-	return Bluebird.all([
-		verifyKeys(user),
-		verifyProfiles(user)
-	])
 }
 
 function loadOwnUser(data) {
