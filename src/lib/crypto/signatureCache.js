@@ -60,15 +60,12 @@ var cacheTypes = {
 
 	signedKeys: "user",
 	signedFriendList: "user",
-	profile: "user",
 
 	circle: "me",
 	trustManager: "me",
 	settings: "me",
 
-	topic: "topic",
 	topicUpdate: "topic",
-	message: "message",
 
 	post: "post",
 	postPrivate: "post",
