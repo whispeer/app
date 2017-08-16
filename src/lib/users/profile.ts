@@ -8,7 +8,8 @@ import ObjectLoader from "../services/cachedObjectLoader"
 import Observer from '../asset/observer';
 
 interface ProfileOptions {
-	isPublicProfile?: boolean
+	isPublicProfile?: boolean,
+	signKey?: string
 }
 
 export default class Profile extends Observer {
@@ -131,5 +132,51 @@ export default class Profile extends Observer {
 			return h.deepGet(this.securedData.contentGet(), attrs);
 		}).nodeify(cb);
 	};
-
 }
+
+type ProfileCache = {
+	profile: {
+		content: any,
+		meta: any,
+	},
+	options: {
+		signKey: string,
+		isPublic: boolean
+	}
+}
+
+export class ProfileLoader extends ObjectLoader<Profile, ProfileCache>({
+	cacheName: "profile",
+	getID: ({ meta }) => meta._signature,
+	download: id => { throw new Error("profile get by id is not implemented") },
+	load: ({ content, meta, isPublic, signKey }): Bluebird<ProfileCache> => {
+		const PROFILE_SECUREDDATA_OPTIONS = {
+			type: "profile",
+			removeEmpty: true,
+			encryptDepth: 1
+		}
+
+		const securedData = isPublic ?
+			SecuredData.createRaw(content, meta, PROFILE_SECUREDDATA_OPTIONS) :
+			SecuredData.load(content, meta, PROFILE_SECUREDDATA_OPTIONS)
+
+		return Bluebird.all([
+			securedData.verifyAsync(signKey),
+			isPublic ? null : securedData.decrypt()
+		]).then(() => {
+			return {
+				profile: {
+					content: securedData.contentGet(),
+					meta: securedData.metaGet(),
+				},
+				options: {
+					signKey,
+					isPublic
+				}
+			}
+		})
+	},
+	restore: ({ profile, options }: ProfileCache) => {
+		return new Profile(profile, options)
+	},
+}) {}

@@ -16,7 +16,7 @@ const initService = require("services/initService")
 
 let userService, knownIDs = [], users = {}, ownUserStatus: any = {}
 
-const Profile = require("../users/profile").default
+import Profile, { ProfileLoader } from "../users/profile"
 
 const promises = ["verifyOwnKeysDone", "verifyOwnKeysCacheDone", "loadedCache", "loaded"]
 
@@ -79,9 +79,7 @@ const getProfiles = (userData, signKey, isMe) => {
 			if (userData.profile.pub) {
 				userData.profile.pub.profileid = userData.profile.pub.profileid || userData.id
 
-				const profileInfo = await loadProfileInfo(userData.profile.pub, signKey, true)
-
-				profiles.public = new Profile(profileInfo, { isPublicProfile: true })
+				profiles.public = await loadProfileInfo(userData.profile.pub, signKey, true)
 			}
 
 			profiles.private = []
@@ -91,13 +89,10 @@ const getProfiles = (userData, signKey, isMe) => {
 
 				profiles.private = await Bluebird.resolve(priv)
 					.map(profile => loadProfileInfo(profile, signKey))
-					.map((profile) => new Profile(profile))
 			}
 		} else {
-			const profileInfo = await loadProfileInfo(userData.profile.me, signKey)
-			profiles.me = new Profile(profileInfo)
+			profiles.me =  await loadProfileInfo(userData.profile.me, signKey)
 		}
-
 
 		return profiles
 	})
@@ -346,25 +341,11 @@ function verifyKeys(signedKeys, signKey, userID) {
 	})
 }
 
-function loadProfileInfo(profileInfo, signKey, isDecrypted = false) {
-	const PROFILE_SECUREDDATA_OPTIONS = {
-		type: "profile",
-		removeEmpty: true,
-		encryptDepth: 1
-	}
-
-	const securedData = isDecrypted ?
-		SecuredData.createRaw(profileInfo.content, profileInfo.meta, PROFILE_SECUREDDATA_OPTIONS) :
-		SecuredData.load(profileInfo.content, profileInfo.meta, PROFILE_SECUREDDATA_OPTIONS)
-
-	return Bluebird.all([
-		securedData.verifyAsync(signKey),
-		isDecrypted ? null : securedData.decrypt()
-	]).then(() => {
-		return {
-			content: securedData.contentGet(),
-			meta: securedData.metaGet()
-		}
+function loadProfileInfo(profileInfo, signKey, isPublic = false) {
+	return ProfileLoader.load({
+		...profileInfo,
+		isPublic,
+		signKey
 	})
 }
 

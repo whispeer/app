@@ -5,7 +5,7 @@ import Cache from "../services/Cache"
 type hookType<ObjectType, CachedObjectType> = {
 	download: (id: any) => Bluebird<any>,
 	load: (response: any) => Bluebird<CachedObjectType>,
-	restore: (response: CachedObjectType) => Bluebird<ObjectType>,
+	restore: (response: CachedObjectType) => Bluebird<ObjectType> | ObjectType,
 	getID: (response: any) => any,
 	cacheName: string
 }
