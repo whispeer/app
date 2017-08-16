@@ -207,15 +207,15 @@ trustManager = {
 			return;
 		}
 
+		if (data.me !== ownKey) {
+			throw new errors.SecurityError("not my trust database");
+		}
+
 		var givenDatabase = SecuredData.load(undefined, data, {
 			type: "trustManager"
 		});
 		return Bluebird.try(function() {
-			if (data.me === ownKey) {
-				return givenDatabase.verifyAsync(ownKey, "user");
-			}
-
-			throw new errors.SecurityError("not my trust database");
+			return givenDatabase.verifyAsync(ownKey, "user");
 		}).then(function() {
 			trustManager.disallow();
 			database = givenDatabase;
@@ -223,10 +223,6 @@ trustManager = {
 
 			trustManager.notify("", "loaded");
 		}).nodeify(cb);
-	},
-	reset: function() {
-		loaded = false;
-		database = undefined;
 	},
 	hasKeyData: function(keyid) {
 		if (!loaded) {

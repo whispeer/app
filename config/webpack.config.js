@@ -6,8 +6,6 @@ var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlug
 var ModuleConcatPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
 var WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").WebpackBundleSizeAnalyzerPlugin;
 
-process.env.WHISPEER_ENV = process.env.WHISPEER_ENV || "production";
-
 var data = require(path.resolve("package.json"))
 
 var prodPlugins = [];
@@ -70,7 +68,7 @@ module.exports = {
 		ionicWebpackFactory.getIonicEnvironmentPlugin(),
 		ionicWebpackFactory.getCommonChunksPlugin(),
 		new webpack.DefinePlugin({
-			"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV),
+			"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV || "production"),
 			"CLIENT_INFO": JSON.stringify({
 				type: "messenger",
 				version: data.version
