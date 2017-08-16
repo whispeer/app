@@ -102,7 +102,6 @@ class User {
 	private friendsKey
 	private migrationState
 	private signedKeys
-	private signedOwnKeys
 
 	private id
 	private mail
@@ -125,12 +124,11 @@ class User {
 
 	data: any = {}
 
-	constructor (userData, profiles) {
+	constructor (userData, signedKeys, profiles) {
 		this.id = h.parseDecimal(userData.id)
 		this.mainKey = userData.mainKey
 
-		this.signedKeys = SecuredData.load(undefined, userData.signedKeys, { type: "signedKeys" })
-		this.signedOwnKeys = userData.signedOwnKeys
+		this.signedKeys = signedKeys
 
 		//all keys we get from the signedKeys object:
 		this.signKey = this.signedKeys.metaAttr("sign")
@@ -236,8 +234,8 @@ class User {
 		}).then((updatedSignedKeys) => {
 			this.friendsKey = newFriendsKey
 			return {
-				updatedSignedKeys: updatedSignedKeys,
-				newFriendsKey: newFriendsKey
+				updatedSignedKeys,
+				newFriendsKey
 			}
 		})
 	}

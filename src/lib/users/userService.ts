@@ -16,7 +16,7 @@ const initService = require("services/initService")
 
 let userService, knownIDs = [], users = {}, ownUserStatus: any = {}
 
-import Profile, { ProfileLoader } from "../users/profile"
+import { ProfileLoader } from "../users/profile"
 
 const promises = ["verifyOwnKeysDone", "verifyOwnKeysCacheDone", "loadedCache", "loaded"]
 
@@ -155,7 +155,7 @@ function makeUser(userData) {
 		const profiles = await getProfiles(userData, signKey, isMe)
 
 		const User = require("users/user").default
-		const user = new User(userData, profiles)
+		const user = new User(userData, signedKeys, profiles)
 		const mail = user.getMail()
 		const nickname = user.getNickname()
 
