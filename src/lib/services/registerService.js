@@ -31,12 +31,12 @@ var registerService = {
 
 				var privateProfile = new Profile({
 					content: profile.priv
-				}, { isDecrypted: true });
+				});
 
 				var privateProfileMe = new Profile({
 					content: h.objectJoin(h.objectJoin(profile.priv, profile.pub), profile.nobody),
 					meta: { myProfile: true }
-				}, { isDecrypted: true });
+				});
 
 				var publicProfile = new Profile({
 					content: profile.pub || {}

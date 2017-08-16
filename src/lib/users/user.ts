@@ -316,7 +316,7 @@ class User {
 			var privatePromises = scopeData.map((scope) => {
 				var newProfile = new Profile({
 					content: applicableParts(scope.name, privacySettings, profile)
-				}, { isDecrypted: true })
+				})
 
 				return newProfile.signAndEncrypt(this.getSignKey(), scope.key)
 			})

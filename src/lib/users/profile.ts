@@ -2,17 +2,18 @@ import h from "../helper/helper";
 const validator = require("validation/validator");
 const SecuredData = require("asset/securedDataWithMetaData")
 
+import * as Bluebird from "bluebird"
+import ObjectLoader from "../services/cachedObjectLoader"
+
 import Observer from '../asset/observer';
 
 interface ProfileOptions {
-	isPublicProfile?: boolean,
-	isDecrypted?: boolean
+	isPublicProfile?: boolean
 }
 
 export default class Profile extends Observer {
 	private securedData: any;
 	private isPublicProfile: boolean;
-	private isDecrypted: boolean;
 	private id: String | number;
 
 	constructor(data: any, options?: ProfileOptions) {
@@ -21,21 +22,12 @@ export default class Profile extends Observer {
 		options = options || {};
 
 		this.isPublicProfile = options.isPublicProfile === true;
-		this.isDecrypted = options.isDecrypted || this.isPublicProfile;
 
-		if (this.isDecrypted) {
-			this.securedData = SecuredData.createRaw(data.content, data.meta, {
-				type: "profile",
-				removeEmpty: true,
-				encryptDepth: 1
-			});
-		} else {
-			this.securedData = SecuredData.load(data.content, data.meta, {
-				type: "profile",
-				removeEmpty: true,
-				encryptDepth: 1
-			});
-		}
+		this.securedData = SecuredData.createRaw(data.content, data.meta, {
+			type: "profile",
+			removeEmpty: true,
+			encryptDepth: 1
+		});
 
 		this.checkProfile();
 
@@ -45,12 +37,7 @@ export default class Profile extends Observer {
 	}
 
 	checkProfile = () => {
-		let err: Error;
-		if (this.securedData.isDecrypted()) {
-			err = validator.validate("profile", this.securedData.contentGet());
-		} else {
-			err = validator.validate("profileEncrypted", this.securedData.contentGet(), 1);
-		}
+		const err = validator.validate("profile", this.securedData.contentGet());
 
 		if (err) {
 			throw err;
@@ -113,10 +100,6 @@ export default class Profile extends Observer {
 
 	changed = () => {
 		return this.securedData.isChanged();
-	};
-
-	verify = (signKey:string, cb?: Function) => {
-		return this.securedData.verifyAsync(signKey, this.getID()).nodeify(cb);
 	};
 
 	setFullProfile = (data: any, cb?: Function) => {

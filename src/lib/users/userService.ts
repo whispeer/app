@@ -78,7 +78,10 @@ const getProfiles = (userData, signKey, isMe) => {
 		if (!isMe) {
 			if (userData.profile.pub) {
 				userData.profile.pub.profileid = userData.profile.pub.profileid || userData.id
-				profiles.public = new Profile(userData.profile.pub, { isPublicProfile: true })
+
+				const profileInfo = await loadProfileInfo(userData.profile.pub, signKey, true)
+
+				profiles.public = new Profile(profileInfo, { isPublicProfile: true })
 			}
 
 			profiles.private = []
@@ -86,15 +89,15 @@ const getProfiles = (userData, signKey, isMe) => {
 			if (userData.profile.priv && userData.profile.priv instanceof Array) {
 				const priv = userData.profile.priv
 
-				profiles.private = priv.map((profile) => {
-					return new Profile(profile)
-				})
+				profiles.private = await Bluebird.resolve(priv)
+					.map(profile => loadProfileInfo(profile, signKey))
+					.map((profile) => new Profile(profile))
 			}
 		} else {
-			profiles.me = new Profile(userData.profile.me)
+			const profileInfo = await loadProfileInfo(userData.profile.me, signKey)
+			profiles.me = new Profile(profileInfo)
 		}
 
-		await verifyProfiles(profiles, signKey, isMe)
 
 		return profiles
 	})
@@ -343,20 +346,26 @@ function verifyKeys(signedKeys, signKey, userID) {
 	})
 }
 
-function verifyProfiles(profiles, signKey, isMe: boolean) {
-	if (isMe) {
-		return profiles.me.verify(signKey)
+function loadProfileInfo(profileInfo, signKey, isDecrypted = false) {
+	const PROFILE_SECUREDDATA_OPTIONS = {
+		type: "profile",
+		removeEmpty: true,
+		encryptDepth: 1
 	}
 
-	const promises = profiles.private.map((priv) => {
-		return priv.verify(signKey)
+	const securedData = isDecrypted ?
+		SecuredData.createRaw(profileInfo.content, profileInfo.meta, PROFILE_SECUREDDATA_OPTIONS) :
+		SecuredData.load(profileInfo.content, profileInfo.meta, PROFILE_SECUREDDATA_OPTIONS)
+
+	return Bluebird.all([
+		securedData.verifyAsync(signKey),
+		isDecrypted ? null : securedData.decrypt()
+	]).then(() => {
+		return {
+			content: securedData.contentGet(),
+			meta: securedData.metaGet()
+		}
 	})
-
-	if (profiles.public) {
-		promises.push(profiles.public.verify(signKey))
-	}
-
-	return Bluebird.all(promises)
 }
 
 function loadOwnUser(data) {
