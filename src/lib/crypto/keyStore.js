@@ -1252,6 +1252,11 @@ SignKey = function (keyData) {
 	this.verify = function (signature, text, type, id) {
 		var trustManager = require("./trustManager");
 		var signatureCache = require("./signatureCache");
+		var name = chelper.bits2hex(signature).substr(0, 10);
+
+		if (debug.enabled("whispeer:keyStore")) {
+			console.time("verify-" + name);
+		}
 
 		return hash(text).then(function (hash) {
 			hash = chelper.hex2bits(hash);
@@ -1266,17 +1271,8 @@ SignKey = function (keyData) {
 			}
 
 			keyStoreDebug("Slow verify of type: " + type);
-			var name = chelper.bits2hex(signature).substr(0, 10);
-
-			if (debug.enabled("whispeer:keyStore")) {
-				console.time("verify-" + name);
-			}
 
 			return verify(signature, text, hash).then(function (valid) {
-				if (debug.enabled("whispeer:keyStore")) {
-					console.timeEnd("verify-" + name);
-				}
-
 				if (valid) {
 					signatureCache.addValidSignature(signature, hash, realid, type, id);
 				}
@@ -1286,7 +1282,11 @@ SignKey = function (keyData) {
 				console.error(e);
 				return false;
 			});
-		});
+		}).finally(() => {
+			if (debug.enabled("whispeer:keyStore")) {
+				console.timeEnd("verify-" + name);
+			}
+		})
 	};
 };
 
