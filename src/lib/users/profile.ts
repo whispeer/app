@@ -115,23 +115,19 @@ export default class Profile extends Observer {
 		})
 	};
 
-	removeAttribute = (attr: string) => {
-		return this.decrypt().then(() => {
-			this.securedData.contentRemoveAttr(attr);
-		})
-	}
+	removeAttribute = (attr: string) =>
+		this.decrypt()
+			.then(() => this.securedData.contentRemoveAttr(attr))
 
-	getFull = (cb?: Function) => {
-		return this.decrypt().then(() => {
-			return this.securedData.contentGet();
-		}).nodeify(cb);
-	};
+	getFull = (cb?: Function) =>
+		this.decrypt()
+			.then(() => this.securedData.contentGet())
+			.nodeify(cb);
 
-	getAttribute = (attrs: any, cb?: Function) => {
-		return this.decrypt().then(() => {
-			return h.deepGet(this.securedData.contentGet(), attrs);
-		}).nodeify(cb);
-	};
+	getAttribute = (attrs: any, cb?: Function) =>
+		this.decrypt()
+			.then(() => h.deepGet(this.securedData.contentGet(), attrs))
+			.nodeify(cb);
 }
 
 type ProfileCache = {
@@ -145,16 +141,17 @@ type ProfileCache = {
 	}
 }
 
+const PROFILE_SECUREDDATA_OPTIONS = {
+	type: "profile",
+	removeEmpty: true,
+	encryptDepth: 1
+}
+
 export class ProfileLoader extends ObjectLoader<Profile, ProfileCache>({
 	cacheName: "profile",
 	getID: ({ meta }) => meta._signature,
 	download: id => { throw new Error("profile get by id is not implemented") },
 	load: ({ content, meta, isPublic, signKey }): Bluebird<ProfileCache> => {
-		const PROFILE_SECUREDDATA_OPTIONS = {
-			type: "profile",
-			removeEmpty: true,
-			encryptDepth: 1
-		}
 
 		const securedData = isPublic ?
 			SecuredData.createRaw(content, meta, PROFILE_SECUREDDATA_OPTIONS) :
@@ -163,20 +160,16 @@ export class ProfileLoader extends ObjectLoader<Profile, ProfileCache>({
 		return Bluebird.all([
 			securedData.verifyAsync(signKey),
 			isPublic ? null : securedData.decrypt()
-		]).then(() => {
-			return {
-				profile: {
-					content: securedData.contentGet(),
-					meta: securedData.metaGet(),
-				},
-				options: {
-					signKey,
-					isPublic
-				}
+		]).then(() => ({
+			profile: {
+				content: securedData.contentGet(),
+				meta: securedData.metaGet(),
+			},
+			options: {
+				signKey,
+				isPublic
 			}
-		})
+		}))
 	},
-	restore: ({ profile, options }: ProfileCache) => {
-		return new Profile(profile, options)
-	},
+	restore: ({ profile, options }: ProfileCache) => new Profile(profile, options)
 }) {}
