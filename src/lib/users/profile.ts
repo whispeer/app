@@ -12,6 +12,12 @@ interface ProfileOptions {
 	signKey?: string
 }
 
+const PROFILE_SECUREDDATA_OPTIONS = {
+	type: "profile",
+	removeEmpty: true,
+	encryptDepth: 1
+}
+
 export default class Profile extends Observer {
 	private securedData: any;
 	private isPublicProfile: boolean;
@@ -24,11 +30,7 @@ export default class Profile extends Observer {
 
 		this.isPublicProfile = options.isPublicProfile === true;
 
-		this.securedData = SecuredData.createRaw(data.content, data.meta, {
-			type: "profile",
-			removeEmpty: true,
-			encryptDepth: 1
-		});
+		this.securedData = SecuredData.createRaw(data.content, data.meta, PROFILE_SECUREDDATA_OPTIONS);
 
 		this.checkProfile();
 
@@ -59,13 +61,11 @@ export default class Profile extends Observer {
 		//sign/hash merge
 		//encrypt merge
 
-		return this.decrypt().bind(this).then(() => {
-			if (this.isPublicProfile) {
-				return this.sign(signKey);
-			} else {
-				return this.securedData.getUpdatedData(signKey);
-			}
-		})
+		if (this.isPublicProfile) {
+			return this.sign(signKey);
+		}
+
+		return this.securedData.getUpdatedData(signKey);
 	};
 
 	sign = (signKey: string, cb?: Function) => {
@@ -78,12 +78,6 @@ export default class Profile extends Observer {
 				content: this.securedData.contentGet(),
 				meta: signedMeta
 			};
-		}).nodeify(cb);
-	};
-
-	decrypt = (cb?: Function) => {
-		return this.securedData.decrypt().then(() => {
-			this.checkProfile();
 		}).nodeify(cb);
 	};
 
@@ -103,31 +97,28 @@ export default class Profile extends Observer {
 		return this.securedData.isChanged();
 	};
 
-	setFullProfile = (data: any, cb?: Function) => {
-		return this.decrypt().then(() => {
-			this.securedData.contentSet(data);
-		}).nodeify(cb);
+	setFullProfile = (data: any) => {
+		this.securedData.contentSet(data)
+		return Bluebird.resolve()
 	};
 
 	setAttribute = (attr: string, value: any) => {
-		return this.decrypt().then(() => {
-			this.securedData.contentSetAttr(attr, value);
-		})
+		this.securedData.contentSetAttr(attr, value);
+		return Bluebird.resolve()
 	};
 
-	removeAttribute = (attr: string) =>
-		this.decrypt()
-			.then(() => this.securedData.contentRemoveAttr(attr))
+	removeAttribute = (attr: string) => {
+		this.securedData.contentRemoveAttr(attr);
+		return Bluebird.resolve()
+	}
 
-	getFull = (cb?: Function) =>
-		this.decrypt()
-			.then(() => this.securedData.contentGet())
-			.nodeify(cb);
+	getFull = () => {
+		return Bluebird.resolve(this.securedData.contentGet())
+	};
 
-	getAttribute = (attrs: any, cb?: Function) =>
-		this.decrypt()
-			.then(() => h.deepGet(this.securedData.contentGet(), attrs))
-			.nodeify(cb);
+	getAttribute = (attrs: any) => {
+		return Bluebird.resolve(h.deepGet(this.securedData.contentGet(), attrs))
+	};
 }
 
 type ProfileCache = {
@@ -139,12 +130,6 @@ type ProfileCache = {
 		signKey: string,
 		isPublic: boolean
 	}
-}
-
-const PROFILE_SECUREDDATA_OPTIONS = {
-	type: "profile",
-	removeEmpty: true,
-	encryptDepth: 1
 }
 
 export class ProfileLoader extends ObjectLoader<Profile, ProfileCache>({
