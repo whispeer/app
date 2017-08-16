@@ -6,7 +6,7 @@ const errors = require('asset/errors');
 const keyStore = require('crypto/keyStore');
 const chelper = require('crypto/helper');
 const Bluebird = require('bluebird');
-var loaded = false, changed = false, signKey, isLoaded = {};
+var loaded = false, changed = false, isLoaded = {};
 
 isLoaded.promise = new Bluebird(function (resolve) {
     isLoaded.promiseResolve = resolve;
@@ -246,8 +246,7 @@ var signatureCache = {
     * Initialize cache
     * @param ownKey id of the own sign key
     */
-    initialize: function (ownKey) {
-        signKey = ownKey;
+    initialize: function () {
         loaded = true;
 
         isLoaded.promiseResolve();
@@ -268,7 +267,6 @@ var signatureCache = {
         });
 
         var data = {
-            me: signKey,
             internalHashVersion: config.hashVersion,
             databases: databases
         };

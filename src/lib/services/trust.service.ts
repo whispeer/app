@@ -71,15 +71,11 @@ class TrustService {
 			});
 		}).then((signatureCacheData: any) => {
 			timeEnd("getSignatureCache");
-			return Bluebird.race([
-				userService.verifyOwnKeysCacheDone(),
-				userService.verifyOwnKeysDone()
-			]).thenReturn(signatureCacheData);
-		}).then((signatureCacheData: any) => {
+
 			if (signatureCacheData) {
-				signatureCache.load(signatureCacheData.data, userService.getOwn().getSignKey());
+				signatureCache.load(signatureCacheData.data);
 			} else {
-				signatureCache.initialize(userService.getOwn().getSignKey());
+				signatureCache.initialize();
 			}
 		});
 	}
