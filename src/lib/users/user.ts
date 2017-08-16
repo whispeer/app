@@ -6,7 +6,6 @@ import * as Bluebird from "bluebird"
 
 const initService = require("services/initService")
 import State from "../asset/state"
-const SecuredData = require("asset/securedDataWithMetaData")
 const keyStoreService = require("crypto/keyStore")
 
 import sessionService from "../services/session.service"
@@ -19,6 +18,16 @@ import filterService from "../services/filter.service"
 const friendsService = require("services/friendsService")
 
 const advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"]
+
+const advancedDefaults = {
+	location: {},
+	birthday: {},
+	relationship: {},
+	education: [],
+	work: {},
+	gender: {},
+	languages: []
+}
 
 function applicableParts(scope, privacy, profile) {
 	var result = {}
@@ -134,9 +143,72 @@ class User {
 		this.signKey = this.signedKeys.metaAttr("sign")
 		this.cryptKey = this.signedKeys.metaAttr("crypt")
 
-		const isMe = (this.id === sessionService.getUserID())
+		this.mutualFriends = userData.mutualFriends
 
-		if (isMe) {
+		this.mail = userData.mail
+		this.nickname = userData.nickname
+
+		this.migrationState = userData.migrationState || 0
+
+		this.profiles = profiles
+
+		this.setData()
+		this.attachListener()
+	}
+
+	private setData = () => {
+		const shortname = this.getShortName()
+		const names = this.getName()
+
+		this.data = {
+			notExisting: false,
+			user: this,
+
+			id: this.id,
+
+			trustLevel: 0,
+
+			name: names.name,
+			names,
+
+			signatureValid: true,
+			fingerprint: keyStoreService.format.fingerPrint(this.signKey),
+
+			addFriendState: this.addFriendState.data,
+			ignoreFriendState: this.ignoreFriendState.data,
+
+			me: this.isOwn(),
+			other: !this.isOwn(),
+			online: friendsService.onlineStatus(this.getID()) || 0,
+
+			basic: {
+				age: "?",
+				location: "?",
+				shortname,
+				mutualFriends: this.mutualFriends,
+				url: "user/" + this.nickname,
+				image: "assets/img/user.png"
+			},
+			advanced: {}
+		}
+
+		advancedBranches.map((branch) => {
+			this.data.advanced[branch] = this.getAdvancedAttribute(branch)
+		})
+	}
+
+	private getAdvancedAttribute(branch) {
+		const result = this.getProfileAttribute(branch)
+
+		if (branch === "gender" && typeof result === "string") {
+			return h.deepCopyObj({ gender: result })
+		}
+
+		return h.deepCopyObj(result || advancedDefaults[branch], 3)
+	}
+
+	private attachListener = () => {
+		if (this.isOwn()) {
 			this.friendsKey = this.signedKeys.metaAttr("friends")
 		} else {
 			friendsService.awaitLoading().then(() => {
@@ -150,55 +222,19 @@ class User {
 			})
 		}
 
-		this.mutualFriends = userData.mutualFriends
+		friendsService.listen((status) => {
+			this.data.online = status
+		}, "online:" + this.getID())
 
-		this.mail = userData.mail
-		this.nickname = userData.nickname
+		friendsService.awaitLoading().then(() => {
+			this.data.added = friendsService.didIRequest(this.getID())
+			this.data.isMyFriend = friendsService.areFriends(this.getID())
 
-		this.migrationState = userData.migrationState || 0
-
-		this.profiles = profiles
-
-		this.data = {
-			notExisting: false,
-			user: this,
-			id: this.id,
-			trustLevel: 0,
-			fingerprint: keyStoreService.format.fingerPrint(this.signKey),
-			basic: {
-				age: "?",
-				location: "?",
-				mutualFriends: this.mutualFriends,
-				url: "user/" + this.nickname,
-				image: "assets/img/user.png"
-			},
-			advanced: {
-				birthday:	{
-					day:	"",
-					month: "",
-					year:	""
-				},
-				location: {
-					town:	"",
-					state: "",
-					country: ""
-				},
-				partner:	{
-					type:	"",
-					name: ""
-				},
-				education: [],
-				job: {
-					what: "",
-					where: ""
-				},
-				gender: {
-					gender: "none",
-					text: ""
-				},
-				languages: []
-			}
-		}
+			friendsService.listen(() => {
+				this.data.added = friendsService.didIRequest(this.getID())
+				this.data.isMyFriend = friendsService.areFriends(this.getID())
+			})
+		})
 	}
 
 	generateNewFriendsKey = () => {
@@ -264,25 +300,25 @@ class User {
 
 		var profiles = this.profiles.private.concat([this.profiles.public])
 
-		return Bluebird.resolve(profiles).map((profile: Profile) => {
+		const values = profiles.map((profile: Profile) => {
 			return profile.getAttribute(attribute)
-		}).filter((value) => {
+		}).filter((value: any) => {
 			return typeof value !== "undefined" && value !== ""
-		}).then((values) => {
-			if (values.length === 0) {
-				return ""
+		})
+
+		if (values.length === 0) {
+			return ""
+		}
+
+		values.sort((val1, val2) => {
+			if (typeof val1 === "object" && typeof val2 === "object") {
+				return Object.keys(val2).length - Object.keys(val1).length
 			}
 
-			values.sort((val1, val2) => {
-				if (typeof val1 === "object" && typeof val2 === "object") {
-					return Object.keys(val2).length - Object.keys(val1).length
-				}
-
-				return 0
-			})
-
-			return values[0]
+			return 0
 		})
+
+		return values[0]
 	}
 
 	/** uses the me profile to generate new profiles */
@@ -296,13 +332,10 @@ class User {
 			privacySettings = settingsService.getBranch("privacy")
 			scopes = getAllProfileTypes(privacySettings)
 
-			var filterToKeysPromise = filterService.filterToKeys(scopes)
+			return filterService.filterToKeys(scopes)
+		}).then((keys: any) => {
+			const profile = this.profiles.me.getFull()
 
-			return Bluebird.all([
-				filterToKeysPromise,
-				this.profiles.me.getFull()
-			])
-		}).spread((keys: any, profile: any) => {
 			var scopeData = h.joinArraysToObject({
 				name: scopes,
 				key: keys.slice(0, keys.length - 1)
@@ -357,7 +390,7 @@ class User {
 			this.profiles.me.updated()
 
 			this.loadBasicDataPromise = null
-			return this.loadFullData()
+			return this.loadBasicData()
 		}).nodeify(cb)
 	}
 
@@ -478,21 +511,7 @@ class User {
 	}
 
 	loadFullData = () => {
-		return Bluebird.try(() => {
-			return this.loadBasicData().thenReturn(advancedBranches)
-		}).map((branch) => {
-			return this.getProfileAttribute(branch)
-		}).then((result) => {
-			var i, advanced = this.data.advanced, defaults = [{}, {}, {}, [], {}, {}, []]
-
-			for (i = 0; i < advancedBranches.length; i += 1) {
-				if (advancedBranches[i] === "gender" && typeof result[i] === "string") {
-					result[i] = { gender: result[i] }
-				}
-
-				advanced[advancedBranches[i]] = h.deepCopyObj(result[i] || defaults[i], 3)
-			}
-		})
+		return this.loadBasicData()
 	}
 
 	getFriends = (cb) => {
@@ -500,50 +519,25 @@ class User {
 	}
 
 	loadImage = () => {
-		return this.getImage().then((imageUrl) => {
+		const blob = this.getProfileAttribute("imageBlob")
+
+		if (!blob) {
+			this.data.basic.image = "assets/img/user.png"
+			return
+		}
+
+		return blobService.getBlobUrl(blob.blobid).then(url =>
+			window.device && window.device.platform === "iOS" ?
+				url.replace("file://", "") : url
+		).then((imageUrl) => {
 			this.data.basic.image = imageUrl
 		}).catch((e) => errorService.criticalError(e))
 	}
 
 	loadBasicData = () => {
 		if (!this.loadBasicDataPromise) {
-			this.loadBasicDataPromise = Bluebird.try(() => {
-				return Bluebird.all([
-					this.getShortName(),
-					this.getName(),
-					this.getTrustLevel()
-				])
-			}).spread((shortname, names: any, trustLevel, signatureValid) => {
-				this.data.signatureValid = signatureValid
-
-				this.data.me = this.isOwn()
-				this.data.other = !this.isOwn()
-
+			this.loadBasicDataPromise = this.getTrustLevel().then((trustLevel) => {
 				this.data.trustLevel = trustLevel
-
-				this.data.online = friendsService.onlineStatus(this.getID()) || 0
-
-				friendsService.listen((status) => {
-					this.data.online = status
-				}, "online:" + this.getID())
-
-				this.data.name = names.name
-				this.data.names = names
-
-				this.data.basic.shortname = shortname
-
-				friendsService.awaitLoading().then(() => {
-					this.data.added = friendsService.didIRequest(this.getID())
-					this.data.isMyFriend = friendsService.areFriends(this.getID())
-
-					friendsService.listen(() => {
-						this.data.added = friendsService.didIRequest(this.getID())
-						this.data.isMyFriend = friendsService.areFriends(this.getID())
-					})
-				})
-
-				this.data.addFriendState = this.addFriendState.data
-				this.data.ignoreFriendState = this.ignoreFriendState.data
 
 				this.loadImage()
 
@@ -608,57 +602,44 @@ class User {
 		return this.mail
 	}
 
-	getImage = () => {
-		return Bluebird.try(() => {
-			return this.getProfileAttribute("imageBlob")
-		}).then(blob => blob ?
-			blobService.getBlobUrl(blob.blobid) : "assets/img/user.png"
-		).then(url => window.device && window.device.platform === "iOS" ?
-			url.replace("file://", "") : url
-		)
-	}
-
 	getShortName = () => {
-		return this.getProfileAttribute("basic").then((basic) => {
-			basic = basic || {}
-			var nickname = this.getNickname()
+		const basic = this.getProfileAttribute("basic") || {}
+		var nickname = this.getNickname()
 
-			return basic.firstname || basic.lastname || nickname || ""
-		})
+		return basic.firstname || basic.lastname || nickname || ""
 	}
 
 	getName = () => {
-		return this.getProfileAttribute("basic").then((basic) => {
-			basic = basic || {}
-			var nickname = this.getNickname()
+		const basic = this.getProfileAttribute("basic") || {}
 
-			var searchNames = [nickname]
+		var nickname = this.getNickname()
 
-			var name = ""
-			if (basic.firstname && basic.lastname) {
-				name = basic.firstname + " " + basic.lastname
-			} else if (basic.firstname || basic.lastname) {
-				name = basic.firstname || basic.lastname
-			} else if (nickname) {
-				name = nickname
-			}
+		var searchNames = [nickname]
 
-			if (basic.firstname) {
-				searchNames.push(basic.firstname)
-			}
+		var name = ""
+		if (basic.firstname && basic.lastname) {
+			name = basic.firstname + " " + basic.lastname
+		} else if (basic.firstname || basic.lastname) {
+			name = basic.firstname || basic.lastname
+		} else if (nickname) {
+			name = nickname
+		}
 
-			if (basic.lastname) {
-				searchNames.push(basic.lastname)
-			}
+		if (basic.firstname) {
+			searchNames.push(basic.firstname)
+		}
 
-			return {
-				name: name,
-				searchName: searchNames.join(" "),
-				firstname: basic.firstname || "",
-				lastname: basic.lastname || "",
-				nickname: this.nickname || ""
-			}
-		})
+		if (basic.lastname) {
+			searchNames.push(basic.lastname)
+		}
+
+		return {
+			name: name,
+			searchName: searchNames.join(" "),
+			firstname: basic.firstname || "",
+			lastname: basic.lastname || "",
+			nickname: this.nickname || ""
+		}
 	}
 
 	ignoreFriendShip = () => {

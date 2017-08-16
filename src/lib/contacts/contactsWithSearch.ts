@@ -124,7 +124,7 @@ export class ContactsWithSearch {
 			}
 
 			return users.map(function (user) {
-				user.loadFullData().catch(errorService.criticalError);
+				user.loadBasicData().catch(errorService.criticalError);
 				return user.data;
 			});
 		}).then((userData) => {

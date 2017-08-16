@@ -99,7 +99,6 @@ export default class Profile extends Observer {
 
 	setFullProfile = (data: any) => {
 		this.securedData.contentSet(data)
-		return Bluebird.resolve()
 	};
 
 	setAttribute = (attr: string, value: any) => {
@@ -109,15 +108,14 @@ export default class Profile extends Observer {
 
 	removeAttribute = (attr: string) => {
 		this.securedData.contentRemoveAttr(attr);
-		return Bluebird.resolve()
 	}
 
 	getFull = () => {
-		return Bluebird.resolve(this.securedData.contentGet())
+		return this.securedData.contentGet()
 	};
 
 	getAttribute = (attrs: any) => {
-		return Bluebird.resolve(h.deepGet(this.securedData.contentGet(), attrs))
+		return h.deepGet(this.securedData.contentGet(), attrs)
 	};
 }
 
