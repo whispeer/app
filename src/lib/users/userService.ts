@@ -8,7 +8,6 @@ import errorService from "../services/error.service"
 
 const signatureCache = require("crypto/signatureCache")
 const trustManager = require("crypto/trustManager")
-const SecuredData = require("asset/securedDataWithMetaData")
 
 const sjcl = require("sjcl")
 const keyStoreService = require("crypto/keyStore")
@@ -17,6 +16,7 @@ const initService = require("services/initService")
 let userService, knownIDs = [], users = {}, ownUserStatus: any = {}
 
 import { ProfileLoader } from "../users/profile"
+import { SignedKeysLoader } from "../users/signedKeys"
 
 const promises = ["verifyOwnKeysDone", "verifyOwnKeysCacheDone", "loadedCache", "loaded"]
 
@@ -147,8 +147,9 @@ function makeUser(userData) {
 			await signatureCache.awaitLoading()
 		}
 
-		const signedKeys = SecuredData.load(undefined, userData.signedKeys, { type: "signedKeys" })
-		const signKey = signedKeys.metaAttr("sign")
+		const signedKeys = await SignedKeysLoader.load(userData.signedKeys)
+		debugger
+		const signKey = '123' // signedKeys.metaAttr("sign")
 
 		await verifyKeys(signedKeys, signKey, userID)
 
@@ -158,9 +159,7 @@ function makeUser(userData) {
 		const user = new User(userData, signedKeys, profiles)
 		const mail = user.getMail()
 		const nickname = user.getNickname()
-
 		knownIDs.push(userID)
-
 		users[userID] = user
 
 		if (mail) {
