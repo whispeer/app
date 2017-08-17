@@ -379,12 +379,17 @@ export class Chunk extends Observer {
 
 Observer.extend(Chunk);
 
-const decryptAndVerifyTitleUpdate = (content, meta) => {
+const decryptAndVerifyTitleUpdate = (titleUpdate) => {
 	return Bluebird.try(async () => {
-		const senderID = meta.userID
+		if (!titleUpdate) {
+			return
+		}
+
+		const { content, meta, server } = titleUpdate
+
 		const securedData = SecuredData.load(content, meta, { type: "topicUpdate" });
 
-		const sender = await userService.get(senderID);
+		const sender = await userService.get(meta.userID);
 
 		await Bluebird.all([
 			securedData.decrypt(),
@@ -394,20 +399,8 @@ const decryptAndVerifyTitleUpdate = (content, meta) => {
 		return {
 			content: securedData.contentGet(),
 			meta: securedData.metaGet(),
-			sender
+			server
 		}
-	})
-}
-
-const loadLegacyTitle = (latestTitleUpdateResponse) => {
-	if (!latestTitleUpdateResponse) {
-		return Bluebird.resolve()
-	}
-
-	const { meta, content, server } = latestTitleUpdateResponse
-
-	return decryptAndVerifyTitleUpdate(content, meta).then(({ content, meta, sender }) => {
-		return new ChatTitleUpdate({ content, meta, server, sender })
 	})
 }
 
@@ -415,34 +408,44 @@ type ChunkCache = {
 	content: any,
 	meta: any,
 	server: any,
-	latestTitleUpdate: any
+	titleUpdate: {
+		server: any
+		content: any
+		meta: any
+	}
 }
 
 export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 	cacheName: "chunk",
 	download: id => socket.emit("chat.chunk.get", { id }),
-	restore: (chunkInfo: ChunkCache) => {
+	restore: ({ meta, content, server, titleUpdate }: ChunkCache) => {
 		return Bluebird.try(async function () {
-			const titleUpdate = await loadLegacyTitle(chunkInfo.latestTitleUpdate)
-			const loadReceiverPromise = userService.getMultipleFormatted(chunkInfo.meta.receiver.sort().map(h.parseDecimal))
+			const loadReceiverPromise = userService.getMultipleFormatted(meta.receiver.sort().map(h.parseDecimal))
 
-			const creator = await userService.get(chunkInfo.meta.creator)
+			const creator = await userService.get(meta.creator)
 
 			if (!creator.isNotExistingUser()) {
-				keyStore.security.addEncryptionIdentifier(chunkInfo.meta._key)
+				keyStore.security.addEncryptionIdentifier(meta._key)
 			} else {
 				// TODO data.disabled = true;
 			}
 
 			const chunk = new Chunk({
-				meta: chunkInfo.meta,
-				content: chunkInfo.content,
-				server: chunkInfo.server,
+				meta: meta,
+				content: content,
+				server: server,
 				receiverObjects: await loadReceiverPromise
 			})
 
 			if (titleUpdate) {
-				chunk.setLatestTitleUpdate(titleUpdate)
+				const chatTitleUpdate = new ChatTitleUpdate({
+					content: titleUpdate.content,
+					meta: titleUpdate.meta,
+					server: titleUpdate.server,
+					sender: await userService.get(titleUpdate.meta.userID)
+				})
+
+				chunk.setLatestTitleUpdate(chatTitleUpdate)
 			}
 
 			return chunk
@@ -453,6 +456,9 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 			const securedData = SecuredData.load(content, meta, CHUNK_SECURED_DATA_OPTIONS)
 
 			const creator = await userService.get(securedData.metaAttr("creator"))
+
+			const titleUpdate = await decryptAndVerifyTitleUpdate(latestTitleUpdate)
+
 			await securedData.verify(creator.getSignKey())
 			await securedData.decrypt()
 
@@ -460,7 +466,7 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 				content: securedData.contentGet(),
 				meta: securedData.metaGet(),
 				server,
-				latestTitleUpdate
+				titleUpdate
 			}
 		})
 	},

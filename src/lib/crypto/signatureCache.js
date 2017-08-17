@@ -69,6 +69,9 @@ var cacheTypes = {
 	post: "post",
 	postPrivate: "post",
 
+	topic: "noCache",
+	message: "noCache",
+
 	profile: "noCache",
 	signedKeys: "noCache",
 
