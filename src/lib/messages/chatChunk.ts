@@ -379,13 +379,36 @@ export class Chunk extends Observer {
 
 Observer.extend(Chunk);
 
+const decryptAndVerifyTitleUpdate = (content, meta) => {
+	return Bluebird.try(async () => {
+		const senderID = meta.userID
+		const securedData = SecuredData.load(content, meta, { type: "topicUpdate" });
+
+		const sender = await userService.get(senderID);
+
+		await Bluebird.all([
+			securedData.decrypt(),
+			securedData.verify(sender.getSignKey())
+		])
+
+		return {
+			content: securedData.contentGet(),
+			meta: securedData.metaGet(),
+			sender
+		}
+	})
+}
+
 const loadLegacyTitle = (latestTitleUpdateResponse) => {
 	if (!latestTitleUpdateResponse) {
 		return Bluebird.resolve()
 	}
 
-	const latestTitleUpdate = new ChatTitleUpdate(latestTitleUpdateResponse)
-	return latestTitleUpdate.getTitle().thenReturn(latestTitleUpdate)
+	const { meta, content, server } = latestTitleUpdateResponse
+
+	return decryptAndVerifyTitleUpdate(content, meta).then(({ content, meta, sender }) => {
+		return new ChatTitleUpdate({ content, meta, server, sender })
+	})
 }
 
 type ChunkCache = {
