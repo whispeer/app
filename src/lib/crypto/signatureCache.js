@@ -58,7 +58,6 @@ var types = {
 var cacheTypes = {
 	signatureCache: "noCache",
 
-	signedKeys: "user",
 	signedFriendList: "user",
 
 	circle: "me",
@@ -69,6 +68,9 @@ var cacheTypes = {
 
 	post: "post",
 	postPrivate: "post",
+
+	profile: "noCache",
+	signedKeys: "noCache",
 
 	comment: "noCache",
 	friendShip: "noCache",

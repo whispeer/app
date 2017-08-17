@@ -1,15 +1,10 @@
 import ObjectLoader from "../services/cachedObjectLoader"
 import * as Bluebird from "bluebird"
+const SecuredData = require("asset/securedDataWithMetaData")
+const keyStoreService = require("crypto/keyStore")
 
-type SignedKeys = {
-	crypt: string,
-	friends: string,
-	sign: string,
-	_hashVersion: string,
-	_signature: string,
-	_type: string,
-	_version: string,
-}
+// actually typeof securedData but securedData is not a ts class yet
+type SignedKeys = any
 
 type SignedKeysCache = {
 	crypt: string,
@@ -23,26 +18,24 @@ type SignedKeysCache = {
 
 export class SignedKeysLoader extends ObjectLoader<SignedKeys, SignedKeysCache>({
 	cacheName: "signedKeys",
-	getID: ({ _signature }) => _signature,
+	getID: ({ signedKeys: { _signature }, signKey }) => `${signKey}-${_signature}`,
 	download: id => { throw new Error("profile get by id is not implemented") },
-	load: ({ crypt, friends, sign, _hashVersion, _signature, _type, _version }): Bluebird<SignedKeysCache> => {
+	load: ({ signedKeys, signKey }): Bluebird<SignedKeysCache> => {
+		const securedData = SecuredData.load(undefined, signedKeys, { type: "signedKeys" })
 
-
-
-		// SecuredData.load(undefined, userData.signedKeys, { type: "signedKeys" })
-		const tmp = {
-			crypt: "abc",
-			friends: "abc",
-			sign: "abc",
-			_hashVersion: "abc",
-			_signature: "abc",
-			_type: "abc",
-			_version: "abc",
-		}
-		return Bluebird.resolve(tmp)
+		return securedData.verifyAsync(signKey).then(() =>
+			securedData.metaGet()
+		)
 	},
 	restore: (signedKeysCache: SignedKeysCache) => {
-		return Bluebird.resolve(signedKeysCache)
-		// new Profile(profile, options)
+		const signedKeys = SecuredData.createRaw(undefined, signedKeysCache, { type: "signedKeys" })
+
+		const friends = signedKeys.metaAttr("friends")
+		const crypt = signedKeys.metaAttr("crypt")
+
+		keyStoreService.security.addEncryptionIdentifier(friends)
+		keyStoreService.security.addEncryptionIdentifier(crypt)
+
+		return signedKeys
 	}
 }) {}

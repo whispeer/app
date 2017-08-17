@@ -1255,7 +1255,7 @@ SignKey = function (keyData) {
 		var name = chelper.bits2hex(signature).substr(0, 10);
 
 		if (debug.enabled("whispeer:keyStore")) {
-			console.time("verify-" + name);
+			console.time(`verify-${name}-${type}`);
 		}
 
 		return hash(text).then(function (hash) {
@@ -1284,7 +1284,7 @@ SignKey = function (keyData) {
 			});
 		}).finally(() => {
 			if (debug.enabled("whispeer:keyStore")) {
-				console.timeEnd("verify-" + name);
+				console.timeEnd(`verify-${name}-${type}`);
 			}
 		})
 	};

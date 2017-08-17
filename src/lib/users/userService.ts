@@ -144,11 +144,9 @@ function makeUser(userData) {
 			await signatureCache.awaitLoading()
 		}
 
-		const signedKeys = await SignedKeysLoader.load(userData.signedKeys)
-		debugger
-		const signKey = '123' // signedKeys.metaAttr("sign")
+		const signKey = userData.signedKeys.sign
 
-		await verifyKeys(signedKeys, signKey, userID)
+		const signedKeys = await SignedKeysLoader.load({ signedKeys: userData.signedKeys, signKey })
 
 		const profiles = await getProfiles(userData, signKey, isMe)
 
@@ -326,16 +324,6 @@ function improvementListener(identifier) {
 }
 
 Observer.extend(userService)
-
-function verifyKeys(signedKeys, signKey, userID) {
-	return signedKeys.verifyAsync(signKey, userID).then(() => {
-		const friends = signedKeys.metaAttr("friends")
-		const crypt = signedKeys.metaAttr("crypt")
-
-		keyStoreService.security.addEncryptionIdentifier(friends)
-		keyStoreService.security.addEncryptionIdentifier(crypt)
-	})
-}
 
 function loadProfileInfo(profileInfo, signKey, isPublic = false) {
 	return ProfileLoader.load({
