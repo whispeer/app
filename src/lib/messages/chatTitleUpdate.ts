@@ -8,16 +8,16 @@ import * as Bluebird from "bluebird"
 export default class TopicUpdate {
 	state: any
 	private _id: any
-	private _securedData: any
-	private _userID: any
+	private securedData: any
+	private userID: any
 
 	constructor(updateData) {
 		var content = updateData.content,
 			meta = updateData.meta;
 
 		this._id = updateData.server.id;
-		this._securedData = SecuredData.load(content, meta, { type: "topicUpdate" });
-		this._userID = meta.userID;
+		this.securedData = SecuredData.load(content, meta, { type: "topicUpdate" });
+		this.userID = meta.userID;
 
 		this.state = {
 			loading: true,
@@ -38,7 +38,7 @@ export default class TopicUpdate {
 	};
 
 	getTime = () => {
-		return h.parseDecimal(this._securedData.metaAttr("time"));
+		return h.parseDecimal(this.securedData.metaAttr("time"));
 	};
 
 	isAfter = (topicUpdate) => {
@@ -51,28 +51,31 @@ export default class TopicUpdate {
 
 	protected decryptAndVerify = h.cacheResult<Bluebird<any>>(() => {
 		return Bluebird.try(async () => {
-			const user = await this.getUser()
+			const userID = this.userID
+			const securedData = this.securedData
 
-			this.setState({
-				sender: user
-			});
+			const sender = await userService.get(userID);
 
-			const decryptPromise = this._securedData.decrypt()
-			const verifyPromise = this._securedData.verify(user.getSignKey())
+			await Bluebird.all([
+				securedData.decrypt(),
+				securedData.verify(sender.getSignKey())
+			])
 
-			await verifyPromise
-
-			return await decryptPromise
+			return {
+				content: securedData.contentGet(),
+				sender
+			}
 		})
 	});
 
 	load() {
 		return Bluebird.try(async () => {
-			const content = await this.decryptAndVerify()
+			const { content, sender } = await this.decryptAndVerify()
 
 			this.setState({
 				title: content.title,
-				loading: false
+				loading: false,
+				sender
 			});
 
 			return content;
@@ -80,27 +83,23 @@ export default class TopicUpdate {
 	}
 
 	ensureParent = (topic) => {
-		this._securedData.checkParent(topic.getSecuredData());
+		this.securedData.checkParent(topic.getSecuredData());
 	}
 
 	ensureIsAfterTopicUpdate = (topicUpdate) => {
-		this._securedData.checkAfter(topicUpdate.getSecuredData());
+		this.securedData.checkAfter(topicUpdate.getSecuredData());
 	}
 
 	getUserID = () => {
-		return this._userID;
-	}
-
-	getUser = () => {
-		return userService.get(this.getUserID());
+		return this.userID;
 	}
 
 	getSecuredData = () => {
-		return this._securedData;
+		return this.securedData;
 	}
 
 	getMetaUpdate = () => {
-		return this._securedData.metaAttr("metaUpdate")
+		return this.securedData.metaAttr("metaUpdate")
 	}
 
 	getTitle = () => {
