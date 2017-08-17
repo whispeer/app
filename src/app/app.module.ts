@@ -4,6 +4,8 @@ declare global {
 		Zone: any;
 		whispeerGetStorage: any;
 	}
+
+	const IONIC_ENV: string
 }
 
 require("interceptors/addKeysInterceptor");
@@ -170,6 +172,15 @@ export class AppModule {
 				})
 			})
 		})
+
+		if (IONIC_ENV === "prod") {
+			Bluebird.config({
+				warnings: false,
+				longStackTraces: false,
+				cancellation: false,
+				monitoring: false
+			})
+		}
 
 		Bluebird.setScheduler((fn) => {
 			this.tasks.push(fn)

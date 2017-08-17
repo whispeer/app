@@ -69,6 +69,7 @@ module.exports = {
 		ionicWebpackFactory.getCommonChunksPlugin(),
 		new webpack.DefinePlugin({
 			"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV || "production"),
+			"IONIC_ENV": JSON.stringify(process.env.IONIC_ENV),
 			"CLIENT_INFO": JSON.stringify({
 				type: "messenger",
 				version: data.version

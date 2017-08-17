@@ -131,8 +131,6 @@ function makeUser(userData) {
 			return new NotExistingUser()
 		}
 
-		// decrypt / verify profiles
-		// verify signed keys
 		const userID = h.parseDecimal(userData.id)
 
 		if (users[userID]) {
@@ -141,7 +139,6 @@ function makeUser(userData) {
 
 		const isMe = sessionService.isOwnUserID(userID)
 
-		// enhance own user
 		if (isMe) {
 			enhanceOwnUser(userData)
 			await signatureCache.awaitLoading()
