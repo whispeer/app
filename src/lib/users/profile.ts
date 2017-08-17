@@ -132,7 +132,7 @@ type ProfileCache = {
 
 export class ProfileLoader extends ObjectLoader<Profile, ProfileCache>({
 	cacheName: "profile",
-	getID: ({ meta }) => meta._signature,
+	getID: ({ meta, signKey }) => `${signKey}-${meta._signature}`,
 	download: id => { throw new Error("profile get by id is not implemented") },
 	load: ({ content, meta, isPublic, signKey }): Bluebird<ProfileCache> => {
 

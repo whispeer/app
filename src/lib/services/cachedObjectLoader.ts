@@ -6,7 +6,7 @@ type hookType<ObjectType, CachedObjectType> = {
 	download: (id: any) => Bluebird<any>,
 	load: (response: any) => Bluebird<CachedObjectType>,
 	restore: (response: CachedObjectType) => Bluebird<ObjectType> | ObjectType,
-	getID: (response: any) => any,
+	getID: (response: any) => string,
 	cacheName: string
 }
 
