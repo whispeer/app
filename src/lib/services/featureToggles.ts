@@ -1,6 +1,5 @@
 import * as Bluebird from 'bluebird'
 import socketService from "./socket.service"
-import sessionService from "./session.service"
 
 class FeatureToggles {
 	config = {}
@@ -13,7 +12,7 @@ class FeatureToggles {
 		})
 	}
 
-	loadFeatureConfig(response) {
+	loadFeatureConfig() {
 		return Bluebird.resolve(this.config)
 	}
 

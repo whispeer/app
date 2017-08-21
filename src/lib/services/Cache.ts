@@ -1,8 +1,7 @@
 import { errorServiceInstance } from "./error.service";
 import * as Bluebird from "bluebird";
-import Dexie from "dexie";
 import h from "../helper/helper"
-import idb, { Cursor } from "idb"
+import idb, { Cursor } from "idb" // tslint:disable-line:no-unused-variable
 
 const REINIT_CACHE_TIMEOUT = 2000
 let dbPromise, cachesDisabled
@@ -116,7 +115,7 @@ export default class Cache {
 
 	get(id: string): Bluebird<any> {
 		if (this.isDisabled()) {
-			return Bluebird.reject(new Error("Cache is disabled"));
+			return Bluebird.reject(new Error(`Cache is disabled ${this.name}`));
 		}
 
 		/*

@@ -1,10 +1,8 @@
 import * as Bluebird from "bluebird"
-import idb from "idb"
 
 import Storage from "./Storage";
 import blobCache from "../../lib/asset/blobCache"
 import Cache from "../services/Cache"
-import h from "../helper/helper"
 import keyStore from "./keyStore.service";
 import { landingPage } from "./location.manager";
 import { withPrefix } from "./storage.service";
@@ -30,7 +28,7 @@ export class SessionService {
 
 	setLoginData = (_sid: string, _userid: any) => {
 		this.sid = _sid;
-		this.userid = _userid;
+		this.userid = parseInt(_userid, 10)
 		this.loggedin = true;
 
 		this.loginResolve()
@@ -63,10 +61,9 @@ export class SessionService {
 		return this.sid;
 	}
 
-	getUserID = () => {
-		// parseFloat is slightly faster than parseInt
-		return parseFloat(this.userid);
-	}
+	getUserID = () => this.userid
+
+	isOwnUserID = (id) => parseInt(id, 10) === this.userid
 
 	clear = () => {
 		return Bluebird.all([

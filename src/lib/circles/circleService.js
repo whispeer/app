@@ -11,7 +11,7 @@ var socket = require("services/socket.service").default;
 var keyStore = require("services/keyStore.service").default;
 var initService = require("services/initService");
 
-var userService = require("user/userService");
+var userService = require("users/userService").default;
 var settingsService = require("services/settings.service").default;
 
 var friendsService = require("services/friendsService");
@@ -195,9 +195,8 @@ var Circle = function (data) {
 			return userService.getMultiple(loadableUsers.slice(0, limit));
 		}).map(function (user) {
 			persons.push(user.data);
-			return Bluebird.fromCallback(function (cb) {
-				user.loadBasicData(cb);
-			}).thenReturn(user);
+
+			return user.loadBasicData().thenReturn(user)
 		}).nodeify(cb);
 	};
 

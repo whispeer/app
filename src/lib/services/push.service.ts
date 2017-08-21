@@ -34,7 +34,7 @@ export class PushService {
 	}
 
 	getType = () => {
-		const platform = (<any>window).device.platform;
+		const platform = window.device.platform;
 
 		if (platform === "Android") {
 			return "android";

@@ -113,6 +113,8 @@ export class HomePage {
 		messageService.loadMoreChats().then(() => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.chatsLoading = false;
+
+			console.timeEnd("Spinner on Home")
 		});
 	}
 

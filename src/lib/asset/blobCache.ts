@@ -2,7 +2,7 @@ import * as Bluebird from "bluebird"
 import { File } from '@ionic-native/file'
 
 import Cache from "../services/Cache"
-import h from "../helper/helper"
+import h from "../helper/helper" // tslint:disable-line:no-unused-variable
 
 const BLOB_CACHE_DIR = "blobCache"
 const FILE = new File()

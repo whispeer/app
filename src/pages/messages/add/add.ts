@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from "@angular/core";
+	import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController, NavParams, IonicPage, Searchbar } from "ionic-angular";
 
 const contactsService = require("../../../lib/services/friendsService");
@@ -7,7 +7,6 @@ const initService = require("../../../lib/services/initService")
 import ChatLoader, { Chat } from "../../../lib/messages/chat"
 
 import { ContactsWithSearch } from "../../../lib/contacts/contactsWithSearch"
-import { TranslateService } from "@ngx-translate/core";
 
 import h from "../../../lib/helper/helper";
 
@@ -38,7 +37,7 @@ export class AddPage extends ContactsWithSearch {
 
 	addMemoizer: Memoizer
 
-	constructor(private navCtrl: NavController, private navParams: NavParams, private platform: Platform, private element: ElementRef, private translate: TranslateService) {
+	constructor(private navCtrl: NavController, private navParams: NavParams, platform: Platform) {
 		super()
 
 		this.ios = platform.is("ios")
@@ -108,7 +107,7 @@ export class AddPage extends ContactsWithSearch {
 			return user.id
 		}).then((data) => {
 			return this.chat.addReceivers(data)
-		}).then((data) => {
+		}).then(() => {
 			this.navCtrl.push("Chat Details", { chatID: this.chat.getID() })
 		});
 	}

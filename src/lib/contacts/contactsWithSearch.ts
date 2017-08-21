@@ -1,5 +1,5 @@
 const contactsService = require("../../lib/services/friendsService");
-const userService = require("../../lib/user/userService");
+const userService = require("../../lib/users/userService").default;
 import errorService from "../../lib/services/error.service";
 
 import * as Bluebird from 'bluebird';
@@ -124,7 +124,7 @@ export class ContactsWithSearch {
 			}
 
 			return users.map(function (user) {
-				user.loadFullData(errorService.criticalError);
+				user.loadBasicData().catch(errorService.criticalError);
 				return user.data;
 			});
 		}).then((userData) => {

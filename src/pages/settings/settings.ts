@@ -4,7 +4,6 @@ import { NavController, NavParams, AlertController, IonicPage } from "ionic-angu
 import { TranslateService } from '@ngx-translate/core';
 
 import Tutorial from "../../app/tutorial";
-import blobCache from "../../lib/asset/blobCache"
 import sessionService from "../../lib/services/session.service";
 
 @IonicPage({

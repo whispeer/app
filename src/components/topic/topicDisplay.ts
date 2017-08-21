@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core"
+import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core" // tslint:disable-line:no-unused-variable
 import { Media, MediaObject } from '@ionic-native/media';
 
 import { NavController, ActionSheetController, Platform } from "ionic-angular"
@@ -19,7 +19,7 @@ import { TypeState } from "typestate"
 
 import uuidv4 from 'uuid/v4'
 
-import VoicemailPlayer, { recordingType, recordingsType } from "../../lib/asset/voicemailPlayer"
+import VoicemailPlayer, { recordingType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
 import featureToggles from "../../lib/services/featureToggles"

@@ -1,3 +1,13 @@
+declare global {
+	interface Window {
+		device: any;
+		Zone: any;
+		whispeerGetStorage: any;
+	}
+
+	const IONIC_ENV: string
+}
+
 require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
@@ -5,7 +15,7 @@ require("toBlob")
 
 import * as moment from 'moment';
 
-import { NgModule, ErrorHandler, NgZone } from '@angular/core';
+import { NgModule, ErrorHandler, NgZone } from '@angular/core'; // tslint:disable-line:no-unused-variable
 import { DatePipe } from "@angular/common";
 
 import { Platform, IonicApp, IonicErrorHandler, IonicModule, Config } from 'ionic-angular';
@@ -123,7 +133,7 @@ export class AppModule {
 	}
 
 	runInAngularZone(fn) {
-		if((<any>this.zone).inner !== (<any>window).Zone.current) {
+		if((<any>this.zone).inner !== window.Zone.current) {
 			this.zone.run(fn)
 			return
 		}
@@ -133,10 +143,10 @@ export class AppModule {
 
 	constructor(
 		private zone: NgZone,
-		private translate: TranslateService,
+		private translate: TranslateService, // tslint:disable-line:no-unused-variable
 		private globalization: Globalization,
-		private config: Config,
-		private platform: Platform
+		private config: Config, // tslint:disable-line:no-unused-variable
+		private platform: Platform // tslint:disable-line:no-unused-variable
 	) {
 		translate.setDefaultLang("en");
 
@@ -162,6 +172,15 @@ export class AppModule {
 				})
 			})
 		})
+
+		if (IONIC_ENV === "prod") {
+			Bluebird.config({
+				warnings: false,
+				longStackTraces: false,
+				cancellation: false,
+				monitoring: false
+			})
+		}
 
 		Bluebird.setScheduler((fn) => {
 			this.tasks.push(fn)

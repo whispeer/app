@@ -3,7 +3,7 @@ const errors = require("../asset/errors.js");
 
 import keyStore from "./keyStore.service";
 
-var userService = require("user/userService");
+var userService = require("users/userService").default;
 const circleService = require("circles/circleService");
 
 var localize = require("i18n/localizationConfig");
@@ -47,7 +47,7 @@ class FilterService {
 		});
 	}
 
-	public filterToKeys(filters: any, cb: any) {
+	public filterToKeys(filters: any, cb?: any) {
 		return Bluebird.try(() => {
 			var filterPromises = filters.map((filter: any) => {
 				var map = filter.split(":");

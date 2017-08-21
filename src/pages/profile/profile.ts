@@ -4,7 +4,7 @@ import sessionService from '../../lib/services/session.service';
 import reportService from "../../lib/services/reportService";
 import * as Bluebird from 'bluebird';
 
-const userService = require("user/userService")
+const userService = require("users/userService").default
 const friendsService = require("services/friendsService")
 import blobService from "../../lib/services/blobService"
 import ImageUpload from "../../lib/services/imageUpload.service"
@@ -116,7 +116,7 @@ export class ProfilePage {
 			var fp = user.getFingerPrint();
 			this.fingerprint = [fp.substr(0,13), fp.substr(13,13), fp.substr(26,13), fp.substr(39,13)];
 
-			return user.loadFullData().thenReturn(user);
+			return user.loadBasicData().thenReturn(user);
 		}).then((user) => {
 			this.userObject = user;
 			this.user = this.userObject.data;
@@ -333,12 +333,10 @@ export class ProfilePage {
 	}
 
 	removeProfileImage() {
-		return Promise.all([
-			this.userObject.removeProfileAttribute("image"),
-			this.userObject.removeProfileAttribute("imageBlob")
-		]).then(() => {
-			return this.userObject.uploadChangedProfile()
-		})
+		this.userObject.removeProfileAttribute("image"),
+		this.userObject.removeProfileAttribute("imageBlob")
+
+		return this.userObject.uploadChangedProfile()
 	}
 
 	uploadProfileImage(url) {
@@ -354,12 +352,9 @@ export class ProfilePage {
 				imageHash: imageMeta.blobHash
 			});
 
-			var removeImageAttributePromise = this.userObject.removeProfileAttribute("image");
+			this.userObject.removeProfileAttribute("image");
 
-			return Promise.all([
-				setImageBlobAttributePromise,
-				removeImageAttributePromise
-			]);
+			return setImageBlobAttributePromise
 		}).then(() => {
 			return this.userObject.uploadChangedProfile()
 		})

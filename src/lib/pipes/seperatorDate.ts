@@ -1,5 +1,4 @@
 import { Pipe } from "@angular/core";
-import { DatePipe } from "@angular/common";
 import * as moment from 'moment';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -10,7 +9,7 @@ const translateKeys = ["today", "yesterday"]
 })
 export class SeperatorDatePipe {
 
-	constructor(private datePipe: DatePipe, private translate: TranslateService) {}
+	constructor(private translate: TranslateService) {}
 
 	transform(value: any): string {
 		if(!value) {
