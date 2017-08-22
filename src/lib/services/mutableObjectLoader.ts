@@ -7,21 +7,35 @@ import Cache from "../services/Cache"
 // - Group multiple requests together -> download can do that for itself
 // - Add cache info so server does not resend full data (esp. for trustManager) -> activeInstance
 // - merge new and active -> restore has active and response
-// - immutable to make clear no request necessary
-// - cache first then update if not immutable
+// - cache first then update
+
+enum UpdateEvent {
+	wake,
+	blink
+}
+
+enum UpdateAction {
+	Reload,
+	DeferredReload
+}
+
+const DEFERRED_UPDATE_DELAY = 5000
 
 type hookType<ObjectType, CachedObjectType> = {
 	download: (id: string, activeInstance: Optional<ObjectType>) => Bluebird<any>,
 	load: (response: any, activeInstance: Optional<ObjectType>) => Bluebird<CachedObjectType>,
 	restore: (response: CachedObjectType, activeInstance: Optional<ObjectType>) => Bluebird<ObjectType> | ObjectType,
+	shouldUpdate: (event: UpdateEvent) => Bluebird<boolean>,
+	updateActions: {
+		[s: number]: UpdateAction,
+	}
 	getID: (response: any) => string,
-	immutable?: boolean,
 	cacheName: string
 }
 
 type Optional<t> = t | null
 
-function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName }: hookType<ObjectType, CachedObjectType>) {
+function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName, shouldUpdate, updateActions }: hookType<ObjectType, CachedObjectType>) {
 	let loading: { [s: string]: Bluebird<ObjectType> } = {}
 	let byId: { [s: string]: ObjectType } = {}
 
@@ -44,6 +58,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			.then((instance) => {
 				cacheInMemory(id, instance)
 				considerLoaded(id)
+				scheduleInstanceUpdate(UpdateEvent.wake, id, instance)
 				return instance
 			})
 
@@ -53,6 +68,36 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			.then((cachedData) => restore(cachedData, activeInstance))
 			.then((instance) => cacheInMemory(id, instance))
 			.finally(() => considerLoaded(id))
+
+	const updateInstance = (id, instance: ObjectType) => {
+		// TODO
+	}
+
+	const updateInstances = () => {
+		// TODO
+	}
+
+	const scheduleInstancesUpdate = (event: UpdateEvent) => {
+		switch(updateActions[event]) {
+			case UpdateAction.Reload:
+				updateInstances()
+				break;
+			case UpdateAction.DeferredReload:
+				Bluebird.delay(DEFERRED_UPDATE_DELAY).then(() => updateInstances())
+		}
+	}
+
+	socketService.listen("reconnect", () => scheduleInstancesUpdate(UpdateEvent.blink))
+
+	const scheduleInstanceUpdate = (event: UpdateEvent, id, instance: ObjectType) => {
+		switch(updateActions[event]) {
+			case UpdateAction.Reload:
+				updateInstance(id, instance)
+				break;
+			case UpdateAction.DeferredReload:
+				Bluebird.delay(DEFERRED_UPDATE_DELAY).then(() => updateInstance(id, instance))
+		}
+	}
 
 	return class ObjectLoader {
 		static getLoaded(id): ObjectType {
@@ -71,14 +116,13 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			const id = getID(response)
 
 			if (byId[id]) {
-				return serverResponseToInstance(response, id, byId[id])
+				return Bluebird.resolve(byId[id])
 			}
 
 			if (!loading[id]) {
 				loading = {
 					...loading,
 					[id]: loadFromCache(id)
-						.then((instance) => serverResponseToInstance(response, id, instance))
 						.catch(() => serverResponseToInstance(response, id, null))
 				}
 			}
@@ -88,12 +132,11 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 
 		static get(id): Bluebird<ObjectType> {
 			if (byId[id]) {
-				throw new Error("updating in memory cached instance is not yet implemented")
+				return Bluebird.resolve(byId[id])
 			}
 
 			if (!loading[id]) {
 				let promise = loadFromCache(id)
-					.then((instance) => download(id, instance).then((response) => serverResponseToInstance(response, id, instance)))
 					.catch(() => download(id, null).then((response) => serverResponseToInstance(response, id, null))
 				)
 
