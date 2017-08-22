@@ -306,7 +306,7 @@ export class Chunk extends Observer {
 
 			const receiverObjectsExceptOwn = receiverObjects.filter((receiver) => !receiver.isOwn())
 
-			const givenInfo = { cryptInfo: { receiverKeys: {} }, chunkKey: givenKey}
+			const givenInfo = { cryptInfo: { receiverKeys: {}, keys: [] }, chunkKey: givenKey}
 
 			const { cryptInfo, chunkKey } = givenKey ? givenInfo : await Chunk.cryptInfo(receiverObjectsExceptOwn)
 
@@ -334,9 +334,7 @@ export class Chunk extends Observer {
 	};
 
 	static createData(receiver, message, images) {
-		var imagePreparation = Bluebird.resolve(images).map((image: any) => {
-			return image.prepare()
-		})
+		Message.prepare(images)
 
 		const uploadImages = (chunkKey) => {
 			return Bluebird.all(images.map((image) => {
@@ -344,35 +342,34 @@ export class Chunk extends Observer {
 			}))
 		}
 
-		return Bluebird.all([
-			Chunk.createRawData(receiver, { content: {} }),
-			imagePreparation
-		]).spread((chunkData: any, imagesMeta) => {
-			// create chunk stub for empty chat so we can connect it to the first message
-			var chunkStub = new Chunk({
+		return Bluebird.try(async function () {
+			const chunkData = await Chunk.createRawData(receiver, { content: {} })
+			const chunkStub = new Chunk({
 				meta: chunkData.chunk.meta,
 				content: {},
 				server: {},
 				receiverObjects: []
 			});
 
-			var messageMeta = {
-				createTime: new Date().getTime(),
-				images: imagesMeta
+			const messageMeta = {
+				createTime: new Date().getTime()
+			}
+
+			const secured = Message.createRawSecuredData(message, messageMeta, chunkStub)
+
+			await Message.setAttachmentsInfo(secured, { images, files: [], voicemails: [] })
+
+			const messageData = await secured._signAndEncrypt(userService.getOwn().getSignKey(), chunkStub.getKey())
+
+			const imageKeys = await uploadImages(chunkStub.getKey())
+
+			return {
+				...chunkData,
+				message: {
+					...messageData,
+					imageKeys: h.array.flatten(imageKeys).map(keyStore.upload.getKey)
+				}
 			};
-
-			return Bluebird.all([
-				chunkData,
-				Message.createRawData(message, messageMeta, chunkStub),
-				uploadImages(chunkStub.getKey())
-			]);
-		}).spread((chunkData, messageData, imageKeys: any) => {
-			imageKeys = h.array.flatten(imageKeys);
-			messageData.imageKeys = imageKeys.map(keyStore.upload.getKey);
-
-			chunkData.message = messageData;
-
-			return chunkData;
 		})
 	}
 }

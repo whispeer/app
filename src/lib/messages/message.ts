@@ -109,18 +109,43 @@ export class Message {
 		this.prepareAttachments()
 	}
 
-	private prepare = (uploads) => Bluebird.resolve(uploads).map((upload: any) => upload.prepare())
-
-	private prepareImages = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.images))
-	private prepareFiles = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.files))
-	private prepareVoicemails = h.cacheResult<Bluebird<any>>(() => this.prepare(this.attachments.voicemails))
+	static prepare = (uploads) => Bluebird.resolve(uploads).map((upload: any) => upload.prepare())
 
 	hasAttachments = () => {
 		return this.attachments.images.length !== 0 || this.attachments.files.length !== 0 || this.attachments.voicemails.length !== 0
 	}
 
 	private prepareAttachments = () => {
-		return Bluebird.all([this.prepareFiles(), this.prepareImages(), this.prepareVoicemails()])
+		return Bluebird.all([
+			Message.prepare(this.attachments.files),
+			Message.prepare(this.attachments.images),
+			Message.prepare(this.attachments.voicemails)
+		])
+	}
+
+	static setAttachmentsInfo = (securedData, attachments: attachments) => {
+		return Bluebird.try(async function () {
+			const imagesInfo = await Message.prepare(attachments.images)
+			const voicemailsInfo = await Message.prepare(attachments.voicemails)
+			const filesInfo = await Message.prepare(attachments.files)
+
+			const extractImagesInfo = (infos, key) => {
+				return infos.map((info) =>
+					h.objectMap(info, (val) => val[key])
+				)
+			}
+
+			securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
+			securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
+			securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
+			securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
+			securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
+			securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
+
+			if (filesInfo.length === 0 && imagesInfo.length === 0 && voicemailsInfo.length === 0) {
+				securedData.contentSet(securedData.contentGet().message)
+			}
+		})
 	}
 
 	private setDefaultData = () => {
@@ -176,26 +201,7 @@ export class Message {
 
 			this.securedData.setParent(chunk.getSecuredData())
 
-			const imagesInfo = await this.prepareImages()
-			const voicemailsInfo = await this.prepareVoicemails()
-			const filesInfo = await this.prepareFiles()
-
-			const extractImagesInfo = (infos, key) => {
-				return infos.map((info) =>
-					h.objectMap(info, (val) => val[key])
-				)
-			}
-
-			this.securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
-			this.securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
-			this.securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
-			this.securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
-			this.securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
-			this.securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
-
-			if (filesInfo.length === 0 && imagesInfo.length === 0 && voicemailsInfo.length === 0) {
-				this.securedData.contentSet(this.securedData.contentGet().message)
-			}
+			await Message.setAttachmentsInfo(this.securedData, this.attachments)
 
 			const chunkKey = chunk.getKey()
 
@@ -372,10 +378,7 @@ export class Message {
 		return secured
 	}
 
-	static createRawData(message, meta, chunk: Chunk) {
-		const secured = Message.createRawSecuredData(message, meta, chunk)
-		return secured._signAndEncrypt(userService.getOwn().getSignKey(), chunk.getKey())
-	}
+
 
 	static idFromData(server) {
 		const serverID = h.parseDecimal(server.id)

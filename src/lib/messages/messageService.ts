@@ -157,7 +157,7 @@ messageService = {
 	sendNewChat: function (receiver, message, images) {
 		return Bluebird.try(function () {
 			if (receiver.length === 1) {
-				return messageService.sendMessageToUserChatIfExists(receiver[0], message, images);
+				return messageService.sendMessageToUserChatIfExists(receiver[0], message, { images, files: [], voicemails: [] });
 			}
 
 			return false;
