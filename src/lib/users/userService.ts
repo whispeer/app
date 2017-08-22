@@ -145,6 +145,9 @@ function makeUser(userData) {
 		}
 
 		const signKey = userData.signedKeys.sign
+		const nickname = userData.nickname
+
+		userService.notify({ key: signKey, userid: userID, nickname }, "loadUserKey")
 
 		const signedKeys = await SignedKeysLoader.load({ signedKeys: userData.signedKeys, signKey })
 
@@ -153,7 +156,6 @@ function makeUser(userData) {
 		const User = require("users/user").default
 		const user = new User(userData, signedKeys, profiles)
 		const mail = user.getMail()
-		const nickname = user.getNickname()
 		knownIDs.push(userID)
 		users[userID] = user
 
@@ -164,8 +166,6 @@ function makeUser(userData) {
 		if (nickname) {
 			users[nickname] = user
 		}
-
-		userService.notify(user, "loadedUser")
 
 		return user
 	})

@@ -49,7 +49,7 @@ class TrustService {
 
 		this.delay = h.aggregateOnce(THROTTLE, this.uploadDatabase);
 		window.setInterval(this.storeSignatureCache, STORESIGNATURECACHEINTERVAL);
-		userService.listen(this.addNewUsers, "loadedUser");
+		userService.listen(this.addNewUsers, "loadUserKey");
 
 		initService.get("trustManager.get", this.onInit, {
 			cacheCallback: this.loadFromCache,
@@ -148,9 +148,9 @@ class TrustService {
 		}
 	}
 
-	private addNewUsers = (user: any) => {
-		if (trustManager.isLoaded() && !trustManager.hasKeyData(user.getSignKey())) {
-			trustManager.addUser(user);
+	private addNewUsers = (userInfo) => {
+		if (trustManager.isLoaded() && !trustManager.hasKeyData(userInfo.key)) {
+			trustManager.addUser(userInfo);
 			this.delay();
 		}
 	}
@@ -197,10 +197,6 @@ class TrustService {
 			return this.uploadDatabase();
 		}).nodeify(cb);
 	};
-
-	addUser = (user: any) => {
-		return trustManager.addUser(user);
-	}
 }
 
 export default new TrustService();

@@ -68,17 +68,14 @@ function KeyTrustData(data) {
 	};
 }
 
-function userToDataSet(user, trustLevel) {
+function userToDataSet({ key, userid, nickname }, trustLevel) {
 	var content = {
 		added: new Date().getTime(),
-		key: user.getSignKey(),
-		userid: user.getID(),
-		trust: serializeTrust(trustLevel || trustStates.UNTRUSTED)
+		trust: serializeTrust(trustLevel || trustStates.UNTRUSTED),
+		key,
+		userid,
+		nickname
 	};
-
-	if (user.getNickname()) {
-		content.nickname = user.getNickname();
-	}
 
 	return content;
 }
@@ -102,18 +99,18 @@ trustManager = {
 	createDatabase: function(me) {
 		var data = {};
 
-		data.nicknames = {};
-		data.ids = {};
+		data.nicknames = {}
+		data.ids = {}
 
-		var signKey = me.getSignKey();
+		const key = me.getSignKey()
+		const userid = me.getUserID()
+		const nickname = me.getNickname()
 
-		data[signKey] = userToDataSet(me, trustStates.OWN);
-		if (me.getNickname()) {
-			data.nicknames[me.getNickname()] = signKey;
-		}
-		data.ids[me.getID()] = signKey;
+		data[key] = userToDataSet({ key, userid, nickname }, trustStates.OWN)
 
-		data.me = me.getSignKey();
+		data.nicknames[nickname] = key
+		data.ids[userid] = key
+		data.me =  key
 
 		database = SecuredData.load(undefined, data, {
 			type: "trustManager"
@@ -151,7 +148,6 @@ trustManager = {
 			return Bluebird.resolve().nodeify(cb);
 		}
 
-		console.log("Updating trust database");
 		var givenDatabase = SecuredData.load(undefined, data, {
 			type: "trustManager"
 		});
@@ -246,8 +242,8 @@ trustManager = {
 
 		return false;
 	},
-	addUser: function(user) {
-		trustManager.addDataSet(userToDataSet(user));
+	addUser: function(userInfo) {
+		trustManager.addDataSet(userToDataSet(userInfo));
 	},
 	setKeyTrustLevel: function(signKey, trustLevel) {
 		if (trustLevel === trustStates.OWN) {
