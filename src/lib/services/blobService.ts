@@ -84,7 +84,7 @@ class MyBlob {
 		}
 
 		this.meta = options.meta || {};
-		this.key = this.meta._key;
+		this.key = this.meta._key || this.meta.key;
 		this.decrypted = options.decrypted || !this.key;
 
 		this.uploadProgress = new Progress({ total: this.getSize() });
@@ -248,7 +248,7 @@ class MyBlob {
 	private reserveID () {
 		return Bluebird.try(() => {
 			const meta = this.meta;
-			meta.key = this.key;
+			meta._key = this.key;
 			meta.one = 1;
 
 			if (this.preReservedID) {

@@ -183,6 +183,11 @@ class ImageUpload extends FileUpload {
 		var diff = canvas.width - canvas.height;
 
 		var newCtx = canvas.getContext("2d");
+
+		if (newCtx === null) {
+			throw new Error("could not initialize canvas context")
+		}
+
 		newCtx.translate(canvas.width/2, canvas.height/2);
 		newCtx.rotate(angle);
 		newCtx.translate(-canvas.width/2, -canvas.height/2);
