@@ -2,13 +2,24 @@ import * as Bluebird from "bluebird"
 
 import Cache from "../services/Cache"
 
+// What do we want to achieve and how:
+
+// - Group multiple requests together -> download can do that for itself
+// - Add cache info so server does not resend full data (esp. for trustManager) -> activeInstance
+// - merge new and active -> restore has active and response
+// - immutable to make clear no request necessary
+// - cache first then update if not immutable
+
 type hookType<ObjectType, CachedObjectType> = {
-	download: (id: string) => Bluebird<any>,
-	load: (response: any) => Bluebird<CachedObjectType>,
-	restore: (response: CachedObjectType) => Bluebird<ObjectType> | ObjectType,
+	download: (id: string, activeInstance: Optional<ObjectType>) => Bluebird<any>,
+	load: (response: any, activeInstance: Optional<ObjectType>) => Bluebird<CachedObjectType>,
+	restore: (response: CachedObjectType, activeInstance: Optional<ObjectType>) => Bluebird<ObjectType> | ObjectType,
 	getID: (response: any) => string,
+	immutable?: boolean,
 	cacheName: string
 }
+
+type Optional<t> = t | null
 
 function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName }: hookType<ObjectType, CachedObjectType>) {
 	let loading: { [s: string]: Bluebird<ObjectType> } = {}
@@ -29,17 +40,17 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 	const loadFromCache = (id) =>
 		cache.get(id)
 			.then((cacheResponse) => cacheResponse.data)
-			.then(restore)
+			.then((instance) => restore(instance, null))
 			.then((instance) => {
 				cacheInMemory(id, instance)
 				considerLoaded(id)
 				return instance
 			})
 
-	const serverResponseToInstance = (response, id) =>
-		load(response)
+	const serverResponseToInstance = (response, id, activeInstance: Optional<ObjectType>) =>
+		load(response, activeInstance)
 			.then((cacheableData) => cache.store(id, cacheableData).thenReturn(cacheableData))
-			.then(restore)
+			.then((cachedData) => restore(cachedData, activeInstance))
 			.then((instance) => cacheInMemory(id, instance))
 			.finally(() => considerLoaded(id))
 
@@ -60,13 +71,15 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			const id = getID(response)
 
 			if (byId[id]) {
-				return Bluebird.resolve(byId[id])
+				return serverResponseToInstance(response, id, byId[id])
 			}
 
 			if (!loading[id]) {
 				loading = {
 					...loading,
-					[id]: loadFromCache(id).catch(() => serverResponseToInstance(response, id))
+					[id]: loadFromCache(id)
+						.then((instance) => serverResponseToInstance(response, id, instance))
+						.catch(() => serverResponseToInstance(response, id, null))
 				}
 			}
 
@@ -75,12 +88,13 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 
 		static get(id): Bluebird<ObjectType> {
 			if (byId[id]) {
-				return Bluebird.resolve(byId[id])
+				throw new Error("updating in memory cached instance is not yet implemented")
 			}
 
 			if (!loading[id]) {
-				let promise = loadFromCache(id).catch(() =>
-					download(id).then((response) => serverResponseToInstance(response, id))
+				let promise = loadFromCache(id)
+					.then((instance) => download(id, instance).then((response) => serverResponseToInstance(response, id, instance)))
+					.catch(() => download(id, null).then((response) => serverResponseToInstance(response, id, null))
 				)
 
 				loading = {
