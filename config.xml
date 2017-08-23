@@ -69,7 +69,7 @@
 		<splash src="resources/ios/splash/Default@2x~iphone.png" width="640" height="960"/>
 		<splash src="resources/ios/splash/Default~iphone.png" width="320" height="480"/>
 	</platform>
-	<preference name="loadUrlTimeoutValue" value="50000" />
+	<preference name="loadUrlTimeoutValue" value="50000"/>
 	<preference name="HideKeyboardFormAccessoryBar" value="true"/>
 	<preference name="webviewbounce" value="false"/>
 	<preference name="UIWebViewBounce" value="false"/>
@@ -84,7 +84,7 @@
 	<preference name="SplashScreenDelay" value="3000"/>
 	<preference name="KeyboardShrinksView" value="true"/>
 	<preference name="xwalkMultipleApk" value="false"/>
-	<preference name="Orientation" value="portrait" />
+	<preference name="Orientation" value="portrait"/>
 	<feature name="StatusBar">
 		<param name="ios-package" onload="true" value="CDVStatusBar"/>
 	</feature>
@@ -96,7 +96,7 @@
 	<plugin name="cordova-plugin-console" spec="~1.0.5"/>
 	<plugin name="cordova-plugin-statusbar" spec="~2.2.1"/>
 	<plugin name="cordova-plugin-device" spec="~1.1.4"/>
-	<plugin name="cordova-plugin-splashscreen" spec="~4.0.1"/>
+	<plugin name="cordova-plugin-splashscreen" spec="https://github.com/whispeer/cordova-plugin-splashscreen.git#adaptedSpinner"/>
 	<plugin name="cordova-plugin-wkwebview-engine" spec="https://github.com/driftyco/cordova-plugin-wkwebview-engine.git"/>
 	<plugin name="cordova-plugin-keyboard" spec="~1.1.5"/>
 	<plugin name="com-sarriaroman-photoviewer" spec="~1.1.10"/>
