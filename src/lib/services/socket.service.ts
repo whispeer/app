@@ -85,7 +85,7 @@ class SocketService extends Observer {
 		}
 	}
 
-	_connect () {
+	private _connect () {
 		this._socket = connect(this._domain, config.socket.options);
 
 		this._socket.on("disconnect", () => {
@@ -97,10 +97,14 @@ class SocketService extends Observer {
 		this._socket.on("connect", () => {
 			socketDebug("socket connected");
 			this.emit("whispeerPing", {});
+
+			(<any>this._socket.io).engine.on("heartbeat", () => {
+				this.notify("heartbeat")
+			})
 		});
 	}
 
-	_emit (channel: string, request: Object) {
+	private _emit (channel: string, request: Object) {
 		return new Bluebird<any>((resolve, reject) => {
 			var onDisconnect = function () {
 				reject(new DisconnectError("Disconnected while sending"));

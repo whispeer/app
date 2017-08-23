@@ -1,6 +1,8 @@
 import * as Bluebird from "bluebird"
 
+import socketService from "../services/socket.service"
 import Cache from "../services/Cache"
+import errorService from "../services/error.service"
 
 // What do we want to achieve and how:
 
@@ -14,28 +16,21 @@ enum UpdateEvent {
 	blink
 }
 
-enum UpdateAction {
-	Reload,
-	DeferredReload
-}
-
-const DEFERRED_UPDATE_DELAY = 5000
+const LONG_APP_PAUSE = 2 * 60 * 1000
+const LONG_DISCONNECT = 60 * 1000
 
 type hookType<ObjectType, CachedObjectType> = {
 	download: (id: string, activeInstance: Optional<ObjectType>) => Bluebird<any>,
 	load: (response: any, activeInstance: Optional<ObjectType>) => Bluebird<CachedObjectType>,
 	restore: (response: CachedObjectType, activeInstance: Optional<ObjectType>) => Bluebird<ObjectType> | ObjectType,
-	shouldUpdate: (event: UpdateEvent) => Bluebird<boolean>,
-	updateActions: {
-		[s: number]: UpdateAction,
-	}
+	shouldUpdate: (event: UpdateEvent, activeInstance: ObjectType, lastUpdated: number) => Bluebird<boolean>,
 	getID: (response: any) => string,
-	cacheName: string
+	cacheName: string,
 }
 
 type Optional<t> = t | null
 
-function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName, shouldUpdate, updateActions }: hookType<ObjectType, CachedObjectType>) {
+function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName, shouldUpdate }: hookType<ObjectType, CachedObjectType>) {
 	let loading: { [s: string]: Bluebird<ObjectType> } = {}
 	let byId: { [s: string]: ObjectType } = {}
 
@@ -54,7 +49,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 	const loadFromCache = (id) =>
 		cache.get(id)
 			.then((cacheResponse) => cacheResponse.data)
-			.then((instance) => restore(instance, null))
+			.then((cachedData) => restore(cachedData, null))
 			.then((instance) => {
 				cacheInMemory(id, instance)
 				considerLoaded(id)
@@ -69,35 +64,52 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			.then((instance) => cacheInMemory(id, instance))
 			.finally(() => considerLoaded(id))
 
-	const updateInstance = (id, instance: ObjectType) => {
-		// TODO
-	}
-
-	const updateInstances = () => {
-		// TODO
-	}
-
-	const scheduleInstancesUpdate = (event: UpdateEvent) => {
-		switch(updateActions[event]) {
-			case UpdateAction.Reload:
-				updateInstances()
-				break;
-			case UpdateAction.DeferredReload:
-				Bluebird.delay(DEFERRED_UPDATE_DELAY).then(() => updateInstances())
-		}
-	}
-
-	socketService.listen("reconnect", () => scheduleInstancesUpdate(UpdateEvent.blink))
+	const updateInstance = (id, instance: ObjectType) =>
+		download(id, instance).then((response) =>
+			serverResponseToInstance(response, id, instance)
+		)
 
 	const scheduleInstanceUpdate = (event: UpdateEvent, id, instance: ObjectType) => {
-		switch(updateActions[event]) {
-			case UpdateAction.Reload:
-				updateInstance(id, instance)
-				break;
-			case UpdateAction.DeferredReload:
-				Bluebird.delay(DEFERRED_UPDATE_DELAY).then(() => updateInstance(id, instance))
-		}
+		const lastUpdated = 0
+
+		return shouldUpdate(event, instance, lastUpdated).then((shouldUpdate) => {
+			if (shouldUpdate) {
+				return updateInstance(id, instance)
+			}
+		}).catch(errorService.criticalError)
 	}
+
+	const scheduleInstancesUpdate = (event: UpdateEvent) =>
+		Object.keys(byId)
+			.forEach((id) => scheduleInstanceUpdate(event, id, byId[id]) )
+
+	let lastHeartbeat = 0
+
+	socketService.listen(() => lastHeartbeat = Date.now(), "heartbeat")
+	socketService.on("reconnect", () => {
+		console.info(`reconnect at ${Date.now()} after ${Date.now() - lastHeartbeat}`)
+
+		if (Date.now() - lastHeartbeat > LONG_DISCONNECT) {
+			scheduleInstancesUpdate(UpdateEvent.wake)
+		} else {
+			scheduleInstancesUpdate(UpdateEvent.blink)
+		}
+
+		lastHeartbeat = Date.now()
+	})
+
+	let pauseStarted = 0
+
+	document.addEventListener("pause", () => pauseStarted = Date.now(), false);
+	document.addEventListener("resume", () => {
+		console.info(`ended pause at ${Date.now()} after ${Date.now() - pauseStarted}`)
+
+		if (Date.now() - pauseStarted > LONG_APP_PAUSE) {
+			scheduleInstancesUpdate(UpdateEvent.wake)
+		} else {
+			scheduleInstancesUpdate(UpdateEvent.blink)
+		}
+	}, false);
 
 	return class ObjectLoader {
 		static getLoaded(id): ObjectType {
