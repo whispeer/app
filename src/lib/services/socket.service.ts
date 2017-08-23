@@ -172,8 +172,7 @@ class SocketService extends Observer {
 		request.version = APIVERSION;
 		request.clientInfo = CLIENT_INFO;
 
-		socketDebug("Request on " + channel);
-		socketDebug(request);
+		socketDebug("Request on " + channel, request);
 
 		this._interceptors.forEach(function (interceptor) {
 			if (interceptor.transformRequest) {

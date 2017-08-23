@@ -14,8 +14,6 @@ import h from "../helper/helper";
 const trustManager = require("crypto/trustManager");
 const signatureCache = require("crypto/signatureCache");
 
-const userService = require("users/userService").default;
-
 const debug = require("debug");
 
 const THROTTLE = 20, STORESIGNATURECACHEINTERVAL = 30000;
@@ -35,6 +33,11 @@ function timeEnd(name: string) {
 	}
 }
 
+let resolveOwnKeys, resolveOwnUser
+
+const ownKeysPromise = new Bluebird((resolve) => resolveOwnKeys = resolve)
+const ownUserPromise = new Bluebird<any>((resolve) => resolveOwnUser = resolve)
+
 class TrustService {
 	private signatureCacheObject: CacheServiceType;
 	private trustManagerCache: CacheServiceType;
@@ -49,7 +52,6 @@ class TrustService {
 
 		this.delay = h.aggregateOnce(THROTTLE, this.uploadDatabase);
 		window.setInterval(this.storeSignatureCache, STORESIGNATURECACHEINTERVAL);
-		userService.listen(this.addNewUsers, "loadUserKey");
 
 		initService.get("trustManager.get", this.onInit, {
 			cacheCallback: this.loadFromCache,
@@ -61,6 +63,14 @@ class TrustService {
 		});
 
 		this.waitForLogin();
+	}
+
+	ownKeysLoaded() {
+		resolveOwnKeys()
+	}
+
+	ownUserLoaded(user) {
+		resolveOwnUser(user)
 	}
 
 	private waitForLogin() {
@@ -86,7 +96,7 @@ class TrustService {
 			trustServiceDebug("Could not load trust service from cache!");
 			console.error(e);
 		}).then(() => {
-			return userService.verifyOwnKeysDone();
+			return ownKeysPromise
 		}).then(() => {
 			if (data.unChanged) {
 				if (!trustManager.isLoaded()) {
@@ -148,7 +158,7 @@ class TrustService {
 		}
 	}
 
-	private addNewUsers = (userInfo) => {
+	addNewUsers = (userInfo) => {
 		if (trustManager.isLoaded() && !trustManager.hasKeyData(userInfo.key)) {
 			trustManager.addUser(userInfo);
 			this.delay();
@@ -159,22 +169,23 @@ class TrustService {
 		return trustManager.loadDatabase(database).thenReturn(database).nodeify(cb);
 	}
 
-	private createTrustDatabase = (cb?: Function) => {
-		Bluebird.try(() => {
-			trustManager.createDatabase(userService.getOwn());
+	private createTrustDatabase = () => {
+		ownUserPromise.then((ownUser) => {
+			const key = ownUser.getSignKey()
+			const userid = ownUser.getID()
+			const nickname = ownUser.getNickname()
+
+			trustManager.createDatabase({ key, userid, nickname });
 
 			this.uploadDatabase().catch(errorServiceInstance.criticalError);
 
 			return null;
-		}).nodeify(cb);
+		})
 	}
 
 	private loadFromCache = (cacheEntry: any) => {
 		trustServiceDebug("trustManager cache get done");
-		this.loadCachePromise = Bluebird.race([
-			userService.verifyOwnKeysDone(),
-			userService.verifyOwnKeysCacheDone()
-		]).then(() => {
+		this.loadCachePromise = ownKeysPromise.then(() => {
 			trustServiceDebug("trustManager cache loading");
 			return this.loadDatabase(cacheEntry.data);
 		});

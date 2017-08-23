@@ -189,10 +189,7 @@ class SettingsService extends Observer {
 	loadFromCache = (cacheEntry: any) => {
 		var userService = require("users/userService").default;
 
-		this.loadCachePromise = Bluebird.race([
-			userService.ownLoadedCache(),
-			userService.ownLoaded()
-		]).then(() => {
+		this.loadCachePromise = userService.getOwnAsync().then(() => {
 			return this.loadSettings(cacheEntry.data);
 		});
 
@@ -209,7 +206,7 @@ class SettingsService extends Observer {
 			var toCache = h.deepCopyObj(givenSettings);
 
 			var userService = require("users/userService").default;
-			return userService.ownLoaded().then(() => {
+			return userService.getOwnAsync().then(() => {
 				return this.loadSettings(givenSettings);
 			}).thenReturn(toCache);
 		});

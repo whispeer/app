@@ -64,7 +64,7 @@ var cacheTypes = {
 	trustManager: "me",
 	settings: "me",
 
-	topicUpdate: "topic",
+	topicUpdate: "noCache",
 
 	post: "post",
 	postPrivate: "post",

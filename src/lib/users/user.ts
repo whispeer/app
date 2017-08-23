@@ -7,6 +7,7 @@ import * as Bluebird from "bluebird"
 const initService = require("services/initService")
 import State from "../asset/state"
 const keyStoreService = require("crypto/keyStore")
+const signatureCache = require("crypto/signatureCache")
 
 import sessionService from "../services/session.service"
 import blobService from "../services/blobService"
@@ -14,8 +15,13 @@ import Profile from "../users/profile"
 import trustService from "../services/trust.service"
 import settingsService from "../services/settings.service"
 import filterService from "../services/filter.service"
+import MutableObjectLoader from "../services/mutableObjectLoader"
+
+import { ProfileLoader } from "../users/profile"
+import { SignedKeysLoader } from "../users/signedKeys"
 
 const friendsService = require("services/friendsService")
+const trustManager = require("crypto/trustManager")
 
 const advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"]
 
@@ -457,27 +463,21 @@ class User {
 	}
 
 	getTrustLevel = () => {
-		return this.getTrustData().then((trust) => {
-			if (trust.isOwn()) {
-				return -1
-			}
+		const trust = trustService.getKey(this.getSignKey())
 
-			if (trust.isVerified()) {
-				return 2
-			}
+		if (trust.isOwn()) {
+			return -1
+		}
 
-			if (trust.isWhispeerVerified() || trust.isNetworkVerified()) {
-				return 1
-			}
+		if (trust.isVerified()) {
+			return 2
+		}
 
-			return 0
-		})
-	}
+		if (trust.isWhispeerVerified() || trust.isNetworkVerified()) {
+			return 1
+		}
 
-	getTrustData = () => {
-		return Bluebird.resolve(
-			trustService.getKey(this.getSignKey())
-		)
+		return 0
 	}
 
 	changePassword = (newPassword, cb) => {
@@ -535,17 +535,11 @@ class User {
 	}
 
 	loadBasicData = () => {
-		if (!this.loadBasicDataPromise) {
-			this.loadBasicDataPromise = this.getTrustLevel().then((trustLevel) => {
-				this.data.trustLevel = trustLevel
+		this.data.trustLevel = this.getTrustLevel()
 
-				this.loadImage()
+		this.loadImage()
 
-				return null
-			})
-		}
-
-		return this.loadBasicDataPromise
+		return Bluebird.resolve()
 	}
 
 	setMigrationState = (migrationState, cb) => {
@@ -681,5 +675,160 @@ class User {
 		}
 	}
 }
+
+type CachedUser = any
+
+function loadProfileInfo(profileInfo, signKey, isPublic = false) {
+	return ProfileLoader.load({
+		...profileInfo,
+		isPublic,
+		signKey
+	})
+}
+
+const getProfiles = (userData, signKey, isMe) => {
+	return Bluebird.try(async function () {
+		const profiles = {
+			public: null,
+			private: null,
+			me: null
+		}
+
+		if (!isMe) {
+			if (userData.profile.pub) {
+				userData.profile.pub.profileid = userData.profile.pub.profileid || userData.id
+
+				profiles.public = await loadProfileInfo(userData.profile.pub, signKey, true)
+			}
+
+			profiles.private = []
+
+			if (userData.profile.priv && userData.profile.priv instanceof Array) {
+				const priv = userData.profile.priv
+
+				profiles.private = await Bluebird.resolve(priv)
+					.map(profile => loadProfileInfo(profile, signKey))
+			}
+		} else {
+			profiles.me =  await loadProfileInfo(userData.profile.me, signKey)
+		}
+
+		return profiles
+	})
+}
+
+const deletedUserName = "Deleted user"
+export class NotExistingUser {
+	data: any
+
+	constructor (identifier?) {
+		this.data = {
+			trustLevel: -1,
+			notExisting: true,
+			basic: {
+				shortname: deletedUserName,
+				image: "assets/img/user.png"
+			},
+			name: deletedUserName,
+			user: this
+		}
+
+		if (typeof identifier === "number") {
+			this.data.id = identifier
+		}
+	}
+
+	isNotExistingUser = () => {
+		return true
+	}
+
+	loadBasicData = (cb) => {
+		return Bluebird.resolve().nodeify(cb)
+	}
+
+	reLoadBasicData = (cb) => {
+		return Bluebird.resolve().nodeify(cb)
+	}
+
+	loadFullData = (cb) => {
+		return Bluebird.resolve().nodeify(cb)
+	}
+
+	isOwn = () => {
+		return false
+	}
+}
+
+function enhanceOwnUser(userData) {
+	const nickname = userData.nickname
+	const mainKey = userData.mainKey
+	const signKey = userData.signedKeys.sign
+
+	keyStoreService.setKeyGenIdentifier(nickname)
+	// TODO improvementListener(nickname)
+	keyStoreService.sym.registerMainKey(mainKey)
+
+	keyStoreService.security.verifyWithPW(userData.signedOwnKeys, {
+		main: mainKey,
+		sign: signKey
+	})
+
+	keyStoreService.security.addEncryptionIdentifier(mainKey)
+	keyStoreService.security.addEncryptionIdentifier(signKey)
+
+	trustService.ownKeysLoaded()
+
+	trustManager.setOwnSignKey(signKey)
+}
+
+export class UserLoader extends MutableObjectLoader<User, CachedUser>({
+	download: (id) =>
+		socketService.emit("user.getMultiple", { identifiers: [id] })
+			.then((response) => response.users[0]),
+	load: (userData) => {
+		return Bluebird.resolve(userData)
+	},
+	restore: (userData) => {
+		return Bluebird.try(async function () {
+			if (userData.userNotExisting) {
+				return new NotExistingUser(userData.identifier)
+			}
+
+			if (userData.error === true) {
+				return new NotExistingUser()
+			}
+
+			const userID = h.parseDecimal(userData.id)
+
+			const isMe = sessionService.isOwnUserID(userID)
+
+			if (isMe) {
+				enhanceOwnUser(userData)
+				await signatureCache.awaitLoading()
+			}
+
+			const signKey = userData.signedKeys.sign
+			const nickname = userData.nickname
+
+			trustService.addNewUsers({ key: signKey, userid: userID, nickname })
+
+			const signedKeys = await SignedKeysLoader.load({ signedKeys: userData.signedKeys, signKey })
+
+			const profiles = await getProfiles(userData, signKey, isMe)
+
+			const User = require("users/user").default
+			const user = new User(userData, signedKeys, profiles)
+
+			if (isMe) {
+				trustService.ownUserLoaded(user)
+			}
+
+			return user
+		})
+	},
+	shouldUpdate: (event, instance, lastUpdated) => Bluebird.resolve(false),
+	getID: (userData) => userData.id.toString(),
+	cacheName: "user"
+}) {}
 
 export default User
