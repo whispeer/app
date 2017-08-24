@@ -11,7 +11,7 @@ import errorService from "../services/error.service"
 // - merge new and active -> restore has active and response
 // - cache first then update
 
-enum UpdateEvent {
+export enum UpdateEvent {
 	wake,
 	blink
 }
@@ -43,7 +43,6 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 
 	const cacheInMemory = (id, instance) => {
 		byId = { ...byId, [id]: instance }
-		return instance
 	}
 
 	const loadFromCache = (id) =>
@@ -61,7 +60,14 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 		load(response, activeInstance)
 			.then((cacheableData) => cache.store(id, cacheableData).thenReturn(cacheableData))
 			.then((cachedData) => restore(cachedData, activeInstance))
-			.then((instance) => cacheInMemory(id, instance))
+			.then((instance) => {
+				if (activeInstance && activeInstance !== instance) {
+					console.warn("Restore should update active instance")
+				}
+				cacheInMemory(id, instance)
+
+				return instance
+			})
 			.finally(() => considerLoaded(id))
 
 	const updateInstance = (id, instance: ObjectType) =>

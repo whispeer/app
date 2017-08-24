@@ -44,6 +44,14 @@ export const goToBusinessVersion = () => {
 	setTopPath("/business.html")
 }
 
+export const reloadApp = () => {
+	if (isBusinessVersion()) {
+		goToBusinessVersion()
+	} else {
+		goToPrivateHome()
+	}
+}
+
 export const isBlockedReturnUrl = (url: string) => {
 	return blockedReturnUrls.filter((blockedUrl: string) => {
 		return url.indexOf(blockedUrl) !== -1;
