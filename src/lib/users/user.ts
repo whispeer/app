@@ -867,7 +867,7 @@ function enhanceOwnUser(userData) {
 	trustManager.setOwnSignKey(signKey)
 }
 
-export class UserLoader extends MutableObjectLoader<UserInterface, CachedUser>({
+export default class UserLoader extends MutableObjectLoader<UserInterface, CachedUser>({
 	download: (id, previousInstance) =>
 		socketService.emit("user.getMultiple", { identifiers: [id] })
 			.then((response) => response.users[0]),
@@ -920,6 +920,8 @@ export class UserLoader extends MutableObjectLoader<UserInterface, CachedUser>({
 			const signKey = userData.signedKeys.sign
 			const nickname = userData.nickname
 
+			require("users/user").default
+
 			trustService.addNewUsers({ key: signKey, userid: userID, nickname })
 
 			const signedKeys = await SignedKeysLoader.load({ signedKeys: userData.signedKeys, signKey })
@@ -945,5 +947,3 @@ export class UserLoader extends MutableObjectLoader<UserInterface, CachedUser>({
 	getID: (userData) => userData.id.toString(),
 	cacheName: "user"
 }) {}
-
-export default User

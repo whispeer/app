@@ -2,7 +2,7 @@ import * as Bluebird from "bluebird"
 import socketService from "../services/socket.service"
 import sessionService from "../services/session.service"
 
-import { UserLoader } from "./user"
+import UserLoader from "./user"
 
 const sjcl = require("sjcl")
 const initService = require("services/initService")
