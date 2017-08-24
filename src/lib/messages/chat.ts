@@ -61,6 +61,19 @@ window.addEventListener("beforeunload", function (e) {
 	return
 });
 
+const verifyMessageAssociations = (message: Message, latestChunkID: number) => {
+	return Bluebird.all([
+		ChunkLoader.get(message.getChunkID()),
+		ChunkLoader.get(latestChunkID),
+	]).then(([messageChunk, latestChunk]) => {
+		message.verifyParent(messageChunk)
+
+		return Chunk.loadChunkChain(latestChunk, messageChunk).thenReturn([latestChunk, messageChunk])
+	}).then(([latestChunk, messageChunk]) => {
+		latestChunk.ensureChunkChain(messageChunk)
+	})
+}
+
 export class Chat extends Observer {
 	//Sorted IDs
 	private messages:timeArray = []
@@ -80,13 +93,16 @@ export class Chat extends Observer {
 		super()
 
 		this.id = id
+
+		this.update({ latestChunk, latestMessage, unreadMessageIDs })
+	}
+
+	update = ({ latestChunk, latestMessage, unreadMessageIDs }) => {
 		this.unreadMessageIDs = unreadMessageIDs
 
-		this.chunkIDs = [latestChunk.getID()]
+		this.addChunkID(latestChunk.getID())
 
 		if (latestMessage) {
-			// TODO: await this.verifyMessageAssociations(latestMessage)
-
 			this.addMessageID(latestMessage.getClientID(), latestMessage.getTime())
 		}
 	}
@@ -126,18 +142,8 @@ export class Chat extends Observer {
 		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "chatUpdate", id }, time)
 	}
 
-	verifyMessageAssociations = (message: Message) => {
-		return Bluebird.all([
-			ChunkLoader.get(message.getChunkID()),
-			ChunkLoader.get(h.array.last(this.chunkIDs)),
-		]).then(([messageChunk, latestChunk]) => {
-			message.verifyParent(messageChunk)
-
-			return Chunk.loadChunkChain(latestChunk, messageChunk).thenReturn([latestChunk, messageChunk])
-		}).then(([latestChunk, messageChunk]) => {
-			latestChunk.ensureChunkChain(messageChunk)
-		})
-	}
+	verifyMessageAssociations = (message: Message) =>
+		verifyMessageAssociations(message, h.array.last(this.chunkIDs))
 
 	addChunkID = (chunkID) => {
 		if (this.chunkIDs.indexOf(chunkID) > -1) {
@@ -495,16 +501,20 @@ export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 	},
 	getID: (response) => response.chat.id,
 	restore: (chatInfo, previousInstance) => {
-		if (previousInstance) {
-			// debugger
-			return previousInstance
-		}
-
 		return Bluebird.try(async function () {
 			const { id, latestMessageID, latestChunkID, unreadMessageIDs } = chatInfo
 
-			const latestMessage = await MessageLoader.get(latestMessageID)
+			const latestMessage = latestMessageID ? await MessageLoader.get(latestMessageID) : null
 			const latestChunk = await ChunkLoader.get(latestChunkID)
+
+			if (latestMessage) {
+				await verifyMessageAssociations(latestMessage, latestChunk.getID())
+			}
+
+			if (previousInstance) {
+				previousInstance.update({ unreadMessageIDs, latestMessage, latestChunk })
+				return previousInstance
+			}
 
 			return new Chat({
 				id,
