@@ -490,31 +490,26 @@ export class Chat extends Observer {
 	}
 }
 
-const loadHook = (chatResponse) => {
-	const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
-		ChunkLoader.load(chunkData)
-	))
-
-	const loadMessages = Bluebird.all(chatResponse.messages.map((messageData) =>
-		MessageLoader.load(messageData)
-	))
-
-	const chat = new Chat(chatResponse.chat)
-
-	return Bluebird.all([
-		loadChunks,
-		loadMessages,
-	]).then(() => chat.load()).thenReturn(chat)
-}
-
-const downloadHook = (id) => {
-	return socketService.emit("chat.get", { id }).then((response) => response.chat)
-}
-
-const idHook = (response) => response.chat.id
-
 const hooks = {
-	downloadHook, loadHook, idHook
+	downloadHook: (id) =>
+		socketService.emit("chat.get", { id }).then((response) => response.chat),
+	loadHook: (chatResponse) => {
+		const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
+			ChunkLoader.load(chunkData)
+		))
+
+		const loadMessages = Bluebird.all(chatResponse.messages.map((messageData) =>
+			MessageLoader.load(messageData)
+		))
+
+		const chat = new Chat(chatResponse.chat)
+
+		return Bluebird.all([
+			loadChunks,
+			loadMessages,
+		]).then(() => chat.load()).thenReturn(chat)
+	},
+	idHook: (response) => response.chat.id
 }
 
 export default class ChatLoader extends ObjectLoader(hooks) {}
