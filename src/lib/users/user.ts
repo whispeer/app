@@ -24,7 +24,7 @@ import { SignedKeysLoader } from "../users/signedKeys"
 const friendsService = require("services/friendsService")
 const trustManager = require("crypto/trustManager")
 
-const RELOAD_DELAY = 5000
+const RELOAD_DELAY = 15000
 const advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"]
 
 const advancedDefaults = {
