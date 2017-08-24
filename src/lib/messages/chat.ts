@@ -97,13 +97,22 @@ export class Chat extends Observer {
 		this.update({ latestChunk, latestMessage, unreadMessageIDs })
 	}
 
+	private store = () => {
+		ChatLoader.updateCache(this.id, {
+			id: this.id,
+			unreadMessageIDs: this.unreadMessageIDs,
+			latestMessageID: this.getLatestMessage(),
+			latestChunkID: this.getLatestChunk()
+		})
+	}
+
 	update = ({ latestChunk, latestMessage, unreadMessageIDs }) => {
 		this.unreadMessageIDs = unreadMessageIDs
 
-		this.addChunkID(latestChunk.getID())
+		this.addChunkID(latestChunk.getID(), false)
 
 		if (latestMessage) {
-			this.addMessageID(latestMessage.getClientID(), latestMessage.getTime())
+			this.addMessageID(latestMessage.getClientID(), latestMessage.getTime(), false)
 		}
 	}
 
@@ -115,12 +124,12 @@ export class Chat extends Observer {
 		return unreadChatIDs.indexOf(this.id) > -1
 	}
 
-	removeMessageID = (removeID) => {
+	private removeMessageID = (removeID) => {
 		this.messages = this.messages.filter(({ id }) => removeID !== id)
 		this.messagesAndUpdates = this.messagesAndUpdates.filter(({ id: { id } }) => removeID !== id)
 	}
 
-	addMessageID = (id, time) => {
+	addMessageID = (id, time, updateCache = true) => {
 		const alreadyAdded = this.messages.find((message) => message.id === id)
 
 		if (alreadyAdded) {
@@ -129,6 +138,10 @@ export class Chat extends Observer {
 
 		this.messages = addAfterTime(this.messages, id, time)
 		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "message", id }, time)
+
+		if (updateCache) {
+			this.store()
+		}
 	}
 
 	addChatUpdateID = (id, time) => {
@@ -145,12 +158,16 @@ export class Chat extends Observer {
 	verifyMessageAssociations = (message: Message) =>
 		verifyMessageAssociations(message, h.array.last(this.chunkIDs))
 
-	addChunkID = (chunkID) => {
+	addChunkID = (chunkID, updateCache = true) => {
 		if (this.chunkIDs.indexOf(chunkID) > -1) {
 			return
 		}
 
 		this.chunkIDs = [...this.chunkIDs, chunkID].sort((a, b) => a - b)
+
+		if (updateCache) {
+			this.store()
+		}
 	}
 
 	loadMoreMessages() {
@@ -176,9 +193,7 @@ export class Chat extends Observer {
 		})
 	}
 
-	loadInitialMessages = h.cacheResult<Bluebird<any>>(() => {
-		return this.loadMoreMessages()
-	})
+	loadInitialMessages = h.cacheResult<Bluebird<any>>(() => this.loadMoreMessages())
 
 	getMessages() {
 		return this.messages
@@ -217,6 +232,7 @@ export class Chat extends Observer {
 		unreadChatIDs = unreadChatIDs.filter((id) => id !== this.id)
 
 		this.notify(this.getID(), "read")
+		this.store()
 	}
 
 	markRead() {
@@ -237,6 +253,8 @@ export class Chat extends Observer {
 		if (unreadChatIDs.indexOf(this.id) === -1) {
 			unreadChatIDs.push(this.id)
 		}
+
+		this.store()
 	}
 
 	isAdmin = (user) => {
@@ -474,7 +492,7 @@ export class Chat extends Observer {
 }
 
 type ChatCache = {
-	id: string,
+	id: number,
 	latestMessageID: any,
 	latestChunkID: any,
 	unreadMessageIDs: any

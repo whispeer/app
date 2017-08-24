@@ -135,11 +135,11 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			return byId.hasOwnProperty(id)
 		}
 
-		static load(response): Bluebird<ObjectType> {
-			const id = getID(response)
+		static load(source): Bluebird<ObjectType> {
+			const id = getID(source)
 
 			if (byId[id]) {
-				serverResponseToInstance(response, id, byId[id])
+				serverResponseToInstance(source, id, byId[id])
 
 				return Bluebird.resolve(byId[id])
 			}
@@ -148,11 +148,15 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 				loading = {
 					...loading,
 					[id]: loadFromCache(id)
-						.catch(() => serverResponseToInstance(response, id, null))
+						.catch(() => serverResponseToInstance(source, id, null))
 				}
 			}
 
 			 return loading[id]
+		}
+
+		static updateCache(id, cacheableData: CachedObjectType) {
+			return cache.store(id, cacheableData)
 		}
 
 		static get(id): Bluebird<ObjectType> {
