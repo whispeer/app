@@ -28,6 +28,8 @@ const getMessageInfo = (latestMessageID) => {
 	}
 }
 
+let initialLoaded = false
+
 const memoizer = new Memoizer([
 	() => messageService.getChatIDs(),
 	() => ChatLoader.getAll(),
@@ -38,7 +40,7 @@ const memoizer = new Memoizer([
 	return chatIDs.filter((chatID) => {
 		loaded = loaded && ChatLoader.isLoaded(chatID)
 
-		return loaded
+		return initialLoaded && loaded
 	}).map((chatID) => {
 		const chat = ChatLoader.getLoaded(chatID)
 
@@ -113,6 +115,7 @@ export class HomePage {
 		messageService.loadMoreChats().then(() => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.chatsLoading = false;
+			initialLoaded = true
 
 			console.timeEnd("Spinner on Home")
 		});
