@@ -13,21 +13,6 @@ import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
 
-const getMessageInfo = (latestMessageID) => {
-	if (!MessageLoader.isLoaded(latestMessageID)) {
-		return {
-			latestMessageText: ""
-		}
-	}
-
-	const latestMessage = MessageLoader.getLoaded(latestMessageID)
-
-	return {
-		time: latestMessage.getTime(),
-		latestMessageText: latestMessage.getText(),
-	}
-}
-
 let initialLoaded = false
 
 const chatMemoizer = {}
