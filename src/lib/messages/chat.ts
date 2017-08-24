@@ -2,7 +2,7 @@ import * as Bluebird from 'bluebird';
 
 import socketService from "../services/socket.service"
 
-import ObjectLoader from "../services/objectLoader"
+import ObjectLoader from "../services/mutableObjectLoader"
 
 import ChunkLoader, { Chunk } from "./chatChunk"
 import MessageLoader, { Message } from "./message"
@@ -74,24 +74,21 @@ export class Chat extends Observer {
 
 	private id: number
 
-	private loadingInfo: {
-		latestMessageID: number,
-		latestChunkID: number
-	}
-
 	public newMessage = ""
 
-	constructor({ id, latestMessageID, latestChunkID, unreadMessageIDs }) {
+	constructor({ id, latestMessage, latestChunk, unreadMessageIDs }) {
 		super()
 
 		this.id = id
-
-		this.loadingInfo = {
-			latestMessageID: latestMessageID,
-			latestChunkID: latestChunkID,
-		}
-
 		this.unreadMessageIDs = unreadMessageIDs
+
+		this.chunkIDs = [latestChunk.getID()]
+
+		if (latestMessage) {
+			// TODO: await this.verifyMessageAssociations(latestMessage)
+
+			this.addMessageID(latestMessage.getClientID(), latestMessage.getTime())
+		}
 	}
 
 	getID = () => {
@@ -149,26 +146,6 @@ export class Chat extends Observer {
 
 		this.chunkIDs = [...this.chunkIDs, chunkID].sort((a, b) => a - b)
 	}
-
-	load = h.cacheResult<Bluebird<any>>(() => {
-		return Bluebird.try(async () => {
-			const { latestChunkID, latestMessageID } = this.loadingInfo
-
-			const latestChunk = await ChunkLoader.get(latestChunkID)
-
-			this.chunkIDs = [latestChunk.getID()]
-
-			if (!latestMessageID) {
-				return
-			}
-
-			const latestMessage = await MessageLoader.get(latestMessageID)
-
-			await this.verifyMessageAssociations(latestMessage)
-
-			this.addMessageID(latestMessage.getClientID(), latestMessage.getTime())
-		})
-	})
 
 	loadMoreMessages() {
 		const oldestKnownMessage = this.messages.length === 0 ? 0 : MessageLoader.getLoaded(this.messages[0].id).getServerID()
@@ -490,10 +467,17 @@ export class Chat extends Observer {
 	}
 }
 
-const hooks = {
-	downloadHook: (id) =>
+type ChatCache = {
+	id: string,
+	latestMessageID: any,
+	latestChunkID: any,
+	unreadMessageIDs: any
+}
+
+export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
+	download: (id) =>
 		socketService.emit("chat.get", { id }).then((response) => response.chat),
-	loadHook: (chatResponse) => {
+	load: (chatResponse) => {
 		const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
 			ChunkLoader.load(chunkData)
 		))
@@ -502,17 +486,37 @@ const hooks = {
 			MessageLoader.load(messageData)
 		))
 
-		const chat = new Chat(chatResponse.chat)
+		const { id, latestMessageID, latestChunkID, unreadMessageIDs } = chatResponse.chat
 
 		return Bluebird.all([
 			loadChunks,
 			loadMessages,
-		]).then(() => chat.load()).thenReturn(chat)
+		]).thenReturn({ id, latestMessageID, latestChunkID, unreadMessageIDs })
 	},
-	idHook: (response) => response.chat.id
-}
+	getID: (response) => response.chat.id,
+	restore: (chatInfo, previousInstance) => {
+		if (previousInstance) {
+			// debugger
+			return previousInstance
+		}
 
-export default class ChatLoader extends ObjectLoader(hooks) {}
+		return Bluebird.try(async function () {
+			const { id, latestMessageID, latestChunkID, unreadMessageIDs } = chatInfo
+
+			const latestMessage = await MessageLoader.get(latestMessageID)
+			const latestChunk = await ChunkLoader.get(latestChunkID)
+
+			return new Chat({
+				id,
+				latestMessage,
+				latestChunk,
+				unreadMessageIDs
+			})
+		})
+	},
+	shouldUpdate: () => Bluebird.resolve(true),
+	cacheName: "chat"
+}) {}
 
 let lastLoaded = 0
 

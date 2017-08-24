@@ -1,12 +1,10 @@
 import * as Bluebird from "bluebird"
 import socketService from "../services/socket.service"
 import sessionService from "../services/session.service"
-import errorService from "../services/error.service"
 
 import { UserLoader } from "./user"
 
 const sjcl = require("sjcl")
-const keyStoreService = require("crypto/keyStore")
 const initService = require("services/initService")
 
 let userService

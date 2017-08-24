@@ -96,14 +96,10 @@ messageService = {
 				messageService.allChatsLoaded = true
 			}
 
-			return socket.definitlyEmit("chat.getMultiple", {
-				ids: unloadedChatIDs.slice(0, 10)
-			})
-		}).then(function (latest) {
-			return latest.chats
-		}).map((chatData) => {
-			return ChatLoader.load(chatData)
-		}, { concurrency: 5 }).catch(errorService.criticalError);
+			return unloadedChatIDs.slice(0, 10)
+		}).map((chatID) =>
+			ChatLoader.get(chatID)
+		).catch(errorService.criticalError);
 	}),
 	sendUnsentMessages: function () {
 		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
