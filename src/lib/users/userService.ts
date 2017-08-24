@@ -93,34 +93,6 @@ userService = {
 	}
 }
 
-const improvementListener = (identifier) => {
-	let improve = []
-
-	keyStoreService.addImprovementListener(function (rid) {
-		improve.push(rid)
-
-		if (improve.length === 1) {
-			Bluebird.resolve().timeout(5000).then(function () {
-				const own = userService.getOwn()
-				if (!own || own.getNickOrMail() !== identifier) {
-					throw new Error("user changed so no improvement update!")
-				}
-
-				return Bluebird.all(improve.map(function (keyID) {
-					return keyStoreService.sym.symEncryptKey(keyID, own.getMainKey())
-				}))
-			}).then(function () {
-				const toUpload = keyStoreService.upload.getDecryptors(improve)
-				return socketService.emit("key.addFasterDecryptors", {
-					keys: toUpload
-				})
-			}).then(function () {
-				improve = []
-			}).catch(errorService.criticalError)
-		}
-	})
-}
-
 initService.registerCacheCallback(function () {
 	return UserLoader.get(sessionService.getUserID()).catch(function (e) {
 		if (e instanceof sjcl.exception.corrupt) {

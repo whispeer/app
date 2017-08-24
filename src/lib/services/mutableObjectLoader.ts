@@ -80,20 +80,25 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 
 		return shouldUpdate(event, instance, lastUpdated).then((shouldUpdate) => {
 			if (shouldUpdate) {
+				console.info(`Schedule ${cacheName} instance ${id} update with event ${UpdateEvent[event]}`)
 				return updateInstance(id, instance)
 			}
 		}).catch(errorService.criticalError)
 	}
 
-	const scheduleInstancesUpdate = (event: UpdateEvent) =>
+	const scheduleInstancesUpdate = (event: UpdateEvent) => {
+		console.info(`Schedule ${cacheName} instances update with event ${UpdateEvent[event]}`)
+
 		Object.keys(byId)
 			.forEach((id) => scheduleInstanceUpdate(event, id, byId[id]) )
+	}
 
-	let lastHeartbeat = 0
+	let lastHeartbeat = Date.now()
 
 	socketService.listen(() => lastHeartbeat = Date.now(), "heartbeat")
-	socketService.on("reconnect", () => {
-		console.info(`reconnect at ${Date.now()} after ${Date.now() - lastHeartbeat}`)
+
+	socketService.on("connect", () => {
+		console.info(`connect at ${Date.now()} after ${Date.now() - lastHeartbeat}`)
 
 		if (Date.now() - lastHeartbeat > LONG_DISCONNECT) {
 			scheduleInstancesUpdate(UpdateEvent.wake)
@@ -134,6 +139,8 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			const id = getID(response)
 
 			if (byId[id]) {
+				serverResponseToInstance(response, id, byId[id])
+
 				return Bluebird.resolve(byId[id])
 			}
 

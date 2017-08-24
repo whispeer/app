@@ -99,7 +99,7 @@ class SocketService extends Observer {
 			this.emit("whispeerPing", {});
 
 			(<any>this._socket.io).engine.on("heartbeat", () => {
-				this.notify("heartbeat")
+				this.notify(null, "heartbeat")
 			})
 		});
 	}
