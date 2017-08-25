@@ -27,8 +27,7 @@
 			<hexagon class="message__file__hexagon"></hexagon>
 			<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
 			<ion-icon name="md-play" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>
-			<loading-progress *ngIf="!voicemailLoaded() && voicemailDownloadProgress && !voicemailSending()" [progress]="voicemailProgress" [inverse]="false"></loading-progress>
-			<loading-progress *ngIf="voicemailSending()" [progress]="message.data.voicemails[0].getProgress" [inverse]="true"></loading-progress>
+			<loading-progress *ngIf="(!voicemailLoaded() && voicemailDownloadProgress) || voicemailSending()" [progress]="voicemailProgress" [inverse]="voicemailSending()"></loading-progress>
 			<ion-icon name="md-pause" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
 		</div>
 		<span class="message__file__info">
