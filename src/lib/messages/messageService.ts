@@ -59,6 +59,8 @@ messageService = {
 
 				if (!message.isOwn()) {
 					chat.addUnreadMessage(message.getServerID())
+				} else if (chat.getLatestMessage() === message.getClientID()) {
+					chat.localMarkRead()
 				}
 
 				messageService.prependChatID(chat.getID())

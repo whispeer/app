@@ -87,7 +87,6 @@ export class MyApp {
 			// Okay, so the platform is ready and our plugins are available.
 			// Here you can do any higher level native things you might need.
 			this.statusBar.styleLightContent();
-			this.splashScreen.hide();
 
 			const pushService = new PushService(this.nav, platform, this.push);
 			pushService.register();
@@ -114,6 +113,8 @@ export class MyApp {
 			})
 
 			sessionService.loadLogin().then((loggedin) => {
+				this.splashScreen.hide();
+
 				if (!loggedin && this.nav.length() > 0) {
 					this.nav.remove(0, this.nav.length() - 1)
 					this.nav.setRoot("Login")
