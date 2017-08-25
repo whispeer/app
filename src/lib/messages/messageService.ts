@@ -56,7 +56,10 @@ messageService = {
 				const message = await MessageLoader.load(data.message)
 
 				chat.addMessageID(message.getClientID(), message.getTime())
-				chat.addUnreadMessage(message.getServerID())
+
+				if (!message.isOwn()) {
+					chat.addUnreadMessage(message.getServerID())
+				}
 
 				messageService.prependChatID(chat.getID())
 				messageService.notify({ message, chat, chunk }, "message")
