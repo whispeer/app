@@ -27,11 +27,11 @@
 			<hexagon class="message__file__hexagon"></hexagon>
 			<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
 			<ion-icon name="md-play" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>
-			<ion-spinner *ngIf="(!voicemailLoaded() && voicemailDownloadProgress !== undefined) || voicemailSending()" class="message__file__hexagon-spinner"></ion-spinner>
+			<loading-progress *ngIf="(!voicemailLoaded() && voicemailDownloadProgress) || voicemailSending()" [progress]="voicemailProgress" [inverse]="voicemailSending()"></loading-progress>
 			<ion-icon name="md-pause" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
 		</div>
 		<span class="message__file__info">
-			<ion-icon icon name="ios-barcode-outline" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': voicemailPlaying()}"></ion-icon>&nbsp;
+			<ion-icon icon name="stats" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': voicemailPlaying()}"></ion-icon>&nbsp;
 			<span><span *ngIf="voicemailLoaded()">{{ voicemailPosition() * 1000 | date: 'mm:ss' }} /&nbsp;</span>{{ voicemailDuration() * 1000 | date: 'mm:ss' }}</span>
 			<span *ngIf="!voicemailLoaded()" class="message__file__info__size">&nbsp;[{{formatSize(voicemailSize())}}]</span>
 		</span>

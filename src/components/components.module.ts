@@ -9,6 +9,7 @@ import { UserImageComponent } from "./userImage";
 import { MainMenu } from "./mainMenu";
 import { ChooseFriends } from "./chooseFriends"
 import { LoadComponent } from "./load"
+import { LoadingProgress } from "./loadingProgress"
 
 import { HexagonModule } from "./hexagonModule";
 
@@ -22,6 +23,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		UserImageComponent,
 		ChooseFriends,
 		LoadComponent,
+		LoadingProgress,
 	],
 	imports: [
 		HexagonModule,
@@ -36,6 +38,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		UserImageComponent,
 		ChooseFriends,
 		LoadComponent,
+		LoadingProgress,
 
 		HexagonModule,
 		CommonModule,
