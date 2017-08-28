@@ -55,7 +55,7 @@ messageService = {
 				const chat = await ChatLoader.get(chunk.getChatID())
 				const message = await MessageLoader.load(data.message)
 
-				chat.addMessageID(message.getClientID(), message.getTime())
+				chat.addMessage(message)
 
 				if (!message.isOwn()) {
 					chat.addUnreadMessage(message.getServerID())

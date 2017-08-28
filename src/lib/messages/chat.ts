@@ -82,6 +82,9 @@ export class Chat extends Observer {
 
 	private chunkIDs: number[] = []
 
+	private loadMissingMessagesPromise = Bluebird.resolve()
+	private waitingMissingMessages = false
+
 	// Unsorted IDs
 	private unreadMessageIDs: number[] = []
 
@@ -112,7 +115,7 @@ export class Chat extends Observer {
 		this.addChunkID(latestChunk.getID(), false)
 
 		if (latestMessage) {
-			this.addMessageID(latestMessage.getClientID(), latestMessage.getTime(), false)
+			this.addMessage(latestMessage, false)
 		}
 	}
 
@@ -129,7 +132,13 @@ export class Chat extends Observer {
 		this.messagesAndUpdates = this.messagesAndUpdates.filter(({ id: { id } }) => removeID !== id)
 	}
 
-	addMessageID = (id, time, updateCache = true) => {
+	addMessage = (message: Message, updateCache = true) => {
+		this.addMessageID(message.getClientID(), message.getTime(), updateCache)
+
+		this.scheduleLoadMissingMessages()
+	}
+
+	private addMessageID = (id, time, updateCache = true) => {
 		const alreadyAdded = this.messages.find((message) => message.id === id)
 
 		if (alreadyAdded) {
@@ -170,13 +179,120 @@ export class Chat extends Observer {
 		}
 	}
 
-	loadMoreMessages() {
-		const oldestKnownMessage = this.messages.length === 0 ? 0 : MessageLoader.getLoaded(this.messages[0].id).getServerID()
+	private hasMessage = (id) =>
+		this.messages.find((message) => message.id === id)
+
+	private loadPreviousMessagesFromCache = (message: Message, limit = 20) => {
+		const messagesLoaded = []
 
 		return Bluebird.try(async () => {
-			const { messages, chunks = [], remainingMessagesCount } = await socketService.emit("chat.getMessages", {
+			let currentMessage = message
+
+			for (let i = 0; i < limit; i += 1) {
+				if (!currentMessage.getPreviousID()) {
+					return messagesLoaded
+				}
+
+				const previousMessage = await MessageLoader.getFromCache(currentMessage.getPreviousID())
+
+				if (this.hasMessage(previousMessage.getClientID())) {
+					return messagesLoaded
+				}
+
+				messagesLoaded.push(previousMessage)
+
+				currentMessage = previousMessage
+			}
+
+			return messagesLoaded
+		}).catch((e) => messagesLoaded).then((messages) => {
+			messages.forEach((m) => this.addMessage(m))
+			return messages
+		})
+	}
+
+	private loadMissingMessages = () => {
+		return Bluebird.try(async () => {
+			const batchSizes = [1, 3, 10, 20]
+			let iteration = 0, batchSize
+
+			while(batchSize = batchSizes[iteration++]) {
+				const knownMessages = this.messages
+					.map(({ id }) => MessageLoader.getLoaded(id))
+					.filter((m) => m.hasBeenSent())
+
+				if (knownMessages.length < 2) {
+					return
+				}
+
+				const ids = knownMessages.map((m) => m.getClientID())
+
+				const messagesWithoutPredecessor = knownMessages.filter((m) =>
+					ids.indexOf(m.getPreviousID()) === -1
+				).sort((a, b) => a.getTime() - b.getTime())
+
+				if (messagesWithoutPredecessor.length === 1) {
+					console.warn("No more missing messages")
+					// No missing messages
+					return
+				}
+
+				console.warn(`Loading batch size ${batchSize} messages`)
+
+				await Bluebird.all(messagesWithoutPredecessor.map((m) => {
+					return this.loadOlderMessages(m, batchSize)
+				}))
+			}
+
+			//TODO we were unable to finish in 34 messages :(
+			//TODO remove everything except first block
+		})
+	}
+
+	// TODO: Check if this leaks memory
+	scheduleLoadMissingMessages = () => {
+		if (this.messages.length < 2) {
+			return
+		}
+
+		if (this.waitingMissingMessages) {
+			return
+		}
+
+		this.waitingMissingMessages = true
+
+		console.warn("Scheduling missing message check")
+
+		this.loadMissingMessagesPromise = this.loadMissingMessagesPromise
+			.delay(50)
+			.finally(() => {
+				this.waitingMissingMessages = false
+				return this.loadMissingMessages()
+			})
+
+		return this.loadMissingMessagesPromise
+	}
+
+	loadOlderMessages(message: Message, limit = 20) {
+		return Bluebird.try(async () => {
+			if (message) {
+				const messagesFromCache = await this.loadPreviousMessagesFromCache(message, limit)
+
+				limit -= messagesFromCache.length
+
+				if (limit < 1) {
+					return
+				}
+
+				if (messagesFromCache.length > 0) {
+					message = h.array.last(messagesFromCache)
+				}
+			}
+
+			const { messages, chunks = [] } = await socketService.definitlyEmit("chat.getMessages", {
 				id: this.getID(),
-				oldestKnownMessage
+				oldestKnownMessage: message ? message.getServerID() : 0,
+				limit
 			})
 
 			await Bluebird.all<Chunk>(chunks.map((chunk) => ChunkLoader.load(chunk)))
@@ -186,11 +302,17 @@ export class Chat extends Observer {
 			await Bluebird.all(messagesObjects.map((message) => this.verifyMessageAssociations(message)))
 
 			messagesObjects.forEach((message) =>
-				this.addMessageID(message.getClientID(), message.getTime())
+				this.addMessage(message)
 			)
 
-			return { remaining: remainingMessagesCount }
+			return
 		})
+	}
+
+	loadMoreMessages() {
+		const oldestKnownMessage = this.messages.length === 0 ? null : MessageLoader.getLoaded(this.messages[0].id)
+
+		return this.loadOlderMessages(oldestKnownMessage)
 	}
 
 	loadInitialMessages = h.cacheResult<Bluebird<any>>(() => this.loadMoreMessages())
@@ -469,7 +591,7 @@ export class Chat extends Observer {
 
 			sendMessagePromise.then(() => {
 				this.removeMessageID(messageObject.getClientID())
-				this.addMessageID(messageObject.getClientID(), messageObject.getTime())
+				this.addMessage(messageObject)
 
 				return messageSendCache.delete(messageObject.getClientID());
 			});

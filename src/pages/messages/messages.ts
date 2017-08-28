@@ -235,9 +235,9 @@ export class MessagesPage {
 
 		this.messagesLoading = true;
 
-		return this.chat.loadMoreMessages().then(({ remaining }) => {
+		return this.chat.loadMoreMessages().then(() => {
 			this.messagesLoading = false;
-			return remaining
+			return
 		})
 	}
 

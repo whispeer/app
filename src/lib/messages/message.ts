@@ -22,6 +22,7 @@ export class Message {
 
 	private serverID: number
 	private clientID: any
+	private previousID: any
 	private securedData: any
 	private attachments: attachments
 
@@ -47,6 +48,8 @@ export class Message {
 		const { serverID, clientID } = Message.idFromData(server)
 		this.serverID = serverID
 		this.clientID = clientID
+
+		this.previousID = server.previousMessage
 
 		this.chunkID = server.chunkID
 
@@ -269,6 +272,10 @@ export class Message {
 
 	getServerID = () => {
 		return this.serverID
+	}
+
+	getPreviousID = () => {
+		return this.previousID
 	}
 
 	getClientID = () => {

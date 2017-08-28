@@ -56,6 +56,15 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			return byId.hasOwnProperty(id)
 		}
 
+		// Throws
+		static getFromCache(id): Bluebird<ObjectType> {
+			if (byId[id]) {
+				return Bluebird.resolve(byId[id])
+			}
+
+			return loadFromCache(id)
+		}
+
 		static load(response): Bluebird<ObjectType> {
 			const id = getID(response)
 
