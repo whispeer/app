@@ -85,6 +85,13 @@ export class Chat extends Observer {
 	private loadMissingMessagesPromise = Bluebird.resolve()
 	private waitingMissingMessages = false
 
+	private lastStoredInfo: {
+		id: any,
+		unreadMessageIDs: any[],
+		latestMessageID: any,
+		latestChunkID: any
+	}
+
 	// Unsorted IDs
 	private unreadMessageIDs: number[] = []
 
@@ -101,12 +108,20 @@ export class Chat extends Observer {
 	}
 
 	private store = () => {
-		ChatLoader.updateCache(this.id, {
+		const storeInfo = {
 			id: this.id,
 			unreadMessageIDs: this.unreadMessageIDs,
 			latestMessageID: this.getLatestMessage(),
 			latestChunkID: this.getLatestChunk()
-		})
+		}
+
+		if (h.deepEqual(this.lastStoredInfo, storeInfo)) {
+			return
+		}
+
+		this.lastStoredInfo = storeInfo
+
+		ChatLoader.updateCache(this.id, storeInfo)
 	}
 
 	update = ({ latestChunk, latestMessage, unreadMessageIDs }) => {
