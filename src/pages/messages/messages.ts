@@ -6,7 +6,7 @@ import errorService from "../../lib/services/error.service";
 import messageService from "../../lib/messages/messageService";
 import Burst from "../../lib/messages/burst"
 import { Chat } from "../../lib/messages/chat"
-import MessageLoader from "../../lib/messages/message"
+import MessageLoader, { Message } from "../../lib/messages/message"
 
 const inView = require("in-view");
 

@@ -141,6 +141,9 @@ export class Chat extends Observer {
 		return unreadChatIDs.indexOf(this.id) > -1
 	}
 
+	isMessageUnread = (message: Message) =>
+			this.unreadMessageIDs.indexOf(message.getClientID()) > -1
+
 	private removeMessageID = (removeID) => {
 		this.messages = this.messages.filter(({ id }) => removeID !== id)
 	}
