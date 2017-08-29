@@ -229,12 +229,16 @@ export class Chat extends Observer {
 				const ids = knownMessages.map((m) => m.getClientID())
 
 				const messagesWithoutPredecessor = knownMessages.filter((m) =>
-					m.getPreviousID() && ids.indexOf(m.getPreviousID()) === -1
+					ids.indexOf(m.getPreviousID()) === -1
 				).sort((a, b) => a.getTime() - b.getTime())
 
-				if (messagesWithoutPredecessor.length === 0) {
+				if (knownMessages.filter((m) => !m.getPreviousID()).length > 1) {
+					console.warn("Got more than one last message in chat. Aborting!")
+					return
+				}
+
+				if (messagesWithoutPredecessor.length === 1) {
 					console.warn("No more missing messages")
-					// No missing messages
 					return
 				}
 
