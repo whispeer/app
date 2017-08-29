@@ -839,7 +839,7 @@ const improvementListener = (identifier) => {
 				const keys = improve
 				improve = []
 
-				improveKeyAccess(keys, identifier)
+				return improveKeyAccess(keys, identifier)
 			}).catch(errorService.criticalError)
 		}
 	})

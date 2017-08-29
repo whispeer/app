@@ -143,40 +143,31 @@ export class MessagesPage {
 	}
 
 	private getBursts = (options) => {
-		if (!this.chat || this.chat.getMessagesAndUpdates().length === 0) {
+		if (!this.chat || this.chat.getMessages().length === 0) {
 			return { changed: false, bursts: [] };
 		}
 
-		const messagesAndUpdates = this.chat.getMessagesAndUpdates().map(({ id: { id, type }}) => {
-			if (type === "message") {
-				return MessageLoader.getLoaded(id)
-			}
-
-			if (type === "topicUpdate") {
-				throw new Error("not yet implemented")
-			}
-
-			throw new Error("invalid type for message or update")
-		})
+		const messages = this.chat.getMessages()
+			.map(({ id }) => MessageLoader.getLoaded(id))
 
 		if (this.burstTopic !== this.chat.getID()) {
-			this.bursts = BurstHelper.calculateBursts(messagesAndUpdates);
+			this.bursts = BurstHelper.calculateBursts(messages);
 			this.burstTopic = this.chat.getID();
 
 			return { changed: true, bursts: this.bursts };
 		}
 
-		var newElements = BurstHelper.getNewElements(messagesAndUpdates, this.bursts);
+		var newElements = BurstHelper.getNewElements(messages, this.bursts);
 
 		if (options) {
-			const firstViewMessage = messagesAndUpdates.find((elem) => {
+			const firstViewMessage = messages.find((elem) => {
 				return options.after == elem.getClientID().toString()
 			})
 
-			const index = messagesAndUpdates.indexOf(firstViewMessage)
+			const index = messages.indexOf(firstViewMessage)
 
 			newElements = newElements.filter((element) => {
-				return messagesAndUpdates.indexOf(element) > index
+				return messages.indexOf(element) > index
 			})
 		}
 
@@ -188,7 +179,7 @@ export class MessagesPage {
 			burst.removeAllExceptLast();
 		});
 
-		var newBursts = BurstHelper.calculateBursts(messagesAndUpdates);
+		var newBursts = BurstHelper.calculateBursts(messages);
 		if (!BurstHelper.mergeBursts(this.bursts, newBursts)) {
 			console.warn("Rerender all bursts!");
 			this.bursts = newBursts;

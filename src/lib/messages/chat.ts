@@ -78,7 +78,6 @@ export class Chat extends Observer {
 	//Sorted IDs
 	private messages:timeArray = []
 	private chatUpdates:timeArray = []
-	private messagesAndUpdates:timeArray = []
 
 	private chunkIDs: number[] = []
 
@@ -144,7 +143,6 @@ export class Chat extends Observer {
 
 	private removeMessageID = (removeID) => {
 		this.messages = this.messages.filter(({ id }) => removeID !== id)
-		this.messagesAndUpdates = this.messagesAndUpdates.filter(({ id: { id } }) => removeID !== id)
 	}
 
 	addMessage = (message: Message, updateCache = true) => {
@@ -161,22 +159,10 @@ export class Chat extends Observer {
 		}
 
 		this.messages = addAfterTime(this.messages, id, time)
-		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "message", id }, time)
 
 		if (updateCache) {
 			this.store()
 		}
-	}
-
-	addChatUpdateID = (id, time) => {
-		const alreadyAdded = this.chatUpdates.find((chatUpdate) => chatUpdate.id === id)
-
-		if (alreadyAdded) {
-			return
-		}
-
-		this.chatUpdates = addAfterTime(this.chatUpdates, id, time)
-		this.messagesAndUpdates = addAfterTime(this.messagesAndUpdates, { type: "chatUpdate", id }, time)
 	}
 
 	verifyMessageAssociations = (message: Message) =>
@@ -243,10 +229,10 @@ export class Chat extends Observer {
 				const ids = knownMessages.map((m) => m.getClientID())
 
 				const messagesWithoutPredecessor = knownMessages.filter((m) =>
-					ids.indexOf(m.getPreviousID()) === -1
+					m.getPreviousID() && ids.indexOf(m.getPreviousID()) === -1
 				).sort((a, b) => a.getTime() - b.getTime())
 
-				if (messagesWithoutPredecessor.length === 1) {
+				if (messagesWithoutPredecessor.length === 0) {
 					console.warn("No more missing messages")
 					// No missing messages
 					return
@@ -334,10 +320,6 @@ export class Chat extends Observer {
 
 	getMessages() {
 		return this.messages
-	}
-
-	getMessagesAndUpdates() {
-		return this.messagesAndUpdates
 	}
 
 	getChatUpdates() {
