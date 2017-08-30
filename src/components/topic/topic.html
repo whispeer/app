@@ -45,18 +45,15 @@
 			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
 				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>
 
-				<span *ngIf="burst.isMessageBurst()">
-				  <div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
-				  <Message [message]="message" *ngFor="let message of burst.items"></Message>
-				</span>
-
-				<div class="messages_message" *ngIf="burst.isChatUpdate()">
-					<div class="burst-seperator burst-seperator-update">
-						<span class="burst-seperator-text">
-							{{ burst.firstItem().state.sender.data.name }} {{ 'topic.changed' | translate }} "<strong>{{ burst.firstItem().state.title }}</strong>"
-						</span>
-					</div>
+				<div *ngIf="isPreviousMissing(burst)">
+					<ion-spinner text-center margin-vertical class="spinner--full"></ion-spinner>
+					MISSING MESSAGES!1!!!
 				</div>
+
+				<span>
+					<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>
+					<Message [message]="message" *ngFor="let message of burst.items"></Message>
+				</span>
 
 				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>
 			</ion-item>

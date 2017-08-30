@@ -674,7 +674,7 @@ export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 
 let lastLoaded = 0
 
-const localMarkChatsRead = (unreadIDs) => {
+const setUnreadChatIDs = (unreadIDs) => {
 	const chats = ChatLoader.getAll()
 
 	Object.keys(chats).forEach((id) => {
@@ -700,7 +700,7 @@ socketService.channel("unreadChats", (e, data) => {
 		return
 	}
 
-	localMarkChatsRead(data.unreadChatIDs)
+	setUnreadChatIDs(data.unreadChatIDs)
 })
 
 const loadUnreadChatIDs = () => {
@@ -720,7 +720,7 @@ const loadUnreadChatIDs = () => {
 			return
 		}
 
-		localMarkChatsRead(data.chatIDs);
+		setUnreadChatIDs(data.chatIDs);
 	});
 }
 

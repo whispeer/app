@@ -22,6 +22,8 @@ import uuidv4 from 'uuid/v4'
 import VoicemailPlayer, { recordingType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
+import { Message } from "../../lib/messages/message"
+import Burst from "../../lib/messages/burst"
 import featureToggles from "../../lib/services/featureToggles"
 
 enum RecordingStates {
@@ -76,7 +78,7 @@ export class TopicComponent {
 
 	mutationObserver: MutationObserver
 
-	bursts: any[]
+	bursts: Burst[]
 
 	private recordingInfo = {
 		UUID: "",
@@ -545,6 +547,16 @@ export class TopicComponent {
 		this.bursts = this.allBurstMessages()
 
 		return this.bursts
+	}
+
+	isPreviousMissing(burst: Burst) {
+		const message = burst.getItems()[0]
+
+		return this.bursts.findIndex((burst) =>
+			burst.getItems().findIndex((m) =>
+				m.getClientID() === message.getPreviousID()
+			) > -1
+		) === -1
 	}
 
 	ngOnChanges(changes: SimpleChanges) {

@@ -175,9 +175,9 @@ export class MessagesPage {
 			return { changed: false, bursts: this.bursts };
 		}
 
-		this.bursts.forEach((burst) => {
-			burst.removeAllExceptLast();
-		});
+		this.bursts.forEach((burst) =>
+			burst.removeAllExceptLast()
+		)
 
 		var newBursts = BurstHelper.calculateBursts(messages);
 		if (!BurstHelper.mergeBursts(this.bursts, newBursts)) {
