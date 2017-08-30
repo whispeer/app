@@ -522,7 +522,7 @@ export class Chat extends Observer {
 			const content = { title }
 			const meta = { admins }
 
-			const newKey = addedReceiver.length > 0 && removedReceiver.length > 0
+			const newKey = addedReceiver.length > 0 || removedReceiver.length > 0
 
 			return Chunk.createRawData(receiver, {
 				content,
