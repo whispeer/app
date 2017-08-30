@@ -1,29 +1,31 @@
 import h from "../helper/helper";
-var Observer = require("asset/observer");
+import Observer from "../asset/observer"
 import * as Bluebird from "bluebird";
 
 import errorService from "../services/error.service"
 import socket from "../services/socket.service"
 import Cache from "../services/Cache"
 
-var sessionService = require("services/session.service");
+import sessionService from "../services/session.service"
 var initService = require("services/initService");
 
 import ChunkLoader, { Chunk } from "../messages/chatChunk"
 import ChatLoader from "../messages/chat"
 import MessageLoader from "../messages/message"
+import ChatListLoader from "../messages/chatList"
 
 var messageService;
 
-let chatIDs
 let activeChat = 0
 
 messageService = {
 	prependChatID: function (chatID) {
-		chatIDs = [
+		const chatList = ChatListLoader.getLoaded(sessionService.getUserID())
+		const chatIDs = chatList.get()
+		chatList.set([
 			chatID,
-			...messageService.getChatIDs().filter((id) => id !== chatID)
-		]
+			...chatIDs.filter((id) => id !== chatID)
+		])
 	},
 	addSocketData: function (data) {
 		if (!data) {
@@ -70,14 +72,14 @@ messageService = {
 			await Bluebird.resolve()
 		})
 	},
-	loadChatIDs: function () {
-		return socket.definitlyEmit("chat.getAllIDs", {}).then(function (response) {
-			chatIDs = response.chatIDs
-			return chatIDs
-		});
-	},
 	getChatIDs: function () {
-		return chatIDs || []
+		const myID = sessionService.getUserID()
+
+		if (!ChatListLoader.isLoaded(myID)) {
+			return []
+		}
+
+		return ChatListLoader.getLoaded(myID).get()
 	},
 	setActiveChat: (_activeChat) => {
 		activeChat = _activeChat
@@ -87,11 +89,7 @@ messageService = {
 	},
 	loadMoreChats: h.cacheUntilSettled(() => {
 		return initService.awaitLoading().then(function () {
-			if (chatIDs && chatIDs.length > 0) {
-				return Bluebird.resolve()
-			}
-
-			return messageService.loadChatIDs()
+			return ChatListLoader.get(sessionService.getUserID())
 		}).then(function () {
 			const unloadedChatIDs = messageService.getChatIDs().filter(function (chatID) {
 				return !ChatLoader.isLoaded(chatID)

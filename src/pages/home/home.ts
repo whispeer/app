@@ -17,6 +17,10 @@ let initialLoaded = false
 
 const chatMemoizer = {}
 
+// Amount of chats after we don't load more initially
+// Considered to be at least one filled screen
+const CHATS_PER_SCREEN = 10
+
 const getChatMemoizer = (chatID) => {
 	if (!chatMemoizer[chatID]) {
 		chatMemoizer[chatID] = new Memoizer([
@@ -94,7 +98,7 @@ export class HomePage {
 
 	loadTopics = () => {
 		console.warn("load more chats?", this.getChats().length)
-		if (this.getChats().length >= 10) {
+		if (this.getChats().length >= CHATS_PER_SCREEN) {
 			return
 		}
 
