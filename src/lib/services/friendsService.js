@@ -394,7 +394,7 @@ friendsService = {
 				throw new Error("unmatching arrays");
 			}
 
-			return userService.verifyOwnKeysDone().thenReturn(data);
+			return userService.getOwnAsync().thenReturn(data);
 		}).then(function (data) {
 			if (data.signedList) {
 				return signedList.verify(userService.getOwn().getSignKey(), "user");

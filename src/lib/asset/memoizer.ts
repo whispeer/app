@@ -37,7 +37,7 @@ export default class Memoizer {
 		}
 
 		this.values = newValues
-		this.cachedValue = this.reduce(...this.values)
+		this.cachedValue = this.reduce(...this.values, this.cachedValue)
 
 		return this.cachedValue
 	}

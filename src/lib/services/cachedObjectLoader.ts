@@ -2,24 +2,15 @@ import * as Bluebird from "bluebird"
 
 import Cache from "../services/Cache"
 
-// What do we want to achieve and how:
-
-// - Group multiple requests together -> download can do that for itself
-// - Add cache info so server does not resend full data (esp. for trustManager) -> activeInstance
-// - merge new and active -> restore has active and response
-// - immutable to make clear no request necessary
-// - cache first then update if not immutable
-
 type hookType<ObjectType, CachedObjectType> = {
-	download: (id: string, activeInstance?: string) => Bluebird<any>,
+	download: (id: string) => Bluebird<any>,
 	load: (response: any) => Bluebird<CachedObjectType>,
-	restore: (response: CachedObjectType, activeInstance?: ObjectType) => Bluebird<ObjectType> | ObjectType,
+	restore: (response: CachedObjectType) => Bluebird<ObjectType> | ObjectType,
 	getID: (response: any) => string,
-	immutable?: boolean,
 	cacheName: string
 }
 
-function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName, immutable = true }: hookType<ObjectType, CachedObjectType>) {
+function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName }: hookType<ObjectType, CachedObjectType>) {
 	let loading: { [s: string]: Bluebird<ObjectType> } = {}
 	let byId: { [s: string]: ObjectType } = {}
 
@@ -65,6 +56,15 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			return byId.hasOwnProperty(id)
 		}
 
+		// Throws
+		static getFromCache(id): Bluebird<ObjectType> {
+			if (byId[id]) {
+				return Bluebird.resolve(byId[id])
+			}
+
+			return loadFromCache(id)
+		}
+
 		static load(response): Bluebird<ObjectType> {
 			const id = getID(response)
 
@@ -88,9 +88,8 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			}
 
 			if (!loading[id]) {
-				let promise = loadFromCache(id).catch(() =>
-					download(id).then((response) => serverResponseToInstance(response, id))
-				)
+				let promise = loadFromCache(id)
+					.catch(() => download(id).then((response) => serverResponseToInstance(response, id)))
 
 				loading = {
 					...loading,

@@ -13,59 +13,51 @@ import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
 
-const getMessageInfo = (latestMessageID) => {
-	if (!MessageLoader.isLoaded(latestMessageID)) {
-		return {
-			latestMessageText: ""
-		}
+let initialLoaded = false
+
+const chatMemoizer = {}
+
+// Amount of chats after we don't load more initially
+// Considered to be at least one filled screen
+const CHATS_PER_SCREEN = 10
+
+const getChatMemoizer = (chatID) => {
+	if (!chatMemoizer[chatID]) {
+		chatMemoizer[chatID] = new Memoizer([
+			() => ChatLoader.getLoaded(chatID),
+			() => ChatLoader.getLoaded(chatID).getLatestChunk(),
+			() => ChatLoader.getLoaded(chatID).getLatestMessage(),
+			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs()
+		], (chat, latestChunkID, latestMessageID, unreadMessageIDs, previousValue) => {
+			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
+
+			const info = previousValue || { id: chat.getID() }
+
+			info.id = chat.getID()
+			info.unread = chat.getUnreadMessageIDs().length > 0
+			info.unreadCount = chat.getUnreadMessageIDs().length
+
+			info.partners = latestChunk.getPartners()
+			info.partnersDisplay = latestChunk.getPartnerDisplay()
+			info.title = latestChunk.getTitle()
+			info.time = latestChunk.getTime()
+			info.type = latestChunk.getReceiver().length > 2 ? "groupChat" : "peerChat"
+
+			if (!MessageLoader.isLoaded(latestMessageID)) {
+				info.latestMessageText = ""
+			} else {
+				const latestMessage = MessageLoader.getLoaded(latestMessageID)
+
+				info.time = latestMessage.getTime()
+				info.latestMessageText = latestMessage.getText()
+			}
+
+			return info
+		})
 	}
 
-	const latestMessage = MessageLoader.getLoaded(latestMessageID)
-
-	return {
-		time: latestMessage.getTime(),
-		latestMessageText: latestMessage.getText(),
-	}
+	return chatMemoizer[chatID]
 }
-
-const memoizer = new Memoizer([
-	() => messageService.getChatIDs(),
-	() => ChatLoader.getAll(),
-	() => MessageLoader.getAll(),
-], (chatIDs) => {
-	let loaded = true
-
-	return chatIDs.filter((chatID) => {
-		loaded = loaded && ChatLoader.isLoaded(chatID)
-
-		return loaded
-	}).map((chatID) => {
-		const chat = ChatLoader.getLoaded(chatID)
-
-		const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
-
-		const chatInfo = {
-			id: chat.getID(),
-
-			unread: chat.isUnread(),
-			unreadCount: chat.getUnreadMessageIDs().length,
-		}
-
-		const chunkInfo = {
-			partners: latestChunk.getPartners(),
-			partnersDisplay: latestChunk.getPartnerDisplay(),
-			title: latestChunk.getTitle(),
-			time: latestChunk.getTime(),
-			type: latestChunk.getReceiver().length > 2 ? "groupChat" : "peerChat"
-		}
-
-		const messageInfo = getMessageInfo(chat.getLatestMessage())
-
-		return Object.assign({}, chatInfo, chunkInfo, messageInfo)
-	}).sort((a, b) =>
-		b.time - a.time
-	)
-})
 
 @IonicPage({
 	name: "Home",
@@ -106,20 +98,31 @@ export class HomePage {
 
 	loadTopics = () => {
 		console.warn("load more chats?", this.getChats().length)
-		if (this.getChats().length >= 10) {
+		if (this.getChats().length >= CHATS_PER_SCREEN) {
 			return
 		}
 
 		messageService.loadMoreChats().then(() => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.chatsLoading = false;
+			initialLoaded = true
 
 			console.timeEnd("Spinner on Home")
 		});
 	}
 
 	getChats = () => {
-		return memoizer.getValue()
+		let loaded = true
+
+		return messageService.getChatIDs().filter((chatID) => {
+			loaded = loaded && ChatLoader.isLoaded(chatID)
+
+			return initialLoaded && loaded
+		}).map((chatID) =>
+			getChatMemoizer(chatID).getValue()
+		).sort((a, b) =>
+			b.time - a.time
+		)
 	}
 
 	loadMoreTopics = (infiniteScroll) => {

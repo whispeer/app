@@ -119,7 +119,7 @@ export class PushService {
 	}
 
 	private notification = (data) => {
-		console.log(data);
+		console.info("Got Push notification with data", data);
 
 		if (data && data.additionalData) {
 			const additionalData = data.additionalData;
@@ -156,13 +156,14 @@ export class PushService {
 					return messageService.addSocketData(additionalData.content);
 				}
 			}).then(() => {
-				this.pushInstance.finish(() => {console.log(`push done at ${new Date()}`)}, () => {console.warn("Finishing push failed!")}, additionalData.notId)
+				this.pushInstance.finish(() => {console.info(`push done at ${new Date()}`)}, () => {console.warn("Finishing push failed!")}, additionalData.notId)
 			});
 		}
 	};
 
 	register = () => {
 		try {
+			console.info("Registering for Push")
 			this.pushInstance = this.push.init(this.pushConfig);
 
 			this.pushInstance.on("registration").subscribe(this.registration);

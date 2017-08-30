@@ -1,200 +1,16 @@
-import h from "../helper/helper"
-import Observer from "../asset/observer"
 import * as Bluebird from "bluebird"
 import socketService from "../services/socket.service"
-import CacheService from "../services/Cache"
 import sessionService from "../services/session.service"
-import errorService from "../services/error.service"
 
-const signatureCache = require("crypto/signatureCache")
-const trustManager = require("crypto/trustManager")
+import UserLoader from "./user"
 
 const sjcl = require("sjcl")
-const keyStoreService = require("crypto/keyStore")
 const initService = require("services/initService")
 
-let userService, knownIDs = [], users = {}, ownUserStatus: any = {}
-
-import { ProfileLoader } from "../users/profile"
-import { SignedKeysLoader } from "../users/signedKeys"
-
-const promises = ["verifyOwnKeysDone", "verifyOwnKeysCacheDone", "loadedCache", "loaded"]
-
-promises.forEach(function (promiseName) {
-	ownUserStatus[promiseName] = new Bluebird(function (resolve) {
-		ownUserStatus[promiseName + "Resolve"] = function () {
-			delete ownUserStatus[promiseName + "Resolve"]
-			resolve()
-		}
-	})
-})
-
-const deletedUserName = "Deleted user"; //localize("user.deleted", {})
-const NotExistingUser = function (identifier?) {
-	this.data = {
-		trustLevel: -1,
-		notExisting: true,
-		basic: {
-			shortname: deletedUserName,
-			image: "assets/img/user.png"
-		},
-		name: deletedUserName,
-		user: this
-	}
-
-	if (typeof identifier === "number") {
-		this.data.id = identifier
-	}
-
-	this.isNotExistingUser = function () {
-		return true
-	}
-
-	this.loadBasicData = function (cb) {
-		return Bluebird.resolve().nodeify(cb)
-	}
-
-	this.reLoadBasicData = function (cb) {
-		return Bluebird.resolve().nodeify(cb)
-	}
-
-	this.loadFullData = function (cb) {
-		return Bluebird.resolve().nodeify(cb)
-	}
-
-	this.isOwn = function () {
-		return false
-	}
-}
-
-const getProfiles = (userData, signKey, isMe) => {
-	return Bluebird.try(async function () {
-		const profiles = {
-			public: null,
-			private: null,
-			me: null
-		}
-
-		if (!isMe) {
-			if (userData.profile.pub) {
-				userData.profile.pub.profileid = userData.profile.pub.profileid || userData.id
-
-				profiles.public = await loadProfileInfo(userData.profile.pub, signKey, true)
-			}
-
-			profiles.private = []
-
-			if (userData.profile.priv && userData.profile.priv instanceof Array) {
-				const priv = userData.profile.priv
-
-				profiles.private = await Bluebird.resolve(priv)
-					.map(profile => loadProfileInfo(profile, signKey))
-			}
-		} else {
-			profiles.me =  await loadProfileInfo(userData.profile.me, signKey)
-		}
-
-		return profiles
-	})
-}
-
-function enhanceOwnUser(userData) {
-	const nickname = userData.nickname
-	const mainKey = userData.mainKey
-	const signKey = userData.signedKeys.sign
-
-	keyStoreService.setKeyGenIdentifier(nickname)
-	improvementListener(nickname)
-	keyStoreService.sym.registerMainKey(mainKey)
-
-	keyStoreService.security.verifyWithPW(userData.signedOwnKeys, {
-		main: mainKey,
-		sign: signKey
-	})
-
-	keyStoreService.security.addEncryptionIdentifier(mainKey)
-	keyStoreService.security.addEncryptionIdentifier(signKey)
-
-	ownUserStatus.verifyOwnKeysDoneResolve({ signKey, mainKey })
-	ownUserStatus.verifyOwnKeysCacheDoneResolve()
-
-	trustManager.setOwnSignKey(signKey)
-}
-
-function makeUser(userData) {
-	return Bluebird.try(async function () {
-		if (userData.userNotExisting) {
-			return new NotExistingUser(userData.identifier)
-		}
-
-		if (userData.error === true) {
-			return new NotExistingUser()
-		}
-
-		const userID = h.parseDecimal(userData.id)
-
-		if (users[userID]) {
-			return users[userID]
-		}
-
-		const isMe = sessionService.isOwnUserID(userID)
-
-		if (isMe) {
-			enhanceOwnUser(userData)
-			await signatureCache.awaitLoading()
-		}
-
-		const signKey = userData.signedKeys.sign
-		const nickname = userData.nickname
-
-		userService.notify({ key: signKey, userid: userID, nickname }, "loadUserKey")
-
-		const signedKeys = await SignedKeysLoader.load({ signedKeys: userData.signedKeys, signKey })
-
-		const profiles = await getProfiles(userData, signKey, isMe)
-
-		const User = require("users/user").default
-		const user = new User(userData, signedKeys, profiles)
-		const mail = user.getMail()
-		knownIDs.push(userID)
-		users[userID] = user
-
-		if (mail) {
-			users[mail] = user
-		}
-
-		if (nickname) {
-			users[nickname] = user
-		}
-
-		return user
-	})
-}
-
-const THROTTLE = 20
-
-/** loads all the users in the batch */
-function doLoad(identifier) {
-	return initService.awaitLoading().then(function () {
-		return socketService.emit("user.getMultiple", {identifiers: identifier})
-	}).then(function (data) {
-		if (!data || !data.users) {
-			return []
-		}
-		return data.users
-	}).map(makeUser)
-}
-
-const delay = h.delayMultiplePromise(Bluebird, THROTTLE, doLoad, 10)
+let userService
 
 function loadUser(identifier) {
-	return Bluebird.try(function () {
-		if (users[identifier]) {
-			return users[identifier]
-		} else {
-			return delay(identifier)
-		}
-	})
+	return UserLoader.get(identifier)
 }
 
 userService = {
@@ -203,16 +19,12 @@ userService = {
 		return Bluebird.try(function () {
 			return socketService.emit("user.searchFriends", {
 				text: query,
-				known: knownIDs
+				known: []
 			})
 		}).then((data) => {
 			return data.results
 		}).map((user: any) => {
-			if (typeof user === "object") {
-				return makeUser(user)
-			} else {
-				return users[user]
-			}
+			return UserLoader.load(user)
 		}).nodeify(cb)
 	},
 
@@ -224,16 +36,12 @@ userService = {
 		return initService.awaitLoading().then(function () {
 			return socketService.definitlyEmit("user.search", {
 				text: query,
-				known: knownIDs
+				known: []
 			})
 		}).then((data) => {
 			return data.results
 		}).map((user) => {
-			if (typeof user === "object") {
-				return makeUser(user)
-			} else {
-				return users[user]
-			}
+			return UserLoader.load(user)
 		}).nodeify(cb)
 	},
 
@@ -273,107 +81,37 @@ userService = {
 		}).nodeify(cb)
 	},
 
-	verifyOwnKeysCacheDone: function () {
-		return ownUserStatus.verifyOwnKeysCacheDone
-	},
-
-	verifyOwnKeysDone: function () {
-		return ownUserStatus.verifyOwnKeysDone
-	},
-
-	ownLoadedCache: function () {
-		return ownUserStatus.loadedCache
-	},
-
-	ownLoaded: function () {
-		return ownUserStatus.loaded
-	},
-
 	/** get own user. synchronous */
 	getOwn: function () {
-		return users[sessionService.getUserID()]
+		return UserLoader.getLoaded(sessionService.getUserID())
+	},
+
+	getOwnAsync: () => {
+		return UserLoader.get(sessionService.getUserID())
 	}
 }
 
-function improvementListener(identifier) {
-	let improve = []
-
-	keyStoreService.addImprovementListener(function (rid) {
-		improve.push(rid)
-
-		if (improve.length === 1) {
-			Bluebird.resolve().timeout(5000).then(function () {
-				const own = userService.getOwn()
-				if (!own || own.getNickOrMail() !== identifier) {
-					throw new Error("user changed so no improvement update!")
-				}
-
-				return Bluebird.all(improve.map(function (keyID) {
-					return keyStoreService.sym.symEncryptKey(keyID, own.getMainKey())
-				}))
-			}).then(function () {
-				const toUpload = keyStoreService.upload.getDecryptors(improve)
-				return socketService.emit("key.addFasterDecryptors", {
-					keys: toUpload
-				})
-			}).then(function () {
-				improve = []
-			}).catch(errorService.criticalError)
-		}
-	})
-}
-
-Observer.extend(userService)
-
-function loadProfileInfo(profileInfo, signKey, isPublic = false) {
-	return ProfileLoader.load({
-		...profileInfo,
-		isPublic,
-		signKey
-	})
-}
-
-function loadOwnUser(data) {
-	return Bluebird.try(function () {
-		return makeUser(data)
-	}).catch(function (e) {
+initService.registerCacheCallback(function () {
+	return UserLoader.get(sessionService.getUserID()).catch(function (e) {
 		if (e instanceof sjcl.exception.corrupt) {
 			alert("Password did not match. Logging out")
-
 			sessionService.logout()
-
 			return new Bluebird(function () {})
 		}
 
 		return Bluebird.reject(e)
 	})
-}
-
-const ownUserCache = new CacheService("ownUser")
-
-initService.registerCacheCallback(function () {
-	return ownUserCache.get(sessionService.getUserID().toString()).then(function (cacheEntry) {
-		if (!cacheEntry) {
-			throw new Error("No user Cache")
-		}
-
-		return loadOwnUser(cacheEntry.data)
-	}).then(function () {
-		ownUserStatus.loadedCacheResolve()
-	})
 })
 
 initService.registerCallback(function () {
-	return socketService.definitlyEmit("user.get", {
-		id: sessionService.getUserID(),
-		//TODO: use cachedInfo: getInfoFromCacheEntry(cachedInfo),
-	}).then(function (data) {
-		return loadOwnUser(data).thenReturn(data)
-	}).then(function (userData) {
-		ownUserCache.store(sessionService.getUserID().toString(), userData)
+	return UserLoader.get(sessionService.getUserID()).catch(function (e) {
+		if (e instanceof sjcl.exception.corrupt) {
+			alert("Password did not match. Logging out")
+			sessionService.logout()
+			return new Bluebird(function () {})
+		}
 
-		ownUserStatus.loadedResolve()
-		return null
+		return Bluebird.reject(e)
 	})
 })
 

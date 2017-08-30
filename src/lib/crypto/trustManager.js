@@ -96,15 +96,11 @@ trustManager = {
 	isLoaded: function() {
 		return loaded;
 	},
-	createDatabase: function(me) {
+	createDatabase: function({ key, userid, nickname }) {
 		var data = {};
 
 		data.nicknames = {}
 		data.ids = {}
-
-		const key = me.getSignKey()
-		const userid = me.getUserID()
-		const nickname = me.getNickname()
 
 		data[key] = userToDataSet({ key, userid, nickname }, trustStates.OWN)
 
