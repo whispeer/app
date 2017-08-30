@@ -26,8 +26,7 @@ export default class ChatListLoader extends ObjectLoader<ChatList, ChatIDList>({
 	getID: () => sessionService.getUserID(),
 	restore: (chatIDs, previousInstance) => {
 		const firstLoadedIndex = chatIDs.findIndex((id) => ChatLoader.isLoaded(id))
-
-		const chatsToLoad = firstLoadedIndex === -1 ? [] : chatIDs.splice(0, firstLoadedIndex)
+		const chatsToLoad = firstLoadedIndex === -1 ? chatIDs.slice(0, 1) : chatIDs.slice(0, firstLoadedIndex)
 
 		return Bluebird.all(chatsToLoad.map((id) => ChatLoader.get(id))).then(() => {
 			if (previousInstance) {
