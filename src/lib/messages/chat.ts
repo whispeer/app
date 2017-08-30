@@ -199,6 +199,8 @@ export class Chat extends Observer {
 
 				const previousMessage = await MessageLoader.getFromCache(currentMessage.getPreviousID())
 
+				await this.verifyMessageAssociations(previousMessage)
+
 				if (this.hasMessage(previousMessage.getClientID())) {
 					return messagesLoaded
 				}
@@ -306,7 +308,6 @@ export class Chat extends Observer {
 			await Bluebird.all<Chunk>(chunks.map((chunk) => ChunkLoader.load(chunk)))
 
 			const messagesObjects = await Bluebird.all<Message>(messages.map((message) => MessageLoader.load(message)))
-
 			await Bluebird.all(messagesObjects.map((message) => this.verifyMessageAssociations(message)))
 
 			messagesObjects.forEach((message) =>
