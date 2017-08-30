@@ -552,6 +552,10 @@ export class TopicComponent {
 	isPreviousMissing(burst: Burst) {
 		const message = burst.getItems()[0]
 
+		if (this.bursts[0] === burst || !message.getPreviousID()) {
+			return false
+		}
+
 		return this.bursts.findIndex((burst) =>
 			burst.getItems().findIndex((m) =>
 				m.getClientID() === message.getPreviousID()
