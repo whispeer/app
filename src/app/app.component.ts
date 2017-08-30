@@ -1,5 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController } from "ionic-angular";
+import * as Bluebird from 'bluebird';
 
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { StatusBar } from "@ionic-native/status-bar";
@@ -12,6 +13,10 @@ import { isBusinessVersion } from "../lib/services/location.manager";
 import Tutorial from "./tutorial";
 
 import sessionService from '../lib/services/session.service';
+
+// When we think it's safe to hide the splash screen, there might actually be
+// some more drawing going on. This delay is to offset for that rendering.
+const SPLASH_SCREEN_HIDE_DELAY = 200
 
 @Component({
 	templateUrl: "app.html"
@@ -113,8 +118,8 @@ export class MyApp {
 			})
 
 			sessionService.loadLogin().then((loggedin) => {
-				this.splashScreen.hide();
 
+				Bluebird.delay(SPLASH_SCREEN_HIDE_DELAY).then(() => this.splashScreen.hide())
 				if (!loggedin && this.nav.length() > 0) {
 					this.nav.remove(0, this.nav.length() - 1)
 					this.nav.setRoot("Login")
