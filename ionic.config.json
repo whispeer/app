@@ -1,5 +1,8 @@
 {
   "name": "whispeerMessenger",
   "app_id": "27db744f",
-  "type": "ionic-angular"
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
 }
