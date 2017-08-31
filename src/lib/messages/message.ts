@@ -254,6 +254,7 @@ export class Message {
 				this.sendTime = h.parseDecimal(response.server.sendTime)
 				this.serverID = h.parseDecimal(response.server.id)
 				this.chunkID = h.parseDecimal(response.server.chunkID)
+				this.previousID = response.server.previousMessage
 				this.data.timestamp = this.getTime()
 			}
 

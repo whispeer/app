@@ -247,7 +247,7 @@ export class Chat extends Observer {
 					return
 				}
 
-				console.warn(`Loading batch size ${batchSize} messages`)
+				console.warn(`Loading batch size ${batchSize} messages. Missing ${messagesWithoutPredecessor.length}`)
 
 				await Bluebird.all(messagesWithoutPredecessor.map((m) => {
 					return this.loadOlderMessages(m, batchSize)
