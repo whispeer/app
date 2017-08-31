@@ -218,6 +218,8 @@ export class TopicComponent {
 
 		this.newMessageText = "";
 
+		document.querySelector("textarea").focus()
+
 		this.change();
 	}
 
