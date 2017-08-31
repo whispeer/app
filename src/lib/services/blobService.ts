@@ -29,7 +29,7 @@ const initService = require("services/initService");
 const Queue = require("asset/Queue");
 const keyStore = require("crypto/keyStore");
 
-const knownBlobs = {};
+const knownBlobURLs = {};
 const downloadBlobQueue = new Queue(5);
 downloadBlobQueue.start();
 
@@ -265,8 +265,6 @@ class MyBlob {
 			if (data.blobid) {
 				this.blobID = data.blobid;
 
-				knownBlobs[this.blobID] = Bluebird.resolve(this);
-
 				return this.blobID;
 			}
 		})
@@ -278,7 +276,6 @@ class MyBlob {
 		}).then((data) => {
 			if (data.blobid) {
 				this.preReservedID = data.blobid;
-				knownBlobs[this.preReservedID] = Bluebird.resolve(this);
 				return data.blobid;
 			}
 
@@ -320,11 +317,11 @@ const loadBlob = (blobID, progress, estimatedSize) => {
 }
 
 const getBlob = (blobID, downloadProgress: Progress, estimatedSize: number) => {
-	if (!knownBlobs[blobID]) {
-		knownBlobs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize)
+	if (!knownBlobURLs[blobID]) {
+		knownBlobURLs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize)
 	}
 
-	return knownBlobs[blobID]
+	return knownBlobURLs[blobID]
 }
 
 const blobService = {
