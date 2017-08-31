@@ -18,8 +18,7 @@ sed -i .bak 's/android-minSdkVersion" value="16"/android-minSdkVersion" value="2
 
 ./scripts/setVersionCode.js 5
 
-rm -rf platforms
-rm -rf plugins
+rm -rf platforms plugins www/*
 cordova prepare
 
 # sed -i .bak 's/^ext.cdvMinSdkVersion/\/\/ext.cdvMinSdkVersion/g' ./plugins/phonegap-plugin-barcodescanner/src/android/barcodescanner.gradle
@@ -37,8 +36,7 @@ cordova plugin add cordova-plugin-crosswalk-webview
 ionic cordova build --release android
 cp ./platforms/android/build/outputs/apk/android-release-unsigned.apk ./release/whispeer-android4-unsigned.apk
 
-rm -rf platforms
-rm -rf plugins
+rm -rf platforms plugins www/*
 cordova prepare
 
 extra=android
