@@ -169,6 +169,10 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 		}
 
 		static get(id): Bluebird<ObjectType> {
+			if (typeof id === "undefined" || id === null) {
+				throw new Error(`Can't get object with id ${id} - ${cacheName}`)
+			}
+
 			if (byId[id]) {
 				return Bluebird.resolve(byId[id])
 			}

@@ -14,6 +14,8 @@ import ChatLoader from "../messages/chat"
 import MessageLoader from "../messages/message"
 import ChatListLoader from "../messages/chatList"
 
+new Cache("messageSend").deleteAll()
+
 var messageService;
 
 let activeChat = 0
@@ -105,9 +107,9 @@ messageService = {
 		).catch(errorService.criticalError);
 	}),
 	sendUnsentMessages: function () {
-		var messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
+		var unsentMessages = new Cache("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });
 
-		return messageSendCache.all().map(function (unsentMessage: any) {
+		return unsentMessages.all().map(function (unsentMessage: any) {
 			var data = JSON.parse(unsentMessage.data);
 
 			return messageService.getChat(data.chatID).then(function (chat) {
