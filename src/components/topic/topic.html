@@ -89,7 +89,7 @@
 			</button>
 		</div>
 		<ion-item class="clean-input-wrap ios__messages__input-wrap">
-			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (blur)="toggleInputFocus()" (focus)="toggleInputFocus()"></ion-textarea>
+			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>
 		</ion-item>
 		<div class="ios__messages__recording-overlay" [ngClass]="{'ios__messages__recording-overlay--distance': isPaused()}">
 			<span *ngIf="isRecording()">
@@ -141,7 +141,7 @@
 			</button>
 		</div>
 		<ion-item class="messages__input-wrap">
-			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (blur)="toggleInputFocus()" (focus)="toggleInputFocus()"></ion-textarea>
+			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>
 		</ion-item>
 		<div class="ios__messages__recording-overlay" [ngClass]="{'ios__messages__recording-overlay--distance': isPaused()}">
 			<span *ngIf="isRecording()">

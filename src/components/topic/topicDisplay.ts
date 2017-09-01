@@ -262,10 +262,10 @@ export class TopicComponent {
 	};
 
 	toggleInputFocus = () =>
-		this.inputFocus = !this.inputFocus;
+		this.inputFocus = !this.inputFocus
 
 	showCameraShortcut = () =>
-		!this.inputFocus && this.newMessageText.length === 0;
+		!this.inputFocus && this.newMessageText.length === 0
 
 	isRecordingUIVisible = () =>
 		!RecordingStateMachine.is(RecordingStates.NotRecording)
