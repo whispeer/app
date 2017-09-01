@@ -73,6 +73,7 @@ export class TopicComponent {
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
 	oldScrollFromBottom: number = 0
+	inputFocus: boolean = false
 
 	cameraOptions: CameraOptions
 
@@ -259,6 +260,12 @@ export class TopicComponent {
 			});
 		});
 	};
+
+	toggleInputFocus = () =>
+		this.inputFocus = !this.inputFocus;
+
+	showCameraShortcut = () =>
+		!this.inputFocus && this.newMessageText.length === 0;
 
 	isRecordingUIVisible = () =>
 		!RecordingStateMachine.is(RecordingStates.NotRecording)
