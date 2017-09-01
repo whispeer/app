@@ -178,7 +178,7 @@ topicWithBursts {
 
 .message__file {
 	display: flex;
-	height: 55px;
+	min-height: 55px;
 	width: 100%;
 
 	overflow: visible;
@@ -253,6 +253,7 @@ topicWithBursts {
 
 .message__file__info {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: flex-start;
 	width: 100%;
