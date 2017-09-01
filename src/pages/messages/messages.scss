@@ -235,19 +235,15 @@ topicWithBursts {
 }
 
 .message__file--sending {
-	background: map-get($colors, other_grey) !important;
+	background: map-get($colors, primary_faded) !important;
 
 	&:before {
-		border-right-color: map-get($colors, other_grey) !important;
-	}
-
-	.message__file__hexagon-spinner * {
-		stroke: map-get($colors, dark) !important;
+		border-right-color: map-get($colors, primary_faded) !important;
 	}
 
 	.message__file__hexagon {
 		.content, .border {
-			fill: map-get($colors, light_grey);
+			fill: map-get($colors, other_grey);
 		}
 	}
 }
