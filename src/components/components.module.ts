@@ -4,6 +4,7 @@ import { IonicModule } from 'ionic-angular';
 
 import { ResponsiveDatePipe } from "../lib/pipes/responsiveDate";
 import { MaxValuePipe } from "../lib/pipes/maxValue";
+import { LimitPipe } from "../lib/pipes/limit";
 
 import { UserImageComponent } from "./userImage";
 import { MainMenu } from "./mainMenu";
@@ -19,6 +20,7 @@ import { TranslateModule } from '@ngx-translate/core';
 	declarations: [
 		ResponsiveDatePipe,
 		MaxValuePipe,
+		LimitPipe,
 		MainMenu,
 		UserImageComponent,
 		ChooseFriends,
@@ -34,6 +36,7 @@ import { TranslateModule } from '@ngx-translate/core';
 	exports: [
 		ResponsiveDatePipe,
 		MaxValuePipe,
+		LimitPipe,
 		MainMenu,
 		UserImageComponent,
 		ChooseFriends,
