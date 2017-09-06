@@ -1,5 +1,5 @@
 import { Pipe } from "@angular/core";
-import * as moment from 'moment';
+import moment from 'moment';
 import { TranslateService } from '@ngx-translate/core';
 
 const translateKeys = ["today", "yesterday"]

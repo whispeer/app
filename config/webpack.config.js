@@ -75,6 +75,10 @@ module.exports = {
 				version: data.version
 			})
 		}),
+		new webpack.ContextReplacementPlugin(
+			/moment\/locale/,
+			/\/de|\/en/
+		),
 		new BundleAnalyzerPlugin({
 			analyzerMode: "static",
 			reportFilename: "report-chunks.html",

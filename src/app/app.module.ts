@@ -13,7 +13,7 @@ require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
 require("toBlob")
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import { NgModule, ErrorHandler, NgZone } from '@angular/core'; // tslint:disable-line:no-unused-variable
 import { DatePipe } from "@angular/common";
