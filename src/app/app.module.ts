@@ -62,7 +62,11 @@ const DEFAULT_LANG = "de"
 		MyApp
 	],
 	imports: [
-		IonicModule.forRoot(MyApp),
+		IonicModule.forRoot(MyApp, {
+			scrollPadding: false,
+			scrollAssist: true,
+			autoFocusAssist: false
+		}),
 		TranslateModule.forRoot({
 			loader: {
 				provide: TranslateLoader,

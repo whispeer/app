@@ -627,7 +627,7 @@ type ChatCache = {
 
 export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 	download: (id) =>
-		socketService.emit("chat.get", { id }).then((response) => response.chat),
+		socketService.definitlyEmit("chat.get", { id }).then((response) => response.chat),
 	load: (chatResponse) => {
 		const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
 			ChunkLoader.load(chunkData)
