@@ -13,12 +13,10 @@
 				{{ 'sales.callToAction' | translate }}
 			</div>
 			<div class="sales__callToAction-number">
-				+49 (0) 30 - 55 59 76 24
+				<a href="tel:+493055597624">+49 (0) 30 - 55 59 76 24</a>
 			</div>
 		</div>
-		<div class="sales__main-finePrint">
-			{{ 'sales.finePrint' | translate }}
-		</div>
+		<div class="sales__main-finePrint" [innerHtml]="'sales.finePrint' | translate"></div>
 	</div>
 
 	<div class="sales__private" (click)="goToPrivateHome()">
