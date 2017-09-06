@@ -12,10 +12,6 @@ class FeatureToggles {
 		})
 	}
 
-	loadFeatureConfig() {
-		return Bluebird.resolve(this.config)
-	}
-
 	isFeatureEnabled(featureName) {
 		if (!this.config.hasOwnProperty(featureName)) {
 			// console.warn(`Unknown feature: ${featureName}`)

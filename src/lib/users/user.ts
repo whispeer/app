@@ -24,7 +24,8 @@ import { SignedKeysLoader } from "../users/signedKeys"
 const friendsService = require("services/friendsService")
 const trustManager = require("crypto/trustManager")
 
-const RELOAD_DELAY = 15000
+const RELOAD_DELAY_MIN = 1 * 60 * 1000
+const RELOAD_DELAY_MAX = 10 * 60 * 1000
 const advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"]
 
 const advancedDefaults = {
@@ -939,7 +940,7 @@ export default class UserLoader extends MutableObjectLoader<UserInterface, Cache
 	},
 	shouldUpdate: (event, instance, lastUpdated) => {
 		if (event === UpdateEvent.wake) {
-			return Bluebird.delay(RELOAD_DELAY).thenReturn(true)
+			return Bluebird.delay(h.randomIntFromInterval(RELOAD_DELAY_MIN, RELOAD_DELAY_MAX)).thenReturn(true)
 		}
 
 		return Bluebird.resolve(false)
