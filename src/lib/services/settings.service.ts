@@ -42,7 +42,6 @@ interface ISettings {
 }
 
 interface IPrivacyAPI {
-	safetyNames: string[],
 	setPrivacy: Function,
 	removeCircle: Function
 }
@@ -54,68 +53,71 @@ const SecuredData = require("asset/securedDataWithMetaData");
 const notVisible:IVisibility = {
 	encrypt: true,
 	visibility: []
-};
+}
+
+const privacyAttributes = ["birthday", "location", "relationship", "education", "work", "gender", "languages"]
+
+const publicBranches = ["uiLanguage", "sound", "donate"]
+const serverBranches = ["mailsEnabled"]
+
+const defaultSettings:ISettings = {
+	privacy: {
+		basic: {
+			firstname: {
+				encrypt: false,
+				visibility: ["always:allfriends"]
+			},
+			lastname: {
+				encrypt: false,
+				visibility: ["always:allfriends"]
+			}
+		},
+		imageBlob: {
+			encrypt: false,
+			visibility: []
+		},
+		location: notVisible,
+		birthday: notVisible,
+		relationship: notVisible,
+		education: notVisible,
+		work: notVisible,
+		gender: notVisible,
+		languages: notVisible
+	},
+	donate: {
+		refused: false,
+		later: 0
+	},
+	sharePosts: ["always:allfriends"],
+	filterSelection: [],
+	sound: {
+		enabled: true
+	},
+	messages: {
+		sendShortCut: "enter"
+	},
+	uiLanguage: "en"
+}
+
+const securedDataOptions = { type: "settings", removeEmpty: true }
 
 class SettingsService extends Observer {
 
 	settings: any;
 	serverSettings = {};
-	options = { type: "settings", removeEmpty: true };
 	api: any;
-
-	defaultSettings:ISettings = {
-		privacy: {
-			basic: {
-				firstname: {
-					encrypt: false,
-					visibility: ["always:allfriends"]
-				},
-				lastname: {
-					encrypt: false,
-					visibility: ["always:allfriends"]
-				}
-			},
-			imageBlob: {
-				encrypt: false,
-				visibility: []
-			},
-			location: notVisible,
-			birthday: notVisible,
-			relationship: notVisible,
-			education: notVisible,
-			work: notVisible,
-			gender: notVisible,
-			languages: notVisible
-		},
-		donate: {
-			refused: false,
-			later: 0
-		},
-		sharePosts: ["always:allfriends"],
-		filterSelection: [],
-		sound: {
-			enabled: true
-		},
-		messages: {
-			sendShortCut: "enter"
-		},
-		uiLanguage: "en"
-	};
-
-	publicBranches = ["uiLanguage", "sound", "donate"];
-	serverBranches = ["mailsEnabled"];
 
 	loadCachePromise = Bluebird.resolve();
 
 	isBranchPublic = (branchName: string) => {
-		return this.publicBranches.indexOf(branchName) > -1;
+		return publicBranches.indexOf(branchName) > -1;
 	}
 
 	isBranchServer = (branchName: string) => {
-		return this.serverBranches.indexOf(branchName) > -1;
+		return serverBranches.indexOf(branchName) > -1;
 	}
 
-	turnOldSettingsToNew = (settings: any) => {
+	private turnOldSettingsToNew = (settings: any) => {
 		var result = {
 			meta: { initialLanguage: <string> undefined },
 			content: { }
@@ -132,7 +134,7 @@ class SettingsService extends Observer {
 		return result;
 	}
 
-	migrateToFormat2 = (givenOldSettings: any) => {
+	private migrateToFormat2 = (givenOldSettings: any) => {
 		console.warn("migrating settings to format 2");
 
 		return Bluebird.try(() => {
@@ -148,7 +150,7 @@ class SettingsService extends Observer {
 
 			return SecuredData.createAsync(data.content,
 				data.meta,
-				this.options,
+				securedDataOptions,
 				ownUser.getSignKey(),
 				ownUser.getMainKey()
 			);
@@ -157,7 +159,7 @@ class SettingsService extends Observer {
 			this.settings = SecuredData.load(
 				signedAndEncryptedSettings.content,
 				signedAndEncryptedSettings.meta,
-				this.options
+				securedDataOptions
 			);
 
 			return socketService.emit("settings.setSettings", {
@@ -173,7 +175,7 @@ class SettingsService extends Observer {
 			if (givenSettings.ct) {
 				return this.migrateToFormat2(givenSettings);
 			} else {
-				return SecuredData.load(givenSettings.content, givenSettings.meta, this.options);
+				return SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions);
 			}
 		}).then(_settings => {
 			this.settings = _settings;
@@ -222,7 +224,7 @@ class SettingsService extends Observer {
 	}
 
 	setDefaultLanguage = (language: string) => {
-		this.defaultSettings.uiLanguage = language;
+		defaultSettings.uiLanguage = language;
 	}
 
 	getContent = () => {
@@ -256,7 +258,7 @@ class SettingsService extends Observer {
 		}
 
 		if (typeof branchContent === "undefined") {
-			return this.defaultSettings[branchName];
+			return defaultSettings[branchName];
 		}
 
 		return branchContent;
@@ -272,39 +274,35 @@ class SettingsService extends Observer {
 		}
 	};
 
-	privacy: IPrivacyAPI = {
 
-		safetyNames: ["birthday", "location", "relationship", "education", "work", "gender", "languages"],
+	setPrivacy = (privacy: any, updateProfile: any) => {
+		return Bluebird.try(() => {
+			this.updateBranch("privacy", privacy);
+			return this.uploadChangedData();
+		}).then(() => {
+			if (!updateProfile) {
+				return;
+			}
 
-		setPrivacy: (privacy: any, cb: Function, updateProfile: any) => {
-			return Bluebird.try(() => {
-				this.updateBranch("privacy", privacy);
-				return this.uploadChangedData();
-			}).then(() => {
-				if (!updateProfile) {
-					return;
-				}
+			var userService = require("users/userService").default;
+			return userService.getOwn().uploadChangedProfile();
+		})
+	}
 
-				var userService = require("users/userService").default;
-				return userService.getOwn().uploadChangedProfile();
-			}).nodeify(cb);
-		},
+	removeCircle = (id: any) => {
+		return Bluebird.try(() => {
+			var privacy = this.getBranch("privacy");
 
-		removeCircle: (id: any, cb: Function) => {
-			return Bluebird.try(() => {
-				var privacy = this.getBranch("privacy");
+			privacyAttributes.forEach((safetyName: any) => {
+				h.removeArray(privacy[safetyName].visibility, "circle:" + id);
+			});
 
-				this.privacy.safetyNames.forEach((safetyName: any) => {
-					h.removeArray(privacy[safetyName].visibility, "circle:" + id);
-				});
+			h.removeArray(privacy.basic.firstname.visibility, "circle:" + id);
+			h.removeArray(privacy.basic.lastname.visibility, "circle:" + id);
 
-				h.removeArray(privacy.basic.firstname.visibility, "circle:" + id);
-				h.removeArray(privacy.basic.lastname.visibility, "circle:" + id);
-
-				return this.privacy.setPrivacy(privacy, null, true);
-			}).nodeify(cb);
-		}
-	};
+			return this.setPrivacy(privacy, true);
+		})
+	}
 
 	uploadChangedData = (cb?: Function) => {
 		if (!this.settings.isChanged()) {
