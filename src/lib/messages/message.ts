@@ -138,22 +138,16 @@ export class Message {
 			const voicemailsInfo = await Message.prepare(attachments.voicemails)
 			const filesInfo = await Message.prepare(attachments.files)
 
-			if (imagesInfo.length > 0) {
+			if (imagesInfo.length > 0 || filesInfo.length > 0 || voicemailsInfo.length > 0) {
 				securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
 				securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
-			}
 
-			if (filesInfo.length > 0) {
 				securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
 				securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
-			}
 
-			if (voicemailsInfo.length > 0) {
 				securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
 				securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
-			}
-
-			if (filesInfo.length === 0 && imagesInfo.length === 0 && voicemailsInfo.length === 0) {
+			} else {
 				securedData.contentSet(securedData.contentGet().message)
 			}
 		})
