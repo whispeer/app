@@ -1,4 +1,4 @@
-import { Push } from '@ionic-native/push';
+import { Push, PushObject } from '@ionic-native/push';
 
 import { NavController, Platform } from "ionic-angular";
 
@@ -19,7 +19,7 @@ const sjcl = require("sjcl");
 export class PushService {
 	constructor(private navCtrl: NavController, private platform: Platform, private push: Push) {}
 
-	pushInstance: any;
+	pushInstance: PushObject;
 
 	private getOrCreatePushkey = () => {
 		const storagePushKey = sessionStorage.get("pushKey");
@@ -155,11 +155,17 @@ export class PushService {
 
 					return messageService.addSocketData(additionalData.content);
 				}
-			}).then(() => {
-				this.pushInstance.finish(() => {console.info(`push done at ${new Date()}`)}, () => {console.warn("Finishing push failed!")}, additionalData.notId)
-			});
+			}).then(() =>
+				this.pushInstance.finish()
+			).then(
+				() => console.info(`push done at ${new Date()}`),
+				() => console.warn("Finishing push failed!")
+			)
 		}
 	};
+
+	unregister = () =>
+		this.pushInstance.unregister()
 
 	register = () => {
 		try {
