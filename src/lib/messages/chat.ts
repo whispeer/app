@@ -299,7 +299,7 @@ export class Chat extends Observer {
 				}
 			}
 
-			const { messages, chunks = [] } = await socketService.definitlyEmit("chat.getMessages", {
+			const { messages, chunks = [], remainingMessagesCount } = await socketService.definitlyEmit("chat.getMessages", {
 				id: this.getID(),
 				oldestKnownMessage: message ? message.getServerID() : 0,
 				limit
@@ -314,7 +314,7 @@ export class Chat extends Observer {
 				this.addMessage(message)
 			)
 
-			return
+			return remainingMessagesCount
 		})
 	}
 
