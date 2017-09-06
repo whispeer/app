@@ -16,6 +16,12 @@ import Progress from "../asset/Progress"
 
 type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
 
+const extractImagesInfo = (infos, key) => {
+	return infos.map((info) =>
+		h.objectMap(info, (val) => val[key])
+	)
+}
+
 export class Message {
 	private wasSent: boolean
 	private isOwnMessage: boolean
@@ -132,18 +138,20 @@ export class Message {
 			const voicemailsInfo = await Message.prepare(attachments.voicemails)
 			const filesInfo = await Message.prepare(attachments.files)
 
-			const extractImagesInfo = (infos, key) => {
-				return infos.map((info) =>
-					h.objectMap(info, (val) => val[key])
-				)
+			if (imagesInfo.length > 0) {
+				securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
+				securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
 			}
 
-			securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"))
-			securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"))
-			securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
-			securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
-			securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
-			securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
+			if (filesInfo.length > 0) {
+				securedData.metaSetAttr("files", filesInfo.map((info) => info.meta))
+				securedData.contentSetAttr("files", filesInfo.map((info) => info.content))
+			}
+
+			if (voicemailsInfo.length > 0) {
+				securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
+				securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
+			}
 
 			if (filesInfo.length === 0 && imagesInfo.length === 0 && voicemailsInfo.length === 0) {
 				securedData.contentSet(securedData.contentGet().message)
