@@ -33,7 +33,7 @@ export const isBusinessVersion = () => {
 }
 
 export const goToPrivateHome = () => {
-	setTopPath("/")
+	setTopPath("/index.html")
 }
 
 export const loginPage = () => {
