@@ -13,8 +13,6 @@ import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
 
-let initialLoaded = false
-
 const chatMemoizer = {}
 
 // Amount of chats after we don't load more initially
@@ -79,6 +77,8 @@ export class HomePage {
 
 	lang: string = "en"
 
+	numberOfChatsToDisplay = 0
+
 	constructor(public navCtrl: NavController, private translate: TranslateService) {}
 
 	ngOnInit() {}
@@ -97,33 +97,28 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
-		console.warn("load more chats?", this.getChats().length)
-		if (this.getChats().length >= CHATS_PER_SCREEN) {
+		console.warn("load more chats?", this.getLoadedChats().length)
+		if (this.getLoadedChats().length >= CHATS_PER_SCREEN) {
 			return
 		}
 
-		messageService.loadMoreChats().then(() => {
+		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.chatsLoading = false;
-			initialLoaded = true
-
-			console.timeEnd("Spinner on Home")
+			this.numberOfChatsToDisplay += chats.length
 		});
 	}
 
-	getChats = () => {
-		let loaded = true
+	getChatCount = () => messageService.getChatIDs().length
 
-		return messageService.getChatIDs().filter((chatID) => {
-			loaded = loaded && ChatLoader.isLoaded(chatID)
+	getLoadedChats = () =>
+		messageService.getChatIDs()
+			.filter((chatID) => ChatLoader.isLoaded(chatID))
+			.filter((id, i) => i < this.numberOfChatsToDisplay)
+			.map((chatID) => getChatMemoizer(chatID).getValue())
+			.sort((a, b) => b.time - a.time)
 
-			return initialLoaded && loaded
-		}).map((chatID) =>
-			getChatMemoizer(chatID).getValue()
-		).sort((a, b) =>
-			b.time - a.time
-		)
-	}
+	showNoConversationsPlaceholder = () => !this.chatsLoading && this.getChatCount() === 0
 
 	loadMoreTopics = (infiniteScroll) => {
 		if (this.chatsLoading) {
@@ -131,8 +126,9 @@ export class HomePage {
 			return
 		}
 
-		messageService.loadMoreChats().then(() => {
+		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
+			this.numberOfChatsToDisplay += chats.length
 			infiniteScroll.complete();
 		})
 	}
