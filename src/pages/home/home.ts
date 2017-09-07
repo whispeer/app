@@ -4,6 +4,8 @@ import { NavController, Content, IonicPage } from "ionic-angular"
 
 import { TranslateService } from '@ngx-translate/core'
 
+import * as Bluebird from "bluebird"
+
 import messageService from "../../lib/messages/messageService"
 import Memoizer from "../../lib/asset/memoizer"
 
@@ -79,7 +81,9 @@ export class HomePage {
 
 	numberOfChatsToDisplay = 0
 
-	constructor(public navCtrl: NavController, private translate: TranslateService) {}
+	constructor(public navCtrl: NavController, private translate: TranslateService) {
+		setInterval(() => this.checkNoMissingChats(), 10 * 1000)
+	}
 
 	ngOnInit() {}
 
@@ -111,12 +115,33 @@ export class HomePage {
 
 	getChatCount = () => messageService.getChatIDs().length
 
-	getLoadedChats = () =>
-		messageService.getChatIDs()
+	checkNoMissingChats = () => {
+		if (this.numberOfChatsToDisplay === 0) {
+			return
+		}
+
+		const missing = messageService.getChatIDs()
+			.slice(0, this.numberOfChatsToDisplay)
+			.filter((chatID) => !ChatLoader.isLoaded(chatID))
+
+		if (missing.length === 0) {
+			return
+		}
+
+		console.warn("Fetching missing chats:", missing)
+
+		return Bluebird.all(
+			missing.map((chatID) => ChatLoader.get(chatID))
+		)
+	}
+
+	getLoadedChats = () => {
+		return messageService.getChatIDs()
 			.filter((chatID) => ChatLoader.isLoaded(chatID))
 			.filter((id, i) => i < this.numberOfChatsToDisplay)
 			.map((chatID) => getChatMemoizer(chatID).getValue())
 			.sort((a, b) => b.time - a.time)
+	}
 
 	showNoConversationsPlaceholder = () => !this.chatsLoading && this.getChatCount() === 0
 
@@ -129,6 +154,11 @@ export class HomePage {
 		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.numberOfChatsToDisplay += chats.length
+
+			if (messageService.allChatsLoaded) {
+				this.numberOfChatsToDisplay = messageService.getChatIDs().length
+			}
+
 			infiniteScroll.complete()
 		})
 	}
