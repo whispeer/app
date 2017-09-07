@@ -1,13 +1,13 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild } from "@angular/core"
 
-import { NavController, Content, IonicPage } from "ionic-angular";
+import { NavController, Content, IonicPage } from "ionic-angular"
 
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core'
 
-import messageService from "../../lib/messages/messageService";
+import messageService from "../../lib/messages/messageService"
 import Memoizer from "../../lib/asset/memoizer"
 
-const contactsService = require("../../lib/services/friendsService");
+const contactsService = require("../../lib/services/friendsService")
 
 import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
@@ -66,14 +66,14 @@ const getChatMemoizer = (chatID) => {
 	templateUrl: 'home.html'
 })
 export class HomePage {
-	@ViewChild(Content) content: Content;
+	@ViewChild(Content) content: Content
 
-	topics: any[] = [];
-	requests: any[] = [];
-	searchTerm: string = "";
+	topics: any[] = []
+	requests: any[] = []
+	searchTerm: string = ""
 
-	chatsLoading: boolean = true;
-	moreTopicsAvailable: boolean = true;
+	chatsLoading: boolean = true
+	moreTopicsAvailable: boolean = true
 
 	lang: string = "en"
 
@@ -88,12 +88,12 @@ export class HomePage {
 		// but it runs too early when redirected from login. (works in messages...)
 		// another problem is that the search bars have different heights.
 
-		//this.content.scrollTo(0, 58, 0);
-		this.loadTopics();
-		this.loadRequests();
+		//this.content.scrollTo(0, 58, 0)
+		this.loadTopics()
+		this.loadRequests()
 
-		const en = (this.translate.currentLang.toLowerCase().indexOf("de") === -1);
-		this.lang = en ? "en" : "de";
+		const en = (this.translate.currentLang.toLowerCase().indexOf("de") === -1)
+		this.lang = en ? "en" : "de"
 	}
 
 	loadTopics = () => {
@@ -104,9 +104,9 @@ export class HomePage {
 
 		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
-			this.chatsLoading = false;
+			this.chatsLoading = false
 			this.numberOfChatsToDisplay += chats.length
-		});
+		})
 	}
 
 	getChatCount = () => messageService.getChatIDs().length
@@ -122,14 +122,14 @@ export class HomePage {
 
 	loadMoreTopics = (infiniteScroll) => {
 		if (this.chatsLoading) {
-			infiniteScroll.complete();
+			infiniteScroll.complete()
 			return
 		}
 
 		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.numberOfChatsToDisplay += chats.length
-			infiniteScroll.complete();
+			infiniteScroll.complete()
 		})
 	}
 
@@ -140,8 +140,8 @@ export class HomePage {
 	loadRequests = () => {
 		contactsService.awaitLoading().then(() => {
 			this.updateRequests()
-			contactsService.listen(this.updateRequests);
-		});
+			contactsService.listen(this.updateRequests)
+		})
 	}
 
 	get requestsLabel() {
@@ -151,16 +151,16 @@ export class HomePage {
 	}
 
 	openContactRequests = () => {
-		this.navCtrl.push("Requests");
+		this.navCtrl.push("Requests")
 	}
 
 	openChat = (chatID: number) => {
-		this.navCtrl.push("Messages", { chatID: chatID });
+		this.navCtrl.push("Messages", { chatID: chatID })
 	}
 
 	newMessage = () => {
 		this.navCtrl.push("New Message", {}, {
 			animation: "md-transition"
-		});
+		})
 	}
 }
