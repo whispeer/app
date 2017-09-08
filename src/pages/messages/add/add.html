@@ -4,16 +4,18 @@
 			{{ 'chooseFriends.title' | translate }}
 		</ion-title>
 	</ion-navbar>
+	<ion-toolbar class="toolbar--search" [color]="'primary'">
+		<ion-searchbar
+			*ngIf="!contactsLoading && !loadingChat && !saving"
+			animated
+			[placeholder]="'chooseFriends.search' | translate"
+			[(ngModel)]="searchTerm"
+			(ngModelChange)="executeSearch()"
+		></ion-searchbar>
+	</ion-toolbar>
 </ion-header>
 
 <ion-content>
-	<ion-searchbar
-		*ngIf="!contactsLoading && !loadingChat && !saving"
-		animated
-		[placeholder]="'chooseFriends.search' | translate"
-		[(ngModel)]="searchTerm"
-		(ngModelChange)="executeSearch()"
-	></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading || loadingChat || saving" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list *ngIf="!saving" [virtualScroll]="getFilteredUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
