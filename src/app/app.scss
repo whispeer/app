@@ -185,6 +185,7 @@ ion-fab-list[side="top"] {
 	margin-right: 34px !important;
 
 	.checkbox-icon {
+		border-radius: 0;
 		border: none !important;
 		background-color: transparent;
 		background-image: url("../assets/icon/checkbox_empty.svg") !important;
