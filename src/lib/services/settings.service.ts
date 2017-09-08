@@ -38,6 +38,9 @@ interface ISettings {
 	messages: {
 		sendShortCut: string
 	},
+	safety: {
+		blockedUsers: number[]
+	},
 	uiLanguage: string
 }
 
@@ -99,10 +102,13 @@ class SettingsService extends Observer {
 		messages: {
 			sendShortCut: "enter"
 		},
+		safety: {
+			blockedUsers: []
+		},
 		uiLanguage: "en"
 	};
 
-	publicBranches = ["uiLanguage", "sound", "donate"];
+	publicBranches = ["uiLanguage", "sound", "donate", "safety"];
 	serverBranches = ["mailsEnabled"];
 
 	loadCachePromise = Bluebird.resolve();
