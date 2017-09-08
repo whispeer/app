@@ -25,7 +25,7 @@
 
 		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
 			<ion-label>{{contact.name}}</ion-label>
-			<div item-content class="checkbox" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+			<div item-content class="checkbox checkbox-hexagon" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
 				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
 			</div>
 		</ion-item>
