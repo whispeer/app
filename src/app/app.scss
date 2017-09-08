@@ -204,6 +204,12 @@ ion-fab-list[side="top"] {
 	}
 }
 
+.checkbox-hexagon--remove {
+	.checkbox-icon {
+		background-image: url("../assets/icon/checkbox_remove.svg") !important;
+	}
+}
+
 .toolbar-content {
 	display: flex;
 	align-items: center;

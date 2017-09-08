@@ -100,6 +100,18 @@ export class AddPage extends ContactsWithSearch {
 		return this.addMemoizer.getValue()
 	}
 
+	getSelectedUsers = () => {
+		return this.selectedUsers.sort((a: any, b: any): number => {
+			if(a.name > b.name) {
+				return 1
+			} else if(a.name < b.name) {
+				return -1
+			} else {
+				return 0
+			}
+		})
+	}
+
 	addReceivers = () => {
 		this.saving = true
 
