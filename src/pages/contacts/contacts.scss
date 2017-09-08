@@ -2,6 +2,18 @@ page-contacts {
 	ion-list {
 		border-bottom: .55px solid #e5e5e5;
 	}
+
+	ion-content {
+		background-color: map-get($colors, light_grey) !important;
+	}
+}
+
+.friends__list {
+	margin-bottom: 0;
+}
+
+.not-found-footer {
+	margin-top: 0;
 }
 
 .friends__divider {
@@ -26,5 +38,15 @@ page-contacts {
 
 ion-avatar {
 	width: 36px;
-	height: 36px
+	height: 36px;
+
+	user-image {
+		display: inline-block;
+		height: 100%;
+		width: 100%;
+
+		svg {
+			height: 100%;
+		}
+	}
 }
