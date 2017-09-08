@@ -6,6 +6,21 @@ page-contacts {
 	ion-content {
 		background-color: map-get($colors, light_grey) !important;
 	}
+
+	ion-avatar {
+		width: 36px;
+		height: 36px;
+
+		user-image {
+			display: inline-block;
+			height: 100%;
+			width: 100%;
+
+			svg {
+				height: 100%;
+			}
+		}
+	}
 }
 
 .friends__list {
@@ -32,21 +47,6 @@ page-contacts {
 
 		ion-icon {
 			margin-top: 2px;
-		}
-	}
-}
-
-ion-avatar {
-	width: 36px;
-	height: 36px;
-
-	user-image {
-		display: inline-block;
-		height: 100%;
-		width: 100%;
-
-		svg {
-			height: 100%;
 		}
 	}
 }
