@@ -5,7 +5,7 @@ import FileUpload from "./fileUpload.service"
 import blobService from "./blobService"
 
 var Queue = require("asset/Queue");
-var imageLib = require("imageLib");
+var imageLib = require("blueimp-load-image/js/load-image");
 
 var canvasToBlob : any = Bluebird.promisify(h.canvasToBlob.bind(h));
 

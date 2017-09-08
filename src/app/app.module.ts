@@ -11,7 +11,7 @@ declare global {
 require("interceptors/addKeysInterceptor");
 require("interceptors/sessionServiceInterceptor");
 require("services/trust.service");
-require("toBlob")
+require("blueimp-canvas-to-blob/js/canvas-to-blob")
 
 import moment from 'moment';
 

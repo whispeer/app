@@ -1,4 +1,4 @@
-	import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController, NavParams, IonicPage, Searchbar } from "ionic-angular";
 
 const contactsService = require("../../../lib/services/friendsService");
