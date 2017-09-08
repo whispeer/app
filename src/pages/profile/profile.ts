@@ -18,7 +18,6 @@ import { PhotoViewer } from '@ionic-native/photo-viewer';
 import { TranslateService } from '@ngx-translate/core';
 
 import settings from "../../lib/services/settings.service"
-import h from "../../lib/helper/helper"
 
 const ImagePickerOptions = {
 	width: 2560,
@@ -152,32 +151,17 @@ export class ProfilePage {
 		this.navCtrl.pop();
 	}
 
-	getBlockedUsers = () => settings.getBranch("safety").blockedUsers.map(h.parseDecimal)
-
-	setBlockedUsers = (blockedUsers: number[]): Bluebird<any> => {
-		const safety = settings.getBranch("safety")
-
-		settings.updateBranch("safety", {
-			...safety,
-			blockedUsers
-		})
-
-		return settings.uploadChangedData()
-	}
-
 	block = () => {
 		if (this.isBlocked()) {
 			return
 		}
 
-		return this.setBlockedUsers([...this.getBlockedUsers(), this.userId])
+		return settings.setBlockedUsers([...settings.getBlockedUsers(), this.userId])
 	}
 
-	unblock = () => this.setBlockedUsers(this.getBlockedUsers().filter((uid) => uid !== this.userId))
+	unblock = () => settings.setBlockedUsers(settings.getBlockedUsers().filter((uid) => uid !== this.userId))
 
-	isBlocked = () =>
-		this.getBlockedUsers().indexOf(this.userId) > -1
-
+	isBlocked = () => settings.isBlocked(this.userId)
 
 	private addOrAccept() {
 		if (this.isRequest) {

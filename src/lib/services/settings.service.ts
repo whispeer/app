@@ -332,6 +332,22 @@ class SettingsService extends Observer {
 			})
 	};
 
+	getBlockedUsers = () => this.getBranch("safety").blockedUsers.map(h.parseDecimal)
+
+	setBlockedUsers = (blockedUsers: number[]): Bluebird<any> => {
+		const safety = this.getBranch("safety")
+
+		this.updateBranch("safety", {
+			...safety,
+			blockedUsers
+		})
+
+		return this.uploadChangedData()
+	}
+
+	isBlocked = (userID: number) =>
+		this.getBlockedUsers().indexOf(userID) > -1
+
 	getPrivacyAttribute = (attr: any) => {
 		var b = this.getBranch("privacy"),
 				i: number,
