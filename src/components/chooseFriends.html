@@ -4,7 +4,7 @@
 			{{ 'chooseFriends.title' | translate }}
 		</ion-title>
 	</ion-navbar>
-	<ion-toolbar [color]="'primary'">
+	<ion-toolbar class="toolbar--search" [color]="'primary'">
 		<ion-searchbar
 			*ngIf="!contactsLoading"
 			animated

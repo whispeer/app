@@ -2,7 +2,7 @@
 	<ion-navbar [color]="'primary'">
 		<ion-title>{{ 'contacts.title' | translate }}</ion-title>
 	</ion-navbar>
-	<ion-toolbar [color]="'primary'">
+	<ion-toolbar class="toolbar--search" [color]="'primary'">
 		<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()" (keypress)="handleSearchKey($event)" [placeholder]="'contacts.search' | translate" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate"></ion-searchbar>
 	</ion-toolbar>
 </ion-header>
