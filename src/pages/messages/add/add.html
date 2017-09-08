@@ -11,6 +11,7 @@
 			[placeholder]="'chooseFriends.search' | translate"
 			[(ngModel)]="searchTerm"
 			(ngModelChange)="executeSearch()"
+			[showCancelButton]="true"
 		></ion-searchbar>
 	</ion-toolbar>
 </ion-header>
