@@ -17,6 +17,9 @@ import { PhotoViewer } from '@ionic-native/photo-viewer';
 
 import { TranslateService } from '@ngx-translate/core';
 
+import settings from "../../lib/services/settings.service"
+import h from "../../lib/helper/helper"
+
 const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
@@ -91,14 +94,14 @@ export class ProfilePage {
 	) {}
 
 	ngOnInit() {
-		this.userId = parseFloat(this.navParams.get("userId"));
+		this.userId = parseInt(this.navParams.get("userId"), 10)
 		this.isOwn = true;
 
 		const awaitFriendsService = friendsService.awaitLoading().then(() => {
 			var requests = friendsService.getRequests();
 			this.isRequest = requests.indexOf(this.userId) > -1
 
-			this.isOwn = this.userId === parseFloat(sessionService.userid);
+			this.isOwn = this.userId === parseInt(sessionService.userid, 10)
 
 			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn;
 		});
@@ -148,6 +151,33 @@ export class ProfilePage {
 	goBack() {
 		this.navCtrl.pop();
 	}
+
+	getBlockedUsers = () => settings.getBranch("safety").blockedUsers.map(h.parseDecimal)
+
+	setBlockedUsers = (blockedUsers: number[]): Bluebird<any> => {
+		const safety = settings.getBranch("safety")
+
+		settings.updateBranch("safety", {
+			...safety,
+			blockedUsers
+		})
+
+		return settings.uploadChangedData()
+	}
+
+	block = () => {
+		if (this.isBlocked()) {
+			return
+		}
+
+		return this.setBlockedUsers([...this.getBlockedUsers(), this.userId])
+	}
+
+	unblock = () => this.setBlockedUsers(this.getBlockedUsers().filter((uid) => uid !== this.userId))
+
+	isBlocked = () =>
+		this.getBlockedUsers().indexOf(this.userId) > -1
+
 
 	private addOrAccept() {
 		if (this.isRequest) {

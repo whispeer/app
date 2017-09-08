@@ -312,9 +312,9 @@ class SettingsService extends Observer {
 		}
 	};
 
-	uploadChangedData = (cb?: Function) => {
+	uploadChangedData = () => {
 		if (!this.settings.isChanged()) {
-			return Bluebird.resolve(true).nodeify(cb);
+			return Bluebird.resolve(true)
 		}
 
 		var userService = require("users/userService").default;
@@ -329,7 +329,7 @@ class SettingsService extends Observer {
 				});
 			}).then((result: any) => {
 				return result.success;
-			}).nodeify(cb);
+			})
 	};
 
 	getPrivacyAttribute = (attr: any) => {
