@@ -104,7 +104,7 @@ messageService = {
 			return unloadedChatIDs.slice(0, count)
 		}).map((chatID) =>
 			ChatLoader.get(chatID)
-		).catch(errorService.criticalError);
+		)
 	}),
 	sendUnsentMessages: function () {
 		var unsentMessages = new Cache("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });

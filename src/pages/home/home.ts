@@ -15,6 +15,8 @@ import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
 
+import errorService from "../../lib/services/error.service"
+
 const chatMemoizer = {}
 
 // Amount of chats after we don't load more initially
@@ -110,7 +112,7 @@ export class HomePage {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.chatsLoading = false
 			this.numberOfChatsToDisplay += chats.length
-		})
+		}).catch(errorService.criticalError);
 	}
 
 	getChatCount = () => messageService.getChatIDs().length
