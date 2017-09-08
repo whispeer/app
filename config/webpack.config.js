@@ -3,15 +3,11 @@ var webpack = require("webpack");
 var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
 var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
-var ModuleConcatPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
 var WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").WebpackBundleSizeAnalyzerPlugin;
 
 var data = require(path.resolve("package.json"))
 
 var prodPlugins = [];
-if (process.env.IONIC_ENV === "prod") {
-  prodPlugins.push(new ModuleConcatPlugin());
-}
 
 module.exports = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,

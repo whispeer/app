@@ -921,8 +921,6 @@ export default class UserLoader extends MutableObjectLoader<UserInterface, Cache
 			const signKey = userData.signedKeys.sign
 			const nickname = userData.nickname
 
-			require("users/user").default
-
 			trustService.addNewUsers({ key: signKey, userid: userID, nickname })
 
 			const signedKeys = await SignedKeysLoader.load({ signedKeys: userData.signedKeys, signKey })
