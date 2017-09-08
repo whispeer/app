@@ -23,6 +23,7 @@ $fab-size: 76px;
 
 $kelly_green: #5ab70d;
 $napier_green: #3a8100;
+$tea_green: #cde9B6;
 
 $prussian_blue: #003b4c;
 $prussian_blue_highlight: #124958;
@@ -44,6 +45,7 @@ $champagne: #ffeda5;
 $colors_private: (
 	primary: $kelly_green,
 	primaryDarker: $napier_green,
+	primary_faded: $tea_green,
 
 	green: $kelly_green,
 	greenDarker: $napier_green,
@@ -65,6 +67,7 @@ $colors_private: (
 $colors_business: (
 	primary: $prussian_blue,
 	primaryDarker: $napier_green,
+	primary_faded: $border_grey,
 
 	green: $kelly_green,
 	greenDarker: $napier_green,

@@ -327,13 +327,17 @@ ion-fab-list[side="top"] {
 
 .radial-progress--inverse {
 	$circle-color: map-get($colors, grey);
-	$circle-background: transparentize($circle-color, 0.7);
-	$inset-color: map-get($colors, dark_grey);
+	$circle-background: transparentize(map-get($colors, dark_grey), 0.7);
+	$inset-color: map-get($colors, other_grey);
 
 	background-color: $circle-background;
 
 	.circle .mask .fill {
 		background-color: $circle-color;
+	}
+
+	.inset {
+		background-color: $inset-color;
 	}
 }
 

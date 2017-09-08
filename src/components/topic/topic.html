@@ -84,12 +84,12 @@
 			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">
 				<ion-icon name="add-circle"></ion-icon>
 			</button>
-			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()">
+			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">
 				<ion-icon name="camera"></ion-icon>
 			</button>
 		</div>
 		<ion-item class="clean-input-wrap ios__messages__input-wrap">
-			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()"></ion-textarea>
+			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>
 		</ion-item>
 		<div class="ios__messages__recording-overlay" [ngClass]="{'ios__messages__recording-overlay--distance': isPaused()}">
 			<span *ngIf="isRecording()">
@@ -114,6 +114,7 @@
 		</button>
 	</div>
 
+	<!-- TODO: refactor this to be one form, not two -->
 	<div class="messages__form" *ngIf="!platform.is('ios')" #footer>
 		<div
 			class="messages__form__button-wrap"
@@ -135,12 +136,12 @@
 			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">
 				<ion-icon name="add-circle"></ion-icon>
 			</button>
-			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()">
+			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">
 				<ion-icon name="camera"></ion-icon>
 			</button>
 		</div>
 		<ion-item class="messages__input-wrap">
-			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText"></ion-textarea>
+			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>
 		</ion-item>
 		<div class="ios__messages__recording-overlay" [ngClass]="{'ios__messages__recording-overlay--distance': isPaused()}">
 			<span *ngIf="isRecording()">

@@ -170,10 +170,14 @@ topicWithBursts {
 }
 
 .messages__wrap--file {
-	padding: 10px 0;
+	padding: 0;
 }
 
 .message__file {
+	display: flex;
+	min-height: 55px;
+	width: 100%;
+
 	overflow: visible;
 	padding: 5px 0 5px 25px;
 }
@@ -183,8 +187,8 @@ topicWithBursts {
 
 	width: 40px;
 
-	top: -6px;
-	left: -10px;
+	top: 4px;
+	left: -12px;
 
 	z-index: 3;
 
@@ -231,27 +235,24 @@ topicWithBursts {
 }
 
 .message__file--sending {
-	background: map-get($colors, other_grey) !important;
+	background: map-get($colors, primary_faded) !important;
 
 	&:before {
-		border-right-color: map-get($colors, other_grey) !important;
-	}
-
-	.message__file__hexagon-spinner * {
-		stroke: map-get($colors, dark) !important;
+		border-right-color: map-get($colors, primary_faded) !important;
 	}
 
 	.message__file__hexagon {
 		.content, .border {
-			fill: map-get($colors, light_grey);
+			fill: map-get($colors, other_grey);
 		}
 	}
 }
 
 .message__file__info {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	justify-content: center;
+	justify-content: flex-start;
 	width: 100%;
 	//white-space: nowrap;
 
