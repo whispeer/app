@@ -17,6 +17,9 @@
 
 <ion-content>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-item-divider class="friends__divider" *ngIf="selectedUsers.length > 0">
+		Selected Contacts
+	</ion-item-divider>
 	<ion-list [virtualScroll]="selectedUsers" class="friends__list">
 		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
 			<ion-label>{{contact.name}}</ion-label>
@@ -26,6 +29,8 @@
 			</div>
 		</ion-item>
 	</ion-list>
+	<p class="text-grey" padding-horizontal *ngIf="selectedUsers.length > 0">Above contacts will be added to the new conversation.<br>
+	You can later manage all members and add more.</p>
 	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}

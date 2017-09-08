@@ -16,6 +16,10 @@
 // automatically applied to the <body> element in the app.
 
 chooseFriends, page-add {
+	ion-content {
+		background-color: map-get($colors, light_grey) !important;
+	}
+
 	.friends__list .item .checkbox {
 		margin-right: 8px !important;
 	}
