@@ -4,22 +4,24 @@
 			{{ 'chooseFriends.title' | translate }}
 		</ion-title>
 	</ion-navbar>
+	<ion-toolbar [color]="'primary'">
+		<ion-searchbar
+			*ngIf="!contactsLoading"
+			animated
+			[placeholder]="'chooseFriends.search' | translate"
+			[(ngModel)]="searchTerm"
+			(ngModelChange)="executeSearch()" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate">
+		</ion-searchbar>
+	</ion-toolbar>
 </ion-header>
 
 <ion-content>
-	<ion-searchbar
-		*ngIf="!contactsLoading"
-		animated
-		[placeholder]="'chooseFriends.search' | translate"
-		[(ngModel)]="searchTerm"
-		(ngModelChange)="executeSearch()"
-	></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list [virtualScroll]="selectedUsers" class="friends__list">
 		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
 			<ion-label>{{contact.name}}</ion-label>
 
-			<div item-content class="checkbox" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+			<div item-content class="checkbox checkbox-hexagon checkbox-hexagon--remove" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
 				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
 			</div>
 		</ion-item>
@@ -31,7 +33,7 @@
 
 		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
 			<ion-label>{{contact.name}}</ion-label>
-			<div item-content class="checkbox" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+			<div item-content class="checkbox checkbox-hexagon" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
 				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
 			</div>
 		</ion-item>

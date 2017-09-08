@@ -15,9 +15,13 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
-chooseFriends {
+chooseFriends, page-add {
+	.toolbar--search {
+		padding: 0 !important;
+	}
+
 	.friends__list .item .checkbox {
-		margin-right: 8px;
+		margin-right: 8px !important;
 	}
 }
 
