@@ -22,6 +22,10 @@ let activeChat = 0
 
 messageService = {
 	prependChatID: function (chatID) {
+		if (!ChatListLoader.isLoaded(sessionService.getUserID())) {
+			return
+		}
+
 		const chatList = ChatListLoader.getLoaded(sessionService.getUserID())
 		const chatIDs = chatList.get()
 		chatList.set([
