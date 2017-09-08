@@ -41,11 +41,6 @@ interface ISettings {
 	uiLanguage: string
 }
 
-interface IPrivacyAPI {
-	setPrivacy: Function,
-	removeCircle: Function
-}
-
 import h from "../helper/helper";
 const EncryptedData = require("crypto/encryptedData");
 const SecuredData = require("asset/securedDataWithMetaData");
