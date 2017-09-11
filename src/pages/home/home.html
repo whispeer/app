@@ -33,7 +33,7 @@
 					<span class="hexagon__image__image topic__remainingUsers">+{{chat.partners.length - 2}}</span>
 				</ion-avatar>
 			</div>
-			<div class="topic__header" *ngIf="!chat.blocked">
+			<div class="topic__header">
 				<h2 class="user__name">
 					<span *ngIf="!chat.title">
 						<span *ngFor="let partner of chat.partners; let l = last">
@@ -52,7 +52,7 @@
 				</div>
 			</div>
 			<p *ngIf="!chat.latestMessageBlocked">{{chat.latestMessageText}}</p>
-			<p *ngIf="chat.latestMessageBlocked">REDACTED</p>
+			<p *ngIf="chat.latestMessageBlocked">- blocked message -</p>
 		</ion-item>
 	</ion-list>
 
