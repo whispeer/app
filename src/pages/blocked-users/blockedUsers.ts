@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, IonicPage } from 'ionic-angular';
 
-const contactsService = require("../../lib/services/friendsService")
 const initService = require("../../lib/services/initService")
 import userService from "../../lib/users/userService"
 
@@ -22,14 +21,25 @@ export class BlockedUsersPage extends ContactsWithSearch {
 		super()
 	}
 
-	ionViewDidLoad() {
-		initService.awaitLoading()
-			.then(() => userService.getMultipleFormatted(settings.getBlockedUsers().map(({ id }) => id)))
+	load() {
+		if (settings.getBlockedUsers().length === 0) {
+			//TODO remove this view from history
+			const views = this.navCtrl.getViews().filter(({ component }) => component === BlockedUsersPage)
+			views.forEach((view) => this.navCtrl.removeView(view))
+		}
+
+		return userService.getMultipleFormatted(settings.getBlockedUsers().map(({ id }) => id))
 			.then((users) => ContactsWithSearch.sort(users))
 			.then((users) => {
 				this.contacts = users
 				this.contactsLoading = false
 			})
+	}
+
+	ionViewDidLoad() {
+		initService.awaitLoading().then(() => this.load())
+
+		settings.listen(() => this.load(), "updated")
 	}
 
 	goToUser(userId) {

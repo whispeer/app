@@ -14,6 +14,7 @@ const contactsService = require("../../lib/services/friendsService")
 import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
+import settings from "../../lib/services/settings.service"
 
 const chatMemoizer = {}
 
@@ -27,7 +28,8 @@ const getChatMemoizer = (chatID) => {
 			() => ChatLoader.getLoaded(chatID),
 			() => ChatLoader.getLoaded(chatID).getLatestChunk(),
 			() => ChatLoader.getLoaded(chatID).getLatestMessage(),
-			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs()
+			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs(),
+			() => settings.getBlockedUsers()
 		], (chat, latestChunkID, latestMessageID, unreadMessageIDs, previousValue) => {
 			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
 

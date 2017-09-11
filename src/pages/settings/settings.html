@@ -22,7 +22,7 @@
 				[checked]="tutorialVisible()"
 				(ionChange)="resetTutorial($event)"></ion-toggle>
 		</ion-item>
-		<ion-item detail-push (click)="showBlocked()">
+		<ion-item detail-push (click)="showBlocked()" *ngIf="hasBlocked()">
 			{{ 'settings.blocked' | translate}}
 		</ion-item>
 		<ion-item detail-push (click)="feedback()">

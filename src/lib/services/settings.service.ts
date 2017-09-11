@@ -255,16 +255,24 @@ class SettingsService extends Observer {
 		}).nodeify(cb);
 	};
 
-	getBranch = (branchName: any) => {
-		var branchContent: any;
-
+	getBranchContent = (branchName: string) => {
 		if (this.isBranchServer(branchName)) {
-			branchContent = this.serverSettings[branchName];
-		} else if (this.isBranchPublic(branchName)) {
-			branchContent = this.settings.metaAttr(branchName);
-		} else {
-			branchContent = this.settings.contentGet()[branchName];
+			return this.serverSettings[branchName];
 		}
+
+		if (this.isBranchPublic(branchName)) {
+			return this.settings.metaAttr(branchName);
+		}
+
+		return this.settings.contentGet()[branchName];
+	}
+
+	getBranch = (branchName: string) => {
+		if (!this.settings) {
+			return this.defaultSettings[branchName];
+		}
+
+		const branchContent = this.getBranchContent(branchName)
 
 		if (typeof branchContent === "undefined") {
 			return this.defaultSettings[branchName];
@@ -281,6 +289,8 @@ class SettingsService extends Observer {
 		} else {
 			this.settings.contentSetAttr(branchName, value);
 		}
+
+		this.notify("", "updated");
 	};
 
 	privacy: IPrivacyAPI = {

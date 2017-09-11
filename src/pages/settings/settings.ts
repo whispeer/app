@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import Tutorial from "../../app/tutorial";
 import sessionService from "../../lib/services/session.service";
+import settings from "../../lib/services/settings.service"
 
 @IonicPage({
 	name: "Settings",
@@ -22,6 +23,8 @@ export class SettingsPage {
 	tutorialVisible() {
 		return Tutorial.tutorialVisible
 	}
+
+	hasBlocked = () => settings.getBlockedUsers().length > 0
 
 	resetTutorial({ checked }) {
 		if (!checked) return;
