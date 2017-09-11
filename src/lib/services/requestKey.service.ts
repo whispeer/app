@@ -72,7 +72,7 @@ class RequestKeyService {
 		}).nodeify(cb);
 	}
 
-	getKey = (keyID: string, callback: Function) => {
+	getKey = (keyID: string, callback?: Function) => {
 		if (typeof keyID !== "string") {
 			throw new Error("not a valid key realid: " + keyID);
 		}
