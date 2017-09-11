@@ -350,6 +350,9 @@ class SettingsService extends Observer {
 		return this.uploadChangedData()
 	}
 
+	isBlockedSince = (userID: number, time: number) =>
+		!!this.getBlockedUsers().find(({ id, since }) => userID === id && since < time )
+
 	isBlocked = (userID: number) =>
 		!!this.getBlockedUsers().find(({ id }) => userID === id)
 

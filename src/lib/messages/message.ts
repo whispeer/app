@@ -126,7 +126,7 @@ export class Message {
 	}
 
 	isBlocked = () =>
-		settings.isBlocked(this.data.sender.id)
+		settings.isBlockedSince(this.data.sender.id, this.getTime())
 
 	private prepareAttachments = () => {
 		return Bluebird.all([
