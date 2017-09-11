@@ -16,7 +16,7 @@
 		<img class="home__no-content-image" src="assets/images/no_conversations_{{lang}}.png">
 	</div>
 	<ion-list class="space-for-fab">
-		<ion-item *ngFor="let chat of getLoadedChats(); let i = index" class="topic" [ngClass]="{'topic--new': chat.unread}" tappable (click)="openChat(chat.id)">
+		<ion-item *ngFor="let chat of getLoadedChats(); let i = index" class="topic" [ngClass]="{'topic--new': !chat.blocked && chat.unread}" tappable (click)="openChat(chat.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of chat.partnersDisplay"
@@ -33,7 +33,7 @@
 					<span class="hexagon__image__image topic__remainingUsers">+{{chat.partners.length - 2}}</span>
 				</ion-avatar>
 			</div>
-			<div class="topic__header">
+			<div class="topic__header" *ngIf="!chat.blocked">
 				<h2 class="user__name">
 					<span *ngIf="!chat.title">
 						<span *ngFor="let partner of chat.partners; let l = last">
@@ -41,7 +41,7 @@
 						</span>
 					</span>
 					<span *ngIf="chat.title">{{chat.title}}</span>
-					<div class="topic__badgeContainer" *ngIf="chat.unread">
+					<div class="topic__badgeContainer" *ngIf="!chat.blocked && chat.unread">
 						<span class="topic__hexBadge">
 							<span class="topic__hexBadge__text">{{ chat.unreadCount | maxValue: 99 }}</span>
 						</span>
@@ -51,7 +51,8 @@
 					<ion-note item-right>{{chat.time | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>
 				</div>
 			</div>
-			<p>{{chat.latestMessageText}}</p>
+			<p *ngIf="!chat.latestMessageBlocked">{{chat.latestMessageText}}</p>
+			<p *ngIf="chat.latestMessageBlocked">REDACTED</p>
 		</ion-item>
 	</ion-list>
 

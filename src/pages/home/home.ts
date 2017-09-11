@@ -36,6 +36,7 @@ const getChatMemoizer = (chatID) => {
 			info.id = chat.getID()
 			info.unread = chat.getUnreadMessageIDs().length > 0
 			info.unreadCount = chat.getUnreadMessageIDs().length
+			info.blocked = chat.isBlocked()
 
 			info.partners = latestChunk.getPartners()
 			info.partnersDisplay = latestChunk.getPartnerDisplay()
@@ -50,6 +51,7 @@ const getChatMemoizer = (chatID) => {
 
 				info.time = latestMessage.getTime()
 				info.latestMessageText = latestMessage.getText()
+				info.latestMessageBlocked = latestMessage.data.sender.user.isBlocked()
 			}
 
 			return info
