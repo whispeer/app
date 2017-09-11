@@ -13,6 +13,10 @@ if (process.env.IONIC_ENV === "prod") {
   prodPlugins.push(new ModuleConcatPlugin());
 }
 
+const commit = require("child_process")
+	.execSync("git rev-parse --short HEAD")
+	.toString();
+
 module.exports = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,
 	output: {
@@ -68,7 +72,8 @@ module.exports = {
 			"IONIC_ENV": JSON.stringify(process.env.IONIC_ENV),
 			"CLIENT_INFO": JSON.stringify({
 				type: "messenger",
-				version: data.version
+				version: data.version,
+				commit
 			})
 		}),
 		new webpack.ContextReplacementPlugin(

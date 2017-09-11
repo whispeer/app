@@ -22,11 +22,20 @@
 				[checked]="tutorialVisible()"
 				(ionChange)="resetTutorial($event)"></ion-toggle>
 		</ion-item>
+		<ion-item detail-push (click)="showBlocked()">
+			{{ 'settings.blocked' | translate}}
+		</ion-item>
+		<ion-item detail-push (click)="feedback()">
+			{{ 'settings.feedback' | translate}}
+		</ion-item>
 	</ion-list>
 	<ion-list>
 		<ion-list-header>
 			{{ 'settings.about' | translate}}
 		</ion-list-header>
+		<ion-item>
+			Version {{ version }}
+		</ion-item>
 		<ion-item detail-push (click)="tos()">
 			{{ 'settings.tos' | translate}}
 		</ion-item>
@@ -35,14 +44,6 @@
 		</ion-item>
 		<ion-item detail-push (click)="contactUs()">
 			{{ 'settings.contact' | translate}}
-		</ion-item>
-	</ion-list>
-	<ion-list>
-		<ion-item detail-push (click)="showBlocked()">
-			{{ 'settings.blocked' | translate}}
-		</ion-item>
-		<ion-item detail-push (click)="feedback()">
-			{{ 'settings.feedback' | translate}}
 		</ion-item>
 	</ion-list>
 

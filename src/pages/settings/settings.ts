@@ -17,6 +17,7 @@ import sessionService from "../../lib/services/session.service";
 export class SettingsPage {
 	pushEnabled = true;
 	tutorialPassed = true;
+	version = `${CLIENT_INFO.version}-${CLIENT_INFO.commit}`;
 
 	tutorialVisible() {
 		return Tutorial.tutorialVisible
@@ -62,6 +63,10 @@ export class SettingsPage {
 		// to be set with a subsequent call like this:
 		logoutConfirm.setCssClass('logout-confirm');
 		logoutConfirm.present();
+	}
+
+	showBlocked() {
+		this.navCtrl.push("List Blocked")
 	}
 
 	feedback() {
