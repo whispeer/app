@@ -15,7 +15,7 @@
 		<ion-item *virtualItem="let contact" (click)="goToUser(contact.id)" detail-push>
 			<ion-avatar class="hexagon--border"
 					[ngClass]="{'hexagon__image--active': contact.online}" item-left>
-				<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
+				<user-image [hideBlocked]="false" [id]="contact.id" [image]="contact.basic.image"></user-image>
 			</ion-avatar>
 			<h2>
 				<strong *ngIf="contact.names.firstname">
