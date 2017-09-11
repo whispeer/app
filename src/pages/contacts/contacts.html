@@ -2,11 +2,13 @@
 	<ion-navbar [color]="'primary'">
 		<ion-title>{{ 'contacts.title' | translate }}</ion-title>
 	</ion-navbar>
+	<ion-toolbar class="toolbar--search" [color]="'primary'">
+		<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()" (keypress)="handleSearchKey($event)" [placeholder]="'contacts.search' | translate" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate"></ion-searchbar>
+	</ion-toolbar>
 </ion-header>
 
 
 <ion-content>
-	<ion-searchbar animated [(ngModel)]="searchTerm" (ngModelChange)="executeSearch()" (keypress)="handleSearchKey($event)" [placeholder]="'contacts.search' | translate" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate"></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="goToRequests()">
 		<div class="badgeContainer">
@@ -15,7 +17,7 @@
 		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
-	<ion-list [approxItemHeight]="'50px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
+	<ion-list [approxItemHeight]="'50px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
 		</ion-item-divider>
@@ -44,5 +46,10 @@
 		</ion-item>
 	</ion-list>
 	<ion-spinner *ngIf="searchResultsLoading && !contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<div class="space-for-fab">
+		<p class="text-grey not-found-footer" padding>
+			If you cannot find who you are looking for, try searching for their username.
+		</p>
+	</div>
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
 </ion-content>
