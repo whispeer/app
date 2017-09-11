@@ -145,6 +145,7 @@ interface UserInterface {
 	acceptFriendShip: () => any
 	removeAsFriend: () => any
 	addAsFriend: () => any
+	isBlocked: () => boolean
 }
 
 type ProfilesType = {
@@ -218,6 +219,9 @@ class User implements UserInterface {
 			this.data.advanced[branch] = this.getAdvancedAttribute(branch)
 		})
 	}
+
+	isBlocked = () =>
+		settingsService.isBlocked(this.id)
 
 	private setData = () => {
 		this.data = {
@@ -783,6 +787,8 @@ export class NotExistingUser implements UserInterface {
 			this.data.id = identifier
 		}
 	}
+
+	isBlocked = () => false
 
 	getID = () => -1
 	generateNewFriendsKey = () => Bluebird.reject(new Error("not my own user"))

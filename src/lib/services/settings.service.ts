@@ -351,7 +351,7 @@ class SettingsService extends Observer {
 	}
 
 	isBlocked = (userID: number) =>
-		this.getBlockedUsers().find(({ id }) => userID === id)
+		!!this.getBlockedUsers().find(({ id }) => userID === id)
 
 	getPrivacyAttribute = (attr: any) => {
 		var b = this.getBranch("privacy"),
