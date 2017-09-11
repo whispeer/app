@@ -68,7 +68,7 @@
 		"contact": "Kontaktieren Sie uns",
 		"feedback": "Geben Sie uns Feedback",
 		"logout": "Abmelden",
-		"companyName": "whispeer von mindpost GmbH",
+		"companyName": "whispeer {{version}} von mindpost GmbH",
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",

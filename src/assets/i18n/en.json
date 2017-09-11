@@ -75,7 +75,7 @@
 		"contact": "Contact us",
 		"feedback": "Give us Feedback",
 		"logout": "Logout",
-		"companyName": "whispeer by mindpost GmbH",
+		"companyName": "whispeer {{version}} by mindpost GmbH",
 		"madeInGermany": "Made in Germany with",
 		"humanRights": "for human rights",
 		"pushAlert": "This feature is not ready yet but we are working on it, promise!",

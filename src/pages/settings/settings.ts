@@ -18,7 +18,7 @@ import settings from "../../lib/services/settings.service"
 export class SettingsPage {
 	pushEnabled = true;
 	tutorialPassed = true;
-	version = `${CLIENT_INFO.version}-${CLIENT_INFO.commit}`;
+	version = { version: `${CLIENT_INFO.version}-${CLIENT_INFO.commit}` }
 
 	tutorialVisible() {
 		return Tutorial.tutorialVisible
