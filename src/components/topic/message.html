@@ -1,7 +1,10 @@
-<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.isBlocked()">
-	REDACTED
+<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.isBlockedSince()">
+	<div class="messages__message messages__message-blocked">
+		<span>- blocked message -</span>
+	</div>
+	<span class="messages__time"></span>
 </div>
-<div *ngIf="!message.isBlocked()">
+<div *ngIf="!message.isBlockedSince()">
 	<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.data.text.length > 0 || message.data.images.length > 0">
 		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
 			<span whispeerSyntaxify content="{{message.data.text}}"></span>

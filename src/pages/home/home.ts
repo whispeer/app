@@ -51,7 +51,7 @@ const getChatMemoizer = (chatID) => {
 
 				info.time = latestMessage.getTime()
 				info.latestMessageText = latestMessage.getText()
-				info.latestMessageBlocked = latestMessage.data.sender.user.isBlocked()
+				info.latestMessageBlocked = latestMessage.isBlocked()
 			}
 
 			return info

@@ -415,6 +415,11 @@ topicWithBursts {
 			margin-right: 20px;
 		}
 	}
+	.messages__message-blocked {
+		background-color: white;
+		border: 1px solid $isabelline;
+		color: $dark-grey;
+	}
 	.messages__time {
 		margin: auto auto auto 0;
 	}
@@ -444,6 +449,10 @@ topicWithBursts {
 				border-bottom-right-radius: 10px;
 				transform:translate(-30px, -2px);
 			}
+		}
+
+		.messages__message-blocked:before {
+			border-left: 20px solid transparent;
 		}
 	}
 	.message__file {

@@ -125,8 +125,11 @@ export class Message {
 		return this.attachments.images.length !== 0 || this.attachments.files.length !== 0 || this.attachments.voicemails.length !== 0
 	}
 
-	isBlocked = () =>
+	isBlockedSince = () =>
 		settings.isBlockedSince(this.data.sender.id, this.getTime())
+
+	isBlocked = () =>
+		settings.isBlocked(this.data.sender.id)
 
 	private prepareAttachments = () => {
 		return Bluebird.all([
