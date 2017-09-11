@@ -156,10 +156,10 @@ export class ProfilePage {
 			return
 		}
 
-		return settings.setBlockedUsers([...settings.getBlockedUsers(), this.userId])
+		return settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
 	}
 
-	unblock = () => settings.setBlockedUsers(settings.getBlockedUsers().filter((uid) => uid !== this.userId))
+	unblock = () => settings.setBlockedUsers(settings.getBlockedUsers().filter(({ id }) => id !== this.userId))
 
 	isBlocked = () => settings.isBlocked(this.userId)
 

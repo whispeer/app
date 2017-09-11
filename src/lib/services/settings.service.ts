@@ -11,6 +11,11 @@ interface IVisibility {
 	visibility: string[]
 }
 
+interface blockedUserInfo {
+	id: number,
+	since: number
+}
+
 interface ISettings {
 	privacy: {
 		basic: {
@@ -39,7 +44,7 @@ interface ISettings {
 		sendShortCut: string
 	},
 	safety: {
-		blockedUsers: number[]
+		blockedUsers: blockedUserInfo[]
 	},
 	uiLanguage: string
 }
@@ -332,9 +337,9 @@ class SettingsService extends Observer {
 			})
 	};
 
-	getBlockedUsers = () => this.getBranch("safety").blockedUsers.map(h.parseDecimal)
+	getBlockedUsers = (): blockedUserInfo[] => this.getBranch("safety").blockedUsers.map(h.parseDecimal)
 
-	setBlockedUsers = (blockedUsers: number[]): Bluebird<any> => {
+	setBlockedUsers = (blockedUsers: blockedUserInfo[]): Bluebird<any> => {
 		const safety = this.getBranch("safety")
 
 		this.updateBranch("safety", {
@@ -346,7 +351,7 @@ class SettingsService extends Observer {
 	}
 
 	isBlocked = (userID: number) =>
-		this.getBlockedUsers().indexOf(userID) > -1
+		this.getBlockedUsers().find(({ id }) => userID === id)
 
 	getPrivacyAttribute = (attr: any) => {
 		var b = this.getBranch("privacy"),
