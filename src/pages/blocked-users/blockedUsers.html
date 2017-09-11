@@ -7,7 +7,7 @@
 
 <ion-content>
 	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<ion-list [approxItemHeight]="'50px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
+	<ion-list [approxItemHeight]="'50px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
 		</ion-item-divider>
@@ -34,6 +34,14 @@
 				</strong>
 			</h2>
 		</ion-item>
+
 	</ion-list>
+
+	<div class="explanation space-for-fab">
+		<p class="text-grey">
+			{{ 'blocked.listExplanation' | translate}}<br>
+		</p>
+	</div>
+
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
 </ion-content>
