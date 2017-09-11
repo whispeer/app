@@ -41,6 +41,19 @@ export class ContactsWithSearch {
 		})
 	}
 
+	static sort = (users) => users.sort((a: any, b: any): number => {
+		const firstAvailable = a.names.firstname && b.names.firstname;
+		const lastAvailable = a.names.lastname && b.names.firstname;
+
+		if(!firstAvailable && !lastAvailable) {
+			return a.name.localeCompare(b.name);
+		} else if (!firstAvailable) {
+			return a.names.lastname.localeCompare(b.names.lastname);
+		} else {
+			return a.names.firstname.localeCompare(b.names.firstname);
+		}
+	});
+
 	protected loadContactsUsers = () => {
 		var contacts = contactsService.getFriends();
 
@@ -50,24 +63,9 @@ export class ContactsWithSearch {
 
 		this.loadedContactIDs = contacts.slice()
 
-		return Bluebird.try(() => {
-			return userService.getMultipleFormatted(contacts);
-		}).then((result: any[]) => {
-			return result.sort((a: any, b: any): number => {
-				const firstAvailable = a.names.firstname && b.names.firstname;
-				const lastAvailable = a.names.lastname && b.names.firstname;
-
-				if(!firstAvailable && !lastAvailable) {
-					return a.name.localeCompare(b.name);
-				} else if (!firstAvailable) {
-					return a.names.lastname.localeCompare(b.names.lastname);
-				} else {
-					return a.names.firstname.localeCompare(b.names.firstname);
-				}
-			});
-		}).then((result: any[]) => {
-			this.contacts = result;
-		})
+		return userService.getMultipleFormatted(contacts)
+			.then((result: any[]) => ContactsWithSearch.sort(result))
+			.then((result: any[]) => this.contacts = result)
 	}
 
 	contactDividers = (record, recordIndex, records) => {

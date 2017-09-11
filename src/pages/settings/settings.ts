@@ -66,7 +66,7 @@ export class SettingsPage {
 	}
 
 	showBlocked() {
-		this.navCtrl.push("List Blocked")
+		this.navCtrl.push("Blocked Users")
 	}
 
 	feedback() {

@@ -1,0 +1,39 @@
+<ion-header>
+	<ion-navbar [color]="'primary'">
+		<ion-title>{{ 'blocked.title' | translate }}</ion-title>
+	</ion-navbar>
+</ion-header>
+
+
+<ion-content>
+	<ion-spinner *ngIf="contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-list [approxItemHeight]="'50px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
+		<ion-item-divider *virtualHeader="let header" class="friends__divider">
+			{{ header }}
+		</ion-item-divider>
+
+		<ion-item *virtualItem="let contact" (click)="goToUser(contact.id)" detail-push>
+			<ion-avatar class="hexagon--border"
+					[ngClass]="{'hexagon__image--active': contact.online}" item-left>
+				<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
+			</ion-avatar>
+			<h2>
+				<strong *ngIf="contact.names.firstname">
+					{{contact.names.firstname}}
+				</strong>
+				<span *ngIf="contact.names.firstname && contact.names.lastname">
+					{{contact.names.lastname}}
+				</span>
+				<strong
+					*ngIf="!contact.names.firstname && contact.names.lastname">
+					{{contact.names.lastname}}
+				</strong>
+				<strong
+					*ngIf="!contact.names.firstname && !contact.names.lastname">
+					{{contact.name}}
+				</strong>
+			</h2>
+		</ion-item>
+	</ion-list>
+	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
+</ion-content>
