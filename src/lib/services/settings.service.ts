@@ -337,7 +337,7 @@ class SettingsService extends Observer {
 			})
 	};
 
-	getBlockedUsers = (): blockedUserInfo[] => this.getBranch("safety").blockedUsers.map(h.parseDecimal)
+	getBlockedUsers = (): blockedUserInfo[] => this.getBranch("safety").blockedUsers
 
 	setBlockedUsers = (blockedUsers: blockedUserInfo[]): Bluebird<any> => {
 		const safety = this.getBranch("safety")
