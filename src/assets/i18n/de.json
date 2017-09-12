@@ -73,13 +73,19 @@
 		"tos": "Nutzungsbedingungen",
 		"privacy": "Datenschutzbestimmungen",
 		"contact": "Kontaktiere uns",
-		"feedback": "Gebe uns Feedback",
+		"feedback": "Gib uns Feedback",
 		"logout": "Abmelden",
 		"companyName": "whispeer {{version}} von mindpost GmbH",
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Möchtest du dein Konto auf diesem Gerät abmelden?"
+		"logoutWarning": "Möchtest du dein Konto auf diesem Gerät abmelden?",
+		"blocked": "Blockierte Nutzer"
+	},
+	"blocked": {
+		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Du kannst sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken.",
+		"title": "Blockiert",
+		"messageReplacement": "- blockierter Inhalt -"
 	},
 	"profile": {
 		"ownTitle": "Profil",
@@ -90,7 +96,7 @@
 		"location": "Ort",
 		"languages": "Sprache",
 		"verify": {
-			"action": "Diesen Kontakt verifizieren",
+			"action": "Diesen Nutzer verifizieren",
 			"success": {
 				"heading": "Kontakt verifiziert",
 				"body": "Dieser Kontakt wurde erfolgreich verifiziert. Bitte lass ihn auch deine ID Scannen um die höchstmögliche Sicherheit zu gewährleisten.",
@@ -103,8 +109,10 @@
 			}
 		},
 		"idTitle": "Deine ID<br/> als Text",
-		"idExplanation": "Das ist deine persönliche und einzigartige ID auf whispeer. Diese brauchst du, <span class='text-primary'>um Kontakte zu verifizieren</span>—für die extra Portion Sicherheit! <br><br>Sie scannen deine ID, du scannst ihre IDs und ihr beide habt eure Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
+		"idExplanation": "Das ist deine persönliche und einzigartige ID auf whispeer. Diese brauchst du, <span class='text-primary'>um Kontakte zu verifizieren</span> — für die extra Portion Sicherheit! <br><br>Sie scannen deine ID, du scannst ihre IDs und ihr beide habt eure Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
 		"contacts": {
+			"blockContact": "Diesen Nutzer blockieren",
+			"unblockContact": "Diesen Nutzer entblocken",
 			"accepted": "Akzeptiert!",
 			"requestSent": "Anfrage gesendet!",
 			"acceptRequest": "Anfrage annehmen?",
@@ -120,9 +128,17 @@
 			"acceptedMessage": "{{name}} ist nun dein Kontakt.",
 			"requestSentMessage": "Du hast eine Kontaktanfrage an {{name}} gesendet.",
 			"reportContact": "Diesen Nutzer melden",
+			"blockConfirm": {
+				"title": "Diesen Nutzer blockieren?",
+				"message": "Blockieren schützt dich vor allem, was dieser Nutzer dir sendet. Du wirst nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.",
+				"cancel": "Abbrechen",
+				"confirm": "Blockieren"
+			},
 			"reportConfirm": {
 				"title": "Diesen Nutzer melden?",
-				"message": "Bitte bestätige, dass du diesen Nutzer melden möchtest. Wir setzen uns dann mit dir in Verbindung."
+				"message": "Bitte bestätige, dass du diesen Nutzer melden möchtest. Wir setzen uns dann mit dir in Verbindung.",
+				"cancel": "Abbrechen",
+				"confirm": "Melden"
 			}
 		},
 		"image": {
