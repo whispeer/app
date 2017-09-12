@@ -52,7 +52,7 @@
 				</div>
 			</div>
 			<p *ngIf="!chat.latestMessageBlocked">{{chat.latestMessageText}}</p>
-			<p *ngIf="chat.latestMessageBlocked">- blocked message -</p>
+			<p *ngIf="chat.latestMessageBlocked">{{ 'blocked.messageReplacement' | translate }}</p>
 		</ion-item>
 	</ion-list>
 

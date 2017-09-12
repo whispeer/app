@@ -1,6 +1,6 @@
 <div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.isBlockedSince()">
 	<div class="messages__message messages__message-blocked">
-		<span>- blocked message -</span>
+		<span>{{ 'blocked.messageReplacement' | translate }}</span>
 	</div>
 	<span class="messages__time"></span>
 </div>
