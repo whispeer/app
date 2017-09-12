@@ -75,11 +75,17 @@
 		"contact": "Contact us",
 		"feedback": "Give us Feedback",
 		"logout": "Logout",
-		"companyName": "whispeer by mindpost GmbH",
+		"companyName": "whispeer {{version}} by mindpost GmbH",
 		"madeInGermany": "Made in Germany with",
 		"humanRights": "for human rights",
 		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
-		"logoutWarning": "Do you want to log out from this device?"
+		"logoutWarning": "Do you want to log out from this device?",
+		"blocked": "Blocked users"
+	},
+	"blocked": {
+		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",
+		"title": "Blocked Users",
+		"messageReplacement": "- blocked content -"
 	},
 	"profile": {
 		"ownTitle": "Profile",
@@ -90,7 +96,7 @@
 		"location": "Location",
 		"languages": "Language",
 		"verify": {
-			"action": "Verify this Contact",
+			"action": "Verify this user",
 			"success": {
 				"heading": "Trusted contact",
 				"body": "This contact is now verified. Please let your contact scan your personal id too, to ensure maximum security.",
@@ -103,8 +109,10 @@
 			}
 		},
 		"idTitle": "Your ID<br/> as a text",
-		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with Contacts</span>—for extra security! <br><br>They scan your ID, you scan their IDs and both of you easily increased your security measures again. Cool, huh?",
+		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with Contacts</span> — for extra security! <br><br>They scan your ID, you scan their IDs and both of you easily increased your security measures again. Cool, huh?",
 		"contacts": {
+			"blockContact": "Block this user",
+			"unblockContact": "Unblock this user",
 			"accepted": "Accepted!",
 			"requestSent": "Request sent!",
 			"acceptRequest": "Accept this Request?",
@@ -120,9 +128,17 @@
 			"acceptedMessage": "{{name}} is now a Contact.",
 			"requestSentMessage": "You've sent a Contact Request to {{name}}.",
 			"reportContact": "Report this user",
+			"blockConfirm": {
+				"title": "Block this user?",
+				"message": "Blocking protects you from anything this user will send to you. You won't be notified about their activities and they will appear greyed out in listings.",
+				"cancel": "Cancel",
+				"confirm": "Block"
+			},
 			"reportConfirm": {
 				"title": "Report this user?",
-				"message": "Please confirm that you want to report this user. We'll then get in touch with you."
+				"message": "Please confirm that you want to report this user. We will get in touch with you.",
+				"cancel": "Cancel",
+				"confirm": "Report"
 			}
 		},
 		"image": {

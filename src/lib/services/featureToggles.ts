@@ -1,4 +1,3 @@
-import * as Bluebird from 'bluebird'
 import socketService from "./socket.service"
 
 class FeatureToggles {

@@ -23,6 +23,7 @@ $fab-size: 76px;
 
 $kelly_green: #5ab70d;
 $napier_green: #3a8100;
+$tea_green: #cde9B6;
 
 $prussian_blue: #003b4c;
 $prussian_blue_highlight: #124958;
@@ -44,6 +45,7 @@ $champagne: #ffeda5;
 $colors_private: (
 	primary: $kelly_green,
 	primaryDarker: $napier_green,
+	primary_faded: $tea_green,
 
 	green: $kelly_green,
 	greenDarker: $napier_green,
@@ -65,6 +67,7 @@ $colors_private: (
 $colors_business: (
 	primary: $prussian_blue,
 	primaryDarker: $napier_green,
+	primary_faded: $border_grey,
 
 	green: $kelly_green,
 	greenDarker: $napier_green,
@@ -102,6 +105,11 @@ $list-text-color: map-get($colors, dark);
 $list-border-color: map-get($colors, other_grey);
 
 $list-ios-activated-background-color: $isabelline;
+
+$item-ios-divider-background: map-get($colors, other_grey);
+$item-md-divider-background: map-get($colors, other_grey);
+$item-wp-divider-background: map-get($colors, other_grey);
+
 $alert-ios-message-text-color: map-get($colors, dark);
 
 $action-sheet-ios-button-text-color: map-get($colors, primaryDarker);

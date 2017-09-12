@@ -22,6 +22,18 @@
 				[checked]="tutorialVisible()"
 				(ionChange)="resetTutorial($event)"></ion-toggle>
 		</ion-item>
+		<ion-item detail-push (click)="showBlocked()" *ngIf="hasBlocked()">
+			<ion-avatar item-start class="inline-avatar">
+				<img src="assets/img/blocked-icon.png" />
+			</ion-avatar>
+			<ion-label>{{ 'settings.blocked' | translate}}</ion-label>
+		</ion-item>
+		<ion-item detail-push (click)="feedback()">
+			<ion-avatar item-start class="inline-avatar">
+				<img src="assets/img/feedback-icon.png" />
+			</ion-avatar>
+			<ion-label>{{ 'settings.feedback' | translate}}</ion-label>
+		</ion-item>
 	</ion-list>
 	<ion-list>
 		<ion-list-header>
@@ -37,19 +49,13 @@
 			{{ 'settings.contact' | translate}}
 		</ion-item>
 	</ion-list>
-	<ion-list>
-		<ion-item detail-push (click)="feedback()">
-			{{ 'settings.feedback' | translate}}
-		</ion-item>
-	</ion-list>
 
 	<button ion-button full color="danger" (click)="logout()">{{ 'settings.logout' | translate}}</button>
 
 	<div text-center class="space-for-fab">
 		<p class="text-grey" padding-vertical>
-			{{ 'settings.companyName' | translate}}<br>
-			{{ 'settings.madeInGermany' | translate}} <ion-icon name="md-heart"></ion-icon> {{ 'settings.humanRights' | translate}}
-
+			{{ 'settings.companyName' | translate:version }}<br>
+			{{ 'settings.madeInGermany' | translate }} <ion-icon name="md-heart"></ion-icon> {{ 'settings.humanRights' | translate }}
 		</p>
 	</div>
 

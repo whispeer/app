@@ -22,6 +22,10 @@ let activeChat = 0
 
 messageService = {
 	prependChatID: function (chatID) {
+		if (!ChatListLoader.isLoaded(sessionService.getUserID())) {
+			return
+		}
+
 		const chatList = ChatListLoader.getLoaded(sessionService.getUserID())
 		const chatIDs = chatList.get()
 		chatList.set([
@@ -89,7 +93,7 @@ messageService = {
 	isActiveChat: (chatID) => {
 		return chatID === activeChat
 	},
-	loadMoreChats: h.cacheUntilSettled(() => {
+	loadMoreChats: h.cacheUntilSettled((count) => {
 		return initService.awaitLoading().then(function () {
 			return ChatListLoader.get(sessionService.getUserID())
 		}).then(function () {
@@ -101,10 +105,10 @@ messageService = {
 				messageService.allChatsLoaded = true
 			}
 
-			return unloadedChatIDs.slice(0, 10)
+			return unloadedChatIDs.slice(0, count)
 		}).map((chatID) =>
 			ChatLoader.get(chatID)
-		).catch(errorService.criticalError);
+		)
 	}),
 	sendUnsentMessages: function () {
 		var unsentMessages = new Cache("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });

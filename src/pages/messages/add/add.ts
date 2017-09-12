@@ -1,4 +1,4 @@
-	import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController, NavParams, IonicPage, Searchbar } from "ionic-angular";
 
 const contactsService = require("../../../lib/services/friendsService");
@@ -98,6 +98,18 @@ export class AddPage extends ContactsWithSearch {
 
 	getFilteredUsers = () => {
 		return this.addMemoizer.getValue()
+	}
+
+	getSelectedUsers = () => {
+		return this.selectedUsers.sort((a: any, b: any): number => {
+			if(a.name > b.name) {
+				return 1
+			} else if(a.name < b.name) {
+				return -1
+			} else {
+				return 0
+			}
+		})
 	}
 
 	addReceivers = () => {

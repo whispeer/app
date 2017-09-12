@@ -1,0 +1,15 @@
+blocked-users {
+	ion-content {
+		background-color: map-get($colors, light_grey) !important;
+	}
+	ion-list.list-ios {
+		margin-bottom: 0;
+	}
+}
+
+.explanation {
+	padding-left: 15px;
+	padding-right: 15px;
+	font-size: 13px;
+}
+

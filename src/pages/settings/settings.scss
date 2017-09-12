@@ -12,3 +12,8 @@ page-settings {
 		color: map-get($colors, danger);
 	}
 }
+
+ion-avatar[item-start].inline-avatar {
+	margin-top: 0;
+	margin-bottom: 0;
+}

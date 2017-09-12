@@ -4,17 +4,36 @@
 			{{ 'chooseFriends.title' | translate }}
 		</ion-title>
 	</ion-navbar>
+	<ion-toolbar class="toolbar--search" [color]="'primary'">
+		<ion-searchbar
+			*ngIf="!contactsLoading && !loadingChat && !saving"
+			animated
+			[placeholder]="'chooseFriends.search' | translate"
+			[(ngModel)]="searchTerm"
+			(ngModelChange)="executeSearch()"
+			[showCancelButton]="true"
+			[cancelButtonText]="'general.cancel' | translate"
+		></ion-searchbar>
+	</ion-toolbar>
 </ion-header>
 
 <ion-content>
-	<ion-searchbar
-		*ngIf="!contactsLoading && !loadingChat && !saving"
-		animated
-		[placeholder]="'chooseFriends.search' | translate"
-		[(ngModel)]="searchTerm"
-		(ngModelChange)="executeSearch()"
-	></ion-searchbar>
 	<ion-spinner *ngIf="contactsLoading || loadingChat || saving" text-center margin-vertical class="spinner--full"></ion-spinner>
+	<ion-list class="friends__list" *ngIf="selectedUsers.length > 0">
+		<ion-item-divider class="friends__divider">
+			Selected Contacts
+		</ion-item-divider>
+		<ion-item *ngFor="let contact of getSelectedUsers()">
+			<ion-label>{{contact.name}}</ion-label>
+			<div item-content class="checkbox checkbox-hexagon checkbox-hexagon--remove" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios" (click)=updateSelectedUsers(contact)>
+				<div class="checkbox-icon"><div class="checkbox-inner"></div></div>
+			</div>
+		</ion-item>
+		<p class="text-grey" padding-horizontal>Above contacts will be added to the conversation.</p>
+	</ion-list>
+	<ion-item-divider class="friends__divider" *ngIf="selectedUsers.length > 0">
+		Search
+	</ion-item-divider>
 	<ion-list *ngIf="!saving" [virtualScroll]="getFilteredUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
@@ -22,7 +41,7 @@
 
 		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
 			<ion-label>{{contact.name}}</ion-label>
-			<div item-content class="checkbox" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+			<div item-content class="checkbox checkbox-hexagon" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
 				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
 			</div>
 		</ion-item>

@@ -12,6 +12,8 @@ import h from "../helper/helper"
 import Cache from "../services/Cache";
 import keyStore from "../services/keyStore.service"
 import Observer from "../asset/observer"
+import settings from "../services/settings.service"
+import sessionService from "../services/session.service"
 
 const initService = require("services/initService");
 
@@ -121,6 +123,15 @@ export class Chat extends Observer {
 		this.lastStoredInfo = storeInfo
 
 		ChatLoader.updateCache(this.id, storeInfo)
+	}
+
+	isBlocked = () => {
+		if (this.getReceiverIDs.length > 2) {
+			return false
+		}
+
+		const otherReceiver = this.getReceiverIDs().find((id) => id !== sessionService.getUserID())
+		return settings.isBlocked(otherReceiver)
 	}
 
 	update = ({ latestChunk, latestMessage, unreadMessageIDs }) => {

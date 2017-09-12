@@ -3,15 +3,15 @@ var webpack = require("webpack");
 var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
 var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
-var ModuleConcatPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
 var WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").WebpackBundleSizeAnalyzerPlugin;
 
 var data = require(path.resolve("package.json"))
 
 var prodPlugins = [];
-if (process.env.IONIC_ENV === "prod") {
-  prodPlugins.push(new ModuleConcatPlugin());
-}
+
+const commit = require("child_process")
+	.execSync("git rev-parse --short HEAD")
+	.toString();
 
 module.exports = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,
@@ -28,10 +28,6 @@ module.exports = {
 		modules: [path.resolve("src/lib/"), path.resolve("node_modules")],
 		alias: {
 			whispeerHelper: "helper/helper",
-			workerQueue: "worker/worker-queue",
-			PromiseWorker: "worker/worker-loader",
-			imageLib: "blueimp-load-image/js/load-image",
-			toBlob: "blueimp-canvas-to-blob/js/canvas-to-blob",
 			json3: "asset/json"
 		}
 	},
@@ -72,7 +68,8 @@ module.exports = {
 			"IONIC_ENV": JSON.stringify(process.env.IONIC_ENV),
 			"CLIENT_INFO": JSON.stringify({
 				type: "messenger",
-				version: data.version
+				version: data.version,
+				commit
 			})
 		}),
 		new webpack.ContextReplacementPlugin(

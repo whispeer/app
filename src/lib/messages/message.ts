@@ -13,6 +13,7 @@ import FileUpload from "../services/fileUpload.service"
 import ImageUpload from "../services/imageUpload.service"
 import blobService from "../services/blobService"
 import Progress from "../asset/Progress"
+import settings from "../services/settings.service"
 
 type attachments = { images: ImageUpload[], files: FileUpload[], voicemails: FileUpload[] }
 
@@ -123,6 +124,12 @@ export class Message {
 	hasAttachments = () => {
 		return this.attachments.images.length !== 0 || this.attachments.files.length !== 0 || this.attachments.voicemails.length !== 0
 	}
+
+	isBlockedSince = () =>
+		settings.isBlockedSince(this.data.sender.id, this.getTime())
+
+	isBlocked = () =>
+		settings.isBlocked(this.data.sender.id)
 
 	private prepareAttachments = () => {
 		return Bluebird.all([

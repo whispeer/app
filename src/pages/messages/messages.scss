@@ -170,10 +170,14 @@ topicWithBursts {
 }
 
 .messages__wrap--file {
-	padding: 10px 0;
+	padding: 0;
 }
 
 .message__file {
+	display: flex;
+	min-height: 55px;
+	width: 100%;
+
 	overflow: visible;
 	padding: 5px 0 5px 25px;
 }
@@ -183,8 +187,8 @@ topicWithBursts {
 
 	width: 40px;
 
-	top: -6px;
-	left: -10px;
+	top: 4px;
+	left: -12px;
 
 	z-index: 3;
 
@@ -231,27 +235,24 @@ topicWithBursts {
 }
 
 .message__file--sending {
-	background: map-get($colors, other_grey) !important;
+	background: map-get($colors, primary_faded) !important;
 
 	&:before {
-		border-right-color: map-get($colors, other_grey) !important;
-	}
-
-	.message__file__hexagon-spinner * {
-		stroke: map-get($colors, dark) !important;
+		border-right-color: map-get($colors, primary_faded) !important;
 	}
 
 	.message__file__hexagon {
 		.content, .border {
-			fill: map-get($colors, light_grey);
+			fill: map-get($colors, other_grey);
 		}
 	}
 }
 
 .message__file__info {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	justify-content: center;
+	justify-content: flex-start;
 	width: 100%;
 	//white-space: nowrap;
 
@@ -414,6 +415,11 @@ topicWithBursts {
 			margin-right: 20px;
 		}
 	}
+	.messages__message-blocked {
+		background-color: white;
+		border: 1px solid $isabelline;
+		color: $dark-grey;
+	}
 	.messages__time {
 		margin: auto auto auto 0;
 	}
@@ -443,6 +449,10 @@ topicWithBursts {
 				border-bottom-right-radius: 10px;
 				transform:translate(-30px, -2px);
 			}
+		}
+
+		.messages__message-blocked:before {
+			border-left: 20px solid transparent;
 		}
 	}
 	.message__file {
@@ -500,7 +510,7 @@ topicWithBursts {
 
 	display: flex;
 
-	align-items: center;
+	align-items: flex-end;
 
 	padding: 5px 0;
 }
@@ -512,12 +522,16 @@ topicWithBursts {
 .ios__messages__input-wrap {
 	height: auto;
 	min-height: 30px !important;
+
+	.input-wrapper {
+		align-items: flex-end;
+	}
 }
 
 .ios__messages__message-input {
 	.text-input {
 		border: 1px solid map-get($colors, other_grey);
-		border-radius: 20px;
+		border-radius: 15px;
 		padding: 4px 40px 4px 10px;
 
 		margin: 0 !important;
@@ -534,8 +548,8 @@ topicWithBursts {
 
 .ios__messages__send-message {
 	position: absolute;
-	right: 20px;
-	top: 15px;
+	right: 18px;
+	bottom: 7px;
 
 	margin: 0 !important;
 
@@ -551,6 +565,10 @@ topicWithBursts {
 
 .messages__form__button-wrap {
 	display: flex;
+
+	button {
+		height: 30px !important;
+	}
 }
 
 .ios__messages__recording-overlay {

@@ -11,6 +11,11 @@ interface IVisibility {
 	visibility: string[]
 }
 
+interface blockedUserInfo {
+	id: number,
+	since: number
+}
+
 interface ISettings {
 	privacy: {
 		basic: {
@@ -38,6 +43,9 @@ interface ISettings {
 	messages: {
 		sendShortCut: string
 	},
+	safety: {
+		blockedUsers: blockedUserInfo[]
+	},
 	uiLanguage: string
 }
 
@@ -52,7 +60,7 @@ const notVisible:IVisibility = {
 
 const privacyAttributes = ["birthday", "location", "relationship", "education", "work", "gender", "languages"]
 
-const publicBranches = ["uiLanguage", "sound", "donate"]
+const publicBranches = ["uiLanguage", "sound", "donate", "safety"]
 const serverBranches = ["mailsEnabled"]
 
 const defaultSettings:ISettings = {
@@ -90,6 +98,9 @@ const defaultSettings:ISettings = {
 	},
 	messages: {
 		sendShortCut: "enter"
+	},
+	safety: {
+		blockedUsers: []
 	},
 	uiLanguage: "en"
 }
@@ -235,16 +246,24 @@ class SettingsService extends Observer {
 		}).nodeify(cb);
 	};
 
-	getBranch = (branchName: any) => {
-		var branchContent: any;
-
+	getBranchContent = (branchName: string) => {
 		if (isBranchServer(branchName)) {
-			branchContent = this.serverSettings[branchName];
-		} else if (isBranchPublic(branchName)) {
-			branchContent = this.settings.metaAttr(branchName);
-		} else {
-			branchContent = this.settings.contentGet()[branchName];
+			return this.serverSettings[branchName];
 		}
+
+		if (isBranchPublic(branchName)) {
+			return this.settings.metaAttr(branchName);
+		}
+
+		return this.settings.contentGet()[branchName];
+	}
+
+	getBranch = (branchName: string) => {
+		if (!this.settings) {
+			return defaultSettings[branchName];
+		}
+
+		const branchContent = this.getBranchContent(branchName)
 
 		if (typeof branchContent === "undefined") {
 			return defaultSettings[branchName];
@@ -261,6 +280,8 @@ class SettingsService extends Observer {
 		} else {
 			this.settings.contentSetAttr(branchName, value);
 		}
+
+		this.notify("", "updated");
 	};
 
 
@@ -308,6 +329,25 @@ class SettingsService extends Observer {
 				result.success
 			)
 	};
+
+	getBlockedUsers = (): blockedUserInfo[] => this.getBranch("safety").blockedUsers
+
+	setBlockedUsers = (blockedUsers: blockedUserInfo[]): Bluebird<any> => {
+		const safety = this.getBranch("safety")
+
+		this.updateBranch("safety", {
+			...safety,
+			blockedUsers
+		})
+
+		return this.uploadChangedData()
+	}
+
+	isBlockedSince = (userID: number, time: number) =>
+		!!this.getBlockedUsers().find(({ id, since }) => userID === id && since < time )
+
+	isBlocked = (userID: number) =>
+		!!this.getBlockedUsers().find(({ id }) => userID === id)
 
 	getPrivacyAttribute = (attr: any) => {
 		var b = this.getBranch("privacy"),

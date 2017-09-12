@@ -1,19 +1,22 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild } from "@angular/core"
 
-import { NavController, Content, IonicPage } from "ionic-angular";
+import { NavController, Content, IonicPage } from "ionic-angular"
 
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core'
 
-import messageService from "../../lib/messages/messageService";
+import * as Bluebird from "bluebird"
+
+import messageService from "../../lib/messages/messageService"
 import Memoizer from "../../lib/asset/memoizer"
 
-const contactsService = require("../../lib/services/friendsService");
+const contactsService = require("../../lib/services/friendsService")
 
 import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
+import settings from "../../lib/services/settings.service"
 
-let initialLoaded = false
+import errorService from "../../lib/services/error.service"
 
 const chatMemoizer = {}
 
@@ -27,7 +30,8 @@ const getChatMemoizer = (chatID) => {
 			() => ChatLoader.getLoaded(chatID),
 			() => ChatLoader.getLoaded(chatID).getLatestChunk(),
 			() => ChatLoader.getLoaded(chatID).getLatestMessage(),
-			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs()
+			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs(),
+			() => settings.getBlockedUsers()
 		], (chat, latestChunkID, latestMessageID, unreadMessageIDs, previousValue) => {
 			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
 
@@ -36,6 +40,7 @@ const getChatMemoizer = (chatID) => {
 			info.id = chat.getID()
 			info.unread = chat.getUnreadMessageIDs().length > 0
 			info.unreadCount = chat.getUnreadMessageIDs().length
+			info.blocked = chat.isBlocked()
 
 			info.partners = latestChunk.getPartners()
 			info.partnersDisplay = latestChunk.getPartnerDisplay()
@@ -50,6 +55,7 @@ const getChatMemoizer = (chatID) => {
 
 				info.time = latestMessage.getTime()
 				info.latestMessageText = latestMessage.getText()
+				info.latestMessageBlocked = latestMessage.isBlocked()
 			}
 
 			return info
@@ -68,18 +74,22 @@ const getChatMemoizer = (chatID) => {
 	templateUrl: 'home.html'
 })
 export class HomePage {
-	@ViewChild(Content) content: Content;
+	@ViewChild(Content) content: Content
 
-	topics: any[] = [];
-	requests: any[] = [];
-	searchTerm: string = "";
+	topics: any[] = []
+	requests: any[] = []
+	searchTerm: string = ""
 
-	chatsLoading: boolean = true;
-	moreTopicsAvailable: boolean = true;
+	chatsLoading: boolean = true
+	moreTopicsAvailable: boolean = true
 
 	lang: string = "en"
 
-	constructor(public navCtrl: NavController, private translate: TranslateService) {}
+	numberOfChatsToDisplay = 0
+
+	constructor(public navCtrl: NavController, private translate: TranslateService) {
+		setInterval(() => this.checkNoMissingChats(), 10 * 1000)
+	}
 
 	ngOnInit() {}
 
@@ -88,52 +98,74 @@ export class HomePage {
 		// but it runs too early when redirected from login. (works in messages...)
 		// another problem is that the search bars have different heights.
 
-		//this.content.scrollTo(0, 58, 0);
-		this.loadTopics();
-		this.loadRequests();
+		//this.content.scrollTo(0, 58, 0)
+		this.loadTopics()
+		this.loadRequests()
 
-		const en = (this.translate.currentLang.toLowerCase().indexOf("de") === -1);
-		this.lang = en ? "en" : "de";
+		const en = (this.translate.currentLang.toLowerCase().indexOf("de") === -1)
+		this.lang = en ? "en" : "de"
 	}
 
 	loadTopics = () => {
-		console.warn("load more chats?", this.getChats().length)
-		if (this.getChats().length >= CHATS_PER_SCREEN) {
+		console.warn("load more chats?", this.getLoadedChats().length)
+		if (this.getLoadedChats().length >= CHATS_PER_SCREEN) {
 			return
 		}
 
-		messageService.loadMoreChats().then(() => {
+		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
-			this.chatsLoading = false;
-			initialLoaded = true
-
-			console.timeEnd("Spinner on Home")
-		});
+			this.chatsLoading = false
+			this.numberOfChatsToDisplay += chats.length
+		}).catch(errorService.criticalError);
 	}
 
-	getChats = () => {
-		let loaded = true
+	getChatCount = () => messageService.getChatIDs().length
 
-		return messageService.getChatIDs().filter((chatID) => {
-			loaded = loaded && ChatLoader.isLoaded(chatID)
+	checkNoMissingChats = () => {
+		if (this.numberOfChatsToDisplay === 0) {
+			return
+		}
 
-			return initialLoaded && loaded
-		}).map((chatID) =>
-			getChatMemoizer(chatID).getValue()
-		).sort((a, b) =>
-			b.time - a.time
+		const missing = messageService.getChatIDs()
+			.slice(0, this.numberOfChatsToDisplay)
+			.filter((chatID) => !ChatLoader.isLoaded(chatID))
+
+		if (missing.length === 0) {
+			return
+		}
+
+		console.warn("Fetching missing chats:", missing)
+
+		return Bluebird.all(
+			missing.map((chatID) => ChatLoader.get(chatID))
 		)
 	}
 
+	getLoadedChats = () => {
+		return messageService.getChatIDs()
+			.filter((chatID) => ChatLoader.isLoaded(chatID))
+			.filter((id, i) => i < this.numberOfChatsToDisplay)
+			.map((chatID) => getChatMemoizer(chatID).getValue())
+			.sort((a, b) => b.time - a.time)
+	}
+
+	showNoConversationsPlaceholder = () => !this.chatsLoading && this.getChatCount() === 0
+
 	loadMoreTopics = (infiniteScroll) => {
 		if (this.chatsLoading) {
-			infiniteScroll.complete();
+			infiniteScroll.complete()
 			return
 		}
 
-		messageService.loadMoreChats().then(() => {
+		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
-			infiniteScroll.complete();
+			this.numberOfChatsToDisplay += chats.length
+
+			if (messageService.allChatsLoaded) {
+				this.numberOfChatsToDisplay = messageService.getChatIDs().length
+			}
+
+			infiniteScroll.complete()
 		})
 	}
 
@@ -144,8 +176,8 @@ export class HomePage {
 	loadRequests = () => {
 		contactsService.awaitLoading().then(() => {
 			this.updateRequests()
-			contactsService.listen(this.updateRequests);
-		});
+			contactsService.listen(this.updateRequests)
+		})
 	}
 
 	get requestsLabel() {
@@ -155,16 +187,16 @@ export class HomePage {
 	}
 
 	openContactRequests = () => {
-		this.navCtrl.push("Requests");
+		this.navCtrl.push("Requests")
 	}
 
 	openChat = (chatID: number) => {
-		this.navCtrl.push("Messages", { chatID: chatID });
+		this.navCtrl.push("Messages", { chatID: chatID })
 	}
 
 	newMessage = () => {
 		this.navCtrl.push("New Message", {}, {
 			animation: "md-transition"
-		});
+		})
 	}
 }

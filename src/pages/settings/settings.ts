@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import Tutorial from "../../app/tutorial";
 import sessionService from "../../lib/services/session.service";
+import settings from "../../lib/services/settings.service"
 
 @IonicPage({
 	name: "Settings",
@@ -17,10 +18,13 @@ import sessionService from "../../lib/services/session.service";
 export class SettingsPage {
 	pushEnabled = true;
 	tutorialPassed = true;
+	version = { version: `${CLIENT_INFO.version}-${CLIENT_INFO.commit}` }
 
 	tutorialVisible() {
 		return Tutorial.tutorialVisible
 	}
+
+	hasBlocked = () => settings.getBlockedUsers().length > 0
 
 	resetTutorial({ checked }) {
 		if (!checked) return;
@@ -62,6 +66,10 @@ export class SettingsPage {
 		// to be set with a subsequent call like this:
 		logoutConfirm.setCssClass('logout-confirm');
 		logoutConfirm.present();
+	}
+
+	showBlocked() {
+		this.navCtrl.push("Blocked Users")
 	}
 
 	feedback() {
