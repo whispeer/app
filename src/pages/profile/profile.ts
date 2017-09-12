@@ -17,6 +17,8 @@ import { PhotoViewer } from '@ionic-native/photo-viewer';
 
 import { TranslateService } from '@ngx-translate/core';
 
+import settings from "../../lib/services/settings.service"
+
 const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
@@ -91,14 +93,14 @@ export class ProfilePage {
 	) {}
 
 	ngOnInit() {
-		this.userId = parseFloat(this.navParams.get("userId"));
+		this.userId = parseInt(this.navParams.get("userId"), 10)
 		this.isOwn = true;
 
 		const awaitFriendsService = friendsService.awaitLoading().then(() => {
 			var requests = friendsService.getRequests();
 			this.isRequest = requests.indexOf(this.userId) > -1
 
-			this.isOwn = this.userId === parseFloat(sessionService.userid);
+			this.isOwn = this.userId === parseInt(sessionService.userid, 10)
 
 			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn;
 		});
@@ -148,6 +150,32 @@ export class ProfilePage {
 	goBack() {
 		this.navCtrl.pop();
 	}
+
+	block = () => {
+		if (this.isBlocked()) {
+			return
+		}
+
+		const blockConfirm = this.alertCtrl.create({
+			title: this.translate.instant("profile.contacts.blockConfirm.title"),
+			message: this.translate.instant("profile.contacts.blockConfirm.message"),
+			buttons: [{
+				text: this.translate.instant("profile.contacts.blockConfirm.cancel")
+			}, {
+				text: this.translate.instant("profile.contacts.blockConfirm.confirm"),
+				handler: () => {
+					settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+				}
+			}]
+		});
+
+		blockConfirm.setCssClass('logout-confirm');
+		blockConfirm.present();
+	}
+
+	unblock = () => settings.setBlockedUsers(settings.getBlockedUsers().filter(({ id }) => id !== this.userId))
+
+	isBlocked = () => settings.isBlocked(this.userId)
 
 	private addOrAccept() {
 		if (this.isRequest) {
@@ -419,13 +447,13 @@ export class ProfilePage {
 	}
 
 	report = () => {
-		let reportConfirm = this.alertCtrl.create({
+		const reportConfirm = this.alertCtrl.create({
 			title: this.translate.instant("profile.contacts.reportConfirm.title"),
 			message: this.translate.instant("profile.contacts.reportConfirm.message"),
 			buttons: [{
-				text: "Cancel"
+				text: this.translate.instant("profile.contacts.reportConfirm.cancel")
 			}, {
-				text: "Report",
+				text: this.translate.instant("profile.contacts.reportConfirm.confirm"),
 				handler: () => {
 					reportService.sendReport("user", this.user.id);
 				}

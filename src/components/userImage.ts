@@ -1,5 +1,7 @@
 import { Component, Input } from "@angular/core";
 
+import settings from "../lib/services/settings.service"
+
 const DEFAULT_IMAGE = "assets/img/user.png"
 
 @Component({
@@ -8,6 +10,8 @@ const DEFAULT_IMAGE = "assets/img/user.png"
 })
 export class UserImageComponent {
 	private _image: string = DEFAULT_IMAGE
+
+	@Input() hideBlocked = true
 
 	@Input()
 	set image(image: string) {
@@ -19,7 +23,13 @@ export class UserImageComponent {
 		this._image = DEFAULT_IMAGE
 	}
 
-	get image(): string { return this._image; }
+	get image(): string {
+		if (this.hideBlocked && settings.isBlocked(parseInt(this.id, 10))) {
+			return "assets/img/blocked.png"
+		}
+
+		return this._image;
+	}
 
 	@Input() id: string;
 

@@ -11,6 +11,11 @@ interface IVisibility {
 	visibility: string[]
 }
 
+interface blockedUserInfo {
+	id: number,
+	since: number
+}
+
 interface ISettings {
 	privacy: {
 		basic: {
@@ -37,6 +42,9 @@ interface ISettings {
 	},
 	messages: {
 		sendShortCut: string
+	},
+	safety: {
+		blockedUsers: blockedUserInfo[]
 	},
 	uiLanguage: string
 }
@@ -99,10 +107,13 @@ class SettingsService extends Observer {
 		messages: {
 			sendShortCut: "enter"
 		},
+		safety: {
+			blockedUsers: []
+		},
 		uiLanguage: "en"
 	};
 
-	publicBranches = ["uiLanguage", "sound", "donate"];
+	publicBranches = ["uiLanguage", "sound", "donate", "safety"];
 	serverBranches = ["mailsEnabled"];
 
 	loadCachePromise = Bluebird.resolve();
@@ -244,16 +255,24 @@ class SettingsService extends Observer {
 		}).nodeify(cb);
 	};
 
-	getBranch = (branchName: any) => {
-		var branchContent: any;
-
+	getBranchContent = (branchName: string) => {
 		if (this.isBranchServer(branchName)) {
-			branchContent = this.serverSettings[branchName];
-		} else if (this.isBranchPublic(branchName)) {
-			branchContent = this.settings.metaAttr(branchName);
-		} else {
-			branchContent = this.settings.contentGet()[branchName];
+			return this.serverSettings[branchName];
 		}
+
+		if (this.isBranchPublic(branchName)) {
+			return this.settings.metaAttr(branchName);
+		}
+
+		return this.settings.contentGet()[branchName];
+	}
+
+	getBranch = (branchName: string) => {
+		if (!this.settings) {
+			return this.defaultSettings[branchName];
+		}
+
+		const branchContent = this.getBranchContent(branchName)
 
 		if (typeof branchContent === "undefined") {
 			return this.defaultSettings[branchName];
@@ -270,6 +289,8 @@ class SettingsService extends Observer {
 		} else {
 			this.settings.contentSetAttr(branchName, value);
 		}
+
+		this.notify("", "updated");
 	};
 
 	privacy: IPrivacyAPI = {
@@ -306,9 +327,9 @@ class SettingsService extends Observer {
 		}
 	};
 
-	uploadChangedData = (cb?: Function) => {
+	uploadChangedData = () => {
 		if (!this.settings.isChanged()) {
-			return Bluebird.resolve(true).nodeify(cb);
+			return Bluebird.resolve(true)
 		}
 
 		var userService = require("users/userService").default;
@@ -323,8 +344,27 @@ class SettingsService extends Observer {
 				});
 			}).then((result: any) => {
 				return result.success;
-			}).nodeify(cb);
+			})
 	};
+
+	getBlockedUsers = (): blockedUserInfo[] => this.getBranch("safety").blockedUsers
+
+	setBlockedUsers = (blockedUsers: blockedUserInfo[]): Bluebird<any> => {
+		const safety = this.getBranch("safety")
+
+		this.updateBranch("safety", {
+			...safety,
+			blockedUsers
+		})
+
+		return this.uploadChangedData()
+	}
+
+	isBlockedSince = (userID: number, time: number) =>
+		!!this.getBlockedUsers().find(({ id, since }) => userID === id && since < time )
+
+	isBlocked = (userID: number) =>
+		!!this.getBlockedUsers().find(({ id }) => userID === id)
 
 	getPrivacyAttribute = (attr: any) => {
 		var b = this.getBranch("privacy"),

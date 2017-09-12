@@ -145,6 +145,7 @@ interface UserInterface {
 	acceptFriendShip: () => any
 	removeAsFriend: () => any
 	addAsFriend: () => any
+	isBlocked: () => boolean
 }
 
 type ProfilesType = {
@@ -206,18 +207,24 @@ class User implements UserInterface {
 
 		this.data.mutualFriends = this.mutualFriends
 
-		const shortname = this.getShortName()
-		const names = this.getName()
-
-		this.data.name = names.name
-		this.data.names = names
-
-		this.data.basic.shortname = shortname
+		this.setNames()
 
 		advancedBranches.map((branch) => {
 			this.data.advanced[branch] = this.getAdvancedAttribute(branch)
 		})
 	}
+
+	private setNames = () => {
+		const names = this.getName()
+
+		this.data.name = names.name
+		this.data.names = names
+
+		this.data.basic.shortname = names.shortname
+	}
+
+	isBlocked = () =>
+		settingsService.isBlocked(this.id)
 
 	private setData = () => {
 		this.data = {
@@ -287,6 +294,8 @@ class User implements UserInterface {
 				this.data.isMyFriend = friendsService.areFriends(this.getID())
 			})
 		})
+
+		settingsService.listen(() => this.setNames(), "updated")
 	}
 
 	generateNewFriendsKey = () => {
@@ -642,28 +651,11 @@ class User implements UserInterface {
 		return this.mail
 	}
 
-	private getShortName = () => {
+	private getSearchName = () => {
 		const basic = this.getProfileAttribute("basic") || {}
-		var nickname = this.getNickname()
+		const nickname = this.getNickname()
 
-		return basic.firstname || basic.lastname || nickname || ""
-	}
-
-	getName = () => {
-		const basic = this.getProfileAttribute("basic") || {}
-
-		var nickname = this.getNickname()
-
-		var searchNames = [nickname]
-
-		var name = ""
-		if (basic.firstname && basic.lastname) {
-			name = basic.firstname + " " + basic.lastname
-		} else if (basic.firstname || basic.lastname) {
-			name = basic.firstname || basic.lastname
-		} else if (nickname) {
-			name = nickname
-		}
+		const searchNames = [nickname]
 
 		if (basic.firstname) {
 			searchNames.push(basic.firstname)
@@ -673,12 +665,47 @@ class User implements UserInterface {
 			searchNames.push(basic.lastname)
 		}
 
+		return searchNames.join(" ")
+	}
+
+	private getLongName = () => {
+		const basic = this.getProfileAttribute("basic") || {}
+		const nickname = this.getNickname()
+
+		if (basic.firstname && basic.lastname) {
+			return basic.firstname + " " + basic.lastname
+		}
+
+		if (basic.firstname || basic.lastname) {
+			return basic.firstname || basic.lastname
+		}
+
+		return nickname
+	}
+
+	getName = () => {
+		const basic = this.getProfileAttribute("basic") || {}
+		const nickname = this.getNickname()
+
+		if (this.isBlocked()) {
+			return {
+				name: nickname,
+				originalName: this.getLongName(),
+				searchName: this.getSearchName(),
+				firstname: "",
+				lastname: "",
+				nickname: nickname,
+				shortname: nickname,
+			}
+		}
+
 		return {
-			name: name,
-			searchName: searchNames.join(" "),
+			name: this.getLongName(),
+			searchName: this.getSearchName(),
 			firstname: basic.firstname || "",
 			lastname: basic.lastname || "",
-			nickname: this.nickname || ""
+			nickname: nickname,
+			shortname: basic.firstname || basic.lastname || nickname
 		}
 	}
 
@@ -783,6 +810,8 @@ export class NotExistingUser implements UserInterface {
 			this.data.id = identifier
 		}
 	}
+
+	isBlocked = () => false
 
 	getID = () => -1
 	generateNewFriendsKey = () => Bluebird.reject(new Error("not my own user"))

@@ -14,6 +14,7 @@ const contactsService = require("../../lib/services/friendsService")
 import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
 import ChatLoader from "../../lib/messages/chat"
+import settings from "../../lib/services/settings.service"
 
 import errorService from "../../lib/services/error.service"
 
@@ -29,7 +30,8 @@ const getChatMemoizer = (chatID) => {
 			() => ChatLoader.getLoaded(chatID),
 			() => ChatLoader.getLoaded(chatID).getLatestChunk(),
 			() => ChatLoader.getLoaded(chatID).getLatestMessage(),
-			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs()
+			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs(),
+			() => settings.getBlockedUsers()
 		], (chat, latestChunkID, latestMessageID, unreadMessageIDs, previousValue) => {
 			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
 
@@ -38,6 +40,7 @@ const getChatMemoizer = (chatID) => {
 			info.id = chat.getID()
 			info.unread = chat.getUnreadMessageIDs().length > 0
 			info.unreadCount = chat.getUnreadMessageIDs().length
+			info.blocked = chat.isBlocked()
 
 			info.partners = latestChunk.getPartners()
 			info.partnersDisplay = latestChunk.getPartnerDisplay()
@@ -52,6 +55,7 @@ const getChatMemoizer = (chatID) => {
 
 				info.time = latestMessage.getTime()
 				info.latestMessageText = latestMessage.getText()
+				info.latestMessageBlocked = latestMessage.isBlocked()
 			}
 
 			return info
