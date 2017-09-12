@@ -40,9 +40,9 @@
 			</div>
 			<div class="profile__names">
 				<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
-				<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firtname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
+				<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firstname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
 			</div>
-			<ion-list class="profile__info-list space-for-fab" inset>
+			<ion-list class="profile__info-list space-for-fab" inset *ngIf="!isBlocked()">
 				<ion-item *ngIf="attributeSet(user.advanced.birthday)">
 					<ion-label fixed color="primaryDarker" text-right>{{ 'profile.birthday' | translate }}</ion-label>
 					<p item-content class="profile__info">{{user.advanced.birthday.day}}.<span *ngIf="user.advanced.birthday.month && user.advanced.birthday.month.length === 1">0</span>{{user.advanced.birthday.month}}.{{user.advanced.birthday.year}}</p>
