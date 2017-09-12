@@ -18,20 +18,9 @@
 				<user-image [hideBlocked]="false" [id]="contact.id" [image]="contact.basic.image"></user-image>
 			</ion-avatar>
 			<h2>
-				<strong *ngIf="contact.names.firstname">
-					{{contact.names.firstname}}
-				</strong>
-				<span *ngIf="contact.names.firstname && contact.names.lastname">
-					{{contact.names.lastname}}
+				<span>
+					{{contact.names.originalName}}
 				</span>
-				<strong
-					*ngIf="!contact.names.firstname && contact.names.lastname">
-					{{contact.names.lastname}}
-				</strong>
-				<strong
-					*ngIf="!contact.names.firstname && !contact.names.lastname">
-					{{contact.name}}
-				</strong>
 			</h2>
 		</ion-item>
 

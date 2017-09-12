@@ -651,21 +651,11 @@ class User implements UserInterface {
 		return this.mail
 	}
 
-	getName = () => {
+	private getSearchName = () => {
 		const basic = this.getProfileAttribute("basic") || {}
+		const nickname = this.getNickname()
 
-		var nickname = this.getNickname()
-
-		var searchNames = [nickname]
-
-		var name = ""
-		if (basic.firstname && basic.lastname) {
-			name = basic.firstname + " " + basic.lastname
-		} else if (basic.firstname || basic.lastname) {
-			name = basic.firstname || basic.lastname
-		} else if (nickname) {
-			name = nickname
-		}
+		const searchNames = [nickname]
 
 		if (basic.firstname) {
 			searchNames.push(basic.firstname)
@@ -675,24 +665,47 @@ class User implements UserInterface {
 			searchNames.push(basic.lastname)
 		}
 
+		return searchNames.join(" ")
+	}
+
+	private getLongName = () => {
+		const basic = this.getProfileAttribute("basic") || {}
+		const nickname = this.getNickname()
+
+		if (basic.firstname && basic.lastname) {
+			return basic.firstname + " " + basic.lastname
+		}
+
+		if (basic.firstname || basic.lastname) {
+			return basic.firstname || basic.lastname
+		}
+
+		return nickname
+	}
+
+	getName = () => {
+		const basic = this.getProfileAttribute("basic") || {}
+		const nickname = this.getNickname()
+
 		if (this.isBlocked()) {
 			return {
 				name: nickname,
-				searchName: searchNames.join(" "),
+				originalName: this.getLongName(),
+				searchName: this.getSearchName(),
 				firstname: "",
 				lastname: "",
-				nickname: nickname || "",
-				shortname: nickname || ""
+				nickname: nickname,
+				shortname: nickname,
 			}
 		}
 
 		return {
-			name,
-			searchName: searchNames.join(" "),
+			name: this.getLongName(),
+			searchName: this.getSearchName(),
 			firstname: basic.firstname || "",
 			lastname: basic.lastname || "",
-			nickname: nickname || "",
-			shortname: basic.firstname || basic.lastname || nickname || ""
+			nickname: nickname,
+			shortname: basic.firstname || basic.lastname || nickname
 		}
 	}
 
