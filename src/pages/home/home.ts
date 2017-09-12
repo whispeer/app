@@ -32,7 +32,7 @@ const getChatMemoizer = (chatID) => {
 			() => ChatLoader.getLoaded(chatID).getLatestMessage(),
 			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs(),
 			() => settings.getBlockedUsers()
-		], (chat, latestChunkID, latestMessageID, unreadMessageIDs, previousValue) => {
+		], (chat, latestChunkID, latestMessageID, unreadMessageIDs, blockedUsers, previousValue) => {
 			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
 
 			const info = previousValue || { id: chat.getID() }
