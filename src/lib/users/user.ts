@@ -207,17 +207,20 @@ class User implements UserInterface {
 
 		this.data.mutualFriends = this.mutualFriends
 
-		const shortname = this.getShortName()
+		this.setNames()
+
+		advancedBranches.map((branch) => {
+			this.data.advanced[branch] = this.getAdvancedAttribute(branch)
+		})
+	}
+
+	private setNames = () => {
 		const names = this.getName()
 
 		this.data.name = names.name
 		this.data.names = names
 
-		this.data.basic.shortname = shortname
-
-		advancedBranches.map((branch) => {
-			this.data.advanced[branch] = this.getAdvancedAttribute(branch)
-		})
+		this.data.basic.shortname = names.shortname
 	}
 
 	isBlocked = () =>
@@ -291,6 +294,8 @@ class User implements UserInterface {
 				this.data.isMyFriend = friendsService.areFriends(this.getID())
 			})
 		})
+
+		settingsService.listen(() => this.setNames(), "updated")
 	}
 
 	generateNewFriendsKey = () => {
@@ -646,13 +651,6 @@ class User implements UserInterface {
 		return this.mail
 	}
 
-	private getShortName = () => {
-		const basic = this.getProfileAttribute("basic") || {}
-		var nickname = this.getNickname()
-
-		return basic.firstname || basic.lastname || nickname || ""
-	}
-
 	getName = () => {
 		const basic = this.getProfileAttribute("basic") || {}
 
@@ -677,12 +675,24 @@ class User implements UserInterface {
 			searchNames.push(basic.lastname)
 		}
 
+		if (this.isBlocked()) {
+			return {
+				name: nickname,
+				searchName: searchNames.join(" "),
+				firstname: "",
+				lastname: "",
+				nickname: nickname || "",
+				shortname: nickname || ""
+			}
+		}
+
 		return {
-			name: name,
+			name,
 			searchName: searchNames.join(" "),
 			firstname: basic.firstname || "",
 			lastname: basic.lastname || "",
-			nickname: this.nickname || ""
+			nickname: nickname || "",
+			shortname: basic.firstname || basic.lastname || nickname || ""
 		}
 	}
 
