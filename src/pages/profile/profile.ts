@@ -156,7 +156,21 @@ export class ProfilePage {
 			return
 		}
 
-		return settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+		const blockConfirm = this.alertCtrl.create({
+			title: this.translate.instant("profile.contacts.blockConfirm.title"),
+			message: this.translate.instant("profile.contacts.blockConfirm.message"),
+			buttons: [{
+				text: this.translate.instant("profile.contacts.blockConfirm.cancel")
+			}, {
+				text: this.translate.instant("profile.contacts.blockConfirm.confirm"),
+				handler: () => {
+					settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+				}
+			}]
+		});
+
+		blockConfirm.setCssClass('logout-confirm');
+		blockConfirm.present();
 	}
 
 	unblock = () => settings.setBlockedUsers(settings.getBlockedUsers().filter(({ id }) => id !== this.userId))
@@ -433,13 +447,13 @@ export class ProfilePage {
 	}
 
 	report = () => {
-		let reportConfirm = this.alertCtrl.create({
+		const reportConfirm = this.alertCtrl.create({
 			title: this.translate.instant("profile.contacts.reportConfirm.title"),
 			message: this.translate.instant("profile.contacts.reportConfirm.message"),
 			buttons: [{
-				text: "Cancel"
+				text: this.translate.instant("profile.contacts.reportConfirm.cancel")
 			}, {
-				text: "Report",
+				text: this.translate.instant("profile.contacts.reportConfirm.confirm"),
 				handler: () => {
 					reportService.sendReport("user", this.user.id);
 				}
