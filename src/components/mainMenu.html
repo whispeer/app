@@ -1,8 +1,9 @@
 <ion-fab center bottom fixed #fab>
 	<div class="hexagon-wrap">
-		<hexagon class="hexagon hexagon--fab"></hexagon>
-		<button [mode]="'android'" (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)" class="hexagon__button" ion-fab color="light" clear>
-			<ion-icon name="{{icon}}"></ion-icon>
+		<hexagon class="hexagon"></hexagon>
+		<button ion-fab color="light" clear [mode]="'android'"
+			(press)="handleClick($event, fab)" (tap)="handleClick($event, fab)">
+			abc
 		</button>
 	</div>
 	<ion-fab-list side="top">
