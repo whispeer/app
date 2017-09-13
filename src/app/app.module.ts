@@ -145,6 +145,11 @@ export class AppModule {
 		fn()
 	}
 
+	disableContextMenues = () => {
+		// disable context menu, e.g., on long clicking the fab button.
+		window.addEventListener("contextmenu", e => e.preventDefault())
+	}
+
 	constructor(
 		private zone: NgZone,
 		private translate: TranslateService, // tslint:disable-line:no-unused-variable
@@ -153,6 +158,9 @@ export class AppModule {
 		private platform: Platform // tslint:disable-line:no-unused-variable
 	) {
 		translate.setDefaultLang("en");
+
+		// this used to be a huge problem with long click in chrome.
+		this.disableContextMenues()
 
 		platform.ready().then(() => {
 			this.globalization.getPreferredLanguage().then(({ value }) => {
