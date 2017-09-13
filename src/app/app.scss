@@ -51,48 +51,22 @@ main-menu[ion-fixed] {
 	width: 100%;
 }
 
-ion-spinner {
-	overflow: hidden;
-}
-
-ion-fab[fixed] {
-	position: fixed;
-}
-
 .has-main-menu .scroll-content {
 	padding-bottom: 100px;
 }
 
-ion-fab-list[side="top"] {
-	flex-direction: row;
-	margin-left: -21px;
-	margin-bottom: 73px;
-
-	button:first-child {
-		margin-right: 20px;
-	}
-
-	button:last-child {
-		margin-left: 20px;
-	}
-}
 
 .hexagon-wrap {
 	position: relative;
+	//background: red;
 }
 
 .hexagon {
-	height: 80px;
-
-	svg {
-		height: 80px;
-	}
-
 	.border {
 		fill: map-get($colors, primary);
 	}
 	.content {
-		fill: #fff;
+		fill: #f00;
 	}
 }
 
@@ -128,7 +102,10 @@ ion-fab-list[side="top"] {
 }
 
 .hexagon--fab {
-	padding: 4px;
+
+	font-size: 0;
+	display: block;
+
 	.hexagon__button {
 		width: 66px !important;
 		height: 77px !important;
@@ -375,6 +352,43 @@ ion-fab-list[side="top"] {
 
 	.inset {
 		background-color: $inset-color;
+	}
+}
+
+// -----------------------------------------------------------
+//								Ionic overrides
+// -----------------------------------------------------------
+
+ion-spinner {
+	overflow: hidden;
+}
+
+ion-fab[fixed] {
+	position: fixed;
+}
+
+ion-fab[center] {
+	// this overrides the ionic fab centering to use relative translation.
+  left: 50%;
+  margin-left: 0;
+  transform: translate(-50%);
+}
+
+ion-fab[bottom] {
+  bottom: 20px;
+}
+
+ion-fab-list[side="top"] {
+	flex-direction: row;
+	margin-left: -21px;
+	margin-bottom: 73px;
+
+	button:first-child {
+		margin-right: 20px;
+	}
+
+	button:last-child {
+		margin-left: 20px;
 	}
 }
 
