@@ -13,6 +13,7 @@ import { LoadComponent } from "./load"
 import { LoadingProgress } from "./loadingProgress"
 
 import { HexagonModule } from "./hexagonModule";
+import { MainMenuIconModule } from "./mainMenuIconModule";
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -29,6 +30,7 @@ import { TranslateModule } from '@ngx-translate/core';
 	],
 	imports: [
 		HexagonModule,
+		MainMenuIconModule,
 		IonicModule,
 		CommonModule,
 		TranslateModule.forChild(),
@@ -42,8 +44,8 @@ import { TranslateModule } from '@ngx-translate/core';
 		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
-
 		HexagonModule,
+		MainMenuIconModule,
 		CommonModule,
 	]
 })
