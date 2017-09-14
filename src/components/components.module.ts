@@ -12,8 +12,8 @@ import { ChooseFriends } from "./chooseFriends"
 import { LoadComponent } from "./load"
 import { LoadingProgress } from "./loadingProgress"
 
-import { HexagonModule } from "./hexagonModule";
-import { MainMenuIconModule } from "./mainMenuIconModule";
+import { HexagonComponent } from "./hexagon";
+import { MainMenuIcon} from "./mainMenuIcon";
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -27,13 +27,13 @@ import { TranslateModule } from '@ngx-translate/core';
 		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
+		HexagonComponent,
+		MainMenuIcon
 	],
 	imports: [
-		HexagonModule,
-		MainMenuIconModule,
 		IonicModule,
 		CommonModule,
-		TranslateModule.forChild(),
+		TranslateModule.forChild()
 	],
 	exports: [
 		ResponsiveDatePipe,
@@ -44,8 +44,8 @@ import { TranslateModule } from '@ngx-translate/core';
 		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
-		HexagonModule,
-		MainMenuIconModule,
+		HexagonComponent,
+		MainMenuIcon,
 		CommonModule,
 	]
 })
