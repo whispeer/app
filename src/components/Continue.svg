@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="17" height="17" viewBox="0 0 17 17">
+  <defs>
+    <rect id="continue-a" width="4847" height="4674" x="-56" y="-75"/>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <use fill="#F9F9FA" xlink:href="#continue-a"/>
+    <rect width="4845" height="4672" x="-55" y="-74" stroke="#D5D8DA" stroke-width="2"/>
+    <g fill="#A0A7AA">
+      <polygon points="4 2.034 6.034 0 14.846 8.813 6.034 17.625 4 15.591 10.779 8.813"/>
+    </g>
+  </g>
+</svg>

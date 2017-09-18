@@ -1,0 +1,84 @@
+.main-menu {
+
+	// 2px padding allow for better anti-aliasing of the button content,
+	// which currently is a circular SVG.
+	$anti-aliasing-compensation: 2px;
+
+	// some distance calibrations:
+	$main-menu-bottom-offset: 20px;
+	$lower-submenu-horizontal-distance: 28px;
+	$upper-submenu-vertical-offset: -77px;
+	$upper-submenu-horizontal-offset: 45px;
+
+	position: fixed;
+	padding: $anti-aliasing-compensation;
+	// 20px from bottom is hard coded, 18px compensates for above padding.
+	bottom: $main-menu-bottom-offset - $anti-aliasing-compensation;
+	left: 50%;
+	z-index: 10;
+	transform: translate(-50%);
+	font-size: 0;
+
+	.menu-icon {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		transform: translate(0, -50%);
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		border-radius: 50%;
+		background: transparent;
+
+		&:before {
+			content: "";
+			display: block;
+			padding-top: 100%; 	/* initial ratio of 1:1*/
+		}
+		> main-menu-icon {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			display: block;
+			font-size: 0
+		}
+	}
+
+	.sub-menu {
+		display: block
+		position: absolute;
+		top: 50%;
+		margin: 0;
+		font-size: 0;
+		border-radius: 50%;
+		background: transparent;
+		padding: $anti-aliasing-compensation;
+
+		// settings
+		&:nth-last-of-type(1) {
+			left: 100%;
+			transform: translate($lower-submenu-horizontal-distance - 2*$anti-aliasing-compensation, -50%);
+		}
+
+		// search
+		&:nth-last-of-type(2) {
+			right: 100%;
+			transform: translate(-1 * ($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation), -50%);
+		}
+
+		// contacts
+		&:nth-last-of-type(3) {
+			left: 100%;
+			transform: translate($lower-submenu-horizontal-distance - 2*$anti-aliasing-compensation, -50%) translate(-1 * $upper-submenu-horizontal-offset, $upper-submenu-vertical-offset);
+		}
+
+		// profile
+		&:nth-last-of-type(4) {
+			right: 100%;
+			transform: translate(-1 * ($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation), -50%) translate($upper-submenu-horizontal-offset, $upper-submenu-vertical-offset);
+		}
+	}
+
+
+}

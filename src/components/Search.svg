@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="whispeer/Submenu" transform="translate(0.000000, -77.000000)" fill="#FFFFFF">
+            <g id="Group" transform="translate(0.000000, 77.000000)">
+                <g id="whispeer/Overrides/Main-Menu/Submenu-green" fill-opacity="0.9">
+                    <circle id="bg-left" fill="#435259" cx="24" cy="24" r="24"></circle>
+                </g>
+                <text id="md-search---Ionicons-3-Copy-3" font-family="Ionicons-3" font-size="30" font-weight="normal">
+                    <tspan x="9" y="38"></tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,19 +1,71 @@
-<ion-fab center bottom fixed #fab>
-	<div class="hexagon-wrap">
-		<hexagon class="hexagon"></hexagon>
-		<button ion-fab color="light" clear [mode]="'android'"
-			(press)="handleClick($event, fab)" (tap)="handleClick($event, fab)">
-			<main-menu-icon></main-menu-icon>
-		</button>
-	</div>
-	<ion-fab-list side="top">
-		<button ion-fab color="dark" (click)="fabSideClick(fab, 'profile')"><ion-icon name="md-person"></ion-icon></button>
-		<button ion-fab color="dark" (click)="fabSideClick(fab, 'contacts')"><ion-icon name="md-people"></ion-icon></button>
-	</ion-fab-list>
-	<ion-fab-list side="left">
-		<button ion-fab color="dark" (click)="fabSideClick(fab, 'contacts', { search: true})"><ion-icon name="ios-search"></ion-icon></button>
-	</ion-fab-list>
-	<ion-fab-list side="right">
-		<button ion-fab color="dark" (click)="fabSideClick(fab, 'settings')"><ion-icon name="ios-settings"></ion-icon></button>
-	</ion-fab-list>
-</ion-fab>
+<div class="main-menu">
+	<hexagon></hexagon>
+	<button class="menu-icon" (press)="handleClick($event, fab)" (tap)="handleClick($event, fab)">
+		<main-menu-icon></main-menu-icon>
+	</button>
+	<button class="sub-menu" (click)="fabSideClick(fab, 'profile')">
+		<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+		    <title>Group 4</title>
+		    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+		        <g transform="translate(-45.000000, 0.000000)" fill="#FFFFFF">
+		            <g transform="translate(45.000000, 0.000000)">
+		                <g ifill-opacity="0.9">
+		                    <circle fill="#435259" cx="24" cy="24" r="24"></circle>
+		                </g>
+		                <text font-family="Ionicons-3" font-size="25" font-weight="normal">
+		                    <tspan x="11.5" y="34"></tspan>
+		                </text>
+		            </g>
+		        </g>
+		    </g>
+		</svg>
+	</button>
+	<button class="sub-menu" (click)="fabSideClick(fab, 'contacts')">
+		<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+		    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+		        <g transform="translate(-132.000000, 0.000000)" fill="#FFFFFF">
+		            <g transform="translate(132.000000, 0.000000)">
+		                <g fill-opacity="0.9">
+		                    <circle fill="#435259" cx="24" cy="24" r="24"></circle>
+		                </g>
+		                <text font-family="Ionicons-3" font-size="32" font-weight="normal">
+		                    <tspan x="8" y="37"></tspan>
+		                </text>
+		            </g>
+		        </g>
+		    </g>
+		</svg>
+	</button>
+	<button class="sub-menu" (click)="fabSideClick(fab, 'contacts', { search: true})">
+		<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+		    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+		        <g transform="translate(0.000000, -77.000000)" fill="#FFFFFF">
+		            <g transform="translate(0.000000, 77.000000)">
+		                <g fill-opacity="0.9">
+		                    <circle fill="#435259" cx="24" cy="24" r="24"></circle>
+		                </g>
+		                <text font-family="Ionicons-3" font-size="30" font-weight="normal">
+		                    <tspan x="9" y="38"></tspan>
+		                </text>
+		            </g>
+		        </g>
+		    </g>
+		</svg>
+	</button>
+	<button class="sub-menu" (click)="fabSideClick(fab, 'settings')">
+		<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+		    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+		        <g transform="translate(-177.000000, -77.000000)" fill="#FFFFFF">
+		            <g transform="translate(177.000000, 77.000000)">
+		                <g fill-opacity="0.9">
+		                    <circle fill="#435259" cx="24" cy="24" r="24"></circle>
+		                </g>
+		                <text font-family="Ionicons-3" font-size="30" font-weight="normal">
+		                    <tspan x="9" y="37"></tspan>
+		                </text>
+		            </g>
+		        </g>
+		    </g>
+		</svg>
+	</button>
+</div>
