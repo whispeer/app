@@ -1,27 +1,49 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
-import { NavController, FabContainer } from "ionic-angular";
+import { Component, Input, Output, EventEmitter } from "@angular/core"
+import { NavController, FabContainer } from "ionic-angular"
 
-import sessionService from "../lib/services/session.service";
+import sessionService from "../lib/services/session.service"
 
 @Component({
 	selector: "main-menu",
 	templateUrl: "mainMenu.html"
 })
 export class MainMenu {
-	@Input() icon: string = "md-add";
 
-	@Output() mainHandle = new EventEmitter();
+	@Input() icon: string = "plus"
 
-	constructor(private navCtrl: NavController) {};
+	@Output() mainHandle = new EventEmitter()
+
+	constructor(private navCtrl: NavController) {}
+
+	open = false
+
+
+	onTap = () => {
+		console.log('tap')
+		this.open = !this.open
+		if (this.open) {
+			console.log('and open')
+		} else {
+			console.log('and and close')
+		}
+	}
+
+	onPress = () => {
+		console.log('press')
+		if (!this.open) {
+			console.log('and open')
+			this.open = true;
+		}
+	}
 
 	handleClick = ($event: any, fab: FabContainer) => {
 		if($event.type === "press") {
-			fab.toggleList();
+			fab.toggleList()
 		} else {
 			if(fab._listsActive) {
-				fab.close();
+				fab.close()
 			} else {
-				this.mainHandle.emit();
+				this.mainHandle.emit()
 			}
 		}
 	}
@@ -29,21 +51,21 @@ export class MainMenu {
 	fabSideClick = (fab: FabContainer, what: string, params: any = {}) => {
 		switch (what) {
 			case "contacts":
-				this.navCtrl.push("Contacts", params);
-				break;
+				this.navCtrl.push("Contacts", params)
+				break
 			case "profile":
 				this.navCtrl.push("Profile", {
 					...params,
 					userId: sessionService.userid
-				});
-				break;
+				})
+				break
 			case "settings":
-				this.navCtrl.push("Settings", params);
-				break;
+				this.navCtrl.push("Settings", params)
+				break
 			default:
 				// code...
-				break;
+				break
 		}
-		fab.close();
+		fab.close()
 	}
 }

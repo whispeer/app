@@ -45,8 +45,36 @@
 		}
 	}
 
+	$fade-in-duration: .12s;
+	$individual-delay: .03s;
+
+	.icon {
+		visibility: visible;
+		&.close {
+			visibility: hidden;
+		}
+	}
+
+	&.open {
+			.icon {
+				visibility: hidden;
+				&.close {
+					visibility: visible;
+				}
+			}
+
+		.sub-menu:nth-of-type(n) {
+			visibility: visible;
+			opacity: 1;
+			transition: opacity $fade-in-duration linear;
+			&:nth-last-of-type(2) { transition-delay: 0 * $individual-delay; } // search
+			&:nth-last-of-type(4) { transition-delay: 1 * $individual-delay; } // profile
+			&:nth-last-of-type(3) { transition-delay: 2 * $individual-delay; } // contacts
+			&:nth-last-of-type(1) { transition-delay: 3 * $individual-delay; } // settings
+		}
+	}
+
 	.sub-menu {
-		display: block
 		position: absolute;
 		top: 50%;
 		margin: 0;
@@ -55,28 +83,36 @@
 		background: transparent;
 		padding: $anti-aliasing-compensation;
 
-		// settings
-		&:nth-last-of-type(1) {
-			left: 100%;
-			transform: translate($lower-submenu-horizontal-distance - 2*$anti-aliasing-compensation, -50%);
-		}
+		visibility: hidden;
+		opacity: 0;
+		transition: opacity $fade-in-duration linear, visibility 0s linear $fade-in-duration;
 
 		// search
 		&:nth-last-of-type(2) {
 			right: 100%;
 			transform: translate(-1 * ($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation), -50%);
-		}
-
-		// contacts
-		&:nth-last-of-type(3) {
-			left: 100%;
-			transform: translate($lower-submenu-horizontal-distance - 2*$anti-aliasing-compensation, -50%) translate(-1 * $upper-submenu-horizontal-offset, $upper-submenu-vertical-offset);
+			transition-delay: 0 * $individual-delay, $fade-in-duration + 0 * $individual-delay;
 		}
 
 		// profile
 		&:nth-last-of-type(4) {
 			right: 100%;
 			transform: translate(-1 * ($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation), -50%) translate($upper-submenu-horizontal-offset, $upper-submenu-vertical-offset);
+			transition-delay: 1 * $individual-delay, $fade-in-duration + 1 * $individual-delay;
+		}
+
+		// contacts
+		&:nth-last-of-type(3) {
+			left: 100%;
+			transform: translate($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation, -50%) translate(-1 * $upper-submenu-horizontal-offset, $upper-submenu-vertical-offset);
+			transition-delay: 2 * $individual-delay, $fade-in-duration + 2 * $individual-delay;
+		}
+
+		// settings
+		&:nth-last-of-type(1) {
+			left: 100%;
+			transform: translate($lower-submenu-horizontal-distance - 2*$anti-aliasing-compensation, -50%);
+			transition-delay: 3 * $individual-delay, $fade-in-duration + 3 * $individual-delay;
 		}
 	}
 
