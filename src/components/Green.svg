@@ -5,9 +5,9 @@
   </defs>
   <g fill="none" fill-rule="evenodd">
     <rect width="4845" height="4672" x="-258" y="-117" stroke="#D5D8DA" stroke-width="2"/>
-    <g>
+    <g transform="scale(1.02)">
       <use fill="#FFF" fill-opacity="0.95" xlink:href="#green-c"/>
-      <path stroke="#5AB70D" stroke-width="4" d="M36.5,2.30940108 L2,22.2279854 L2,62.0651539 L36.5,81.9837382 L71,62.0651539 L71,22.2279854 L36.5,2.30940108 Z"/>
     </g>
+    <path stroke="#5AB70D" stroke-width="4" d="M36.5,2.30940108 L2,22.2279854 L2,62.0651539 L36.5,81.9837382 L71,62.0651539 L71,22.2279854 L36.5,2.30940108 Z"/>
   </g>
 </svg>
