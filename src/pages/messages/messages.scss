@@ -536,6 +536,8 @@ topicWithBursts {
 
 		margin: 0 !important;
 
+		height: 30px; // default height to prevent jumping
+
 		&::-webkit-scrollbar {
 			display: none;
 		}
@@ -548,8 +550,11 @@ topicWithBursts {
 
 .ios__messages__send-message {
 	position: absolute;
-	right: 18px;
-	bottom: 7px;
+
+	// **BEFORE CHANGING:** please check the app on iOS if the values really fit!
+	// Chrome does **NOT** position the element the same way iOS does.
+	right: 20px;
+	bottom: 8px;
 
 	margin: 0 !important;
 
