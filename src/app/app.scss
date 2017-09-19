@@ -30,6 +30,18 @@ ion-avatar {
 	height: 36px;
 }
 
+ion-item-divider {
+	&.item-ios {
+		min-height: 0 !important;
+		height: 25px !important;
+	}
+
+	.label-ios {
+		font-size: 15px;
+		margin: auto !important;
+	}
+}
+
 .toolbar--search {
 	padding: 0 !important;
 	.searchbar-ios .searchbar-input {

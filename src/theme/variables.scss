@@ -106,6 +106,7 @@ $list-border-color: map-get($colors, other_grey);
 
 $list-ios-activated-background-color: $isabelline;
 
+$item-ios-divider-text-color: map-get($colors, dark);
 $item-ios-divider-background: map-get($colors, other_grey);
 $item-md-divider-background: map-get($colors, other_grey);
 $item-wp-divider-background: map-get($colors, other_grey);
