@@ -47,21 +47,38 @@
 
 	$fade-in-duration: .12s;
 	$individual-delay: .03s;
+	$icon-rotation: 60deg;
+	$icon-rotation-duration: .1s;
+	$icon-rotation-delay: 0;
 
 	.icon {
 		visibility: visible;
+		transform: none;
+		opacity: 1;
+		transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
+			transition-delay: $icon-rotation-delay;
 		&.close {
 			visibility: hidden;
+			opacity: 0;
+			transform: rotate(-1 * $icon-rotation) scale(.5);
+			transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
 		}
 	}
 
 	&.open {
-			.icon {
-				visibility: hidden;
-				&.close {
-					visibility: visible;
-				}
+		.icon {
+			visibility: hidden;
+			opacity: 0;
+			transform: rotate($icon-rotation) scale(.5);
+			transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
+			&.close {
+				visibility: visible;
+				opacity: 1;
+				transform: none;
+				transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
+				transition-delay: $icon-rotation-delay;
 			}
+		}
 
 		.sub-menu:nth-of-type(n) {
 			visibility: visible;
