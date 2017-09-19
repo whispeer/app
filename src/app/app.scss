@@ -32,6 +32,10 @@ ion-avatar {
 
 .toolbar--search {
 	padding: 0 !important;
+	.searchbar-ios .searchbar-input {
+		color: map-get($colors, other_grey);
+		background: rgba(3, 3, 3, 0.09);
+	}
 }
 
 .fill-primary, .fill-primaryDark, .fill-grey {
