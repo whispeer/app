@@ -48,5 +48,5 @@
 	</ion-list>
 	<ion-spinner *ngIf="searchResultsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 
-	<main-menu *ngIf="!saving && !loadingChat" [icon]="'arrow'" (invoke)="addReceivers()"></main-menu>
+	<main-menu *ngIf="!saving && !loadingChat" [icon]="'arrow'" (invoke)="addReceivers()" ion-fixed></main-menu>
 </ion-content>

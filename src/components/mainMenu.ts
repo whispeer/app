@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core"
-import { NavController, FabContainer } from "ionic-angular"
+import { NavController } from "ionic-angular"
 
 import sessionService from "../lib/services/session.service"
 

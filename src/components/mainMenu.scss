@@ -15,7 +15,7 @@
 	// 20px from bottom is hard coded, 18px compensates for above padding.
 	bottom: $main-menu-bottom-offset - $anti-aliasing-compensation;
 	left: 50%;
-	z-index: 10;
+	z-index: 100; // 99 is not enough.
 	transform: translate(-50%);
 	font-size: 0;
 
