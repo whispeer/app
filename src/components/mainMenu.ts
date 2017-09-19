@@ -11,61 +11,55 @@ export class MainMenu {
 
 	@Input() icon: string = "plus"
 
-	@Output() mainHandle = new EventEmitter()
+	@Output() invoke = new EventEmitter()
 
 	constructor(private navCtrl: NavController) {}
 
 	open = false
 
+	closeOnTouchEnd = false
 
 	onTap = () => {
-		console.log('tap')
-		this.open = !this.open
 		if (this.open) {
-			console.log('and open')
+			this.open = false
 		} else {
-			console.log('and and close')
+			this.invoke.emit()
 		}
 	}
 
 	onPress = () => {
-		console.log('press')
-		if (!this.open) {
-			console.log('and open')
+		if (this.open) {
+			this.closeOnTouchEnd = true
+		} else {
 			this.open = true;
 		}
 	}
 
-	handleClick = ($event: any, fab: FabContainer) => {
-		if($event.type === "press") {
-			fab.toggleList()
-		} else {
-			if(fab._listsActive) {
-				fab.close()
-			} else {
-				this.mainHandle.emit()
-			}
+	onTouchStart = (e) => {
+		console.log('touch start', e)
+	}
+
+	onTouchEnd = (e) => {
+		if (this.closeOnTouchEnd) {
+			this.open = false
+			this.closeOnTouchEnd = false
 		}
 	}
 
-	fabSideClick = (fab: FabContainer, what: string, params: any = {}) => {
-		switch (what) {
-			case "contacts":
-				this.navCtrl.push("Contacts", params)
-				break
-			case "profile":
-				this.navCtrl.push("Profile", {
-					...params,
-					userId: sessionService.userid
-				})
-				break
-			case "settings":
-				this.navCtrl.push("Settings", params)
-				break
-			default:
-				// code...
-				break
-		}
-		fab.close()
+	invokeProfile() {
+		const userId = sessionService.userid
+		this.navCtrl.push("Profile", { userId })
+	}
+
+	invokeContacts() {
+		this.navCtrl.push("Contacts")
+	}
+
+	invokeSearch() {
+		this.navCtrl.push("Contacts", { search: true })
+	}
+
+	invokeSettings() {
+		this.navCtrl.push("Settings")
 	}
 }
