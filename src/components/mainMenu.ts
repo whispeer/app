@@ -19,6 +19,11 @@ export class MainMenu {
 
 	closeOnTouchEnd = false
 
+	profileNode: Element = null
+	searchNode: Element = null
+	contactsNode: Element = null
+	settingsNode: Element = null
+
 	onTap = () => {
 		if (this.open) {
 			this.open = false
@@ -36,7 +41,28 @@ export class MainMenu {
 	}
 
 	onTouchStart = (e) => {
-		console.log('touch start', e)
+		let menu = e.target
+		while (menu && !menu.classList.contains('main-menu')) {
+			menu = menu.parentElement
+		}
+		if (menu) {
+			this.profileNode = menu.querySelectorAll('.sub-menu.profile')[0]
+			this.searchNode = menu.querySelectorAll('.sub-menu.search')[0]
+			this.contactsNode = menu.querySelectorAll('.sub-menu.contacts')[0]
+			this.settingsNode = menu.querySelectorAll('.sub-menu.settings')[0]
+		}
+	}
+
+	isOnSubmenu = (node, event) => {
+		const { left, top, width: diameter } = node.getBoundingClientRect()
+		const centerX = left + diameter / 2
+		const centerY = top + diameter / 2
+		for (let touch of event.changedTouches) {
+			const { clientX, clientY } = touch
+			const distance = Math.sqrt(Math.pow(centerX - clientX, 2) + Math.pow(centerY - clientY, 2))
+			if (distance < diameter / 2) return true
+		}
+		return false
 	}
 
 	onTouchEnd = (e) => {
@@ -44,6 +70,10 @@ export class MainMenu {
 			this.open = false
 			this.closeOnTouchEnd = false
 		}
+		if (this.isOnSubmenu(this.profileNode, e)) this.invokeProfile()
+		if (this.isOnSubmenu(this.searchNode, e)) this.invokeSearch()
+		if (this.isOnSubmenu(this.contactsNode, e)) this.invokeContacts()
+		if (this.isOnSubmenu(this.settingsNode, e)) this.invokeSettings()
 	}
 
 	invokeProfile() {
