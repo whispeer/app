@@ -45,43 +45,125 @@
 		}
 	}
 
+
+	// TODO There's a lot of duplication in this animations code. Tried to tidy it up once, but results were broken. Good luck!
+
 	$fade-in-duration: .12s;
 	$individual-delay: .03s;
-	$icon-rotation: 60deg;
-	$icon-rotation-duration: .1s;
-	$icon-rotation-delay: 0;
+	$icon-rotation: 45deg;
+	$icon-rotation-duration: .18s;
+	$outline-duration: .12s;
 
-	.icon {
-		visibility: visible;
-		transform: none;
-		opacity: 1;
-		transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
-		transition-delay: $icon-rotation-delay;
-	}
-
-	.secondary .icon.close {
-		visibility: hidden;
-		opacity: 0;
-		transform: rotate(-1 * $icon-rotation) scale(.5);
-		transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
-	}
-
-	&.open {
+	&.plus {
 		.icon {
-			visibility: hidden;
-			opacity: 0;
-			transform: rotate($icon-rotation) scale(.5);
-			transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
+			visibility: visible;
+			transform: none;
+			opacity: 1;
+			transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
 		}
 
 		.secondary .icon.close {
-			visibility: visible;
-			opacity: 1;
-			transform: none;
-			transition: opacity $icon-rotation-duration linear, transform $icon-rotation-duration ease, visibility $icon-rotation-duration linear;
-			transition-delay: $icon-rotation-delay;
+			visibility: hidden;
+			opacity: 0;
+			transform: rotate(-1 * $icon-rotation);
+			transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
 		}
 
+		&.open {
+			.icon {
+				visibility: hidden;
+				opacity: 0;
+				transform: rotate($icon-rotation);
+				transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+
+			.secondary .icon.close {
+				visibility: visible;
+				opacity: 1;
+				transform: none;
+				transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+		}
+	}
+
+	&.arrow {
+		$arrow-rotation: 90deg;
+
+		.icon {
+			visibility: visible;
+			transform: none;
+			opacity: 1;
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		.secondary .icon.close {
+			visibility: hidden;
+			opacity: 0;
+			transform: rotate(-1 * $arrow-rotation);
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		&.open {
+			.icon {
+				visibility: hidden;
+				opacity: 0;
+				transform: rotate($arrow-rotation);
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+
+			.secondary .icon.close {
+				visibility: visible;
+				opacity: 1;
+				transform: none;
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+		}
+	}
+
+	&.close {
+		$arrow-rotation: 90deg;
+
+		.icon {
+			visibility: visible;
+			transform: none;
+			opacity: 1;
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		.secondary .icon.close {
+			visibility: hidden;
+			opacity: 0;
+			transform: rotate(-1 * $arrow-rotation);
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		&.open {
+			.icon {
+				visibility: hidden;
+				opacity: 0;
+				transform: rotate($arrow-rotation);
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+
+			.secondary .icon.close {
+				visibility: visible;
+				opacity: 1;
+				transform: none;
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+		}
+	}
+
+
+	&.open {
 		.sub-menu:nth-of-type(n) {
 			visibility: visible;
 			opacity: 1;
@@ -105,6 +187,27 @@
 		visibility: hidden;
 		opacity: 0;
 		transition: opacity $fade-in-duration linear, visibility 0s linear $fade-in-duration;
+
+		svg { position: relative }
+
+		.outline {
+			position: absolute;
+			width: 0;
+			height: 0;
+			left: 50%;
+			top: 50%;
+			border-radius: 50%;
+			opacity: .2;
+			background: #7ab50d;
+			//background: #013c4c;
+			transform: translate(-50%, -50%);
+			transition: width $outline-duration, height $outline-duration;
+			transition-timing-function: cubic-bezier(0.175,  0.885, 0.320, 1.275)
+		}
+		&.active .outline {
+			width: 150%;
+			height: 150%;
+		}
 
 		// search
 		&:nth-last-of-type(2) {

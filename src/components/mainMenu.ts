@@ -60,20 +60,40 @@ export class MainMenu {
 		for (let touch of event.changedTouches) {
 			const { clientX, clientY } = touch
 			const distance = Math.sqrt(Math.pow(centerX - clientX, 2) + Math.pow(centerY - clientY, 2))
-			if (distance < diameter / 2) return true
+			if (distance < ( diameter / 2 ) * 1.5) return true
 		}
 		return false
 	}
 
 	onTouchEnd = (e) => {
+		const nodes = [this.profileNode, this.contactsNode, this.settingsNode, this.searchNode]
+		for (let node of nodes ) {
+			node.classList.remove('active')
+		}
+
+		if (this.open) {
+			if (this.isOnSubmenu(this.profileNode, e)) this.invokeProfile()
+			if (this.isOnSubmenu(this.searchNode, e)) this.invokeSearch()
+			if (this.isOnSubmenu(this.contactsNode, e)) this.invokeContacts()
+			if (this.isOnSubmenu(this.settingsNode, e)) this.invokeSettings()
+		}
 		if (this.closeOnTouchEnd) {
 			this.open = false
 			this.closeOnTouchEnd = false
 		}
-		if (this.isOnSubmenu(this.profileNode, e)) this.invokeProfile()
-		if (this.isOnSubmenu(this.searchNode, e)) this.invokeSearch()
-		if (this.isOnSubmenu(this.contactsNode, e)) this.invokeContacts()
-		if (this.isOnSubmenu(this.settingsNode, e)) this.invokeSettings()
+	}
+
+	onTouchMove = (e) => {
+		if (this.open) {
+			for (let node of [this.profileNode, this.contactsNode, this.settingsNode, this.searchNode]) {
+				if (this.isOnSubmenu(node, e)) {
+					node.classList.add('active')
+				} else {
+					node.classList.remove('active')
+				}
+			}
+		}
+		e.preventDefault()
 	}
 
 	invokeProfile() {
