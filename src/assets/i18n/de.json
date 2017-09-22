@@ -58,6 +58,10 @@
 				"title": "Diesen Chat melden?",
 				"message": "Bitte bestätige, dass du diesen Chat melden möchtest. Wir setzen uns dann mit dir in Verbindung."
 			}
+		},
+		"add": {
+			"title": "Kontate hinzufügen",
+			"selectedExplain": "Above contacts will be added to the conversation."
 		}
 	},
 	"chooseFriends": {
@@ -65,8 +69,7 @@
 		"selected": "Ausgewählt",
 		"search": "Suche",
 		"selectedContacts": "Ausgewählte Kontakte",
-		"selectedExplain": "Above contacts will be added to the new conversation.<br>You can later manage all members and add more.",
-		"selectedExplainAdd": "Above contacts will be added to the conversation."
+		"selectedExplain": "Above contacts will be added to the new conversation.<br>You can later manage all members and add more."
 	},
 	"settings": {
 		"title": "Einstellungen",

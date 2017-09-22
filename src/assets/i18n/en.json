@@ -58,6 +58,10 @@
 				"title": "Report this chat?",
 				"message": "Please confirm that you want to report this chat. We'll then get in touch with you."
 			}
+		},
+		"add": {
+			"title": "Add more contacts",
+			"selectedExplain": "Above contacts will be added to the conversation."
 		}
 	},
 	"chooseFriends": {
