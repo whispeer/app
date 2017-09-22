@@ -15,6 +15,15 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
+ion-app.ios {
+	// enforce SF Font in Chrome
+	font-family: -apple-system, "SF UI Text", "Helvetica Neue", "Roboto", sans-serif;
+}
+
+b, strong {
+	font-weight: 500;
+}
+
 chooseFriends, page-add {
 	ion-content {
 		background-color: map-get($colors, light_grey) !important;
