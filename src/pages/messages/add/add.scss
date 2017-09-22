@@ -18,3 +18,35 @@ page-add {
 		}
 	}
 }
+
+.checkbox__label--user {
+	display: flex;
+	align-items: center;
+	margin: auto;
+	height: 43px;
+
+	ion-avatar {
+		width: 36px;
+		height: 36px;
+
+		user-image {
+			display: inline-block;
+			height: 100%;
+			width: 100%;
+
+			svg {
+				height: 100%;
+			}
+		}
+	}
+}
+
+.checkbox__label--user-selected {
+	ion-avatar {
+		opacity: 0.6;
+	}
+
+	.checkbox__label__username {
+		color: map-get($colors, dark_grey);
+	}
+}
