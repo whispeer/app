@@ -5,6 +5,11 @@ blocked-users {
 	ion-list.list-ios {
 		margin-bottom: 0;
 	}
+
+	ion-avatar {
+		width: 36px;
+		height: 45px;
+	}
 }
 
 .explanation {
@@ -12,4 +17,3 @@ blocked-users {
 	padding-right: 15px;
 	font-size: 13px;
 }
-
