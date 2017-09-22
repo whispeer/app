@@ -1,5 +1,5 @@
 <div class="main-menu" [ngClass]="{'open': open, 'plus': icon === 'plus', 'arrow': icon === 'arrow', 'close': icon === 'close' }">
-	<hexagon></hexagon>
+	<main-menu-hexagon></main-menu-hexagon>
 	<button class="menu-icon" (press)="onPress()" (tap)="onTap()" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)" (touchmove)="onTouchMove($event)">
 		<main-menu-icon [icon]="icon"></main-menu-icon>
 		<main-menu-icon [icon]="'close'" class="secondary"></main-menu-icon>

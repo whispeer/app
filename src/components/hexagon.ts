@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 
 @Component({
 	selector: "hexagon",
-	templateUrl: "Green.svg"
+	templateUrl: "hexagon.svg"
 })
 export class HexagonComponent {
 	constructor() {};
