@@ -526,6 +526,8 @@ topicWithBursts {
 	height: auto;
 	min-height: 30px !important;
 
+	padding-left: 11.5px;
+
 	.input-wrapper {
 		align-items: flex-end;
 	}
@@ -574,8 +576,14 @@ topicWithBursts {
 .messages__form__button-wrap {
 	display: flex;
 
+	padding-left: 11.5px;
+
 	button {
 		height: 30px !important;
+
+		ion-icon {
+			padding: 0 11.5px;
+		}
 	}
 }
 
