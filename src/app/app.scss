@@ -53,9 +53,21 @@ ion-item-divider {
 
 .toolbar--search {
 	padding: 0 !important;
-	.searchbar-ios .searchbar-input {
-		color: map-get($colors, other_grey);
-		background: rgba(3, 3, 3, 0.09);
+	.searchbar-ios {
+		// ionic overwrites the colors we set for the
+		// searchbar when it is placed inside a toolbar
+		// and does not provide options for that
+		.searchbar-search-icon {
+			@include ios-searchbar-icon($searchbar-ios-input-search-icon-svg, $searchbar-ios-input-search-icon-color);
+		}
+
+		.searchbar-clear-icon {
+			@include ios-searchbar-icon($searchbar-ios-input-clear-icon-svg, $searchbar-ios-input-clear-icon-color);
+		}
+
+		.searchbar-input {
+			background: rgba(3, 3, 3, 0.09);
+		}
 	}
 }
 
