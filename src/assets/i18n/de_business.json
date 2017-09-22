@@ -21,28 +21,29 @@
 		"password2Placeholder": "Bitte Passwort erneut eingeben",
 		"passwordPlaceholder": "Bitte Passwort eingeben",
 		"identifierPlaceholder": "Bitte Nutzernamen eingeben",
-		"tos": "Mit der Anmeldung akzeptieren Sie die <strong>Nutzungsbedingungen</strong> und unsere <strong>Datenschutzbestimmungen</strong>",
+		"tos": "Mit der Anmeldung akzeptieren Sie die <strong><a href='https://whispeer.de/de/agb' target='_blank'>Nutzungsbedingungen</a></strong> und <strong><a href='https://whispeer.de/en/privacyPolicy' target='_blank'>Datenschutzbestimmungen</a></strong>.",
 		"header": "<strong>Hallo</strong> und willkommen in <br>der Welt der sicheren Kommunikation!",
 		"messages": {
 			"defaultCallToAction": "<em>Neu registrieren</em> oder <em>einfach anmelden...</em>",
 			"loginSuccess": "<em>Yeah!</em> Wir melden Sie jetzt sicher an...",
-			"ambiguousProcess": "Dieser Nutzername existiert. <em>Sie können <br>die Anmeldung einfach fortsetzen</em> oder <br>einen <em>anderen Nutzernamen registrieren.</em>",
-			"incorrectPassword": "<em>Ihr Passwort</em> ist inkorrekt. <br>Bitte versuchen Sie es erneut.",
-			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> <br>Wählen Sie nun ein sicheres Passwort...",
+			"ambiguousProcess": "Dieser Nutzername existiert. <em>Sie können die Anmeldung einfach fortsetzen</em> oder einen <em>anderen Nutzernamen registrieren.</em>",
+			"incorrectPassword": "<em>Ihr Passwort</em> ist inkorrekt. Bitte versuchen Sie es erneut.",
+			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> Wählen Sie nun ein sicheres Passwort...",
 			"confirmPassword": "Sehr gut! Bitte <em>wiederholen Sie Ihre Passworteingabe...</em>",
-			"registerSuccess": "<em>Willkommen an Bord!</em> <br>Wir melden Sie jetzt sicher an...",
-			"invalidUsername": "<em>A-Z a-z 0-9</em> sind in Nutzernamen erlaubt. <br>Leer- und Sonderzeichen sind es nicht.",
+			"registerSuccess": "<em>Willkommen an Bord!</em> Wir melden Sie jetzt sicher an...",
+			"invalidUsername": "<em>A-Z a-z 0-9</em> sind in Nutzernamen erlaubt. Leer- und Sonderzeichen sind es nicht.",
 			"passwordsDontMatch": "Ihr <em>wiederholtes Passwort</em> stimmt nicht überein.",
 			"genericErrorMessage": "Etwas ist schief gelaufen. Starten Sie bitte neu.",
 			"noConnection": "Keine Verbindung zu whispeer.",
-			"passwordTooShort": "Ihr Passwort ist <em>zu kurz</em>. Es sollte <br>mindestens 8 Zeichen enthalten."
+			"passwordTooShort": "Ihr Passwort ist <em>zu kurz</em>. Es sollte mindestens 8 Zeichen enthalten."
 		},
 		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>",
 		"businessUser": "Doch kein Privatnutzer? <em>Wechsel zu Business</em>"
 	},
 	"contacts": {
 		"title": "Kontakte",
-		"search": "Suche"
+		"search": "Suche",
+		"searchResultExplain": "Falls Sie die gewünschte Person nicht finden können, versuchen Sie nach deren Nutzernamen zu suchen."
 	},
 	"requests": {
 		"title": "Kontaktanfragen"
@@ -50,17 +51,27 @@
 	"topic": {
 		"takePhoto": "Foto aufnehmen",
 		"selectGallery": "Aus Galerie auswählen",
-		"changed": "hat den Titel geändert zu"
+		"changed": "änderte den Titel zu",
+		"detail": {
+			"reportTopic": "Diesen Chat melden",
+			"reportConfirm": {
+				"title": "Diesen Chat melden?",
+				"message": "Bitte bestätigen Sie, dass Sie diesen Chat melden möchten. Wir setzen uns dann mit Ihnen in Verbindung."
+			}
+		}
 	},
 	"chooseFriends": {
 		"title": "Kontakte auswählen",
 		"selected": "Ausgewählt",
-		"search": "Suche"
+		"search": "Suche",
+		"selectedContacts": "Ausgewählte Kontakte",
+		"selectedExplain": "Oben genannte Kontakte werden zur neuen Konversation hinzugefügt. Sie können sie danach noch verwalten und weitere hinzufügen.",
+		"selectedExplainAdd": "Oben genannte Kontakte werden zur aktuellen Konversation hinzugefügt."
 	},
 	"settings": {
 		"title": "Einstellungen",
 		"header": "App Einstellungen",
-		"push": "Push-Benachrichtigungen erhalten",
+		"push": "Erhalte Push-Benachrichtigungen",
 		"tutorial": "Tutorial neustarten",
 		"about": "Über whispeer",
 		"tos": "Nutzungsbedingungen",
@@ -72,7 +83,13 @@
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Möchten Sie Ihr Konto auf diesem Gerät abmelden?"
+		"logoutWarning": "Möchten Sie sich auf diesem Gerät abmelden?",
+		"blocked": "Blockierte Nutzer"
+	},
+	"blocked": {
+		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Sie können sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken.",
+		"title": "Blockiert",
+		"messageReplacement": "- blockierter Inhalt -"
 	},
 	"profile": {
 		"ownTitle": "Profil",
@@ -82,10 +99,24 @@
 		"birthday": "Geburtstag",
 		"location": "Ort",
 		"languages": "Sprache",
-		"verify": "Diesen Kontakt verifizieren",
-		"idTitle": "Ihre ID<br/> als Text",
-		"idExplanation": "Das ist Ihre persönliche und einzigartige ID auf whispeer. Diese brauchen Sie, <span class='text-primary'>um Kontakte zu verifizieren</span>—für die extra Portion Sicherheit! <br><br>Diese scannen Ihre ID, Sie scannen deren IDs und Sie beide haben Ihre Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
+		"verify": {
+			"action": "Diesen Nutzer verifizieren",
+			"success": {
+				"heading": "Nutzer verifiziert",
+				"body": "Dieser Nutzer wurde erfolgreich verifiziert. Der Nutzer sollte Sie ebenfalls verifizieren, um die höchstmögliche Sicherheit zu gewährleisten.",
+				"action": "Meine ID anzeigen"
+			},
+			"fail": {
+				"heading": "Etwas ist schief gelaufen",
+				"body": "Der gescannte QR-Code stimmt nicht mit dem Nutzer überein. Versuchen Sie es bitte noch einmal.",
+				"action": "Wiederholen"
+			}
+		},
+		"idTitle": "Ihre ID <br>als Text",
+		"idExplanation": "Dies ist Ihre persönliche und einzigartige ID auf whispeer. Diese brauchen Sie, <span class='text-primary'>um Kontakte zu verifizieren</span> – für die extra Portion Sicherheit! <br><br>Die Nutzer scannen Ihre ID, Sie scannen deren IDs und Sie beide haben Ihre Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
 		"contacts": {
+			"blockContact": "Diesen Nutzer blockieren",
+			"unblockContact": "Diesen Nutzer entblocken",
 			"accepted": "Akzeptiert!",
 			"requestSent": "Anfrage gesendet!",
 			"acceptRequest": "Anfrage annehmen?",
@@ -99,7 +130,20 @@
 			"removeQuestion": "Möchten Sie {{name}} wirklich aus Ihren Kontakten entfernen?",
 			"removeConfirmButtonText": "Entfernen",
 			"acceptedMessage": "{{name}} ist nun Ihr Kontakt.",
-			"requestSentMessage": "Sie haben eine Kontaktanfrage an {{name}} gesendet."
+			"requestSentMessage": "Sie haben eine Kontaktanfrage an {{name}} gesendet.",
+			"reportContact": "Diesen Nutzer melden",
+			"blockConfirm": {
+				"title": "Diesen Nutzer blockieren?",
+				"message": "Blockieren schützt Sie vor allem, was dieser Nutzer Ihnen sendet. Sie werden nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.",
+				"cancel": "Abbrechen",
+				"confirm": "Blockieren"
+			},
+			"reportConfirm": {
+				"title": "Diesen Nutzer melden?",
+				"message": "Bitte bestätigen Sie, dass Sie diesen Nutzer melden möchten. Wir setzen uns dann mit Ihnen in Verbindung.",
+				"cancel": "Abbrechen",
+				"confirm": "Melden"
+			}
 		},
 		"image": {
 			"view": "Bild ansehen",
@@ -115,7 +159,7 @@
 		"title": "Hey! Sie scheinen noch kein Geschäftskunde zu sein...",
 		"text": "whispeer bringt die sicherste Art verschlüsselter Kommunikation in die professionelle Welt - für Sie und Ihr Unternehmen. Jetzt testen!",
 		"callToAction": "Rufen Sie uns gerne an:",
-		"finePrint": "Deutsche Festnetznummer.<br>Es können Anrufgebühren anfallen.",
+		"finePrint": "Deutsche Festnetznummer. Es können Anrufgebühren anfallen.",
 		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>"
 	}
 }

@@ -21,28 +21,29 @@
 		"password2Placeholder": "Please type your password again",
 		"passwordPlaceholder": "Enter a password",
 		"identifierPlaceholder": "Enter an username",
-		"tos": "By signing up you agree to our <strong>Terms of Service</strong> <br>and our very strict <strong>Privacy Policy</strong>.",
-		"header": "<strong>Hello</strong> and welcome to<br>the world of secure messaging!",
+		"tos": "By signing up you agree to our <strong><a href='https://whispeer.de/en/agb' target='_blank'>Terms of Service</a></strong> and our very strict <strong><a href='https://whispeer.de/en/privacyPolicy' target='_blank'>Privacy Policy</a></strong>.",
+		"header": "<strong>Hello</strong> and welcome to <br>the world of secure messaging!",
 		"messages": {
 			"defaultCallToAction": "<em>Create a new account</em> or <em>simply login...</em>",
 			"loginSuccess": "<em>Success!</em> We'll log you in securely now...",
-			"ambiguousProcess": "This username exists. You can choose to <br><em>continue logging in</em> or <em>register an unique name.</em>",
+			"ambiguousProcess": "This username exists. You can choose to <em>continue logging in</em> or <em>register an unique name.</em>",
 			"incorrectPassword": "<em>Your password</em> is incorrect. Please try again.",
-			"registerMessage": "<em>This username is free.</em> <br>You can continue to choose a secure password...",
+			"registerMessage": "<em>This username is free.</em> You can continue to choose a secure password...",
 			"confirmPassword": "<em>Great!</em> Now verify your new password...",
-			"registerSuccess": "<em>Welcome on board!</em> <br>We'll log you in securely now...",
-			"invalidUsername": "<em>A-Z a-z 0-9</em> are allowed for usernames. <br>Special characters and spaces are not.",
+			"registerSuccess": "<em>Welcome on board!</em> We'll log you in securely now...",
+			"invalidUsername": "<em>A-Z a-z 0-9</em> are allowed for usernames. Special characters and spaces are not.",
 			"passwordsDontMatch": "<em>Your repeated password</em> does not match.",
 			"genericErrorMessage": "Something went wrong. Please start over.",
 			"noConnection": "No connection to whispeer.",
-			"passwordTooShort": "Your password is <em>too short</em>. <br>It should consist of 8 characters minimum."
+			"passwordTooShort": "Your password is <em>too short</em>. It should consist of 8 characters minimum."
 		},
 		"privateUser": "Not a Business User? <em>Switch to Private</em>",
 		"businessUser": "Not a Private User? <em>Switch to Business</em>"
 	},
 	"contacts": {
 		"title": "Contacts",
-		"search": "Search"
+		"search": "Search",
+		"searchResultExplain": "If you cannot find who you are looking for, try searching for their username."
 	},
 	"requests": {
 		"title": "Contact Requests"
@@ -50,12 +51,22 @@
 	"topic": {
 		"takePhoto": "Take a Photo",
 		"selectGallery": "Select from Gallery",
-		"changed": "changed the title to"
+		"changed": "changed the title to",
+		"detail": {
+			"reportTopic": "Report this Chat",
+			"reportConfirm": {
+				"title": "Report this Chat?",
+				"message": "Please confirm that you want to report this chat. We will then get in touch with you."
+			}
+		}
 	},
 	"chooseFriends": {
 		"title": "Select Contacts",
 		"selected": "Selected",
-		"search": "Search"
+		"search": "Search",
+		"selectedContacts": "Selected Contacts",
+		"selectedExplain": "Above contacts will be added to the new conversation. You can later manage all members and add more.",
+		"selectedExplainAdd": "Above contacts will be added to this conversation."
 	},
 	"settings": {
 		"title": "Settings",
@@ -64,7 +75,7 @@
 		"tutorial": "Restart Tutorial",
 		"about": "About whispeer",
 		"tos": "Terms of Service",
-		"privacy": "Privacy policy",
+		"privacy": "Privacy Policy",
 		"contact": "Contact us",
 		"feedback": "Give us Feedback",
 		"logout": "Logout",
@@ -72,7 +83,13 @@
 		"madeInGermany": "Made in Germany with",
 		"humanRights": "for human rights",
 		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
-		"logoutWarning": "Do you want to log out from this device?"
+		"logoutWarning": "Do you want to log out from this device?",
+		"blocked": "Blocked Users"
+	},
+	"blocked": {
+		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",
+		"title": "Blocked Users",
+		"messageReplacement": "- blocked content -"
 	},
 	"profile": {
 		"ownTitle": "Profile",
@@ -82,10 +99,24 @@
 		"birthday": "Birthday",
 		"location": "Location",
 		"languages": "Language",
-		"verify": "Verify this Contact",
-		"idTitle": "Your ID<br/> as a text",
-		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with Contacts</span>—for extra security! <br><br>They scan your ID, you scan their IDs and both of you easily increased your security measures again. Cool, huh?",
+		"verify": {
+			"action": "Verify this User",
+			"success": {
+				"heading": "Contact verified",
+				"body": "This contact is now verified. This contact should also verify you, to ensure the highest level of security.",
+				"action": "Show my ID"
+			},
+			"fail": {
+				"heading": "Something went wrong",
+				"body": "The scanned QR-Code does not match this user. Simply try it again.",
+				"action": "Try again"
+			}
+		},
+		"idTitle": "Your ID <br>as a text",
+		"idExplanation": "This is your personal and unique ID on whispeer. You need this <span class='text-primary'>to verify with Contacts</span> — for extra security! <br><br>They scan your ID, you scan their IDs and both of you easily increased your security measures again. Cool, huh?",
 		"contacts": {
+			"blockContact": "Block this User",
+			"unblockContact": "Unblock this User",
 			"accepted": "Accepted!",
 			"requestSent": "Request sent!",
 			"acceptRequest": "Accept this Request?",
@@ -99,7 +130,20 @@
 			"removeQuestion": "Are you sure that you want to remove {{name}} from your Contacts?",
 			"removeConfirmButtonText": "Remove",
 			"acceptedMessage": "{{name}} is now a Contact.",
-			"requestSentMessage": "You've sent a Contact Request to {{name}}."
+			"requestSentMessage": "You've sent a Contact Request to {{name}}.",
+			"reportContact": "Report this User",
+			"blockConfirm": {
+				"title": "Block this User?",
+				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.",
+				"cancel": "Cancel",
+				"confirm": "Block"
+			},
+			"reportConfirm": {
+				"title": "Report this User?",
+				"message": "Please confirm that you want to report this user. We will get in touch with you.",
+				"cancel": "Cancel",
+				"confirm": "Report"
+			}
 		},
 		"image": {
 			"view": "View Picture",
@@ -112,8 +156,8 @@
 		}
 	},
 	"sales": {
-		"title": "Hey! It seems like you<br/>aren't a Business User yet...",
-		"text": "whispeer brings the most secure way of <em>encrypted communication</em> to the professional world - for you and<br>your company. Try it now!",
+		"title": "Hey! It seems like you aren't a Business User yet...",
+		"text": "whispeer brings the most secure way of <em>encrypted communication</em> to the professional world - for you and your company. Try it now!",
 		"callToAction": "For more details please call:",
 		"finePrint": "German landline. Charges may apply.",
 		"privateUser": "Not a Business User? <em>Switch to Private</em>"

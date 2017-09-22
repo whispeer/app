@@ -26,16 +26,16 @@
 		"messages": {
 			"defaultCallToAction": "<em>Neu registrieren</em> oder <em>einfach anmelden...</em>",
 			"loginSuccess": "<em>Yeah!</em> Wir melden dich jetzt sicher an...",
-			"ambiguousProcess": "Dieser Nutzername existiert. Du kannst <br>die <em>Anmeldung einfach fortsetzen</em> oder <br>einen <em>anderen Nutzernamen registrieren.</em>",
-			"incorrectPassword": "<em>Dein Passwort</em> ist inkorrekt. <br>Bitte versuche es erneut.",
-			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> <br>Wähle nun ein sicheres Passwort...",
+			"ambiguousProcess": "Dieser Nutzername existiert. Du kannst die <em>Anmeldung einfach fortsetzen</em> oder einen <em>anderen Nutzernamen registrieren.</em>",
+			"incorrectPassword": "<em>Dein Passwort</em> ist inkorrekt. Bitte versuche es erneut.",
+			"registerMessage": "<em>Dieser Nutzername ist verfügbar.</em> Wähle nun ein sicheres Passwort...",
 			"confirmPassword": "Sehr gut! Bitte <em>wiederhole deine Passworteingabe</em>...",
-			"registerSuccess": "<em>Willkommen an Bord!</em> <br>Wir melden dich jetzt sicher an...",
-			"invalidUsername": "<em>A-Z a-z 0-9</em> sind in Nutzernamen erlaubt. <br>Leer- und Sonderzeichen sind es nicht.",
+			"registerSuccess": "<em>Willkommen an Bord!</em> Wir melden dich jetzt sicher an...",
+			"invalidUsername": "<em>A-Z a-z 0-9</em> sind in Nutzernamen erlaubt. Leer- und Sonderzeichen sind es nicht.",
 			"passwordsDontMatch": "Dein <em>wiederholtes Passwort</em> stimmt nicht überein.",
 			"genericErrorMessage": "Etwas ist schief gelaufen. Starte bitte neu.",
 			"noConnection": "Keine Verbindung zu whispeer.",
-			"passwordTooShort": "Dein Passwort ist <em>zu kurz</em>. Es sollte <br>mindestens 8 Zeichen enthalten."
+			"passwordTooShort": "Dein Passwort ist <em>zu kurz</em>. Es sollte mindestens 8 Zeichen enthalten."
 		},
 		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>",
 		"businessUser": "Doch kein Privatnutzer? <em>Wechsel zu Business</em>"
@@ -43,7 +43,7 @@
 	"contacts": {
 		"title": "Kontakte",
 		"search": "Suche",
-		"searchResultExplain": "If you cannot find who you are looking for, try searching for their username."
+		"searchResultExplain": "Falls du die gewünschte Person nicht finden kannst, versuche nach deren Nutzernamen zu suchen."
 	},
 	"requests": {
 		"title": "Kontaktanfragen"
@@ -51,7 +51,7 @@
 	"topic": {
 		"takePhoto": "Foto aufnehmen",
 		"selectGallery": "Aus Galerie auswählen",
-		"changed": "hat den Titel geändert zu",
+		"changed": "änderte den Titel zu",
 		"detail": {
 			"reportTopic": "Diesen Chat melden",
 			"reportConfirm": {
@@ -65,8 +65,8 @@
 		"selected": "Ausgewählt",
 		"search": "Suche",
 		"selectedContacts": "Ausgewählte Kontakte",
-		"selectedExplain": "Above contacts will be added to the new conversation.<br>You can later manage all members and add more.",
-		"selectedExplainAdd": "Above contacts will be added to the conversation."
+		"selectedExplain": "Oben genannte Kontakte werden zur neuen Konversation hinzugefügt. Du kannst sie danach noch verwalten und weitere hinzufügen.",
+		"selectedExplainAdd": "Oben genannte Kontakte werden zur aktuellen Konversation hinzugefügt."
 	},
 	"settings": {
 		"title": "Einstellungen",
@@ -83,7 +83,7 @@
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Möchtest du dein Konto auf diesem Gerät abmelden?",
+		"logoutWarning": "Möchtest du dich auf diesem Gerät abmelden?",
 		"blocked": "Blockierte Nutzer"
 	},
 	"blocked": {
@@ -102,18 +102,18 @@
 		"verify": {
 			"action": "Diesen Nutzer verifizieren",
 			"success": {
-				"heading": "Kontakt verifiziert",
-				"body": "Dieser Kontakt wurde erfolgreich verifiziert. Bitte lass ihn auch deine ID Scannen um die höchstmögliche Sicherheit zu gewährleisten.",
+				"heading": "Nutzer verifiziert",
+				"body": "Dieser Nutzer wurde erfolgreich verifiziert. Der Nutzer sollte dich ebenfalls verifizieren, um die höchstmögliche Sicherheit zu gewährleisten.",
 				"action": "Meine ID anzeigen"
 			},
 			"fail": {
-				"heading": "Something went wrong",
-				"body": "Der gescannte QR-Code passt nicht zu diesem Kontakt. Meist ist dies auf Probleme mit der Kamera zurückzuführen. Versuch es bitte nochmal.",
-				"action": "Erneut versuchen"
+				"heading": "Etwas ist schief gelaufen",
+				"body": "Der gescannte QR-Code stimmt nicht mit dem Nutzer überein. Versuche es einfach noch einmal.",
+				"action": "Wiederholen"
 			}
 		},
-		"idTitle": "Deine ID<br/> als Text",
-		"idExplanation": "Das ist deine persönliche und einzigartige ID auf whispeer. Diese brauchst du, <span class='text-primary'>um Kontakte zu verifizieren</span> — für die extra Portion Sicherheit! <br><br>Sie scannen deine ID, du scannst ihre IDs und ihr beide habt eure Sicherheitsmaßnahmen nochmals erhöht. Klasse, oder?",
+		"idTitle": "Deine ID <br>als Text",
+		"idExplanation": "Dies ist deine persönliche und einzigartige ID auf whispeer. Diese brauchst du, <span class='text-primary'>um Nutzer zu verifizieren</span> – für die extra Portion Sicherheit! <br><br>Die Nutzer scannen deine ID, du scannst deren IDs und ihr beide habt eure Sicherheitsmaßnahmen nochmals erhöht. Super, oder?",
 		"contacts": {
 			"blockContact": "Diesen Nutzer blockieren",
 			"unblockContact": "Diesen Nutzer entblocken",
@@ -159,7 +159,7 @@
 		"title": "Hey! Sie scheinen noch kein Geschäftskunde zu sein...",
 		"text": "whispeer bringt die sicherste Art <em>verschlüsselter Kommunikation</em> in die professionelle Welt - für Sie und Ihr Unternehmen. Jetzt testen!",
 		"callToAction": "Rufen Sie uns gerne an:",
-		"finePrint": "Deutsche Festnetznummer.<br>Es können Anrufgebühren anfallen.",
+		"finePrint": "Deutsche Festnetznummer. Es können Anrufgebühren anfallen.",
 		"privateUser": "Doch kein Geschäftskunde? <em>Wechsel zu Privat</em>"
 	}
 }
