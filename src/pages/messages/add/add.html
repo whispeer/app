@@ -37,7 +37,7 @@
 		{{ 'chooseFriends.search' | translate }}
 	</ion-item-divider>
 	<ion-list *ngIf="!saving" [virtualScroll]="getFilteredUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
-		<ion-item-divider *virtualHeader="let header" class="friends__divider">
+		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0 && selectedUsers.length === 0}">
 			{{ header }}
 		</ion-item-divider>
 

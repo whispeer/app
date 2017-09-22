@@ -18,7 +18,7 @@
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
 	<ion-list [approxItemHeight]="'52px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list">
-		<ion-item-divider *virtualHeader="let header" class="friends__divider">
+		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0}">
 			{{ header }}
 		</ion-item-divider>
 

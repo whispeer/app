@@ -35,6 +35,10 @@ page-contacts {
 	margin-top: -1px;
 }
 
+.friends__divider--first {
+	margin-top: 1px;
+}
+
 .friends__request {
 	background-color: map-get($colors, highlight);
 	color: map-get($colors, dark);
