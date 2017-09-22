@@ -21,7 +21,7 @@
 	<ion-spinner *ngIf="contactsLoading || loadingChat || saving" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list class="friends__list" *ngIf="selectedUsers.length > 0">
 		<ion-item-divider class="friends__divider">
-			Selected Contacts
+			{{ 'chooseFriends.selectedContacts' | translate }}
 		</ion-item-divider>
 		<ion-item *ngFor="let contact of getSelectedUsers()">
 			<ion-label>{{contact.name}}</ion-label>
@@ -29,10 +29,12 @@
 				<div class="checkbox-icon"><div class="checkbox-inner"></div></div>
 			</div>
 		</ion-item>
-		<p class="text-grey" padding-horizontal>Above contacts will be added to the conversation.</p>
+		<p class="text-grey" padding-horizontal>
+			{{ 'chooseFriends.selectedExplainAdd' | translate }}
+		</p>
 	</ion-list>
 	<ion-item-divider class="friends__divider" *ngIf="selectedUsers.length > 0">
-		Search
+		{{ 'chooseFriends.search' | translate }}
 	</ion-item-divider>
 	<ion-list *ngIf="!saving" [virtualScroll]="getFilteredUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">

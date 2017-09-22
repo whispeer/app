@@ -42,7 +42,8 @@
 	},
 	"contacts": {
 		"title": "Contacts",
-		"search": "Search"
+		"search": "Search",
+		"searchResultExplain": "If you cannot find who you are looking for, try searching for their username."
 	},
 	"requests": {
 		"title": "Contact Requests"
@@ -62,7 +63,10 @@
 	"chooseFriends": {
 		"title": "Select Contacts",
 		"selected": "Selected",
-		"search": "Search"
+		"search": "Search",
+		"selectedContacts": "Selected Contacts",
+		"selectedExplain": "Above contacts will be added to the new conversation.<br>You can later manage all members and add more.",
+		"selectedExplainAdd": "Above contacts will be added to the conversation."
 	},
 	"settings": {
 		"title": "Settings",

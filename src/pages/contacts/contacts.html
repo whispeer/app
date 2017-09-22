@@ -48,7 +48,9 @@
 	<ion-spinner *ngIf="searchResultsLoading && !contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<div class="space-for-fab">
 		<p class="text-grey not-found-footer" padding>
-			If you cannot find who you are looking for, try searching for their username.
+			<span *ngIf="searchTerm.length > 0">
+				{{ 'contacts.searchResultExplain' | translate }}
+			</span>
 		</p>
 	</div>
 	<main-menu [icon]="'close'" (mainHandle)="close()" ion-fixed></main-menu>
