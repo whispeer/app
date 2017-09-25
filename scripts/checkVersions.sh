@@ -38,3 +38,7 @@ checkVersion ionic -v '3.9.2'
 
 # for completeness, show ionic info
 ionic info
+
+# platform specific tools
+checkVersion ios-deploy -V '1.9.2'
+
