@@ -1,10 +1,10 @@
 import { Component, Input } from "@angular/core"
 
 @Component({
-	selector: "main-menu-icon",
-	templateUrl: "mainMenuIcon.html"
+	selector: "navigator-icon",
+	templateUrl: "icon.html"
 })
-export class MainMenuIcon {
+export class NavigatorIcon {
 	@Input() icon: string = 'plus'
 	constructor() { }
 }

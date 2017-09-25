@@ -1,11 +1,11 @@
-.main-menu {
+.navigator {
 
 	// 2px padding allow for better anti-aliasing of the button content,
 	// which currently is a circular SVG.
 	$anti-aliasing-compensation: 2px;
 
 	// some distance calibrations:
-	$main-menu-bottom-offset: 20px;
+	$navigator-bottom-offset: 20px;
 	$lower-submenu-horizontal-distance: 28px;
 	$upper-submenu-vertical-offset: -77px;
 	$upper-submenu-horizontal-offset: 45px;
@@ -13,7 +13,7 @@
 	position: fixed;
 	padding: $anti-aliasing-compensation;
 	// 20px from bottom is hard coded, 18px compensates for above padding.
-	bottom: $main-menu-bottom-offset - $anti-aliasing-compensation;
+	bottom: $navigator-bottom-offset - $anti-aliasing-compensation;
 	left: 50%;
 	z-index: 100; // 99 is not enough.
 	transform: translate(-50%);
@@ -35,7 +35,7 @@
 			display: block;
 			padding-top: 100%; 	/* initial ratio of 1:1*/
 		}
-		> main-menu-icon {
+		> navigator-icon {
 			position: absolute;
 			top: 50%;
 			left: 50%;
@@ -237,5 +237,29 @@
 		}
 	}
 
+	.glasses {
+		visibility: hidden;
+		opacity: 0;
+		position: absolute;
+		left: 50%;
+		top: -20cm;
+		transform: translate(-50%, -50%);
+		width: 141px;
+		height: 30px;
+		background-image: url(../assets/images/glasses.png);
+		background-size: 141px 30px;
+		transition: top 10s linear, opacity 1s linear;
+	}
 
+	&.easteregg {
+		.menu-icon * {
+			transition: opacity 1s linear 9.5s;
+			opacity: 0;
+		}
+		.glasses {
+			visibility: visible;
+			opacity: 1;
+			top: 50%;
+		}
+	}
 }

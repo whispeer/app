@@ -1,13 +1,15 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core"
 import { NavController } from "ionic-angular"
 
-import sessionService from "../lib/services/session.service"
+import sessionService from "../../lib/services/session.service"
+
+const EASTER_EGG_THRESHOLD = 10 * 1000
 
 @Component({
-	selector: "main-menu",
-	templateUrl: "mainMenu.html"
+	selector: "navigator",
+	templateUrl: "navigator.html"
 })
-export class MainMenu {
+export class Navigator {
 
 	@Input() icon: string = "plus"
 
@@ -40,16 +42,11 @@ export class MainMenu {
 		}
 	}
 
-	onTouchStart = (e) => {
-		let menu = e.target
-		while (menu && !menu.classList.contains('main-menu')) {
-			menu = menu.parentElement
-		}
-		if (menu) {
-			this.profileNode = menu.querySelectorAll('.sub-menu.profile')[0]
-			this.searchNode = menu.querySelectorAll('.sub-menu.search')[0]
-			this.contactsNode = menu.querySelectorAll('.sub-menu.contacts')[0]
-			this.settingsNode = menu.querySelectorAll('.sub-menu.settings')[0]
+	easterEgg = null
+	enableEasterEgg = () => {
+		const navigators = document.querySelectorAll('.navigator');
+		for (let i = 0 ; i < navigators.length; i++) {
+			navigators.item(i).classList.add('easteregg')
 		}
 	}
 
@@ -63,6 +60,20 @@ export class MainMenu {
 			if (distance < ( diameter / 2 ) * 1.5) return true
 		}
 		return false
+	}
+
+	onTouchStart = (e) => {
+		let menu = e.target
+		while (menu && !menu.classList.contains('navigator')) {
+			menu = menu.parentElement
+		}
+		if (menu) {
+			this.profileNode = menu.querySelectorAll('.sub-menu.profile')[0]
+			this.searchNode = menu.querySelectorAll('.sub-menu.search')[0]
+			this.contactsNode = menu.querySelectorAll('.sub-menu.contacts')[0]
+			this.settingsNode = menu.querySelectorAll('.sub-menu.settings')[0]
+		}
+		this.easterEgg = setTimeout(this.enableEasterEgg, EASTER_EGG_THRESHOLD)
 	}
 
 	onTouchEnd = (e) => {
@@ -81,6 +92,7 @@ export class MainMenu {
 			this.open = false
 			this.closeOnTouchEnd = false
 		}
+		clearTimeout(this.easterEgg)
 	}
 
 	onTouchMove = (e) => {

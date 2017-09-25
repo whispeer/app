@@ -7,14 +7,14 @@ import { MaxValuePipe } from "../lib/pipes/maxValue";
 import { FilenameLimitPipe } from "../lib/pipes/filenameLimit";
 
 import { UserImageComponent } from "./userImage";
-import { MainMenu } from "./mainMenu";
+import { Navigator } from "./navigator/navigator";
 import { ChooseFriends } from "./chooseFriends"
 import { LoadComponent } from "./load"
 import { LoadingProgress } from "./loadingProgress"
 
 import { HexagonComponent } from "./hexagon";
-import { MainMenuHexagon } from "./mainMenuHexagon";
-import { MainMenuIcon} from "./mainMenuIcon";
+import { NavigatorHexagon } from "./navigator/hexagon";
+import { NavigatorIcon } from "./navigator/icon";
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -23,14 +23,14 @@ import { TranslateModule } from '@ngx-translate/core';
 		ResponsiveDatePipe,
 		MaxValuePipe,
 		FilenameLimitPipe,
-		MainMenu,
 		UserImageComponent,
 		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
 		HexagonComponent,
-		MainMenuHexagon,
-		MainMenuIcon
+		Navigator,
+		NavigatorHexagon,
+		NavigatorIcon
 	],
 	imports: [
 		IonicModule,
@@ -41,15 +41,15 @@ import { TranslateModule } from '@ngx-translate/core';
 		ResponsiveDatePipe,
 		MaxValuePipe,
 		FilenameLimitPipe,
-		MainMenu,
 		UserImageComponent,
 		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
 		HexagonComponent,
-		MainMenuHexagon,
-		MainMenuIcon,
 		CommonModule,
+		Navigator,
+		NavigatorHexagon,
+		NavigatorIcon,
 	]
 })
 export class ComponentsModule { }
