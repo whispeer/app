@@ -93,6 +93,7 @@
         <param name="ios-package" value="CDVWKWebViewEngine" />
     </feature>
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
+    <hook src="scripts/checkVersions.sh" type="before_prepare" />
     <hook src="scripts/copyPushIcon.js" type="after_prepare" />
     <hook src="scripts/correctIOSSimVersion.sh" type="after_platform_add" />
     <engine name="android" spec="~6.2.1" />
