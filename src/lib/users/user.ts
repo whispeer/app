@@ -18,6 +18,8 @@ import filterService from "../services/filter.service"
 import { reloadApp } from "../services/location.manager"
 import MutableObjectLoader, { UpdateEvent } from "../services/mutableObjectLoader"
 
+import requestKeyService from "../services/requestKey.service"
+
 import { ProfileLoader } from "../users/profile"
 import { SignedKeysLoader } from "../users/signedKeys"
 
@@ -893,6 +895,14 @@ function enhanceOwnUser(userData) {
 	keyStoreService.security.addEncryptionIdentifier(signKey)
 
 	trustService.ownKeysLoaded()
+
+	Bluebird.all([
+		requestKeyService.getKey(signKey),
+		requestKeyService.getKey(mainKey)
+	]).then(() => {
+		requestKeyService.cacheKey(signKey, `user-sign-${nickname}`, requestKeyService.MAXCACHETIME);
+		requestKeyService.cacheKey(mainKey, `user-main-${nickname}`, requestKeyService.MAXCACHETIME);
+	})
 
 	trustManager.setOwnSignKey(signKey)
 }
