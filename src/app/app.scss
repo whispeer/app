@@ -51,26 +51,84 @@ navigator[ion-fixed] {
 	width: 100%;
 }
 
+ion-spinner {
+	overflow: hidden;
+}
+
+ion-fab[fixed] {
+	position: fixed;
+}
+
 .has-main-menu .scroll-content {
 	padding-bottom: 100px;
 }
 
+ion-fab-list[side="top"] {
+	flex-direction: row;
+	margin-left: -21px;
+	margin-bottom: 73px;
+
+	button:first-child {
+		margin-right: 20px;
+	}
+
+	button:last-child {
+		margin-left: 20px;
+	}
+}
 
 .hexagon-wrap {
 	position: relative;
 }
 
 .hexagon {
+	height: 80px;
+
+	svg {
+		height: 80px;
+	}
+
 	.border {
 		fill: map-get($colors, primary);
 	}
 	.content {
-		fill: #f00;
+		fill: #fff;
+	}
+}
+
+.hexagon--green .border {
+	fill: map-get($colors, green) !important;
+}
+
+.hexagon__button {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -23px 0 0 -20px;
+	width: 40px;
+	height: 46px;
+	text-align: center;
+
+	background: transparent !important;
+	color: map-get($colors, grey);
+
+	.fab-close-icon {
+		line-height: 43px !important;
 	}
 
-	font-size: 0;
-	display: block;
+	.button-effect {
+		display: none !important;
+		visibility: hidden !important;
+	}
+}
 
+.hexagon__button--medium {
+	width: 50px !important;
+	height: 57px !important;
+}
+
+.hexagon--fab {
+	padding: 4px;
 	.hexagon__button {
 		width: 66px !important;
 		height: 77px !important;
@@ -79,35 +137,6 @@ navigator[ion-fixed] {
 	.fab-close-icon {
 		line-height: 77px !important;
 	}
-
-	& + button {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%);
-
-		text-align: center;
-
-		background: transparent !important;
-		color: map-get($colors, grey);
-
-		.fab-close-icon { display: none; }
-		.button-effect {
-			display: none !important;
-			visibility: hidden !important;
-		}
-	}
-
-
-}
-
-.hexagon--green .border {
-	fill: map-get($colors, green) !important;
-}
-
-.hexagon__button--medium {
-	width: 50px !important;
-	height: 57px !important;
 }
 
 .clean-input-wrap {
@@ -346,43 +375,6 @@ navigator[ion-fixed] {
 
 	.inset {
 		background-color: $inset-color;
-	}
-}
-
-// -----------------------------------------------------------
-//								Ionic overrides
-// -----------------------------------------------------------
-
-ion-spinner {
-	overflow: hidden;
-}
-
-ion-fab[fixed] {
-	position: fixed;
-}
-
-ion-fab[center] {
-	// this overrides the ionic fab centering to use relative translation.
-	left: 50%;
-	margin-left: 0;
-	transform: translate(-50%);
-}
-
-ion-fab[bottom] {
-	bottom: 20px;
-}
-
-ion-fab-list[side="top"] {
-	flex-direction: row;
-	margin-left: -21px;
-	margin-bottom: 73px;
-
-	button:first-child {
-		margin-right: 20px;
-	}
-
-	button:last-child {
-		margin-left: 20px;
 	}
 }
 
