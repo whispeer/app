@@ -850,7 +850,6 @@ const improvementListener = (identifier) => {
 
 function enhanceOwnUser(userData) {
 	const nickname = userData.nickname
-	const id = userData.nickname
 	const mainKey = userData.mainKey
 	const signKey = userData.signedKeys.sign
 
@@ -872,8 +871,8 @@ function enhanceOwnUser(userData) {
 		requestKeyService.getKey(signKey),
 		requestKeyService.getKey(mainKey)
 	]).then(() => {
-		requestKeyService.cacheKey(signKey, `user-sign-${id}`, requestKeyService.MAXCACHETIME);
-		requestKeyService.cacheKey(mainKey, `user-main-${id}`, requestKeyService.MAXCACHETIME);
+		requestKeyService.cacheKey(signKey, `user-sign-${nickname}`, requestKeyService.MAXCACHETIME);
+		requestKeyService.cacheKey(mainKey, `user-main-${nickname}`, requestKeyService.MAXCACHETIME);
 	})
 
 	trustManager.setOwnSignKey(signKey)
