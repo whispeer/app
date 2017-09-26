@@ -58,7 +58,6 @@ navigator[ion-fixed] {
 
 .hexagon-wrap {
 	position: relative;
-	//background: red;
 }
 
 .hexagon {
@@ -83,8 +82,8 @@ navigator[ion-fixed] {
 
 	& + button {
 		position: absolute;
-    left: 50%;
-    top: 50%;
+		left: 50%;
+		top: 50%;
 		transform: translate(-50%, -50%);
 
 		text-align: center;
@@ -364,13 +363,13 @@ ion-fab[fixed] {
 
 ion-fab[center] {
 	// this overrides the ionic fab centering to use relative translation.
-  left: 50%;
-  margin-left: 0;
-  transform: translate(-50%);
+	left: 50%;
+	margin-left: 0;
+	transform: translate(-50%);
 }
 
 ion-fab[bottom] {
-  bottom: 20px;
+	bottom: 20px;
 }
 
 ion-fab-list[side="top"] {
