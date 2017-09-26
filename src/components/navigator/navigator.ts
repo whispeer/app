@@ -68,10 +68,10 @@ export class Navigator {
 			menu = menu.parentElement
 		}
 		if (menu) {
-			this.profileNode = menu.querySelectorAll('.sub-menu.profile')[0]
-			this.searchNode = menu.querySelectorAll('.sub-menu.search')[0]
-			this.contactsNode = menu.querySelectorAll('.sub-menu.contacts')[0]
-			this.settingsNode = menu.querySelectorAll('.sub-menu.settings')[0]
+			this.profileNode = menu.querySelector('.sub-menu.profile')
+			this.searchNode = menu.querySelector('.sub-menu.search')
+			this.contactsNode = menu.querySelector('.sub-menu.contacts')
+			this.settingsNode = menu.querySelector('.sub-menu.settings')
 		}
 		this.easterEgg = setTimeout(this.enableEasterEgg, EASTER_EGG_THRESHOLD)
 	}
