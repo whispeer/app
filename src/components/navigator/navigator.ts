@@ -5,6 +5,11 @@ import sessionService from "../../lib/services/session.service"
 
 const EASTER_EGG_THRESHOLD = 10 * 1000
 
+interface NodeWithBounds {
+	node: Element,
+	bounds: ClientRect
+}
+
 @Component({
 	selector: "navigator",
 	templateUrl: "navigator.html"
@@ -21,10 +26,10 @@ export class Navigator {
 
 	closeOnTouchEnd = false
 
-	profileNode: Element = null
-	searchNode: Element = null
-	contactsNode: Element = null
-	settingsNode: Element = null
+	profile: NodeWithBounds = null
+	search: NodeWithBounds = null
+	contacts: NodeWithBounds = null
+	settings: NodeWithBounds = null
 
 	onTap = () => {
 		if (this.open) {
@@ -50,16 +55,22 @@ export class Navigator {
 		}
 	}
 
-	isOnSubmenu = (node, event) => {
-		const { left, top, width: diameter } = node.getBoundingClientRect()
+	isOnSubmenu = (bounds: ClientRect, event: TouchEvent) => {
+		const { left, top, width: diameter } = bounds
 		const centerX = left + diameter / 2
 		const centerY = top + diameter / 2
-		for (let touch of event.changedTouches) {
-			const { clientX, clientY } = touch
+		for (let i = 0; i < event.changedTouches.length; i++) {
+			const { clientX, clientY } = event.changedTouches.item(i)
 			const distance = Math.sqrt(Math.pow(centerX - clientX, 2) + Math.pow(centerY - clientY, 2))
 			if (distance < ( diameter / 2 ) * 1.5) return true
 		}
 		return false
+	}
+
+	getNodeWithBounds = (ancestor, selector) => {
+		const node = ancestor.querySelector(selector)
+		const bounds = node.getBoundingClientRect()
+		return { node, bounds }
 	}
 
 	onTouchStart = (e) => {
@@ -68,25 +79,24 @@ export class Navigator {
 			menu = menu.parentElement
 		}
 		if (menu) {
-			this.profileNode = menu.querySelector('.sub-menu.profile')
-			this.searchNode = menu.querySelector('.sub-menu.search')
-			this.contactsNode = menu.querySelector('.sub-menu.contacts')
-			this.settingsNode = menu.querySelector('.sub-menu.settings')
+			this.profile = this.getNodeWithBounds(menu, '.sub-menu.profile')
+			this.search = this.getNodeWithBounds(menu, '.sub-menu.search')
+			this.contacts = this.getNodeWithBounds(menu, '.sub-menu.contacts')
+			this.settings = this.getNodeWithBounds(menu, '.sub-menu.settings')
 		}
 		this.easterEgg = setTimeout(this.enableEasterEgg, EASTER_EGG_THRESHOLD)
 	}
 
-	onTouchEnd = (e) => {
-		const nodes = [this.profileNode, this.contactsNode, this.settingsNode, this.searchNode]
-		for (let node of nodes ) {
+	onTouchEnd = (e: TouchEvent) => {
+		const nodesWithBounds = [ this.search, this.profile, this.contacts, this.settings ]
+		for (let { node } of nodesWithBounds ) {
 			node.classList.remove('active')
 		}
-
 		if (this.open) {
-			if (this.isOnSubmenu(this.profileNode, e)) this.invokeProfile()
-			if (this.isOnSubmenu(this.searchNode, e)) this.invokeSearch()
-			if (this.isOnSubmenu(this.contactsNode, e)) this.invokeContacts()
-			if (this.isOnSubmenu(this.settingsNode, e)) this.invokeSettings()
+			if (this.isOnSubmenu(this.profile.bounds, e)) this.invokeProfile()
+			if (this.isOnSubmenu(this.search.bounds, e)) this.invokeSearch()
+			if (this.isOnSubmenu(this.contacts.bounds, e)) this.invokeContacts()
+			if (this.isOnSubmenu(this.settings.bounds, e)) this.invokeSettings()
 		}
 		if (this.closeOnTouchEnd) {
 			this.open = false
@@ -95,10 +105,10 @@ export class Navigator {
 		clearTimeout(this.easterEgg)
 	}
 
-	onTouchMove = (e) => {
+	onTouchMove = (e: TouchEvent) => {
 		if (this.open) {
-			for (let node of [this.profileNode, this.contactsNode, this.settingsNode, this.searchNode]) {
-				if (this.isOnSubmenu(node, e)) {
+			for (let { node, bounds } of [this.profile, this.contacts, this.settings, this.search]) {
+				if (this.isOnSubmenu(bounds, e)) {
 					node.classList.add('active')
 				} else {
 					node.classList.remove('active')
