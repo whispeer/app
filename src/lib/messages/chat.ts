@@ -690,7 +690,7 @@ const setUnreadChatIDs = (unreadIDs) => {
 	const chats = ChatLoader.getAll()
 
 	Object.keys(chats).forEach((id) => {
-		const chat = chats[id]
+		const chat = chats[id].instance
 
 		if (unreadIDs.indexOf(chat.getID()) !== -1) {
 			return

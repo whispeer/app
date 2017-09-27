@@ -32,7 +32,11 @@ type Optional<t> = t | null
 
 function createLoader<ObjectType, CachedObjectType>({ download, load, restore, getID, cacheName, shouldUpdate }: hookType<ObjectType, CachedObjectType>) {
 	let loading: { [s: string]: Bluebird<ObjectType> } = {}
-	let byId: { [s: string]: ObjectType } = {}
+	let byId: { [s: string]: {
+		instance: ObjectType,
+		lastUpdated: number,
+		updating: boolean
+	} } = {}
 
 	const cache = new Cache(cacheName)
 
@@ -41,20 +45,26 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 		delete loading[id]
 	}
 
-	const cacheInMemory = (id, instance) => {
-		byId = { ...byId, [id]: instance }
+	const cacheInMemory = (id, instance: ObjectType, lastUpdated) => {
+		byId = { ...byId, [id]: { instance, lastUpdated, updating: false } }
 	}
 
-	const loadFromCache = (id) =>
-		cache.get(id)
-			.then((cacheResponse) => cacheResponse.data)
+	const loadFromCache = (id) => {
+		let lastUpdated: number = Date.now()
+
+		return cache.get(id)
+			.then((cacheResponse) => {
+				lastUpdated = cacheResponse.created
+				return cacheResponse.data
+			})
 			.then((cachedData) => restore(cachedData, null))
 			.then((instance) => {
-				cacheInMemory(id, instance)
+				cacheInMemory(id, instance, lastUpdated)
 				considerLoaded(id)
-				scheduleInstanceUpdate(UpdateEvent.wake, id, instance)
+				scheduleInstanceUpdate(UpdateEvent.wake, id)
 				return instance
 			})
+	}
 
 	const serverResponseToInstance = (response, id, activeInstance: Optional<ObjectType>) =>
 		load(response, activeInstance)
@@ -64,7 +74,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 				if (activeInstance && activeInstance !== instance) {
 					console.warn("Restore should update active instance")
 				}
-				cacheInMemory(id, instance)
+				cacheInMemory(id, instance, Date.now())
 
 				return instance
 			})
@@ -75,22 +85,33 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			serverResponseToInstance(response, id, instance)
 		)
 
-	const scheduleInstanceUpdate = (event: UpdateEvent, id, instance: ObjectType) => {
-		const lastUpdated = 0
+	const scheduleInstanceUpdate = (event: UpdateEvent, id) => {
+		const { instance, lastUpdated, updating } = byId[id]
 
-		return shouldUpdate(event, instance, lastUpdated).then((shouldUpdate) => {
+		if (updating) {
+			console.info(`Not updating instance because update is already running ${cacheName}/${id}`)
+			return
+		}
+
+		byId[id].updating = true
+
+		shouldUpdate(event, instance, lastUpdated).then((shouldUpdate) => {
 			if (shouldUpdate) {
 				console.info(`Schedule ${cacheName} instance ${id} update with event ${UpdateEvent[event]}`)
-				return updateInstance(id, instance)
+				return updateInstance(id, instance).then(() =>
+					byId[id].lastUpdated = Date.now()
+				)
 			}
-		}).catch(errorService.criticalError)
+		}).catch(errorService.criticalError).finally(() => byId[id].updating = false)
+
+		return
 	}
 
 	const scheduleInstancesUpdate = (event: UpdateEvent) => {
 		console.info(`Schedule ${cacheName} instances update with event ${UpdateEvent[event]}`)
 
 		Object.keys(byId)
-			.forEach((id) => scheduleInstanceUpdate(event, id, byId[id]) )
+			.forEach((id) => scheduleInstanceUpdate(event, id) )
 	}
 
 	let lastHeartbeat = Date.now()
@@ -128,7 +149,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 				throw new Error(`Not yet loaded: ${id}`)
 			}
 
-			return byId[id]
+			return byId[id].instance
 		}
 
 		static isLoaded(id) {
@@ -139,9 +160,9 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			const id = getID(source)
 
 			if (byId[id]) {
-				serverResponseToInstance(source, id, byId[id])
+				serverResponseToInstance(source, id, byId[id].instance)
 
-				return Bluebird.resolve(byId[id])
+				return Bluebird.resolve(byId[id].instance)
 			}
 
 			if (!loading[id]) {
@@ -162,7 +183,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 		// Throws
 		static getFromCache(id): Bluebird<ObjectType> {
 			if (byId[id]) {
-				return Bluebird.resolve(byId[id])
+				return Bluebird.resolve(byId[id].instance)
 			}
 
 			return loadFromCache(id)
@@ -174,7 +195,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 			}
 
 			if (byId[id]) {
-				return Bluebird.resolve(byId[id])
+				return Bluebird.resolve(byId[id].instance)
 			}
 
 			if (!loading[id]) {
@@ -196,7 +217,7 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 		}
 
 		static addLoaded = (id, obj: ObjectType) => {
-			byId[id] = obj
+			byId[id] = { instance: obj, lastUpdated: Date.now(), updating: false }
 		}
 	}
 }

@@ -7,12 +7,14 @@ import { MaxValuePipe } from "../lib/pipes/maxValue";
 import { FilenameLimitPipe } from "../lib/pipes/filenameLimit";
 
 import { UserImageComponent } from "./userImage";
-import { MainMenu } from "./mainMenu";
+import { Navigator } from "./navigator/navigator";
 import { ChooseFriends } from "./chooseFriends"
 import { LoadComponent } from "./load"
 import { LoadingProgress } from "./loadingProgress"
 
-import { HexagonModule } from "./hexagonModule";
+import { HexagonComponent } from "./hexagon";
+import { NavigatorHexagon } from "./navigator/hexagon";
+import { NavigatorIcon } from "./navigator/icon";
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -21,30 +23,33 @@ import { TranslateModule } from '@ngx-translate/core';
 		ResponsiveDatePipe,
 		MaxValuePipe,
 		FilenameLimitPipe,
-		MainMenu,
 		UserImageComponent,
 		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
+		HexagonComponent,
+		Navigator,
+		NavigatorHexagon,
+		NavigatorIcon
 	],
 	imports: [
-		HexagonModule,
 		IonicModule,
 		CommonModule,
-		TranslateModule.forChild(),
+		TranslateModule.forChild()
 	],
 	exports: [
 		ResponsiveDatePipe,
 		MaxValuePipe,
 		FilenameLimitPipe,
-		MainMenu,
 		UserImageComponent,
 		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
-
-		HexagonModule,
+		HexagonComponent,
 		CommonModule,
+		Navigator,
+		NavigatorHexagon,
+		NavigatorIcon,
 	]
 })
 export class ComponentsModule { }

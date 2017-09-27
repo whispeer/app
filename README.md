@@ -17,9 +17,10 @@ Make sure node is installed and corresponding to the version specified
 in `.nvmrc`, as well as [yarn][yarn]. Yarn can be installed using `npm i
 -g yarn`, when `npm` is available.
 
-	$ node -v && yarn --version
-	v7.5.0
-	0.20.3
+	$ node -v && yarn -v && npm -v
+	v7.10.1
+	1.1.0
+	4.2.0
 
 ### Installation
 
@@ -27,7 +28,14 @@ To install some of the required whispeer dependencies run
 
 	$ git submodule update --init
 
-To install ionic and all other dependencies, run
+ionic and cordova have to be installed globally and need to be somewhere
+around these versions:
+
+	$ cordova -v && ionic -v
+	7.0.1
+	3.9.2
+
+To install all other dependencies, run
 
 	$ yarn
 
