@@ -123,7 +123,10 @@ topicWithBursts {
 	}
 	.messages__header-image {
 		position: absolute;
-		top: 50%;
+
+		// do not trust chrome on this one!
+		// mobile safari does things different...
+		top: calc(50% + 10px);
 		right: 1em;
 		transform: translateY(-50%);
 	}
@@ -523,6 +526,8 @@ topicWithBursts {
 	height: auto;
 	min-height: 30px !important;
 
+	padding-left: 11.5px;
+
 	.input-wrapper {
 		align-items: flex-end;
 	}
@@ -536,6 +541,8 @@ topicWithBursts {
 
 		margin: 0 !important;
 
+		height: 30px; // default height to prevent jumping
+
 		&::-webkit-scrollbar {
 			display: none;
 		}
@@ -548,8 +555,11 @@ topicWithBursts {
 
 .ios__messages__send-message {
 	position: absolute;
-	right: 18px;
-	bottom: 7px;
+
+	// **BEFORE CHANGING:** please check the app on iOS if the values really fit!
+	// Chrome does **NOT** position the element the same way iOS does.
+	right: 20px;
+	bottom: 8px;
 
 	margin: 0 !important;
 
@@ -566,8 +576,14 @@ topicWithBursts {
 .messages__form__button-wrap {
 	display: flex;
 
+	padding-left: 11.5px;
+
 	button {
 		height: 30px !important;
+
+		ion-icon {
+			padding: 0 11.5px;
+		}
 	}
 }
 

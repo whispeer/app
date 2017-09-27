@@ -589,6 +589,8 @@ export class TopicComponent {
 			}
 
 			const fontSize = 16;
+
+			const minSize = 30;
 			const maxSize = fontSize*7;
 
 			const footerElement = this.footer.nativeElement;
@@ -598,7 +600,7 @@ export class TopicComponent {
 			textarea.style.minHeight  = "0";
 			textarea.style.height     = "0";
 
-			const scroll_height = Math.min(textarea.scrollHeight, maxSize);
+			const scroll_height = Math.max(minSize, Math.min(textarea.scrollHeight, maxSize));
 
 			// apply new style
 			textarea.style.minHeight  = scroll_height + "px";

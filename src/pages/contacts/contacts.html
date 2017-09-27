@@ -17,8 +17,8 @@
 		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
-	<ion-list [approxItemHeight]="'50px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list">
-		<ion-item-divider *virtualHeader="let header" class="friends__divider">
+	<ion-list [approxItemHeight]="'52px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list">
+		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0}">
 			{{ header }}
 		</ion-item-divider>
 
@@ -48,7 +48,9 @@
 	<ion-spinner *ngIf="searchResultsLoading && !contactsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<div class="space-for-fab">
 		<p class="text-grey not-found-footer" padding>
-			If you cannot find who you are looking for, try searching for their username.
+			<span *ngIf="searchTerm.length > 0">
+				{{ 'contacts.searchResultExplain' | translate }}
+			</span>
 		</p>
 	</div>
 	<navigator [icon]="'close'" (invoke)="close()" ion-fixed></navigator>

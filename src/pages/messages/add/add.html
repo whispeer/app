@@ -1,7 +1,7 @@
 <ion-header>
 	<ion-navbar [color]="'primary'">
 		<ion-title>
-			{{ 'chooseFriends.title' | translate }}
+			{{ 'topics.add.title' | translate }}
 		</ion-title>
 	</ion-navbar>
 	<ion-toolbar class="toolbar--search" [color]="'primary'">
@@ -21,26 +21,75 @@
 	<ion-spinner *ngIf="contactsLoading || loadingChat || saving" text-center margin-vertical class="spinner--full"></ion-spinner>
 	<ion-list class="friends__list" *ngIf="selectedUsers.length > 0">
 		<ion-item-divider class="friends__divider">
-			Selected Contacts
+			{{ 'chooseFriends.selectedContacts' | translate }}
 		</ion-item-divider>
 		<ion-item *ngFor="let contact of getSelectedUsers()">
-			<ion-label>{{contact.name}}</ion-label>
+			<ion-list [virtualScroll]="selectedUsers" class="friends__list">
+				<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
+					<ion-label class="checkbox__label--user checkbox__label--user-selected">
+						<ion-avatar class="hexagon--border"
+								[ngClass]="{'hexagon__image--active': contact.online}" item-left>
+							<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
+						</ion-avatar>
+						<h2 class="checkbox__label__username">
+							<strong *ngIf="contact.names.firstname">
+								{{contact.names.firstname}}
+							</strong>
+							<span *ngIf="contact.names.firstname && contact.names.lastname">
+								{{contact.names.lastname}}
+							</span>
+							<strong
+								*ngIf="!contact.names.firstname && contact.names.lastname">
+								{{contact.names.lastname}}
+							</strong>
+							<strong
+								*ngIf="!contact.names.firstname && !contact.names.lastname">
+								{{contact.name}}
+							</strong>
+						</h2>
+					</ion-label>
+
+					<div item-content class="checkbox checkbox-hexagon checkbox-hexagon--remove" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+						<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
+					</div>
+				</ion-item>
+			</ion-list>
 			<div item-content class="checkbox checkbox-hexagon checkbox-hexagon--remove" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios" (click)=updateSelectedUsers(contact)>
 				<div class="checkbox-icon"><div class="checkbox-inner"></div></div>
 			</div>
 		</ion-item>
-		<p class="text-grey" padding-horizontal>Above contacts will be added to the conversation.</p>
+		<p class="text-grey" padding-horizontal>
+			{{ 'topics.add.selectedExplain' | translate }}
+		</p>
 	</ion-list>
-	<ion-item-divider class="friends__divider" *ngIf="selectedUsers.length > 0">
-		Search
-	</ion-item-divider>
 	<ion-list *ngIf="!saving" [virtualScroll]="getFilteredUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
-		<ion-item-divider *virtualHeader="let header" class="friends__divider">
+		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0 && selectedUsers.length === 0}">
 			{{ header }}
 		</ion-item-divider>
 
 		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
-			<ion-label>{{contact.name}}</ion-label>
+			<ion-label class="checkbox__label--user">
+				<ion-avatar class="hexagon--border"
+						[ngClass]="{'hexagon__image--active': contact.online}" item-left>
+					<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
+				</ion-avatar>
+				<h2>
+					<strong *ngIf="contact.names.firstname">
+						{{contact.names.firstname}}
+					</strong>
+					<span *ngIf="contact.names.firstname && contact.names.lastname">
+						{{contact.names.lastname}}
+					</span>
+					<strong
+						*ngIf="!contact.names.firstname && contact.names.lastname">
+						{{contact.names.lastname}}
+					</strong>
+					<strong
+						*ngIf="!contact.names.firstname && !contact.names.lastname">
+						{{contact.name}}
+					</strong>
+				</h2>
+			</ion-label>
 			<div item-content class="checkbox checkbox-hexagon" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
 				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
 			</div>
