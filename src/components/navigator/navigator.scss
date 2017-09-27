@@ -1,0 +1,265 @@
+.navigator {
+
+	// 2px padding allow for better anti-aliasing of the button content,
+	// which currently is a circular SVG.
+	$anti-aliasing-compensation: 2px;
+
+	// some distance calibrations:
+	$navigator-bottom-offset: 20px;
+	$lower-submenu-horizontal-distance: 28px;
+	$upper-submenu-vertical-offset: -77px;
+	$upper-submenu-horizontal-offset: 45px;
+
+	position: fixed;
+	padding: $anti-aliasing-compensation;
+	// 20px from bottom is hard coded, 18px compensates for above padding.
+	bottom: $navigator-bottom-offset - $anti-aliasing-compensation;
+	left: 50%;
+	z-index: 100; // 99 is not enough.
+	transform: translate(-50%);
+	font-size: 0;
+
+	.menu-icon {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		transform: translate(0, -50%);
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		border-radius: 50%;
+		background: transparent;
+
+		&:before {
+			content: "";
+			display: block;
+			padding-top: 100%; 	/* initial ratio of 1:1*/
+		}
+		> navigator-icon {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			display: block;
+			font-size: 0
+		}
+	}
+
+
+	// TODO There's a lot of duplication in this animations code. Tried to tidy it up once, but results were broken. Good luck!
+
+	$fade-in-duration: .12s;
+	$individual-delay: .03s;
+	$icon-rotation: 45deg;
+	$icon-rotation-duration: .18s;
+	$outline-duration: .12s;
+
+	&.plus {
+		.icon {
+			visibility: visible;
+			transform: none;
+			opacity: 1;
+			transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		.secondary .icon.close {
+			visibility: hidden;
+			opacity: 0;
+			transform: rotate(-1 * $icon-rotation);
+			transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		&.open {
+			.icon {
+				visibility: hidden;
+				opacity: 0;
+				transform: rotate($icon-rotation);
+				transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+
+			.secondary .icon.close {
+				visibility: visible;
+				opacity: 1;
+				transform: none;
+				transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+		}
+	}
+
+	&.arrow {
+		$arrow-rotation: 90deg;
+
+		.icon {
+			visibility: visible;
+			transform: none;
+			opacity: 1;
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		.secondary .icon.close {
+			visibility: hidden;
+			opacity: 0;
+			transform: rotate(-1 * $arrow-rotation);
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		&.open {
+			.icon {
+				visibility: hidden;
+				opacity: 0;
+				transform: rotate($arrow-rotation);
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+
+			.secondary .icon.close {
+				visibility: visible;
+				opacity: 1;
+				transform: none;
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+		}
+	}
+
+	&.close {
+		$arrow-rotation: 90deg;
+
+		.icon {
+			visibility: visible;
+			transform: none;
+			opacity: 1;
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		.secondary .icon.close {
+			visibility: hidden;
+			opacity: 0;
+			transform: rotate(-1 * $arrow-rotation);
+			// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+		}
+
+		&.open {
+			.icon {
+				visibility: hidden;
+				opacity: 0;
+				transform: rotate($arrow-rotation);
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration/2 ease $icon-rotation-duration/2, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+
+			.secondary .icon.close {
+				visibility: visible;
+				opacity: 1;
+				transform: none;
+				// transition: opacity $icon-rotation-duration ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+				transition: opacity $icon-rotation-duration/2 ease, transform $icon-rotation-duration linear, visibility $icon-rotation-duration linear;
+			}
+		}
+	}
+
+
+	&.open {
+		.sub-menu:nth-of-type(n) {
+			visibility: visible;
+			opacity: 1;
+			transition: opacity $fade-in-duration linear;
+			&:nth-last-of-type(2) { transition-delay: 0 * $individual-delay; } // search
+			&:nth-last-of-type(4) { transition-delay: 1 * $individual-delay; } // profile
+			&:nth-last-of-type(3) { transition-delay: 2 * $individual-delay; } // contacts
+			&:nth-last-of-type(1) { transition-delay: 3 * $individual-delay; } // settings
+		}
+	}
+
+	.sub-menu {
+		position: absolute;
+		top: 50%;
+		margin: 0;
+		font-size: 0;
+		border-radius: 50%;
+		background: transparent;
+		padding: $anti-aliasing-compensation;
+
+		visibility: hidden;
+		opacity: 0;
+		transition: opacity $fade-in-duration linear, visibility 0s linear $fade-in-duration;
+
+		svg { position: relative }
+
+		.outline {
+			position: absolute;
+			width: 0;
+			height: 0;
+			left: 50%;
+			top: 50%;
+			border-radius: 50%;
+			opacity: .25;
+			background: #5ab70d;
+			transform: translate(-50%, -50%);
+			transition: width $outline-duration, height $outline-duration;
+			transition-timing-function: cubic-bezier(0.175,  0.885, 0.320, 1.275)
+		}
+		&.active .outline {
+			width: 130%;
+			height: 130%;
+		}
+
+		// search
+		&:nth-last-of-type(2) {
+			right: 100%;
+			transform: translate(-1 * ($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation), -50%);
+			transition-delay: 0 * $individual-delay, $fade-in-duration + 0 * $individual-delay;
+		}
+
+		// profile
+		&:nth-last-of-type(4) {
+			right: 100%;
+			transform: translate(-1 * ($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation), -50%) translate($upper-submenu-horizontal-offset, $upper-submenu-vertical-offset);
+			transition-delay: 1 * $individual-delay, $fade-in-duration + 1 * $individual-delay;
+		}
+
+		// contacts
+		&:nth-last-of-type(3) {
+			left: 100%;
+			transform: translate($lower-submenu-horizontal-distance - 2 * $anti-aliasing-compensation, -50%) translate(-1 * $upper-submenu-horizontal-offset, $upper-submenu-vertical-offset);
+			transition-delay: 2 * $individual-delay, $fade-in-duration + 2 * $individual-delay;
+		}
+
+		// settings
+		&:nth-last-of-type(1) {
+			left: 100%;
+			transform: translate($lower-submenu-horizontal-distance - 2*$anti-aliasing-compensation, -50%);
+			transition-delay: 3 * $individual-delay, $fade-in-duration + 3 * $individual-delay;
+		}
+	}
+
+	.glasses {
+		visibility: hidden;
+		opacity: 0;
+		position: absolute;
+		left: 50%;
+		top: -20cm;
+		transform: translate(-50%, -50%);
+		width: 141px;
+		height: 30px;
+		background-image: url(../assets/images/glasses.png);
+		background-size: 141px 30px;
+		transition: top 10s linear, opacity 1s linear;
+	}
+
+	&.easteregg {
+		.menu-icon * {
+			transition: opacity 1s linear 9.5s;
+			opacity: 0;
+		}
+		.glasses {
+			visibility: visible;
+			opacity: 1;
+			top: 50%;
+		}
+	}
+}

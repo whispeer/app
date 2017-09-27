@@ -45,7 +45,7 @@ chooseFriends, page-add {
 	fill: $svg-fill-grey;
 }
 
-main-menu[ion-fixed] {
+navigator[ion-fixed] {
 	position: fixed;
 	bottom: 0;
 	width: 100%;
@@ -236,7 +236,7 @@ ion-fab-list[side="top"] {
 }
 
 .space-for-fab {
-	margin-bottom: 95px;
+	margin-bottom: 125px;
 }
 
 .spinner--full {
