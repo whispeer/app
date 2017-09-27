@@ -371,13 +371,13 @@ export class ProfilePage {
 		return this.getFile(url, "image/png").then((file) => {
 			const upload = new ImageUpload(file, imageUploadOptions)
 
-			return upload.prepare().then(({ lowest }) => {
-				return upload.upload().thenReturn(lowest)
-			})
+			return upload.prepare().then(({ lowest }) =>
+				upload.upload().thenReturn(lowest)
+			)
 		}).then((imageMeta) => {
 			var setImageBlobAttributePromise = this.userObject.setProfileAttribute("imageBlob", {
-				blobid: imageMeta.blobID,
-				imageHash: imageMeta.blobHash
+				blobid: imageMeta.meta.blobID,
+				imageHash: imageMeta.content.blobHash
 			});
 
 			this.userObject.removeProfileAttribute("image");
