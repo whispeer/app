@@ -18,6 +18,8 @@ import sessionService from '../lib/services/session.service';
 // some more drawing going on. This delay is to offset for that rendering.
 const SPLASH_SCREEN_HIDE_DELAY = 200
 
+const TUTORIAL_SLIDES = 7
+
 @Component({
 	templateUrl: "app.html"
 })
@@ -41,15 +43,15 @@ export class MyApp {
 	slideNumber = 1;
 	advance() {
 		this.slideNumber++;
-		if (this.slideNumber === 6) {
+		if (this.slideNumber === TUTORIAL_SLIDES + 1) {
 			this.slideNumber = 1;
 			Tutorial.skip();
 		}
 	}
 
-	lang = 'en';
+	lang = 'de';
 	currentSlide() {
-		return `assets/img/${this.lang}/tutorial_step${this.slideNumber}.png`
+		return `assets/img/${this.lang}/tutorial_${this.slideNumber}.png`
 	}
 
 	tutorialClicked(event) {
@@ -62,8 +64,10 @@ export class MyApp {
 
 		const px = offsetX / offsetWidth;
 		const py = offsetY / offsetHeight;
+		const firstSlide = this.slideNumber === 1
+		const shouldSkip = (0.73 < px) && (px < 0.98) && (0.03 < py) && (py < 0.10)
 
-		if ((0.73 < px) && (px < 0.98) && (0.03 < py) && (py < 0.10)) {
+		if (shouldSkip && firstSlide) {
 			Tutorial.skip();
 		} else {
 			this.advance();

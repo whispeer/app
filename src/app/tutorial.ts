@@ -1,6 +1,6 @@
 namespace Tutorial {
 
-	const tutorialVersion = 3;
+	const tutorialVersion = 4;
 	export let tutorialVisible = false;
 
 	export function skip() {
