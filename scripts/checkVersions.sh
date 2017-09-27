@@ -16,9 +16,9 @@ function checkVersion () {
 	if hash $COMMAND 2>/dev/null; then
 		local CURRENT_VERSION=`$COMMAND $VERSION_FLAG`
 		if [ "$CURRENT_VERSION" = "$DESIRED_VERSION" ]; then
-		    echo " 🔵   $COMMAND version matches $DESIRED_VERSION"
+		    echo " ✅   $COMMAND version matches $DESIRED_VERSION"
 		else
-		    echo " 🔴   $COMMAND $CURRENT_VERSION is installed. The recommended $COMMAND version is $DESIRED_VERSION"
+		    echo " ⚠️   $COMMAND $CURRENT_VERSION is installed. The recommended $COMMAND version is $DESIRED_VERSION"
 		fi
 	else
 	  echo " 💩   $COMMAND is not installed"
