@@ -72,13 +72,13 @@ class RequestKeyService {
 		}).nodeify(cb);
 	}
 
-	getKey = (keyID: string, callback?: Function) => {
+	getKey = (keyID: string, cb?: Function) => {
 		if (typeof keyID !== "string") {
 			throw new Error("not a valid key realid: " + keyID);
 		}
 
 		if (keyStore.upload.isKeyLoaded(keyID)) {
-			callback();
+			return Bluebird.resolve().nodeify(cb);
 		}
 
 		keyStoreDebug("loading key: " + keyID);
@@ -94,7 +94,7 @@ class RequestKeyService {
 			keyStoreDebug("key cache miss: " + keyID);
 
 			return this.delayAsync(keyID);
-		}).nodeify(callback);
+		}).nodeify(cb);
 	}
 
 	cacheKey = (realID: string, objectID: string, time: number) => {

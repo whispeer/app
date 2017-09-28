@@ -95,9 +95,7 @@ class TrustService {
 		return this.loadCachePromise.catch(function (e: any) {
 			trustServiceDebug("Could not load trust service from cache!");
 			console.error(e);
-		}).then(() => {
-			return ownKeysPromise
-		}).then(() => {
+		}).then(() => ownKeysPromise).then(() => {
 			if (data.unChanged) {
 				if (!trustManager.isLoaded()) {
 					throw new Error("cache loading seems to have failed but server is unchanged!");

@@ -895,6 +895,8 @@ function enhanceOwnUser(userData) {
 	keyStoreService.security.addEncryptionIdentifier(mainKey)
 	keyStoreService.security.addEncryptionIdentifier(signKey)
 
+	trustManager.setOwnSignKey(signKey)
+
 	trustService.ownKeysLoaded()
 
 	Bluebird.all([
@@ -904,8 +906,6 @@ function enhanceOwnUser(userData) {
 		requestKeyService.cacheKey(signKey, `user-sign-${nickname}`, requestKeyService.MAXCACHETIME);
 		requestKeyService.cacheKey(mainKey, `user-main-${nickname}`, requestKeyService.MAXCACHETIME);
 	})
-
-	trustManager.setOwnSignKey(signKey)
 }
 
 export default class UserLoader extends MutableObjectLoader<UserInterface, CachedUser>({
