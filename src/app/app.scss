@@ -32,6 +32,14 @@ chooseFriends, page-add {
 	.friends__list .item .checkbox {
 		margin-right: 8px !important;
 	}
+
+	.friends__list__header {
+		color: map-get($colors, grey);
+
+		.label-ios {
+			margin-bottom: 0;
+		}
+	}
 }
 
 ion-avatar {
