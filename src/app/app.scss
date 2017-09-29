@@ -74,7 +74,7 @@ ion-item-divider {
 		}
 
 		.searchbar-input {
-			background: rgba(3, 3, 3, 0.09);
+			background: $searchbar-toolbar-ios-background-color;
 			&::-webkit-input-placeholder {
 				color: $searchbar-ios-input-placeholder-color;
 			}

@@ -125,6 +125,7 @@ $searchbar-ios-input-placeholder-color: map-get($colors, other_grey);
 $searchbar-ios-input-search-icon-color: map-get($colors, other_grey);
 $searchbar-ios-input-clear-icon-color: map-get($colors, other_grey);
 $searchbar-ios-input-text-color: map-get($colors, light);
+$searchbar-toolbar-ios-background-color: #3f9908;
 
 @if $business == 1 {
 	$colors: $colors_business;
@@ -147,6 +148,8 @@ $searchbar-ios-input-text-color: map-get($colors, light);
 	$list-border-color: map-get($colors, other_grey);
 
 	$action-sheet-ios-button-text-color: map-get($colors, primary);
+
+	$searchbar-toolbar-ios-background-color: #002937;
 }
 
 
