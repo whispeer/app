@@ -24,6 +24,7 @@ page-contacts {
 }
 
 .friends__list {
+	border-bottom: 1px solid map-get($colors, other_grey);
 	margin-bottom: 0;
 }
 
