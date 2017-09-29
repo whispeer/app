@@ -122,7 +122,7 @@ $toggle-ios-background-color-on: $kelly_green;
 $toggle-ios-border-color-off: grayscale(lighten($border_grey, 11%));
 
 $searchbar-ios-input-placeholder-color: map-get($colors, other_grey);
-$searchbar-ios-input-search-icon-color: map-get($colors, other_grey); // sketch: other_grey korrektur: light
+$searchbar-ios-input-search-icon-color: map-get($colors, other_grey);
 $searchbar-ios-input-clear-icon-color: map-get($colors, other_grey);
 $searchbar-ios-input-text-color: map-get($colors, light);
 
