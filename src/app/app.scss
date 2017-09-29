@@ -207,9 +207,10 @@ ion-fab-list[side="top"] {
 	}
 }
 
-.hexagon__image--active .border {
-	fill: map-get($colors, green);
-}
+// no online status for now!
+//.hexagon__image--active .border {
+//	fill: map-get($colors, green);
+//}
 
 .hexagon__image--large {
 	width: 152px !important;
