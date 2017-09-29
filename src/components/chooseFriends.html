@@ -52,7 +52,7 @@
 	</ion-list>
 	<p class="text-grey" padding-horizontal *ngIf="selectedUsers.length > 0" [innerHTML]="'chooseFriends.selectedExplain' | translate">
 	</p>
-	<ion-item-divider class="friends__divider" *ngIf="selectedUsers.length > 0">
+	<ion-item-divider class="friends__divider" *ngIf="searchTerm.length > 0">
 		{{ 'chooseFriends.search' | translate }}
 	</ion-item-divider>
 	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
