@@ -7,6 +7,9 @@ import h from "../helper/helper" // tslint:disable-line:no-unused-variable
 const BLOB_CACHE_DIR = "blobCache"
 const FILE = new File()
 
+// const win: any = window
+
+// win.FileReader = win.FileReader[win.Zone.__symbol__('originalDelegate')]
 
 let cacheDirectoryPromise:Bluebird<string> = null
 const getCacheDirectory = () => {
@@ -57,16 +60,20 @@ const noPendingStorageOperations = () => {
 const blobCache = {
 
 	clear: () => {
+		console.log ("clear blobCache")
 		return Bluebird.try(async () => {
 			clearing = true
 			await noPendingStorageOperations()
-			return FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
+			console.log ("clear blobCache 2 ")
+			await FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
 				.catch(error => {
 					// There really is little we can do here, but logouts, e.g., should not
 					// fail because we failed to clear.
 					console.warn('Cannot remove cache, resolving promise anyway.')
 					return true
 				})
+
+			console.log ("clear blobCache 3")
 		}).finally(() => clearing = false)
 	},
 
@@ -83,6 +90,7 @@ const blobCache = {
 		return Bluebird.try(async () => {
 			if (clearing) throw new Error('Cannot store blob, currently clearing cache.')
 			storing++
+			console.warn(`storing++ ${storing-1} -> ${storing}, blob: ${blob.getBlobID()}`)
 			const blobID = blob.getBlobID()
 
 			if (!blob.isDecrypted()) {
@@ -90,15 +98,28 @@ const blobCache = {
 			}
 
 			const path = await getCacheDirectory()
+			console.log("getCacheDir", path)
 			const filename = idToFileName(blobID)
 			const exists = await existsFile(path, filename)
+			console.log("existsFile", path, filename, exists)
 
 			if (!exists) {
+				console.log("write now!")
+				if (storing > 3) {
+					debugger
+				}
 				await writeToFile(path, filename, blob.getBlobData())
+				console.log("writeFile")
 			}
 
 			return `${path}${filename}`
-		}).finally(() => storing--)
+		}).catch((e) => {
+			console.error(e)
+			return Bluebird.reject(e)
+		}).finally(() => {
+			storing--
+			console.warn(`storing-- ${storing+1} -> ${storing}, blob: ${blob.getBlobID()}`)
+		})
 	},
 
 	getBlobUrl: (blobID) => {
