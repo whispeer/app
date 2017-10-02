@@ -5,11 +5,14 @@ import Cache from "../services/Cache"
 import h from "../helper/helper" // tslint:disable-line:no-unused-variable
 
 const BLOB_CACHE_DIR = "blobCache"
+const LOCK_TIMEOUT = 30 * 1000
 const FILE = new File()
 
-// const win: any = window
-
-// win.FileReader = win.FileReader[win.Zone.__symbol__('originalDelegate')]
+const fixFileReader = () => {
+	const win: any = window
+	if (win.FileReader[win.Zone.__symbol__('originalDelegate')])
+		win.FileReader = win.FileReader[win.Zone.__symbol__('originalDelegate')]
+}
 
 let cacheDirectoryPromise:Bluebird<string> = null
 const getCacheDirectory = () => {
@@ -30,10 +33,14 @@ const getCacheDirectory = () => {
 	return cacheDirectoryPromise
 }
 
-const readFileAsBlob = (path, filename, type) =>
-	FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
-const writeToFile = (path, filename, data: Blob) =>
-	FILE.writeFile(path, filename, data)
+const readFileAsBlob = (path, filename, type) => {
+	fixFileReader()
+	return FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
+}
+const writeToFile = (path, filename, data: Blob) => {
+	fixFileReader()
+	return FILE.writeFile(path, filename, data)
+}
 const existsFile = (path, filename) =>
 	FILE.checkFile(path, filename).catch((e) => {
 		if (e.code === 1) {
@@ -54,7 +61,7 @@ const noPendingStorageOperations = () => {
 				clearInterval(busyWait)
 			}
 		}, 10)
-	})
+	}).timeout(LOCK_TIMEOUT).catch(Bluebird.TimeoutError, () => {})
 }
 
 const blobCache = {
