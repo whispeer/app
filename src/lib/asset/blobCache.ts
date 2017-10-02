@@ -10,9 +10,10 @@ const FILE = new File()
 
 const fixFileReader = () => {
 	const win: any = window
-	if (win.FileReader[win.Zone.__symbol__('originalDelegate')]) {
+	const delegateName = win.Zone.__symbol__('OriginalDelegate')
+	if (win.FileReader[delegateName]) {
 		console.warn("Fixing file reader!")
-		win.FileReader = win.FileReader[win.Zone.__symbol__('originalDelegate')]
+		win.FileReader = win.FileReader[delegateName]
 	}
 }
 
