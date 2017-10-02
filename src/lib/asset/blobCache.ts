@@ -70,11 +70,9 @@ const noPendingStorageOperations = () => {
 const blobCache = {
 
 	clear: () => {
-		console.log ("clear blobCache")
 		return Bluebird.try(async () => {
 			clearing = true
 			await noPendingStorageOperations()
-			console.log ("clear blobCache 2 ")
 			await FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
 				.catch(error => {
 					// There really is little we can do here, but logouts, e.g., should not
@@ -82,8 +80,6 @@ const blobCache = {
 					console.warn('Cannot remove cache, resolving promise anyway.')
 					return true
 				})
-
-			console.log ("clear blobCache 3")
 		}).finally(() => clearing = false)
 	},
 
@@ -108,18 +104,11 @@ const blobCache = {
 			}
 
 			const path = await getCacheDirectory()
-			console.log("getCacheDir", path)
 			const filename = idToFileName(blobID)
 			const exists = await existsFile(path, filename)
-			console.log("existsFile", path, filename, exists)
 
 			if (!exists) {
-				console.log("write now!")
-				if (storing > 3) {
-					debugger
-				}
 				await writeToFile(path, filename, blob.getBlobData())
-				console.log("writeFile")
 			}
 
 			return `${path}${filename}`

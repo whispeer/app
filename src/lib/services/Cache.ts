@@ -50,16 +50,11 @@ export default class Cache {
 	static deleteDatabase() {
 		cachesDisabled = true
 
-		console.log("delete database start")
-
 		return dbPromise.then((db) => {
-			console.log("closing database start")
 			return db.close()
 		}).then(() => {
-			console.log("delete now!")
 			return idb.delete("whispeerCache")
 		}).then(() => {
-			console.log("reinit cache")
 			setTimeout(() => {
 				initCache()
 			}, REINIT_CACHE_TIMEOUT)
