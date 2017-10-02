@@ -5,7 +5,7 @@
 			<!-- Back button -->
 			<div class="messages__header__fake-back">
 				<button *ngIf="forceBackButton" (click)="navCtrl.pop()" class="bar-button bar-button-ios" color="light" ion-button icon-only clear>
-					<ion-icon name="arrow-back"></ion-icon>
+					<ion-icon name="arrow-back"></ion-icon> {{ 'general.backButtonText' | translate }}
 				</button>
 			</div>
 

@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core'
 import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController, NavParams, IonicPage, Searchbar } from "ionic-angular";
 
@@ -37,8 +38,8 @@ export class AddPage extends ContactsWithSearch {
 
 	addMemoizer: Memoizer
 
-	constructor(private navCtrl: NavController, private navParams: NavParams, platform: Platform) {
-		super()
+	constructor(private navCtrl: NavController, private navParams: NavParams, platform: Platform, translate: TranslateService) {
+		super(translate)
 
 		this.ios = platform.is("ios")
 

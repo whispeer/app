@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, IonicPage } from 'ionic-angular';
+import { TranslateService } from '@ngx-translate/core'
 
 const initService = require("../../lib/services/initService")
 import userService from "../../lib/users/userService"
@@ -17,8 +18,8 @@ import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
 })
 export class BlockedUsersPage extends ContactsWithSearch {
 
-	constructor(private navCtrl: NavController) {
-		super()
+	constructor(private navCtrl: NavController, translate: TranslateService) {
+		super(translate)
 	}
 
 	load() {

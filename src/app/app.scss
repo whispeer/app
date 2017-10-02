@@ -32,6 +32,14 @@ chooseFriends, page-add {
 	.friends__list .item .checkbox {
 		margin-right: 8px !important;
 	}
+
+	.friends__list__header {
+		color: map-get($colors, grey);
+
+		.label-ios {
+			margin-bottom: 0;
+		}
+	}
 }
 
 ion-avatar {
@@ -66,7 +74,10 @@ ion-item-divider {
 		}
 
 		.searchbar-input {
-			background: rgba(3, 3, 3, 0.09);
+			background: $searchbar-toolbar-ios-background-color;
+			&::-webkit-input-placeholder {
+				color: $searchbar-ios-input-placeholder-color;
+			}
 		}
 	}
 }
@@ -207,9 +218,10 @@ ion-fab-list[side="top"] {
 	}
 }
 
-.hexagon__image--active .border {
-	fill: map-get($colors, green);
-}
+// no online status for now!
+//.hexagon__image--active .border {
+//	fill: map-get($colors, green);
+//}
 
 .hexagon__image--large {
 	width: 152px !important;

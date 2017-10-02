@@ -68,6 +68,8 @@
 		"title": "Select Contacts",
 		"selected": "Selected",
 		"search": "Search",
+		"contacts": "Contacts",
+		"global": "Worldwide",
 		"selectedContacts": "Selected Contacts",
 		"selectedExplain": "Above contacts will be added to the new conversation. You can later manage all members and add more.",
 		"selectedExplainAdd": "Above contacts will be added to this conversation."

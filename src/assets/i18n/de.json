@@ -68,6 +68,8 @@
 		"title": "Kontakte auswählen",
 		"selected": "Ausgewählt",
 		"search": "Suche",
+		"contacts": "Kontakte",
+		"global": "Weltweit",
 		"selectedContacts": "Ausgewählte Kontakte",
 		"selectedExplain": "Oben genannte Kontakte werden zur neuen Konversation hinzugefügt. Du kannst sie danach noch verwalten und weitere hinzufügen.",
 		"selectedExplainAdd": "Oben genannte Kontakte werden zur aktuellen Konversation hinzugefügt."

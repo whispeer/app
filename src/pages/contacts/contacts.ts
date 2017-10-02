@@ -20,8 +20,8 @@ export class ContactsPage extends ContactsWithSearch {
 
 	requests: any[] = [];
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, private translate: TranslateService) {
-		super()
+	constructor(public navCtrl: NavController, public navParams: NavParams, public translate: TranslateService) {
+		super(translate)
 	}
 
 	ionViewDidEnter() {
