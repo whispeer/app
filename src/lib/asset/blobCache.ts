@@ -10,8 +10,10 @@ const FILE = new File()
 
 const fixFileReader = () => {
 	const win: any = window
-	if (win.FileReader[win.Zone.__symbol__('originalDelegate')])
+	if (win.FileReader[win.Zone.__symbol__('originalDelegate')]) {
+		console.warn("Fixing file reader!")
 		win.FileReader = win.FileReader[win.Zone.__symbol__('originalDelegate')]
+	}
 }
 
 let cacheDirectoryPromise:Bluebird<string> = null
