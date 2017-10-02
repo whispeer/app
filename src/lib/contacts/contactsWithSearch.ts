@@ -1,3 +1,5 @@
+import { TranslateService } from '@ngx-translate/core'
+
 const contactsService = require("../../lib/services/friendsService");
 const userService = require("../../lib/users/userService").default;
 import errorService from "../../lib/services/error.service";
@@ -31,7 +33,7 @@ export class ContactsWithSearch {
 
 	private memoizer: Memoizer
 
-	constructor() {
+	constructor(public translate: TranslateService) {
 		this.memoizer = new Memoizer([
 			() => this.contacts,
 			() => this.searchResults,
@@ -74,9 +76,9 @@ export class ContactsWithSearch {
 		if(recordIndex === 0) {
 			if (this.searchTerm) {
 				if (record.isMyFriend) {
-					return "Contacts";
+					return this.translate.instant("chooseFriends.contacts")
 				} else {
-					return "Global";
+					return this.translate.instant("chooseFriends.global")
 				}
 			}
 
@@ -87,7 +89,7 @@ export class ContactsWithSearch {
 
 		if (this.searchTerm) {
 			if (previousEntry.isMyFriend && !record.isMyFriend) {
-				return "Global";
+				return this.translate.instant("chooseFriends.global")
 			}
 
 			return null;
