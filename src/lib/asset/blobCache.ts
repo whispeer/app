@@ -5,8 +5,17 @@ import Cache from "../services/Cache"
 import h from "../helper/helper" // tslint:disable-line:no-unused-variable
 
 const BLOB_CACHE_DIR = "blobCache"
+const LOCK_TIMEOUT = 30 * 1000
 const FILE = new File()
 
+const fixFileReader = () => {
+	const win: any = window
+	const delegateName = win.Zone.__symbol__('OriginalDelegate')
+	if (win.FileReader[delegateName]) {
+		console.warn("Fixing file reader!")
+		win.FileReader = win.FileReader[delegateName]
+	}
+}
 
 let cacheDirectoryPromise:Bluebird<string> = null
 const getCacheDirectory = () => {
@@ -27,10 +36,14 @@ const getCacheDirectory = () => {
 	return cacheDirectoryPromise
 }
 
-const readFileAsBlob = (path, filename, type) =>
-	FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
-const writeToFile = (path, filename, data: Blob) =>
-	FILE.writeFile(path, filename, data)
+const readFileAsBlob = (path, filename, type) => {
+	fixFileReader()
+	return FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
+}
+const writeToFile = (path, filename, data: Blob) => {
+	fixFileReader()
+	return FILE.writeFile(path, filename, data)
+}
 const existsFile = (path, filename) =>
 	FILE.checkFile(path, filename).catch((e) => {
 		if (e.code === 1) {
@@ -51,7 +64,7 @@ const noPendingStorageOperations = () => {
 				clearInterval(busyWait)
 			}
 		}, 10)
-	})
+	}).timeout(LOCK_TIMEOUT).catch(Bluebird.TimeoutError, () => {})
 }
 
 const blobCache = {
@@ -60,7 +73,7 @@ const blobCache = {
 		return Bluebird.try(async () => {
 			clearing = true
 			await noPendingStorageOperations()
-			return FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
+			await FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
 				.catch(error => {
 					// There really is little we can do here, but logouts, e.g., should not
 					// fail because we failed to clear.
@@ -83,6 +96,7 @@ const blobCache = {
 		return Bluebird.try(async () => {
 			if (clearing) throw new Error('Cannot store blob, currently clearing cache.')
 			storing++
+			console.warn(`storing++ ${storing-1} -> ${storing}, blob: ${blob.getBlobID()}`)
 			const blobID = blob.getBlobID()
 
 			if (!blob.isDecrypted()) {
@@ -98,7 +112,13 @@ const blobCache = {
 			}
 
 			return `${path}${filename}`
-		}).finally(() => storing--)
+		}).catch((e) => {
+			console.error(e)
+			return Bluebird.reject(e)
+		}).finally(() => {
+			storing--
+			console.warn(`storing-- ${storing+1} -> ${storing}, blob: ${blob.getBlobID()}`)
+		})
 	},
 
 	getBlobUrl: (blobID) => {
