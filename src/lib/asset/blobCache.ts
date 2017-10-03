@@ -92,6 +92,9 @@ const blobCache = {
 		})
 	},
 
+	readFileAsArrayBuffer: (directory: string, name: string) =>
+		Bluebird.resolve(FILE.readAsArrayBuffer(directory, name)),
+
 	store: (blob) => {
 		return Bluebird.try(async () => {
 			if (clearing) throw new Error('Cannot store blob, currently clearing cache.')

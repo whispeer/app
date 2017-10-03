@@ -1,7 +1,7 @@
 import * as Bluebird from "bluebird"
 
 import Storage from "./Storage";
-import blobCache from "../../lib/asset/blobCache"
+import blobCache from "../asset/blobCache"
 import Cache from "../services/Cache"
 import keyStore from "./keyStore.service";
 import { landingPage } from "./location.manager";

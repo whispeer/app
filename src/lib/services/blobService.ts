@@ -21,10 +21,6 @@ import blobCache from "../asset/blobCache"
 import socketService from "./socket.service"
 import BlobDownloader from "./blobDownloader.service"
 
-import { File } from '@ionic-native/file';
-
-const file = new File()
-
 const initService = require("services/initService");
 const Queue = require("asset/Queue");
 const keyStore = require("crypto/keyStore");
@@ -112,7 +108,7 @@ class MyBlob {
 		if (this.blobData.originalUrl) {
 			const { directory, name } = unpath(this.blobData.originalUrl)
 
-			return Bluebird.resolve(file.readAsArrayBuffer(directory, name))
+			return blobCache.readFileAsArrayBuffer(directory, name)
 		}
 
 		return new Bluebird((resolve) => {
@@ -331,7 +327,7 @@ const blobService = {
 	isBlobLoaded: (blobID) => {
 		return blobCache.isLoaded(blobID)
 	},
-	getBlobUrl: (blobID, progress: Progress = new Progress(), estimatedSize = 0) => {
+	getBlobUrl: (blobID, progress: Progress = new Progress(), estimatedSize = 0): Bluebird<string> => {
 		return blobCache.getBlobUrl(blobID).catch(() => {
 			return getBlob(blobID, progress, estimatedSize)
 		})
