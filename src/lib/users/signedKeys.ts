@@ -19,7 +19,7 @@ type SignedKeysCache = {
 export class SignedKeysLoader extends ObjectLoader<SignedKeys, SignedKeysCache>({
 	cacheName: "signedKeys",
 	getID: ({ signedKeys: { _signature }, signKey }) => `${signKey}-${_signature}`,
-	download: id => { throw new Error("profile get by id is not implemented") },
+	download: () => { throw new Error("profile get by id is not implemented") },
 	load: ({ signedKeys, signKey }): Bluebird<SignedKeysCache> => {
 		const securedData = SecuredData.load(undefined, signedKeys, { type: "signedKeys" })
 

@@ -24,6 +24,8 @@ export const landingPage = () => {
 	window.top.location.reload()
 }
 
+export const isIOS = () => window.device && window.device.platform === "iOS"
+
 export const isLoginPage = () => {
 	return window.top.location.pathname.indexOf("/login") !== -1;
 }

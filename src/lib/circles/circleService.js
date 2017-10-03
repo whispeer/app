@@ -2,19 +2,18 @@
 * MessageService
 **/
 
-var h = require("../helper/helper").default;
-var Observer = require("asset/observer");
-var SecuredData = require("asset/securedDataWithMetaData");
-var Bluebird = require("bluebird");
+const h = require("../helper/helper").default;
+const Observer = require("asset/observer");
+const SecuredData = require("asset/securedDataWithMetaData");
+const Bluebird = require("bluebird");
 
-var socket = require("services/socket.service").default;
-var keyStore = require("services/keyStore.service").default;
-var initService = require("services/initService");
+const socket = require("services/socket.service").default;
+const keyStore = require("services/keyStore.service").default;
+const initService = require("services/initService");
 
-var userService = require("users/userService").default;
-var settingsService = require("services/settings.service").default;
+const settingsService = require("services/settings.service").default;
 
-var friendsService = require("services/friendsService");
+const friendsService = require("services/friendsService");
 
 var circles = {};
 var circleArray = [];
@@ -34,7 +33,8 @@ function encryptKeyForUsers(key, users, cb) {
 
 function generateNewKey(cb) {
 	return keyStore.sym.generateKey(null, "CircleKey").then(function (key) {
-		var mainKey = userService.getOwn().getMainKey();
+		const userService = require("users/userService").default;
+		const mainKey = userService.getOwn().getMainKey();
 
 		return keyStore.sym.symEncryptKey(key, mainKey).thenReturn(key);
 	}).nodeify(cb);
@@ -110,6 +110,7 @@ var Circle = function (data) {
 				circleKey: newKey
 			});
 
+			const userService = require("users/userService").default;
 			return circleSec.getUpdatedData(userService.getOwn().getSignKey());
 		}).then(function (newData) {
 			var update = {
@@ -136,6 +137,7 @@ var Circle = function (data) {
 			theCircle.data.userids = circleUsers;
 
 			if (removing) {
+				const userService = require("users/userService").default;
 				var ownUser = userService.getOwn();
 
 				var uploadChangedProfileAsync = Bluebird.promisify(ownUser.uploadChangedProfile.bind(ownUser));
@@ -169,6 +171,7 @@ var Circle = function (data) {
 	};
 
 	this.load = function (cb) {
+		const userService = require("users/userService").default;
 		return Bluebird.all([
 			circleSec.decrypt(),
 			circleSec.verify(userService.getOwn().getSignKey(), undefined, id)
@@ -191,6 +194,8 @@ var Circle = function (data) {
 			var loadableUsers = circleUsers.filter(function (user) {
 				return loadedIDs.indexOf(user) === -1;
 			});
+
+			const userService = require("users/userService").default;
 
 			return userService.getMultiple(loadableUsers.slice(0, limit));
 		}).map(function (user) {
@@ -249,6 +254,7 @@ var circleService = {
 
 		return generateNewKey().then(function (symKey) {
 			return encryptKeyForUsers(symKey, users).then(function () {
+				const userService = require("users/userService").default;
 				var own = userService.getOwn();
 				var mainKey = own.getMainKey();
 

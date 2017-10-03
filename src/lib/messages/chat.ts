@@ -222,7 +222,7 @@ export class Chat extends Observer {
 			}
 
 			return messagesLoaded
-		}).catch((e) => messagesLoaded).then((messages) => {
+		}).catch(() => messagesLoaded).then((messages) => {
 			messages.forEach((m) => this.addMessage(m))
 			return messages
 		})
@@ -578,7 +578,7 @@ export class Chat extends Observer {
 		return this.sendMessage(messageData.message, { images: [], files: [] }, messageData.id);
 	};
 
-	private storeMessage = (messageObject, message, attachments, id) => {
+	private storeMessage = (messageObject, message, id) => {
 		if (!id) {
 			return Bluebird.resolve()
 		}
@@ -602,7 +602,7 @@ export class Chat extends Observer {
 	sendMessage = (message, attachments, id?) => {
 		var messageObject = new Message(message, this, attachments, id)
 
-		this.storeMessage(messageObject, message, attachments, id).finally(() => {
+		this.storeMessage(messageObject, message, id).finally(() => {
 			var sendMessagePromise = messageObject.sendContinously();
 
 			sendMessagePromise.then(() => {

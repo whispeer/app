@@ -5,7 +5,7 @@ import { StatusBar } from "@ionic-native/status-bar";
 import sessionService from '../../lib/services/session.service';
 import { failureCodes } from "../../lib/services/login.service";
 import loginService from "../../lib/services/login.service";
-import passwordStrengthService from '../../lib/services/passwordStrength.service'
+import passwordStrength from '../../lib/services/passwordStrength.service'
 
 const registerService = require('../../lib/services/registerService');
 import whispeerHelper from "../../lib/helper/helper"
@@ -199,7 +199,7 @@ export class LoginPage {
 	}
 
 	passwordToShort = () => {
-		return passwordStrengthService.passwordStrength(this.login.password) === 0
+		return passwordStrength(this.login.password) === 0
 	}
 
 	loadLogin = () =>

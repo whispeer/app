@@ -24,7 +24,7 @@ export default class Storage {
 				storageInfo.broken = true;
 				console.warn(e);
 
-				var getStorageFunction = window.top.whispeerGetStorage;
+				var getStorageFunction = (<any>window).top.whispeerGetStorage;
 
 				if (getStorageFunction) {
 					console.log("got storage function");

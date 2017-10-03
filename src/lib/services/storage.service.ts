@@ -20,7 +20,7 @@ export const storageInfo = {
 }
 
 export function promoteMainWindow() {
-	window.top.whispeerGetStorage = function (prefix: string) {
+	(<any>window).top.whispeerGetStorage = function (prefix: string) {
 		return this.storages[prefix];
 	};
 }

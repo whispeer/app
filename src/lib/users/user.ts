@@ -15,7 +15,7 @@ import Profile from "../users/profile"
 import trustService from "../services/trust.service"
 import settingsService from "../services/settings.service"
 import filterService from "../services/filter.service"
-import { reloadApp } from "../services/location.manager"
+import { reloadApp, isIOS } from "../services/location.manager"
 import MutableObjectLoader, { UpdateEvent } from "../services/mutableObjectLoader"
 
 import requestKeyService from "../services/requestKey.service"
@@ -585,7 +585,7 @@ class User implements UserInterface {
 		}
 
 		return blobService.getBlobUrl(blob.blobid).then(url =>
-			window.device && window.device.platform === "iOS" ?
+			isIOS() ?
 				url.replace("file://", "") : url
 		).then((imageUrl) => {
 			this.data.basic.image = imageUrl
@@ -909,10 +909,10 @@ function enhanceOwnUser(userData) {
 }
 
 export default class UserLoader extends MutableObjectLoader<UserInterface, CachedUser>({
-	download: (id, previousInstance) =>
+	download: (id) =>
 		socketService.emit("user.getMultiple", { identifiers: [id] })
 			.then((response) => response.users[0]),
-	load: (userData, previousInstance) =>
+	load: (userData) =>
 		Bluebird.resolve(userData),
 	restore: (userData, previousInstance) => {
 		if (previousInstance) {
@@ -976,7 +976,7 @@ export default class UserLoader extends MutableObjectLoader<UserInterface, Cache
 			return user
 		})
 	},
-	shouldUpdate: (event, instance, lastUpdated) => {
+	shouldUpdate: (event, instance) => {
 		if (sessionService.isOwnUserID(instance.getID())) {
 			return Bluebird.delay(RELOAD_OWN_DELAY).thenReturn(true)
 		}

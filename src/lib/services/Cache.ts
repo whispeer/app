@@ -1,10 +1,10 @@
 import { errorServiceInstance } from "./error.service";
 import * as Bluebird from "bluebird";
 import h from "../helper/helper"
-import idb, { Cursor } from "idb" // tslint:disable-line:no-unused-variable
+import idb, { Cursor, DB } from "idb" // tslint:disable-line:no-unused-variable
 
 const REINIT_CACHE_TIMEOUT = 2000
-let dbPromise, cachesDisabled
+let dbPromise: Promise<DB>, cachesDisabled
 
 const initCache = () => {
 	cachesDisabled = false
@@ -111,6 +111,20 @@ export default class Cache {
 
 			await tx.complete
 		}).catch(errorServiceInstance.criticalError);
+	}
+
+	contains(id: string): Bluebird<boolean> {
+		if (this.isDisabled()) {
+			return Bluebird.reject(new Error(`Cache is disabled ${this.name}`));
+		}
+
+		return Bluebird.try(async () => {
+			const db = await dbPromise
+			const tx = db.transaction("cache", "readonly")
+			const count = await tx.objectStore("cache").count(`${this.name}/${id}`)
+
+			return count > 0
+		})
 	}
 
 	get(id: string): Bluebird<any> {

@@ -82,9 +82,7 @@ userService = {
 	},
 
 	/** get own user. synchronous */
-	getOwn: function () {
-		return UserLoader.getLoaded(sessionService.getUserID())
-	},
+	getOwn: () => UserLoader.getLoaded(sessionService.getUserID()),
 
 	getOwnAsync: () => {
 		return UserLoader.get(sessionService.getUserID())
