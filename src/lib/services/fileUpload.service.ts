@@ -61,9 +61,13 @@ class FileUpload {
 
 			return this.uploadPreparedBlob(this.blob)
 		}).then((keys) => {
-			const { directory, name } = unpath(this.file.originalUrl)
+			if (this.file.originalUrl) {
+				const { directory, name } = unpath(this.file.originalUrl)
 
-			return blobCache.moveFileToBlob(directory, name, this.blob.getBlobID()).then(() => keys)
+				return blobCache.moveFileToBlob(directory, name, this.blob.getBlobID()).then(() => keys)
+			}
+
+			return keys
 		})
 	}
 
