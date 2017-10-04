@@ -8,7 +8,7 @@ export default class Storage {
 	}
 
 	get = (key: string): any =>
-		Bluebird.resolve(localStorage.getItem(this.calculateKey(key)))
+		localStorage.getItem(this.calculateKey(key))
 
 	set = (key: string, data: any) =>
 		localStorage.setItem(this.calculateKey(key), data);
