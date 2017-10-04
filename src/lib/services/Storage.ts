@@ -21,7 +21,7 @@ export default class Storage {
 		usedKeys.filter(function (key) {
 			return key.indexOf(this._prefix) === 0
 		}, this).forEach(function (key) {
-			localStorage.removeItem(key)
+			localStorage.setItem(key, "")
 		})
 
 		return Bluebird.resolve()
