@@ -37,7 +37,6 @@ ionic cordova build --release android
 cp ./platforms/android/build/outputs/apk/android-release-unsigned.apk ./release/whispeer-android4-unsigned.apk
 
 rm -rf platforms plugins www/*
-cordova prepare
 
 extra=android
 signAndCopy
