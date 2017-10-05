@@ -5,6 +5,9 @@
 </ion-header>
 
 <ion-content class="list-avatar-page">
+	<div *ngIf="showNoConversationsPlaceholder()" class="home__no-content-container" ion-fixed>
+		<img class="home__no-content-image" src="assets/images/no_conversations_{{lang}}.png">
+	</div>
 	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="openContactRequests()">
 		<div class="badgeContainer">
 			<span class="hexBadge">{{requests.length}}</span>
@@ -12,9 +15,6 @@
 		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
-	<div ion-fixed class="home__no-content-container" *ngIf="showNoConversationsPlaceholder()">
-		<img class="home__no-content-image" src="assets/images/no_conversations_{{lang}}.png">
-	</div>
 	<ion-list class="space-for-fab">
 		<ion-item *ngFor="let chat of getLoadedChats(); let i = index" class="topic" [ngClass]="{'topic--new': !chat.blocked && chat.unread}" tappable (click)="openChat(chat.id)">
 			<div class="user__image-wrap" item-left>

@@ -215,6 +215,9 @@ page-home {
 	height: 100%;
 	width: 100%;
 	text-align: center;
+	// no content image should be treated like a background, and therefore
+	// it needs to be reset to auto z-index.
+	&[ion-fixed] { z-index: auto; }
 }
 
 .home__no-content-image {
