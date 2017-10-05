@@ -127,4 +127,5 @@
     <plugin name="phonegap-plugin-push" spec="1.9.1">
         <variable name="SENDER_ID" value="809266780938" />
     </plugin>
+    <plugin name="cordova-plugin-file-opener2" spec="^2.0.19" />
 </widget>
