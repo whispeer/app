@@ -15,9 +15,9 @@ const filterContacts = (contacts, searchTerm) => {
 		return contacts;
 	}
 
-	return contacts.filter((contact) => {
-		return contact.names.searchName.indexOf(searchTerm.toLowerCase()) > -1;
-	});
+	return contacts.filter((contact) =>
+		contact.names.searchName.indexOf(searchTerm.toLowerCase()) > -1
+	)
 }
 
 export class ContactsWithSearch {
