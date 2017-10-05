@@ -107,6 +107,10 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
+		this.numberOfChatsToDisplay = messageService.getChatIDs()
+			.filter((chatID) => ChatLoader.isLoaded(chatID))
+			.length
+
 		console.warn("load more chats?", this.getLoadedChats().length)
 		if (this.getLoadedChats().length >= CHATS_PER_SCREEN) {
 			return
