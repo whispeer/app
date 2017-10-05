@@ -118,20 +118,28 @@ export class Navigator {
 		e.preventDefault()
 	}
 
+	close() {
+		if (this.open) { this.open = false }
+	}
+
 	invokeProfile() {
+		this.close()
 		const userId = sessionService.userid
 		this.navCtrl.push("Profile", { userId })
 	}
 
 	invokeContacts() {
+		this.close()
 		this.navCtrl.push("Contacts")
 	}
 
 	invokeSearch() {
+		this.close()
 		this.navCtrl.push("Contacts", { search: true })
 	}
 
 	invokeSettings() {
+		this.close()
 		this.navCtrl.push("Settings")
 	}
 }
