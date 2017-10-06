@@ -54,9 +54,20 @@
 			</div>
 		</ion-item>
 	</ion-list>
-	<p *ngIf="selectedUsers.length > 0" class="text-grey" padding-horizontal>
-		{{ 'topic.add.selectedExplain' | translate }}
-	</p>
+	<!-- Wondering about this div? Please check chooseFriends.html! -->
+	<div>
+		<p *ngIf="selectedUsers.length > 0" class="text-grey" padding-horizontal>
+			{{ 'topic.add.selectedExplain' | translate }}
+		</p>
+	</div>
+	<ion-list *ngIf="searchTerm.length > 0" class="friends__list">
+		<ion-list-header class="friends__list__header" [attr.padding-top]="selectedUsers.length === 0 ? '': null">
+			{{ 'chooseFriends.search' | translate }}
+		</ion-list-header>
+		<p class="text-grey" padding-horizontal>
+			{{ 'chooseFriends.searchFor' | translate:{searchTerm: searchTerm} }}
+		</p>
+	</ion-list>
 	<ion-list *ngIf="!saving" [virtualScroll]="getFilteredUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0 && selectedUsers.length === 0}">
 			{{ header }}
