@@ -13,6 +13,7 @@
 			(ngModelChange)="executeSearch()"
 			[showCancelButton]="true"
 			[cancelButtonText]="'general.cancel' | translate"
+			(search)="closeSearchBar($event)"
 		></ion-searchbar>
 	</ion-toolbar>
 </ion-header>

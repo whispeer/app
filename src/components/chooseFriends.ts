@@ -66,4 +66,8 @@ export class ChooseFriends extends ContactsWithSearch {
 		this.navCtrl.pop();
 	}
 
+	closeSearchBar = ($event) => {
+		$event.srcElement.blur()
+	}
+
 }

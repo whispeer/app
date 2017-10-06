@@ -10,7 +10,8 @@
 			animated
 			[placeholder]="'chooseFriends.search' | translate"
 			[(ngModel)]="searchTerm"
-			(ngModelChange)="executeSearch()" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate">
+			(ngModelChange)="executeSearch()" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate"
+			(search)="closeSearchBar($event)">
 		</ion-searchbar>
 	</ion-toolbar>
 </ion-header>

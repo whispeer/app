@@ -125,4 +125,8 @@ export class AddPage extends ContactsWithSearch {
 		});
 	}
 
+	closeSearchBar = ($event) => {
+		$event.srcElement.blur()
+	}
+
 }
