@@ -104,11 +104,11 @@
 				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>
 			</span>
 		</div>
-		<button ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"
+		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"
 		*ngIf="!showRecordIcon() || isRecordingUIVisible()">
 			<ion-icon name="send"></ion-icon>
 		</button>
-		<button ion-button icon-only class="ios__messages__send-message" (click)="toggleRecording()"
+		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="toggleRecording()"
 		*ngIf="showRecordIcon() && !isRecordingUIVisible()">
 			<ion-icon name="mic"></ion-icon>
 		</button>
