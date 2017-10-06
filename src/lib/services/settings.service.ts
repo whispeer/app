@@ -49,12 +49,6 @@ interface ISettings {
 	uiLanguage: string
 }
 
-interface IPrivacyAPI {
-	safetyNames: string[],
-	setPrivacy: Function,
-	removeCircle: Function
-}
-
 import h from "../helper/helper";
 const EncryptedData = require("crypto/encryptedData");
 const SecuredData = require("asset/securedDataWithMetaData");
@@ -62,88 +56,91 @@ const SecuredData = require("asset/securedDataWithMetaData");
 const notVisible:IVisibility = {
 	encrypt: true,
 	visibility: []
-};
+}
+
+const privacyAttributes = ["birthday", "location", "relationship", "education", "work", "gender", "languages"]
+
+const publicBranches = ["uiLanguage", "sound", "donate", "safety"]
+const serverBranches = ["mailsEnabled"]
+
+const defaultSettings:ISettings = {
+	privacy: {
+		basic: {
+			firstname: {
+				encrypt: false,
+				visibility: ["always:allfriends"]
+			},
+			lastname: {
+				encrypt: false,
+				visibility: ["always:allfriends"]
+			}
+		},
+		imageBlob: {
+			encrypt: false,
+			visibility: []
+		},
+		location: notVisible,
+		birthday: notVisible,
+		relationship: notVisible,
+		education: notVisible,
+		work: notVisible,
+		gender: notVisible,
+		languages: notVisible
+	},
+	donate: {
+		refused: false,
+		later: 0
+	},
+	sharePosts: ["always:allfriends"],
+	filterSelection: [],
+	sound: {
+		enabled: true
+	},
+	messages: {
+		sendShortCut: "enter"
+	},
+	safety: {
+		blockedUsers: []
+	},
+	uiLanguage: "en"
+}
+
+const isBranchPublic = (branchName: string) => {
+	return publicBranches.indexOf(branchName) > -1;
+}
+
+const isBranchServer = (branchName: string) => {
+	return serverBranches.indexOf(branchName) > -1;
+}
+
+const securedDataOptions = { type: "settings", removeEmpty: true }
+
+const turnOldSettingsToNew = (settings: any) => {
+	var result = {
+		meta: { initialLanguage: <string> undefined },
+		content: { }
+	};
+
+	h.objectEach(settings, (key: any, val: any) => {
+		if (isBranchPublic(key)) {
+			result.meta[key] = val;
+		} else {
+			result.content[key] = val;
+		}
+	});
+
+	return result;
+}
 
 class SettingsService extends Observer {
 
 	settings: any;
 	serverSettings = {};
-	options = { type: "settings", removeEmpty: true };
 	api: any;
-
-	defaultSettings:ISettings = {
-		privacy: {
-			basic: {
-				firstname: {
-					encrypt: false,
-					visibility: ["always:allfriends"]
-				},
-				lastname: {
-					encrypt: false,
-					visibility: ["always:allfriends"]
-				}
-			},
-			imageBlob: {
-				encrypt: false,
-				visibility: []
-			},
-			location: notVisible,
-			birthday: notVisible,
-			relationship: notVisible,
-			education: notVisible,
-			work: notVisible,
-			gender: notVisible,
-			languages: notVisible
-		},
-		donate: {
-			refused: false,
-			later: 0
-		},
-		sharePosts: ["always:allfriends"],
-		filterSelection: [],
-		sound: {
-			enabled: true
-		},
-		messages: {
-			sendShortCut: "enter"
-		},
-		safety: {
-			blockedUsers: []
-		},
-		uiLanguage: "en"
-	};
-
-	publicBranches = ["uiLanguage", "sound", "donate", "safety"];
-	serverBranches = ["mailsEnabled"];
 
 	loadCachePromise = Bluebird.resolve();
 
-	isBranchPublic = (branchName: string) => {
-		return this.publicBranches.indexOf(branchName) > -1;
-	}
-
-	isBranchServer = (branchName: string) => {
-		return this.serverBranches.indexOf(branchName) > -1;
-	}
-
-	turnOldSettingsToNew = (settings: any) => {
-		var result = {
-			meta: { initialLanguage: <string> undefined },
-			content: { }
-		};
-
-		h.objectEach(settings, (key: any, val: any) => {
-			if (this.isBranchPublic(key)) {
-				result.meta[key] = val;
-			} else {
-				result.content[key] = val;
-			}
-		});
-
-		return result;
-	}
-
-	migrateToFormat2 = (givenOldSettings: any) => {
+	private migrateToFormat2 = (givenOldSettings: any) => {
 		console.warn("migrating settings to format 2");
 
 		return Bluebird.try(() => {
@@ -151,7 +148,7 @@ class SettingsService extends Observer {
 			var oldSettings = new EncryptedData(givenOldSettings);
 			return oldSettings.decrypt();
 		}).then(decryptedSettings => {
-			var data = this.turnOldSettingsToNew(decryptedSettings);
+			var data = turnOldSettingsToNew(decryptedSettings);
 
 			data.meta.initialLanguage = h.getLanguageFromPath();
 
@@ -159,17 +156,17 @@ class SettingsService extends Observer {
 
 			return SecuredData.createAsync(data.content,
 				data.meta,
-				this.options,
+				securedDataOptions,
 				ownUser.getSignKey(),
 				ownUser.getMainKey()
-			);
+			)
 
 		}).then(signedAndEncryptedSettings => {
 			this.settings = SecuredData.load(
 				signedAndEncryptedSettings.content,
 				signedAndEncryptedSettings.meta,
-				this.options
-			);
+				securedDataOptions
+			)
 
 			return socketService.emit("settings.setSettings", {
 				settings: signedAndEncryptedSettings,
@@ -184,7 +181,7 @@ class SettingsService extends Observer {
 			if (givenSettings.ct) {
 				return this.migrateToFormat2(givenSettings);
 			} else {
-				return SecuredData.load(givenSettings.content, givenSettings.meta, this.options);
+				return SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions);
 			}
 		}).then(_settings => {
 			this.settings = _settings;
@@ -232,17 +229,11 @@ class SettingsService extends Observer {
 		});
 	}
 
-	setDefaultLanguage = (language: string) => {
-		this.defaultSettings.uiLanguage = language;
-	}
+	setDefaultLanguage = (language: string) => defaultSettings.uiLanguage = language
 
-	getContent = () => {
-		return this.settings.contentGet();
-	};
+	getContent = () => this.settings.contentGet()
 
-	setContent = (content: any) => {
-		return this.settings.contentSet(content);
-	};
+	setContent = (content: any) => this.settings.contentSet(content)
 
 	decrypt = (cb: Function) => {
 		return Bluebird.try(() => {
@@ -256,11 +247,11 @@ class SettingsService extends Observer {
 	};
 
 	getBranchContent = (branchName: string) => {
-		if (this.isBranchServer(branchName)) {
+		if (isBranchServer(branchName)) {
 			return this.serverSettings[branchName];
 		}
 
-		if (this.isBranchPublic(branchName)) {
+		if (isBranchPublic(branchName)) {
 			return this.settings.metaAttr(branchName);
 		}
 
@@ -269,22 +260,22 @@ class SettingsService extends Observer {
 
 	getBranch = (branchName: string) => {
 		if (!this.settings) {
-			return this.defaultSettings[branchName];
+			return defaultSettings[branchName];
 		}
 
 		const branchContent = this.getBranchContent(branchName)
 
 		if (typeof branchContent === "undefined") {
-			return this.defaultSettings[branchName];
+			return defaultSettings[branchName];
 		}
 
 		return branchContent;
 	};
 
 	updateBranch = (branchName: any, value: any) => {
-		if (this.isBranchServer(branchName)) {
+		if (isBranchServer(branchName)) {
 			this.serverSettings[branchName] = value;
-		} else if (this.isBranchPublic(branchName)) {
+		} else if (isBranchPublic(branchName)) {
 			this.settings.metaSetAttr(branchName, value);
 		} else {
 			this.settings.contentSetAttr(branchName, value);
@@ -293,39 +284,31 @@ class SettingsService extends Observer {
 		this.notify("", "updated");
 	};
 
-	privacy: IPrivacyAPI = {
 
-		safetyNames: ["birthday", "location", "relationship", "education", "work", "gender", "languages"],
+	setPrivacy = (privacy: any) => {
+		return Bluebird.try(() => {
+			this.updateBranch("privacy", privacy);
+			return this.uploadChangedData();
+		}).then(() => {
+			const userService = require("users/userService").default;
+			return userService.getOwn().uploadChangedProfile();
+		})
+	}
 
-		setPrivacy: (privacy: any, cb: Function, updateProfile: any) => {
-			return Bluebird.try(() => {
-				this.updateBranch("privacy", privacy);
-				return this.uploadChangedData();
-			}).then(() => {
-				if (!updateProfile) {
-					return;
-				}
+	removeCircle = (id: any) => {
+		return Bluebird.try(() => {
+			var privacy = this.getBranch("privacy");
 
-				var userService = require("users/userService").default;
-				return userService.getOwn().uploadChangedProfile();
-			}).nodeify(cb);
-		},
+			privacyAttributes.forEach((safetyName: any) => {
+				h.removeArray(privacy[safetyName].visibility, "circle:" + id);
+			});
 
-		removeCircle: (id: any, cb: Function) => {
-			return Bluebird.try(() => {
-				var privacy = this.getBranch("privacy");
+			h.removeArray(privacy.basic.firstname.visibility, "circle:" + id);
+			h.removeArray(privacy.basic.lastname.visibility, "circle:" + id);
 
-				this.privacy.safetyNames.forEach((safetyName: any) => {
-					h.removeArray(privacy[safetyName].visibility, "circle:" + id);
-				});
-
-				h.removeArray(privacy.basic.firstname.visibility, "circle:" + id);
-				h.removeArray(privacy.basic.lastname.visibility, "circle:" + id);
-
-				return this.privacy.setPrivacy(privacy, null, true);
-			}).nodeify(cb);
-		}
-	};
+			return this.setPrivacy(privacy);
+		})
+	}
 
 	uploadChangedData = () => {
 		if (!this.settings.isChanged()) {
@@ -342,9 +325,9 @@ class SettingsService extends Observer {
 				return socketService.emit("settings.setSettings", {
 					settings: newEncryptedSettings
 				});
-			}).then((result: any) => {
-				return result.success;
-			})
+			}).then((result: any) =>
+				result.success
+			)
 	};
 
 	getBlockedUsers = (): blockedUserInfo[] => this.getBranch("safety").blockedUsers

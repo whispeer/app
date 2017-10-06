@@ -63,7 +63,7 @@ var Circle = function (data) {
 	};
 
 	this.remove = function (cb) {
-		return settingsService.privacy.removeCircle().then(function () {
+		return settingsService.removeCircle().then(function () {
 			return socket.emit("circle.delete", {
 				remove: {
 					circleid: id
