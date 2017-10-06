@@ -52,11 +52,18 @@
 			</div>
 		</ion-item>
 	</ion-list>
-	<p class="text-grey" padding-horizontal *ngIf="selectedUsers.length > 0" [innerHTML]="'chooseFriends.selectedExplain' | translate">
-	</p>
-	<ion-item-divider class="friends__divider" *ngIf="searchTerm.length > 0">
-		{{ 'chooseFriends.search' | translate }}
-	</ion-item-divider>
+	<!-- This wrapping div is necessary because the Search-Titles paddng would lay under the header without it. Hence the ngIf has to stay on the paragraph. Please don't ask me why! -->
+	<div>
+		<p class="text-grey" padding-horizontal *ngIf="selectedUsers.length > 0" [innerHTML]="'chooseFriends.selectedExplain' | translate"></p>
+	</div>
+	<ion-list *ngIf="searchTerm.length > 0" class="friends__list">
+		<ion-list-header class="friends__list__header" [attr.padding-top]="selectedUsers.length === 0 ? '': null">
+			Suche
+		</ion-list-header>
+		<p class="text-grey" padding-horizontal>
+			Suche nach "{{searchTerm}}"
+		</p>
+	</ion-list>
 	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0 && selectedUsers.length === 0}">
 			{{ header }}
