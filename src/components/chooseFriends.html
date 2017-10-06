@@ -58,10 +58,10 @@
 	</div>
 	<ion-list *ngIf="searchTerm.length > 0" class="friends__list">
 		<ion-list-header class="friends__list__header" [attr.padding-top]="selectedUsers.length === 0 ? '': null">
-			Suche
+			{{ 'chooseFriends.search' | translate }}
 		</ion-list-header>
 		<p class="text-grey" padding-horizontal>
-			Suche nach "{{searchTerm}}"
+			{{ 'chooseFriends.searchFor' | translate:{searchTerm: searchTerm} }}
 		</p>
 	</ion-list>
 	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
