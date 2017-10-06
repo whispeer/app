@@ -119,7 +119,7 @@ export class Navigator {
 	}
 
 	close() {
-		if (this.open) { this.open = false }
+		this.open = false
 	}
 
 	invokeProfile() {
