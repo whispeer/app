@@ -54,7 +54,7 @@
 			</div>
 		</ion-item>
 	</ion-list>
-	<!-- Wondering about this div? Please check chooseFriends.html! -->
+	<!-- This wrapping div is necessary because the Search-Titles paddng would lay under the header without it. Hence the ngIf has to stay on the paragraph. Please don't ask me why! -->
 	<div>
 		<p *ngIf="selectedUsers.length > 0" class="text-grey" padding-horizontal>
 			{{ 'topic.add.selectedExplain' | translate }}
