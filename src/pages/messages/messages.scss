@@ -182,7 +182,7 @@ topicWithBursts {
 	width: 100%;
 
 	overflow: visible;
-	padding: 5px 0 5px 25px;
+	padding: 5px 0 5px 20.5px;
 }
 
 .message__file__hexagon-wrap {
@@ -355,7 +355,7 @@ topicWithBursts {
 		color: #fff;
 
 		&.message__file{
-			margin-left: 20px;
+			margin-left: 20.5px + 10px;
 		}
 	}
 
@@ -389,7 +389,7 @@ topicWithBursts {
 	}
 
 	.message__file__info {
-		padding-left: 10px;
+		padding-left: 8px;
 		padding-right: 15px;
 	}
 
