@@ -322,104 +322,96 @@ topicWithBursts {
 	text-overflow: initial;
 }
 
+$padding-within-burst: 3px;
+$bubble-padding-vertical: 9px;
+$bubble-padding-horizontal: 12px;
+$bubble-radius-ios: 5px;
+$bubble-radius-android: 5px;
+
 .messages__message {
 	position: relative;
-	padding: 5px 20px;
-	border-radius: 20px;
-
+	padding: $bubble-padding-vertical $bubble-padding-horizontal;
+	border-radius: $bubble-radius-ios;
+	.md & { border-radius: $bubble-radius-android; } // .md seems to be an android hack.
 	box-sizing: border-box;
-
 	max-width: 75%;
 	word-wrap: break-word;
 	white-space: normal;
-}
 
-.md .messages__message {
-	border-radius: 5px;
-}
-
-.messages__message {
 	.burst--me & {
-
-		margin: auto 5px 1px 10px;
-		order: 2;
-
+		margin: auto 5px $padding-within-burst 10px;
 		background: $message-bubble-color;
+		order: 2;
 		color: #fff;
 
-		&.message__file{
-			margin-left: 20px;
-		}
+		&.message__file{ margin-left: 20px }
 	}
-}
 
-.messages__message {
 	.burst--other & {
+		margin: auto 10px $padding-within-burst 5px;
 		background: map-get($colors, other_grey);
 		color: map-get($colors, dark);
 
-		margin: auto 10px 1px 5px;
-
-		&.message__file{
-			margin-right: 20px;
-		}
+		&.message__file{ margin-right: 20px }
 	}
 }
 
 .messages__wrap:last-child {
-	.burst--me & .messages__message {
-		&:before {
-			content: "";
-			position: absolute;
-			z-index: 1;
-			bottom: -2px;
-			right: -7px;
-			height: 20px;
-			border-right: 20px solid $message-bubble-color;
-			border-bottom-left-radius: 16px 14px;
-			transform: translate(0, -2px);
-		}
+	.messages__message {
+		.burst--me & {
+			&:before {
+				content: "";
+				position: absolute;
+				z-index: 1;
+				bottom: -2px;
+				right: -7px;
+				height: 20px;
+				border-right: 20px solid $message-bubble-color;
+				border-bottom-left-radius: 16px 14px;
+				transform: translate(0, -2px);
+			}
 
-		&:after {
-			content: "";
-			position: absolute;
-			z-index: 2;
-			bottom: -2px;
-			right: -56px;
-			width: 26px;
-			height: 20px;
-			background: white;
-			border-bottom-left-radius: 10px;
-			transform: translate(-30px, -2px);
+			&:after {
+				content: "";
+				position: absolute;
+				z-index: 2;
+				bottom: -2px;
+				right: -56px;
+				width: 26px;
+				height: 20px;
+				background: white;
+				border-bottom-left-radius: 10px;
+				transform: translate(-30px, -2px);
+			}
 		}
 	}
-}
 
-.messages__wrap:last-child {
-	.burst--other & .messages__message {
-		&:before {
-			content:"";
-			position: absolute;
-			z-index: 2;
-			bottom: -2px;
-			left: -7px;
-			height: 20px;
-			border-left: 20px solid map-get($colors, other_grey);
-			border-bottom-right-radius: 16px 14px;
-			transform: translate(0, -2px);
-		}
+	.messages__message {
+		.burst--other & {
+			&:before {
+				content:"";
+				position: absolute;
+				z-index: 2;
+				bottom: -2px;
+				left: -7px;
+				height: 20px;
+				border-left: 20px solid map-get($colors, other_grey);
+				border-bottom-right-radius: 16px 14px;
+				transform: translate(0, -2px);
+			}
 
-		&:after {
-			content: "";
-			position: absolute;
-			z-index: 3;
-			bottom: -2px;
-			left: 4px;
-			width: 26px;
-			height: 20px;
-			background: white;
-			border-bottom-right-radius: 10px;
-			transform:translate(-30px, -2px);
+			&:after {
+				content: "";
+				position: absolute;
+				z-index: 3;
+				bottom: -2px;
+				left: 4px;
+				width: 26px;
+				height: 20px;
+				background: white;
+				border-bottom-right-radius: 10px;
+				transform:translate(-30px, -2px);
+			}
 		}
 	}
 }
