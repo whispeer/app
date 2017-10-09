@@ -19,11 +19,12 @@
 				<!-- TODO: icon states.
 					maybe we should use different svgs with
 					icons built in them... -->
-				<ion-icon name="md-download" class="message__file__hexagon-icon"></ion-icon>
+				<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)"></ion-icon>
+				<loading-progress *ngIf="(!file.loaded && file.getProgress) || voicemailSending()" [progress]="file.getProgress" [inverse]="voicemailSending()"></loading-progress>
 			</div>
 			<span class="message__file__info">
-				<span class="message__file__name">{{ file.name | filenameLimit: 15 }}</span>
-				<span class="message__file__size">[{{ formatSize(file.size) }}]</span>
+				<span class="message__file__name">{{ file.name | filenameLimit: 25 }}</span>
+				<span class="message__file__size" *ngIf="!file.loaded">[{{ formatSize(file.size) }}]</span>
 			</span>
 		</div>
 		<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>

@@ -9,6 +9,7 @@ import VoicemailPlayer from "../../lib/asset/voicemailPlayer"
 
 import h from "../../lib/helper/helper"
 import Progress from "../../lib/asset/Progress"
+import blobService from "../../lib/services/blobService"
 
 @Component({
 	selector: "Message",
@@ -77,6 +78,17 @@ export class MessageComponent {
 
 	voicemailLoaded = () =>
 		this.message.data.voicemails.reduce((prev, next) => prev && next.loaded, true)
+
+	downloadFile = (file) => {
+		const loadProgress = new Progress()
+
+		file.getProgress = () => loadProgress.getProgress()
+
+		blobService.getBlobUrl(file.blobID, loadProgress, file.size).then((url) => {
+			file.loaded = true
+			file.url = url
+		})
+	}
 
 	downloadVoicemail = h.cacheResult<Bluebird<void>>(() => {
 		this.voicemailDownloadProgress = new Progress()
