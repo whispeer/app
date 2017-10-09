@@ -337,17 +337,9 @@ topicWithBursts {
 	text-overflow: initial;
 }
 
-.burst--me {
-	a {
-		color: white;
-	}
+.messages__message {
+	.burst--me & {
 
-	.messages__time {
-		order: 1;
-		margin: auto 0 auto auto;
-	}
-
-	.messages__message {
 		margin: auto 5px 1px 10px;
 		order: 2;
 
@@ -358,34 +350,45 @@ topicWithBursts {
 			margin-left: 20px;
 		}
 	}
-
-	.messages__wrap:last-child {
-		.messages__message {
-			&:before {
-				content: "";
-				position: absolute;
-				z-index: 1;
-				bottom: -2px;
-				right: -7px;
-				height: 20px;
-				border-right: 20px solid $message-bubble-color;
-				border-bottom-left-radius: 16px 14px;
-				transform: translate(0, -2px);
-			}
-
-			&:after {
-				content: "";
-				position: absolute;
-				z-index: 2;
-				bottom: -2px;
-				right: -56px;
-				width: 26px;
-				height: 20px;
-				background: white;
-				border-bottom-left-radius: 10px;
-				transform: translate(-30px, -2px);
-			}
+}
+.messages__wrap:last-child {
+	.burst--me & .messages__message {
+		&:before {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			bottom: -2px;
+			right: -7px;
+			height: 20px;
+			border-right: 20px solid $message-bubble-color;
+			border-bottom-left-radius: 16px 14px;
+			transform: translate(0, -2px);
 		}
+
+		&:after {
+			content: "";
+			position: absolute;
+			z-index: 2;
+			bottom: -2px;
+			right: -56px;
+			width: 26px;
+			height: 20px;
+			background: white;
+			border-bottom-left-radius: 10px;
+			transform: translate(-30px, -2px);
+		}
+	}
+}
+
+
+.burst--me {
+	a {
+		color: white;
+	}
+
+	.messages__time {
+		order: 1;
+		margin: auto 0 auto auto;
 	}
 
 	.message__file__info {
@@ -407,8 +410,8 @@ topicWithBursts {
 	}
 }
 
-.burst--other {
-	.messages__message {
+.messages__message {
+	.burst--other & {
 		background: map-get($colors, other_grey);
 		color: map-get($colors, dark);
 
@@ -418,6 +421,39 @@ topicWithBursts {
 			margin-right: 20px;
 		}
 	}
+}
+
+.messages__wrap:last-child {
+	.burst--other & .messages__message {
+		&:before {
+			content:"";
+			position: absolute;
+			z-index: 2;
+			bottom: -2px;
+			left: -7px;
+			height: 20px;
+			border-left: 20px solid map-get($colors, other_grey);
+			border-bottom-right-radius: 16px 14px;
+			transform: translate(0, -2px);
+		}
+
+		&:after {
+			content: "";
+			position: absolute;
+			z-index: 3;
+			bottom: -2px;
+			left: 4px;
+			width: 26px;
+			height: 20px;
+			background: white;
+			border-bottom-right-radius: 10px;
+			transform:translate(-30px, -2px);
+		}
+	}
+}
+
+
+.burst--other {
 	.messages__message-blocked {
 		background-color: white;
 		border: 1px solid $isabelline;
@@ -426,38 +462,10 @@ topicWithBursts {
 	.messages__time {
 		margin: auto auto auto 0;
 	}
-	.messages__wrap:last-child {
-		.messages__message {
-			&:before {
-				content:"";
-				position: absolute;
-				z-index: 2;
-				bottom: -2px;
-				left: -7px;
-				height: 20px;
-				border-left: 20px solid map-get($colors, other_grey);
-				border-bottom-right-radius: 16px 14px;
-				transform: translate(0, -2px);
-			}
-
-			&:after {
-				content: "";
-				position: absolute;
-				z-index: 3;
-				bottom: -2px;
-				left: 4px;
-				width: 26px;
-				height: 20px;
-				background: white;
-				border-bottom-right-radius: 10px;
-				transform:translate(-30px, -2px);
-			}
-		}
-
-		.messages__message-blocked:before {
-			border-left: 20px solid transparent;
-		}
+	.messages__message-blocked:before {
+		border-left: 20px solid transparent;
 	}
+
 	.message__file {
 		padding: 5px 25px 5px 0;
 	}
