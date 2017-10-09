@@ -131,21 +131,6 @@ topicWithBursts {
 		transform: translateY(-50%);
 	}
 }
-.messages__message {
-	position: relative;
-	padding: 5px 20px;
-	border-radius: 20px;
-
-	box-sizing: border-box;
-
-	max-width: 75%;
-	word-wrap: break-word;
-	white-space: normal;
-}
-
-.md .messages__message {
-	border-radius: 5px;
-}
 
 .messages__burst {
 	width: 100vw;
@@ -338,6 +323,22 @@ topicWithBursts {
 }
 
 .messages__message {
+	position: relative;
+	padding: 5px 20px;
+	border-radius: 20px;
+
+	box-sizing: border-box;
+
+	max-width: 75%;
+	word-wrap: break-word;
+	white-space: normal;
+}
+
+.md .messages__message {
+	border-radius: 5px;
+}
+
+.messages__message {
 	.burst--me & {
 
 		margin: auto 5px 1px 10px;
@@ -351,6 +352,20 @@ topicWithBursts {
 		}
 	}
 }
+
+.messages__message {
+	.burst--other & {
+		background: map-get($colors, other_grey);
+		color: map-get($colors, dark);
+
+		margin: auto 10px 1px 5px;
+
+		&.message__file{
+			margin-right: 20px;
+		}
+	}
+}
+
 .messages__wrap:last-child {
 	.burst--me & .messages__message {
 		&:before {
@@ -376,49 +391,6 @@ topicWithBursts {
 			background: white;
 			border-bottom-left-radius: 10px;
 			transform: translate(-30px, -2px);
-		}
-	}
-}
-
-
-.burst--me {
-	a {
-		color: white;
-	}
-
-	.messages__time {
-		order: 1;
-		margin: auto 0 auto auto;
-	}
-
-	.message__file__info {
-		padding-left: 10px;
-		padding-right: 15px;
-	}
-
-	.message__file__progress {
-		margin-left: 25px;
-		margin-right: 20px;
-	}
-
-	.message__file__memo-play-icon {
-		color: map-get($colors, light);
-	}
-
-	.message__file__memo-play-icon--active {
-		color: map-get($colors, blue);
-	}
-}
-
-.messages__message {
-	.burst--other & {
-		background: map-get($colors, other_grey);
-		color: map-get($colors, dark);
-
-		margin: auto 10px 1px 5px;
-
-		&.message__file{
-			margin-right: 20px;
 		}
 	}
 }
@@ -452,6 +424,34 @@ topicWithBursts {
 	}
 }
 
+.burst--me {
+	a {
+		color: white;
+	}
+
+	.messages__time {
+		order: 1;
+		margin: auto 0 auto auto;
+	}
+
+	.message__file__info {
+		padding-left: 10px;
+		padding-right: 15px;
+	}
+
+	.message__file__progress {
+		margin-left: 25px;
+		margin-right: 20px;
+	}
+
+	.message__file__memo-play-icon {
+		color: map-get($colors, light);
+	}
+
+	.message__file__memo-play-icon--active {
+		color: map-get($colors, blue);
+	}
+}
 
 .burst--other {
 	.messages__message-blocked {
