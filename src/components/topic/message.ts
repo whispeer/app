@@ -1,4 +1,5 @@
 import { Component, Input } from "@angular/core";
+import { FileOpener } from '@ionic-native/file-opener'
 
 const prettysize = require("prettysize")
 
@@ -10,6 +11,9 @@ import VoicemailPlayer from "../../lib/asset/voicemailPlayer"
 import h from "../../lib/helper/helper"
 import Progress from "../../lib/asset/Progress"
 import blobService from "../../lib/services/blobService"
+import blobCache from "../../lib/asset/blobCache"
+
+const fileOpener = new FileOpener()
 
 @Component({
 	selector: "Message",
@@ -85,8 +89,16 @@ export class MessageComponent {
 		file.getProgress = () => loadProgress.getProgress()
 
 		blobService.getBlobUrl(file.blobID, loadProgress, file.size).then((url) => {
+			if (window.device && window.device.platform === 'Android') {
+				return blobCache.copyBlobToDownloads(file.blobID, file.name)
+			}
+
+			return url
+		}).then((url) => {
 			file.loaded = true
 			file.url = url
+
+			fileOpener.open(url, file.type)
 		})
 	}
 

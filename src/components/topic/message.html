@@ -16,11 +16,9 @@
 		<div class="messages__message message__file" [ngClass]="{'message__file--sending': voicemailSending()}">
 			<div class="message__file__hexagon-wrap">
 				<hexagon class="message__file__hexagon"></hexagon>
-				<!-- TODO: icon states.
-					maybe we should use different svgs with
-					icons built in them... -->
 				<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)"></ion-icon>
-				<loading-progress *ngIf="(!file.loaded && file.getProgress) || voicemailSending()" [progress]="file.getProgress" [inverse]="voicemailSending()"></loading-progress>
+				<ion-icon name="md-document" class="message__file__hexagon-icon" *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)"></ion-icon>
+				<loading-progress *ngIf="(!file.loaded && file.getProgress) || file.sending" [progress]="file.getProgress" [inverse]="voicemailSending()"></loading-progress>
 			</div>
 			<span class="message__file__info">
 				<span class="message__file__name">{{ file.name | filenameLimit: 25 }}</span>
