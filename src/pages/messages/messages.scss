@@ -356,62 +356,53 @@ $bubble-radius-android: 5px;
 	}
 }
 
-.messages__wrap:last-child {
-	.messages__message {
-		.burst--me & {
-			&:before {
-				content: "";
-				position: absolute;
-				z-index: 1;
-				bottom: -2px;
-				right: -7px;
-				height: 20px;
-				border-right: 20px solid $message-bubble-color;
-				border-bottom-left-radius: 16px 14px;
-				transform: translate(0, -2px);
-			}
+.messages__wrap:last-child .messages__message {
 
-			&:after {
-				content: "";
-				position: absolute;
-				z-index: 2;
-				bottom: -2px;
-				right: -56px;
-				width: 26px;
-				height: 20px;
-				background: white;
-				border-bottom-left-radius: 10px;
-				transform: translate(-30px, -2px);
-			}
+	$outer-radius: 16px 14px;
+	$inner-radius: 10px;
+	$size: 20px;
+
+	&:before {
+		content: "";
+		position: absolute;
+		bottom: -2px;
+		height: $size;
+		transform: translate(0, -2px);
+
+		.burst--me & {
+			z-index: 1;
+			right: -7px;
+			border-right: $size solid $message-bubble-color;
+			border-bottom-left-radius: $outer-radius;
+		}
+
+		.burst--other & {
+			z-index: 2;
+			left: -7px;
+			border-left: $size solid map-get($colors, other_grey);
+			border-bottom-right-radius: $outer-radius;
 		}
 	}
 
-	.messages__message {
-		.burst--other & {
-			&:before {
-				content:"";
-				position: absolute;
-				z-index: 2;
-				bottom: -2px;
-				left: -7px;
-				height: 20px;
-				border-left: 20px solid map-get($colors, other_grey);
-				border-bottom-right-radius: 16px 14px;
-				transform: translate(0, -2px);
-			}
+	&:after {
+		content: "";
+		position: absolute;
+		bottom: -2px;
+		height: $size;
+		width: 26px;
+		transform: translate(-30px, -2px);
+		background: white;
 
-			&:after {
-				content: "";
-				position: absolute;
-				z-index: 3;
-				bottom: -2px;
-				left: 4px;
-				width: 26px;
-				height: 20px;
-				background: white;
-				border-bottom-right-radius: 10px;
-				transform:translate(-30px, -2px);
-			}
+		.burst--me & {
+			z-index: 2;
+			right: -56px;
+			border-bottom-left-radius: $inner-radius;
+		}
+
+		.burst--other & {
+			z-index: 3;
+			left: 4px;
+			border-bottom-right-radius: $inner-radius;
 		}
 	}
 }
