@@ -98,7 +98,14 @@ export class MessageComponent {
 			file.loaded = true
 			file.url = url
 
-			fileOpener.open(url, file.type)
+			return fileOpener.open(url, file.type)
+		}).catch((e) => {
+			console.error(e)
+			if (parseInt(e.status, 10) === 9) {
+				alert(`Could not open file. No app found to open file type for ${file.name}`)
+			} else {
+				alert(`Something went wrong trying to load file ${file.name}`)
+			}
 		})
 	}
 
