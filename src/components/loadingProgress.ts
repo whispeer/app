@@ -8,5 +8,7 @@ export class LoadingProgress {
 	@Input() progress: any;
 	@Input() inverse: boolean = false;
 
+	getProgress = () => Math.floor(this.progress() * 100)
+
 	constructor() {};
 }
