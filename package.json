@@ -57,6 +57,8 @@
     "cordova-plugin-device": "~1.1.4",
     "cordova-plugin-file": "~4.3.1",
     "cordova-plugin-file-opener2": "^2.0.19",
+    "cordova-plugin-filechooser": "^1.0.1",
+    "cordova-plugin-filepicker": "^1.1.4",
     "cordova-plugin-globalization": "~1.0.5",
     "cordova-plugin-inappbrowser": "~1.7.1",
     "cordova-plugin-ionic-webview": "^1.1.8",
@@ -147,7 +149,9 @@
         "SENDER_ID": "809266780938"
       },
       "cordova-plugin-ionic-webview": {},
-      "cordova-plugin-file-opener2": {}
+      "cordova-plugin-file-opener2": {},
+      "cordova-plugin-filechooser": {},
+      "cordova-plugin-filepicker": {}
     }
   }
 }

@@ -46,6 +46,21 @@ const ImagePickerOptions = {
 
 const INFINITE_SCROLLING_THRESHOLD = 1000
 
+const isIOS = () => window.device && window.device.platform === 'iOS'
+const isAndroid = () => window.device && window.device.platform === 'Android'
+
+const selectFile = () => {
+	return new Bluebird<string>((resolve, reject) => {
+		if (isIOS()) {
+			window.FilePicker.pickFile(resolve, reject)
+		}
+
+		if (isAndroid()) {
+			window.fileChooser.open(resolve, reject)
+		}
+	})
+}
+
 @Component({
 	selector: "topicWithBursts",
 	templateUrl: "topic.html"
@@ -410,6 +425,20 @@ export class TopicComponent {
 								text: ""
 							});
 						});
+					}
+				}, {
+					text: this.translate.instant("topic.selectFile"),
+					icon: !this.platform.is("ios") ? "document": null,
+					handler: () => {
+						selectFile()
+							.then((file) => this.getFile(file))
+							.then((fileObject) => new FileUpload(fileObject, { encrypt: true, extraInfo: {} }))
+							.then((file) => {
+								this.sendMessage.emit({
+									files: [file],
+									text: ""
+								})
+							})
 					}
 				}, {
 					text: this.translate.instant("general.cancel"),
