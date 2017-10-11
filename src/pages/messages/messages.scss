@@ -325,7 +325,7 @@ topicWithBursts {
 $padding-within-burst: 3px;
 $bubble-padding-vertical: 9px;
 $bubble-padding-horizontal: 12px;
-$bubble-radius-ios: 5px;
+$bubble-radius-ios: 17.5px;
 $bubble-radius-android: 5px;
 
 .messages__message {
@@ -344,7 +344,8 @@ $bubble-radius-android: 5px;
 		order: 2;
 		color: #fff;
 
-		&.message__file{ margin-left: 20px }
+		&.message__file { margin-left: 20px }
+		&.sending { background: $message-sending-bubble-color; }
 	}
 
 	.burst--other & {
@@ -352,11 +353,11 @@ $bubble-radius-android: 5px;
 		background: map-get($colors, other_grey);
 		color: map-get($colors, dark);
 
-		&.message__file{ margin-right: 20px }
+		&.message__file { margin-right: 20px }
 	}
 }
 
-.messages__wrap:last-child .messages__message {
+message:last-of-type .messages__message {
 
 	$outer-radius: 16px 14px;
 	$inner-radius: 10px;
@@ -383,6 +384,8 @@ $bubble-radius-android: 5px;
 			border-bottom-right-radius: $outer-radius;
 		}
 	}
+
+	&.sending:before { border-color: $message-sending-bubble-color; }
 
 	&:after {
 		content: "";
@@ -597,4 +600,16 @@ $bubble-radius-android: 5px;
 
 .messages__send-message {
 	position: relative;
+}
+
+.messageSpinner {
+  animation : delayedDisplay 1200ms linear forwards;
+	opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes delayedDisplay {
+  0% { visibility: hidden; }
+  80% { visibility: visible; opacity: 0 }
+  100%{ visibility: visible; opacity: 1 }
 }

@@ -8,7 +8,7 @@
 <div *ngIf="!message.isBlockedSince()">
 
 	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
-		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
+		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
 			<span whispeerSyntaxify content="{{message.data.text}}"></span>
 			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
 		</div>
@@ -61,7 +61,7 @@
 		<span *ngIf="message.hasBeenSent()" class="messages__time">
 			{{ message.sendTime | date: "shortTime" }}
 		</span>
-		<span *ngIf="!message.hasBeenSent()" class="messages__time">
+		<span *ngIf="!message.hasBeenSent()" class="messages__time messageSpinner">
 			<ion-spinner text-center name="ios-small"></ion-spinner>
 		</span>
 </ng-template>
