@@ -6,7 +6,7 @@ import { NavController, ActionSheetController, Platform } from "ionic-angular"
 import * as Bluebird from "bluebird"
 
 import { ImagePicker } from '@ionic-native/image-picker'
-import { File } from '@ionic-native/file'
+import { File, FileEntry } from '@ionic-native/file'
 import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
@@ -184,7 +184,7 @@ export class TopicComponent {
 		}).map((voicemail:recordingType) => {
 			const { path, duration } = voicemail
 
-			return this.getFile(path, "").then((fileObject) =>
+			return this.getFile(path).then((fileObject) =>
 				new FileUpload(fileObject, { encrypt: true, extraInfo: { duration } })
 			)
 		}).then((voicemails) => {
@@ -230,20 +230,21 @@ export class TopicComponent {
 		return this.newMessageText.length === 0
 	}
 
-	getFile = (url: string, type: string) : Bluebird<any> => {
-		return new Bluebird((resolve, reject) => {
-			this.file.resolveLocalFilesystemUrl(url).then((entry: any) => {
-				return entry.file(resolve, reject);
-			});
-		}).then((file: any) => {
-			file.originalUrl = url;
-			if(this.platform.is("ios")) {
-				file.localURL = url.replace("file://", `http://${window.location.host}`);
-			}
-			file.type = type;
+	getFile = (url: string, type?: string) : Bluebird<any> => {
+		return Bluebird.resolve(this.file.resolveLocalFilesystemUrl(url))
+			.then((entry: FileEntry) => new Bluebird((resolve, reject) => entry.file(resolve, reject)))
+			.then((file: any) => {
+				file.originalUrl = url;
+				if(this.platform.is("ios")) {
+					file.localURL = url.replace("file://", `http://${window.location.host}`);
+				}
 
-			return file;
-		});
+				if (type) {
+					file.type = type;
+				}
+
+				return file;
+			});
 	}
 
 	takeImage = () => {
