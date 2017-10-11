@@ -4,14 +4,17 @@
 	</div>
 	<span class="messages__time"></span>
 </div>
+
 <div *ngIf="!message.isBlockedSince()">
-	<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.data.text.length > 0 || message.data.images.length > 0">
-		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly}">
+
+	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
+		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
 			<span whispeerSyntaxify content="{{message.data.text}}"></span>
 			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
 		</div>
-		<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
+
 	<div *ngFor="let file of message.data.files" class="messages__wrap messages__wrap--file">
 		<div class="messages__message message__file" [ngClass]="{'message__file--sending': voicemailSending()}">
 			<div class="message__file__hexagon-wrap">
@@ -26,8 +29,9 @@
 				<span class="message__file__size">[{{ formatSize(file.size) }}]</span>
 			</span>
 		</div>
-		<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
+
 	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
 		<div class="messages__message message__file" [ngClass]="{'message__file--sending': voicemailSending()}">
 			<div class="message__file__hexagon-wrap">
@@ -49,6 +53,15 @@
 				</div>
 			</div>
 		</div>
-		<span class="messages__time">{{ message.data.date | date: "shortTime" }}</span>
+		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
 </div>
+
+<ng-template #message_time>
+		<span *ngIf="message.hasBeenSent()" class="messages__time">
+			{{ message.sendTime | date: "shortTime" }}
+		</span>
+		<span *ngIf="!message.hasBeenSent()" class="messages__time messageSpinner">
+			<ion-spinner text-center name="ios-small"></ion-spinner>
+		</span>
+</ng-template>
