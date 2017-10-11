@@ -603,13 +603,13 @@ message:last-of-type .messages__message {
 }
 
 .messageSpinner {
-  animation : delayedDisplay 1200ms linear forwards;
+	animation : delayedDisplay 1200ms linear forwards;
 	opacity: 0;
-  visibility: hidden;
+	visibility: hidden;
 }
 
 @keyframes delayedDisplay {
-  0% { visibility: hidden; }
-  80% { visibility: visible; opacity: 0 }
-  100%{ visibility: visible; opacity: 1 }
+	0% { visibility: hidden; }
+	80% { visibility: visible; opacity: 0 }
+	100%{ visibility: visible; opacity: 1 }
 }
