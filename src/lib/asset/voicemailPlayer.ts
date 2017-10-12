@@ -39,7 +39,7 @@ export default class VoicemailPlayer {
 			this.interval = window.setInterval(() => {
 				const indexAtInvocation = this.recordPlayingIndex
 				this.recordings[this.recordPlayingIndex].recording.getCurrentPosition().then((pos: number) => {
-					if (indexAtInvocation === this.recordPlayingIndex && this.interval !== null && pos != -1) {
+					if (indexAtInvocation === this.recordPlayingIndex && this.interval !== null && pos !== -1) {
 						this.position = pos
 					}
 				})
