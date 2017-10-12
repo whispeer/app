@@ -632,7 +632,7 @@ export class Chat extends Observer {
 	sendMessage = (message, attachments, id?) => {
 		var messageObject = new Message(message, this, attachments, id)
 
-		this.storeMessage(messageObject, message, id).finally(() => {
+		return this.storeMessage(messageObject, message, id).finally(() => {
 			var sendMessagePromise = messageObject.sendContinously();
 
 			sendMessagePromise.then(() => {
@@ -649,9 +649,9 @@ export class Chat extends Observer {
 
 			MessageLoader.addLoaded(messageObject.getClientID(), messageObject)
 			this.addMessageID(messageObject.getClientID(), Number.MAX_SAFE_INTEGER)
-		})
 
-		return null;
+			return sendMessagePromise
+		})
 	};
 
 	static getUnreadChatIDs() {

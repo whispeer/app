@@ -269,7 +269,15 @@ export class MessagesPage {
 			return;
 		}
 
-		this.chat.sendMessage(text, { images, files: [], voicemails })
+		const sendPromise = this.chat.sendMessage(text, { images, files: [], voicemails })
+
+		if (this.chat.isDraft()) {
+			sendPromise.then(() => {
+				this.navCtrl.push("Messages", { chatID: this.chat.getID() }, { animate: false }).then(() => {
+					this.navCtrl.remove(this.navCtrl.length() - 2, 1)
+				})
+			})
+		}
 
 		this.chat.newMessage = ""
 		this.markRead()

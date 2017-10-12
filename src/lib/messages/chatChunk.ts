@@ -11,7 +11,6 @@ import ObjectLoader from "../services/cachedObjectLoader"
 const keyStore = require("services/keyStore.service").default;
 const sessionService = require("services/session.service").default;
 
-import { Message } from "./message"
 import ChatTitleUpdate from "./chatTitleUpdate"
 
 const debugName = "whispeer:chunk";
