@@ -266,10 +266,8 @@ topicWithBursts {
 .message__file__progress__bar {
 	position: relative;
 	height: 100%;
-
-	background: map-get($colors, light);
-
 	transition: width 0.1s ease;
+	background: map-get($colors, light);
 }
 
 .message__file__progress__icon {

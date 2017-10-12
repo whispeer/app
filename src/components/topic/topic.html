@@ -64,9 +64,7 @@
 	</div>
 
 	<div class="messages__form" *ngIf="platform.is('ios')" #footer>
-		<div
-			class="messages__form__button-wrap"
-			*ngIf="isRecordingUIVisible()">
+		<div *ngIf="isRecordingUIVisible()" class="messages__form__button-wrap">
 			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="discardRecording()">
 				<ion-icon name="trash"></ion-icon>
 			</button>

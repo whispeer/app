@@ -12,12 +12,14 @@ export type recordingsType = recordingType[]
 const media = new Media()
 
 export default class VoicemailPlayer {
+
+	private static activePlayer: VoicemailPlayer = null
 	private playing = false
 	private recordings: recordingsType = []
 
 	private recordPlayingIndex = 0
 	private position = 0
-	private interval = 0
+	private interval : number = null
 	private loadingPromises : Bluebird<any>[] = []
 
 	constructor(recordings: recordingsType) {
@@ -25,26 +27,30 @@ export default class VoicemailPlayer {
 	}
 
 	play() {
-		console.log("play")
 		this.awaitLoading().then(() => {
-			console.log("play ready")
+			if (VoicemailPlayer.activePlayer) {
+				VoicemailPlayer.activePlayer.reset()
+			}
 			this.recordings[this.recordPlayingIndex].recording.play()
+			VoicemailPlayer.activePlayer = this
+			this.playing = true
 
 			clearInterval(this.interval)
-
 			this.interval = window.setInterval(() => {
+				const indexAtInvocation = this.recordPlayingIndex
 				this.recordings[this.recordPlayingIndex].recording.getCurrentPosition().then((pos: number) => {
-					this.position = pos
+					if (indexAtInvocation === this.recordPlayingIndex && this.interval !== null && pos !== -1) {
+						this.position = pos
+					}
 				})
 			}, 100)
 
-			this.playing = true
 		})
 	}
 
 	pause() {
 		this.recordings[this.recordPlayingIndex].recording.pause()
-
+		VoicemailPlayer.activePlayer = null
 		this.playing = false
 	}
 
@@ -69,18 +75,22 @@ export default class VoicemailPlayer {
 	}
 
 	getPosition() {
-		return this.getDuration(this.recordPlayingIndex) + this.position
+		const currentDuration = this.getDuration(this.recordPlayingIndex)
+		return currentDuration + this.position
 	}
 
 	reset() {
 		clearInterval(this.interval)
 
 		this.recordings.forEach(({ recording }) => recording.stop())
-
 		this.recordPlayingIndex = 0
 		this.position = 0
-		this.interval = 0
+		this.interval = null
 
+		if (this !== VoicemailPlayer.activePlayer) {
+			VoicemailPlayer.activePlayer.reset()
+		}
+		VoicemailPlayer.activePlayer = null
 		this.playing = false
 	}
 
@@ -103,7 +113,6 @@ export default class VoicemailPlayer {
 
 		const loadingPromise = new Bluebird((resolve) => {
 			const subscription = currentRecording.onStatusUpdate.subscribe((s) => {
-				console.log("status update in ", s)
 				if (s === media.MEDIA_RUNNING) {
 					currentRecording.stop()
 				}
@@ -138,8 +147,6 @@ export default class VoicemailPlayer {
 	}
 
 	private statusListener = (status) => {
-		console.log("Status update: " + status)
-
 		if (status === media.MEDIA_STOPPED && this.isPlaying()) {
 			// Use a Promise to trigger the angular zone. Zones are bad. Angular DI is bad.
 			Bluebird.resolve().then(() => {
