@@ -6,7 +6,7 @@ declare global {
 		Zone: any;
 		whispeerGetStorage: any;
 		FilePicker: {
-			pickFile: (resolve: Function, reject: Function, utis?: string[], position?: positionType) => void
+			pickFile: (resolve: Function, reject: Function, utis?: string[] | string, position?: positionType) => void
 		};
 		fileChooser: {
 			open: (resolve: Function, reject: Function) => void

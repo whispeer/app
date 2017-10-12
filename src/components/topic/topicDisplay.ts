@@ -47,10 +47,9 @@ const ImagePickerOptions = {
 const INFINITE_SCROLLING_THRESHOLD = 1000
 
 const isIOS = () => window.device && window.device.platform === 'iOS'
-const isAndroid = () => window.device && window.device.platform === 'Android'
 
 const selectFileIOS = () =>
-	new Bluebird<string>((resolve, reject) => window.FilePicker.pickFile(resolve, reject))
+	new Bluebird<string>((resolve, reject) => window.FilePicker.pickFile(resolve, reject, "public.item"))
 		.then((url) => `file://${url}`)
 
 const selectFileAndroid = () =>
