@@ -22,7 +22,6 @@ import uuidv4 from 'uuid/v4'
 import VoicemailPlayer, { recordingType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
-import { Message } from "../../lib/messages/message"
 import Burst from "../../lib/messages/burst"
 import featureToggles from "../../lib/services/featureToggles"
 
@@ -57,7 +56,6 @@ export class TopicComponent {
 	@Input() messageBurstsFunction;
 	@Input() loadMoreMessages;
 	@Input() messagesLoading;
-	@Input() forceBackButton;
 
 	@Output() sendMessage = new EventEmitter();
 
