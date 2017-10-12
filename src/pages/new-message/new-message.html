@@ -2,4 +2,4 @@
 	<ion-spinner text-center margin-vertical class="spinner--full"></ion-spinner>
 </ion-content>
 
-<chooseFriends *ngIf="!loading && !receiversChosen" (chooseReceivers)="send($event)"></chooseFriends>
+<chooseFriends *ngIf="!loading" (chooseReceivers)="send($event)"></chooseFriends>

@@ -19,6 +19,7 @@ import * as Bluebird from 'bluebird';
 })
 export class NewMessagePage {
 	receiverString: string;
+	loading: boolean = true;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
@@ -31,6 +32,8 @@ export class NewMessagePage {
 			})
 			return
 		}
+
+		this.loading = false
 	}
 
 	private sendToUserTopic(users) {
@@ -43,6 +46,7 @@ export class NewMessagePage {
 	}
 
 	send = (users) => {
+		this.loading = true
 		this.sendToUserTopic(users).then((chatID) => {
 			if (chatID) {
 				this.goToChat(chatID)

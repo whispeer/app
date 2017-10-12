@@ -340,46 +340,6 @@ export class Chunk extends Observer {
 			}, cryptInfo)
 		})
 	};
-
-	static createData(receiver, message, images) {
-		Message.prepare(images)
-
-		const uploadImages = (chunkKey) => {
-			return Bluebird.all(images.map((image) => {
-				return image.upload(chunkKey)
-			}))
-		}
-
-		return Bluebird.try(async function () {
-			const chunkData = await Chunk.createRawData(receiver, { content: {} })
-			const chunkStub = new Chunk({
-				meta: chunkData.chunk.meta,
-				content: {},
-				server: {},
-				receiverObjects: []
-			});
-
-			const messageMeta = {
-				createTime: new Date().getTime()
-			}
-
-			const secured = Message.createRawSecuredData(message, messageMeta, chunkStub)
-
-			await Message.setAttachmentsInfo(secured, { images, files: [], voicemails: [] })
-
-			const messageData = await secured._signAndEncrypt(userService.getOwn().getSignKey(), chunkStub.getKey())
-
-			const imageKeys = await uploadImages(chunkStub.getKey())
-
-			return {
-				...chunkData,
-				message: {
-					...messageData,
-					imageKeys: h.array.flatten(imageKeys).map(keyStore.upload.getKey)
-				}
-			};
-		})
-	}
 }
 
 Observer.extend(Chunk);

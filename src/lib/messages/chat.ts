@@ -607,6 +607,10 @@ export class Chat extends Observer {
 			return Bluebird.resolve()
 		}
 
+		if (this.draft) {
+			return Bluebird.resolve()
+		}
+
 		if (message.hasAttachments()) {
 			return Bluebird.resolve()
 		}
