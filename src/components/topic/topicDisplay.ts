@@ -6,7 +6,7 @@ import { NavController, ActionSheetController, Platform } from "ionic-angular"
 import * as Bluebird from "bluebird"
 
 import { ImagePicker } from '@ionic-native/image-picker'
-import { File, FileEntry } from '@ionic-native/file'
+import { File, FileEntry, DirectoryEntry } from '@ionic-native/file'
 import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
@@ -61,6 +61,8 @@ const selectFile = () => {
 	})
 }
 
+const FILE = new File()
+
 @Component({
 	selector: "topicWithBursts",
 	templateUrl: "topic.html"
@@ -107,7 +109,6 @@ export class TopicComponent {
 		private actionSheetCtrl: ActionSheetController,
 		private platform: Platform,
 		private imagePicker: ImagePicker,
-		private file: File,
 		private camera: Camera,
 		private translate: TranslateService,
 		private media: Media
@@ -188,13 +189,13 @@ export class TopicComponent {
 		this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(({ path, recording, duration }:recordingType) => {
 			const { directory, name } = unpath(path)
 
-			return this.file.moveFile(
+			return FILE.moveFile(
 				this.platform.is("ios") ? "file://" + directory : directory,
 				name,
-				this.file.cacheDirectory,
+				FILE.cacheDirectory,
 				name
 			).then(() => ({
-				path: `${this.file.cacheDirectory}${name}`,
+				path: `${FILE.cacheDirectory}${name}`,
 				duration, recording
 			}))
 		}).map((voicemail:recordingType) => {
@@ -247,8 +248,8 @@ export class TopicComponent {
 	}
 
 	getFile = (url: string, type?: string) : Bluebird<any> => {
-		return Bluebird.resolve(this.file.resolveLocalFilesystemUrl(url))
-			.then((entry: FileEntry) => new Bluebird((resolve, reject) => entry.file(resolve, reject)))
+		return Bluebird.resolve(FILE.resolveLocalFilesystemUrl(url))
+			.then((file: FileEntry) => new Bluebird((resolve, reject) => file.file(resolve, reject)))
 			.then((file: any) => {
 				file.originalUrl = url;
 				if(this.platform.is("ios")) {
@@ -296,10 +297,10 @@ export class TopicComponent {
 
 	getRecordingDir = () => {
 		if (!this.platform.is("ios")) {
-			return this.file.externalRootDirectory
+			return FILE.externalRootDirectory
 		}
 
-		return this.file.tempDirectory.replace(/^file:\/\//, '')
+		return FILE.tempDirectory.replace(/^file:\/\//, '')
 	}
 
 	getRecordingFileName = () => {

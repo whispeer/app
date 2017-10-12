@@ -10,7 +10,7 @@ import sessionService from "../services/session.service"
 var initService = require("services/initService");
 
 import ChunkLoader, { Chunk } from "../messages/chatChunk"
-import ChatLoader from "../messages/chat"
+import ChatLoader, { Chat } from "../messages/chat"
 import MessageLoader from "../messages/message"
 import ChatListLoader from "../messages/chatList"
 
@@ -192,7 +192,7 @@ messageService = {
 			} else {
 				return chat;
 			}
-		}).then(function (chat) {
+		}).then(function (chat: Chat) {
 			return chat.sendMessage(message, attachments);
 		});
 	},
