@@ -63,7 +63,7 @@ export class NewMessagePage {
 					createTime: Date.now()
 				},
 				meta: chunkData.chunk.meta,
-				receiverObjects: users
+				receiverObjects: users.sort((u1, u2) => u1.id - u2.id)
 			}, chunkData)
 			const chat = new Chat({ id: -1, latestMessage: null, latestChunk: chunk, unreadMessageIDs: [] }, true)
 
