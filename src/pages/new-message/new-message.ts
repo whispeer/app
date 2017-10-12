@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { NavController, NavParams, IonicPage } from 'ionic-angular'
 
 import messageService from "../../lib/messages/messageService"
+import ChatLoader, { Chat } from "../../lib/messages/chat"
+import ChunkLoader, { Chunk } from "../../lib/messages/chatChunk"
+
 const userService = require("../../lib/users/userService").default;
 
 import * as Bluebird from 'bluebird';
@@ -15,13 +18,6 @@ import * as Bluebird from 'bluebird';
 	templateUrl: 'new-message.html'
 })
 export class NewMessagePage {
-	messagesLoading = false;
-	partners: any = [];
-	receiversChosen: boolean = false;
-	loading: boolean = true;
-
-	bursts = []
-
 	receiverString: string;
 
 	constructor(public navCtrl: NavController, public navParams: NavParams) {}
@@ -35,8 +31,6 @@ export class NewMessagePage {
 			})
 			return
 		}
-
-		this.loading = false;
 	}
 
 	private sendToUserTopic(users) {
@@ -55,9 +49,24 @@ export class NewMessagePage {
 				return
 			}
 
-			this.partners = users;
-			this.receiversChosen = true;
-			this.loading = false;
+			return Chunk.createRawData(users.map(({ id }) => id), { content: {} })
+		}).then((chunkData) => {
+			const chunk = new Chunk({
+				content: {},
+				server: {
+					id: -1,
+					chatID: -1,
+					createTime: Date.now()
+				},
+				meta: chunkData.chunk.meta,
+				receiverObjects: users
+			}, chunkData)
+			const chat = new Chat({ id: -1, latestMessage: null, latestChunk: chunk, unreadMessageIDs: [] }, true)
+
+			ChatLoader.addLoaded(-1, chat)
+			ChunkLoader.addLoaded(-1, chunk)
+
+			this.goToChat(-1)
 		});
 	}
 
@@ -83,22 +92,9 @@ export class NewMessagePage {
 		throw new Error("invalid receiver param");
 	}
 
-	messageBursts = () => {
-		return { changed: false, bursts: this.bursts };
-	}
-
 	goToChat = (chatID) => {
 		this.navCtrl.push("Messages", { chatID }).then(() => {
 			this.navCtrl.remove(this.navCtrl.length() - 2, 1)
 		})
-	}
-
-	sendMessage = ({ images = [], text }) => {
-		this.bursts = []
-		this.messagesLoading = true
-
-		messageService.sendNewChat(this.partners.map((partner) => partner.user.getID()), text, images).then((chatID) => {
-			this.goToChat(chatID)
-		});
 	}
 }

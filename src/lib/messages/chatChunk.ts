@@ -35,7 +35,7 @@ export class Chunk extends Observer {
 	private admins: number[]
 	private titleUpdate: ChatTitleUpdate
 
-	constructor({ content, server, meta, receiverObjects }) {
+	constructor({ content, server, meta, receiverObjects }, public chunkData?) {
 		super()
 
 		var err = validator.validate("topic", meta);
@@ -72,6 +72,14 @@ export class Chunk extends Observer {
 		if (predecessorID && ChunkLoader.isLoaded(predecessorID)) {
 			ChunkLoader.getLoaded(predecessorID).setSuccessor(this.getID())
 		}
+	}
+
+	create = ({ server: { id, chatID }}) => {
+		this.id = id
+		this.chatID = chatID
+
+		ChunkLoader.addLoaded(id, this)
+		ChunkLoader.removeLoaded(-1)
 	}
 
 	getChatID = () => this.chatID

@@ -3,12 +3,3 @@
 </ion-content>
 
 <chooseFriends *ngIf="!loading && !receiversChosen" (chooseReceivers)="send($event)"></chooseFriends>
-
-<topicWithBursts
-	*ngIf="!loading && receiversChosen"
-	[messageBurstsFunction]="messageBursts"
-	[partners]="partners"
-	[messagesLoading]="messagesLoading"
-	(sendMessage)="sendMessage($event)"
-	[forceBackButton]="true"
-></topicWithBursts>

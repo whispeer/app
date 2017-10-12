@@ -97,18 +97,24 @@ export class Chat extends Observer {
 	private unreadMessageIDs: number[] = []
 
 	private id: number
+	private draft: boolean = false
 
 	public newMessage = ""
 
-	constructor({ id, latestMessage, latestChunk, unreadMessageIDs }) {
+	constructor({ id, latestMessage, latestChunk, unreadMessageIDs }, draft?: boolean) {
 		super()
 
 		this.id = id
+		this.draft = draft
 
 		this.update({ latestChunk, latestMessage, unreadMessageIDs })
 	}
 
 	private store = () => {
+		if (this.draft) {
+			return
+		}
+
 		const storeInfo = {
 			id: this.id,
 			unreadMessageIDs: this.unreadMessageIDs,
@@ -123,6 +129,16 @@ export class Chat extends Observer {
 		this.lastStoredInfo = storeInfo
 
 		ChatLoader.updateCache(this.id, storeInfo)
+	}
+
+	create = ({ id, latestChunkID }) => {
+		this.draft = false
+
+		this.id = id
+		this.chunkIDs = [latestChunkID]
+
+		ChatLoader.addLoaded(id, this)
+		ChatLoader.removeLoaded(-1)
 	}
 
 	isBlocked = () => {
@@ -330,6 +346,10 @@ export class Chat extends Observer {
 	}
 
 	loadMoreMessages() {
+		if (this.draft) {
+			return Bluebird.resolve(0)
+		}
+
 		const oldestKnownMessage = this.messages.length === 0 ? null : MessageLoader.getLoaded(this.messages[0].id)
 
 		return this.loadOlderMessages(oldestKnownMessage)
@@ -375,6 +395,10 @@ export class Chat extends Observer {
 
 	markRead() {
 		this.localMarkRead()
+
+		if (this.draft) {
+			return Bluebird.resolve()
+		}
 
 		return socketService.definitlyEmit("chat.markRead", { id: this.id })
 	}
@@ -598,6 +622,8 @@ export class Chat extends Observer {
 			)
 		)
 	}
+
+	isDraft = () => this.draft
 
 	sendMessage = (message, attachments, id?) => {
 		var messageObject = new Message(message, this, attachments, id)

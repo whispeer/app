@@ -5,7 +5,7 @@ import errorService from "../../lib/services/error.service";
 
 import messageService from "../../lib/messages/messageService";
 import Burst from "../../lib/messages/burst"
-import { Chat } from "../../lib/messages/chat"
+import ChatLoader, { Chat } from "../../lib/messages/chat"
 import MessageLoader, { Message } from "../../lib/messages/message"
 
 const inView = require("in-view");
@@ -254,9 +254,9 @@ export class MessagesPage {
 			return;
 		}
 
-		messageService.sendMessage(this.chat.getID(), text, { images, files: [], voicemails }).then(() => {
-			this.chat.newMessage = "";
-			this.markRead();
-		});
+		this.chat.sendMessage(text, { images, files: [], voicemails })
+
+		this.chat.newMessage = ""
+		this.markRead()
 	}
 }
