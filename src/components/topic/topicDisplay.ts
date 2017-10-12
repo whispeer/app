@@ -305,13 +305,10 @@ export class TopicComponent {
 		}
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
-
 		this.recordingInfo.startTime = Date.now()
-
 		this.recordingFile.startRecord();
 
 		clearInterval(this.recordingInfo.updateInterval)
-
 		this.recordingInfo.updateInterval = window.setInterval(() => {
 			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
 		}, 100)
@@ -343,7 +340,6 @@ export class TopicComponent {
 	toggleRecording = () => {
 		if (RecordingStateMachine.is(RecordingStates.Recording)) {
 			RecordingStateMachine.go(RecordingStates.Paused)
-
 			clearInterval(this.recordingInfo.updateInterval)
 
 			this.recordingFile.stopRecord()
@@ -351,11 +347,9 @@ export class TopicComponent {
 			this.recordingFile = null
 
 			this.recordingPlayer.addRecording(this.getRecordingFileName(), this.recordingInfo.duration)
-
 			this.recordingInfo.duration = 0
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)
-
 			this.startRecording()
 		}
 	}

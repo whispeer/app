@@ -28,9 +28,14 @@ export default class VoicemailPlayer {
 
 	play() {
 		this.awaitLoading().then(() => {
+			if (VoicemailPlayer.activePlayer) {
+				VoicemailPlayer.activePlayer.reset()
+			}
 			this.recordings[this.recordPlayingIndex].recording.play()
-			clearInterval(this.interval)
+			VoicemailPlayer.activePlayer = this
+			this.playing = true
 
+			clearInterval(this.interval)
 			this.interval = window.setInterval(() => {
 				const indexAtInvocation = this.recordPlayingIndex
 				this.recordings[this.recordPlayingIndex].recording.getCurrentPosition().then((pos: number) => {
@@ -40,11 +45,6 @@ export default class VoicemailPlayer {
 				})
 			}, 100)
 
-			if (VoicemailPlayer.activePlayer) {
-				VoicemailPlayer.activePlayer.reset()
-			}
-			VoicemailPlayer.activePlayer = this
-			this.playing = true
 		})
 	}
 
@@ -83,11 +83,13 @@ export default class VoicemailPlayer {
 		clearInterval(this.interval)
 
 		this.recordings.forEach(({ recording }) => recording.stop())
-
 		this.recordPlayingIndex = 0
 		this.position = 0
 		this.interval = null
 
+		if (this !== VoicemailPlayer.activePlayer) {
+			VoicemailPlayer.activePlayer.reset()
+		}
 		VoicemailPlayer.activePlayer = null
 		this.playing = false
 	}
