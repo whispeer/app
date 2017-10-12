@@ -114,7 +114,7 @@
     <plugin name="cordova-plugin-inappbrowser" spec="~1.7.1" />
     <plugin name="cordova-plugin-ionic-webview" spec="^1.1.8" />
     <plugin name="cordova-plugin-keyboard" spec="~1.1.5" />
-    <plugin name="cordova-plugin-media" spec="~3.0.1">
+    <plugin name="cordova-plugin-media" spec="https://github.com/whispeer/cordova-plugin-media.git#fix/voicemail-recording-crash">
         <variable name="MICROPHONE_USAGE_DESCRIPTION" value=" " />
     </plugin>
     <plugin name="cordova-plugin-splashscreen" spec="https://github.com/whispeer/cordova-plugin-splashscreen.git#adaptedSpinner" />
