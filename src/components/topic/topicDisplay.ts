@@ -6,7 +6,7 @@ import { NavController, ActionSheetController, Platform } from "ionic-angular"
 import * as Bluebird from "bluebird"
 
 import { ImagePicker } from '@ionic-native/image-picker'
-import { File, FileEntry, DirectoryEntry } from '@ionic-native/file'
+import { File, FileEntry } from '@ionic-native/file'
 import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
@@ -49,17 +49,14 @@ const INFINITE_SCROLLING_THRESHOLD = 1000
 const isIOS = () => window.device && window.device.platform === 'iOS'
 const isAndroid = () => window.device && window.device.platform === 'Android'
 
-const selectFile = () => {
-	return new Bluebird<string>((resolve, reject) => {
-		if (isIOS()) {
-			window.FilePicker.pickFile(resolve, reject)
-		}
+const selectFileIOS = () =>
+	new Bluebird<string>((resolve, reject) => window.FilePicker.pickFile(resolve, reject))
+		.then((url) => `file://${url}`)
 
-		if (isAndroid()) {
-			window.fileChooser.open(resolve, reject)
-		}
-	})
-}
+const selectFileAndroid = () =>
+	new Bluebird<string>((resolve, reject) => window.fileChooser.open(resolve, reject))
+
+const selectFile = () => isIOS() ? selectFileIOS() : selectFileAndroid()
 
 const FILE = new File()
 
