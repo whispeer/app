@@ -710,7 +710,7 @@ export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 			})
 		})
 	},
-	shouldUpdate: (event, instance) => instance.isDraft() ? Bluebird.resolve(false) : Bluebird.resolve(true),
+	shouldUpdate: (event, instance) => Bluebird.resolve(!instance.isDraft()),
 	cacheName: "chat"
 }) {}
 
