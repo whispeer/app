@@ -33,23 +33,25 @@
 	</div>
 
 	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
-		<div class="messages__message message__file" [ngClass]="{'message__file--sending': voicemailSending()}">
-			<div class="message__file__hexagon-wrap">
-				<hexagon class="message__file__hexagon"></hexagon>
-				<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
-				<ion-icon name="md-play" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>
-				<loading-progress *ngIf="(!voicemailLoaded() && voicemailDownloadProgress) || voicemailSending()" [progress]="voicemailProgress" [inverse]="voicemailSending()"></loading-progress>
-				<ion-icon name="md-pause" class="message__file__hexagon-icon" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
-			</div>
-			<span class="message__file__info">
-				<ion-icon icon name="stats" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': voicemailPlaying()}"></ion-icon>&nbsp;
-				<span><span *ngIf="voicemailLoaded()">{{ voicemailPosition() * 1000 | date: 'mm:ss' }} /&nbsp;</span>{{ voicemailDuration() * 1000 | date: 'mm:ss' }}&nbsp;</span>
-				<span *ngIf="!voicemailLoaded()" class="message__file__info__size">[{{formatSize(voicemailSize())}}]</span>
-			</span>
-			<div class="message__file__progress" *ngIf="voicemailLoaded() && voicemailPosition() > 0">
-				<div class="message__file__progress__bar" [ngStyle]="{'width.%': voicemailPosition() * 100 / voicemailDuration()}"></div>
-				<div class="message__file__progress__icon" [ngStyle]="{'margin-left.%': voicemailPosition() * 100 / voicemailDuration()}">
-					<hexagon class="message__file__progress__icon__hex"></hexagon>
+		<div class="messages__message message__voicemail" [ngClass]="{'message__file--sending': voicemailSending()}">
+			<div class="message__file__info">
+				<div class="message__voicemail__actions">
+					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
+					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>
+					<loading-progress class="message__voicemail__action" *ngIf="!voicemailLoaded() && voicemailDownloadProgress" [progress]="voicemailProgress" [inverse]="voicemailSending()" [color]="(message.isOwn() ? 'primary' : 'isabelline')"></loading-progress>
+					<ion-spinner *ngIf="voicemailSending()" class="message__voicemail__uploadSpinner"></ion-spinner>
+					<ion-icon name="md-pause" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
+				</div>
+				<div class="message__voicemail__player">
+					<ion-icon icon name="stats" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': voicemailPlaying()}"></ion-icon>&nbsp;
+					<span><span *ngIf="voicemailLoaded()">{{ voicemailPosition() * 1000 | date: 'mm:ss' }} /&nbsp;</span>{{ voicemailDuration() * 1000 | date: 'mm:ss' }}&nbsp;</span>
+					<span *ngIf="!voicemailLoaded()" class="message__file__info__size">[{{formatSize(voicemailSize())}}]</span>
+					<div class="message__file__progress" *ngIf="voicemailLoaded() && voicemailPosition() > 0">
+						<div class="message__file__progress__bar" [ngStyle]="{'width.%': voicemailPosition() * 100 / voicemailDuration()}"></div>
+						<div class="message__file__progress__icon" [ngStyle]="{'margin-left.%': voicemailPosition() * 100 / voicemailDuration()}">
+							<hexagon class="message__file__progress__icon__hex"></hexagon>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
