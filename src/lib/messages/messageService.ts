@@ -111,7 +111,7 @@ messageService = {
 		)
 	}),
 	sendUnsentMessages: function () {
-		var unsentMessages = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
+		var unsentMessages = new Cache("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });
 
 		return unsentMessages.all().map(function (unsentMessage: any) {
 			var data = JSON.parse(unsentMessage.data);
@@ -151,8 +151,8 @@ socket.channel("notify.chat", function (e, data) {
 	}
 });
 
-initService.listen(function () {
-	messageService.sendUnsentMessages();
-}, "initDone");
+initService.awaitLoading().then(() => {
+	messageService.sendUnsentMessages()
+})
 
 export default messageService

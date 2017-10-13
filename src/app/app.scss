@@ -343,6 +343,13 @@ ion-fab-list[side="top"] {
 
 /* Circular Progress */
 
+.loading-progress {
+	position: relative;
+
+	width: 30px;
+	height: 30px;
+}
+
 .radial-progress {
 	$circle-size: 30px;
 	$circle-color: #ffffff;
@@ -423,6 +430,38 @@ ion-fab-list[side="top"] {
 .radial-progress--inverse {
 	$circle-color: map-get($colors, grey);
 	$circle-background: transparentize(map-get($colors, dark_grey), 0.7);
+	$inset-color: map-get($colors, other_grey);
+
+	background-color: $circle-background;
+
+	.circle .mask .fill {
+		background-color: $circle-color;
+	}
+
+	.inset {
+		background-color: $inset-color;
+	}
+}
+
+.radial-progress--primary {
+	$circle-color: white;
+	$circle-background: transparentize(#ffffff, 0.8);
+	$inset-color: map-get($colors, primary);
+
+	background-color: $circle-background;
+
+	.circle .mask .fill {
+		background-color: $circle-color;
+	}
+
+	.inset {
+		background-color: $inset-color;
+	}
+}
+
+.radial-progress--isabelline {
+	$circle-color: map-get($colors, grey);
+	$circle-background: transparentize(map-get($colors, dark_grey), 0.8);
 	$inset-color: map-get($colors, other_grey);
 
 	background-color: $circle-background;
