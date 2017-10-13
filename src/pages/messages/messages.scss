@@ -146,16 +146,16 @@ topicWithBursts {
 	width: 100%;
 
 	overflow: visible;
-	padding: 5px 0 5px 20.5px;
+	padding: 5px 0 5px 25px;
 }
 
 .message__file__hexagon-wrap {
 	position: absolute;
 
-	width: 41px;
+	width: 40px;
 
 	top: 4px;
-	left: -20.5px;
+	left: -12px;
 
 	z-index: 3;
 
@@ -321,7 +321,7 @@ $bubble-radius-android: 5px;
 		order: 2;
 		color: #fff;
 
-		&.message__file { margin-left: 20px; }
+		&.message__file { margin-left: 20px }
 		&.sending { background: $message-sending-bubble-color; }
 	}
 
@@ -330,7 +330,7 @@ $bubble-radius-android: 5px;
 		background: map-get($colors, other_grey);
 		color: map-get($colors, dark);
 
-		&.message__file { margin-right: 20px; }
+		&.message__file { margin-right: 20px }
 	}
 }
 
@@ -398,7 +398,7 @@ message:last-of-type .messages__message {
 	}
 
 	.message__file__info {
-		padding-left: 8px;
+		padding-left: 10px;
 		padding-right: 15px;
 	}
 
