@@ -61,9 +61,11 @@
 		<ion-list-header class="friends__list__header" [attr.padding-top]="selectedUsers.length === 0 ? '': null">
 			{{ 'chooseFriends.search' | translate }}
 		</ion-list-header>
-		<p class="text-grey" padding-horizontal>
-			{{ 'chooseFriends.searchFor' | translate:{searchTerm: searchTerm} }}
-		</p>
+		<ion-item>
+			<p class="text-grey">
+				{{ 'chooseFriends.searchFor' | translate:{searchTerm: searchTerm} }}
+			</p>
+		</ion-item>
 	</ion-list>
 	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab">
 		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0 && selectedUsers.length === 0}">
