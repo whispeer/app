@@ -145,11 +145,16 @@ const blobCache = {
 		return Bluebird.try(async () => {
 			const cacheDir = await getCacheDirectory()
 			const blobFile = idToFileName(blobID)
-			const exists = await existsFile(cacheDir, blobFile)
 			const path = isAndroid() ? `${FILE.externalRootDirectory}Download/` : `${FILE.documentsDirectory}`
+			const existsSource = await existsFile(cacheDir, blobFile)
+			const existsDestination = await existsFile(path, filename)
 
-			if (!exists) {
+			if (!existsSource) {
 				throw new Error(`cannot copy blob, blob does not exist: ${filename}`)
+			}
+
+			if (existsDestination) {
+				await FILE.removeFile(path, filename)
 			}
 
 			await FILE.copyFile(cacheDir, blobFile, path, filename)
