@@ -26,7 +26,6 @@
     "@ionic-native/camera": "3.6.1",
     "@ionic-native/core": "3.6.1",
     "@ionic-native/file": "3.6.1",
-    "@ionic-native/file-opener": "^4.3.0",
     "@ionic-native/globalization": "3.6.1",
     "@ionic-native/image-picker": "3.6.1",
     "@ionic-native/in-app-browser": "3.6.1",

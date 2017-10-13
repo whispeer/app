@@ -56,10 +56,6 @@
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/@ionic-native/core/-/core-3.6.1.tgz#fb0dd23f611dbb33ae9bf54c897c46343968aab6"
 
-"@ionic-native/file-opener@^4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/file-opener/-/file-opener-4.3.0.tgz#65e7af5082d78ee57670128fbb87106f6da96825"
-
 "@ionic-native/file@3.6.1":
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/@ionic-native/file/-/file-3.6.1.tgz#5e79763234e7b5b7bd75c7f0ae4a8f92ad6a4aa4"
@@ -1736,6 +1732,14 @@ cordova-plugin-file-opener2@^2.0.19:
 cordova-plugin-file@~4.3.1:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-4.3.3.tgz#012e97aa1afb91f84916e6341b548366d23de9b9"
+
+cordova-plugin-filechooser@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-filechooser/-/cordova-plugin-filechooser-1.0.1.tgz#fa59e97b8cdd91260be0bec460db8ec5de93488f"
+
+cordova-plugin-filepicker@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-filepicker/-/cordova-plugin-filepicker-1.1.4.tgz#34aa7e6f756bad690fed3401e9cf366421f55ae7"
 
 cordova-plugin-globalization@~1.0.5:
   version "1.0.7"
