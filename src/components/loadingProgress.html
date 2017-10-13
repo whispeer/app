@@ -1,5 +1,5 @@
-<div *ngIf="progress && progress() < 1">
-	<div class="radial-progress" [ngClass]="{'radial-progress--inverse': inverse}" [attr.data-progress]="progress() * 100">
+<div class="loading-progress" *ngIf="progress && progress() < 1">
+	<div class="radial-progress" [ngClass]="[className, inverse ? 'radial-progress--inverse' : '']" [attr.data-progress]="progress() * 100">
 		<div class="circle">
 			<div class="mask full">
 				<div class="fill"></div>
