@@ -417,20 +417,6 @@ export class TopicComponent {
 						});
 					}
 				}, {
-					text: this.translate.instant("topic.selectFile"),
-					icon: !this.platform.is("ios") ? "document": null,
-					handler: () => {
-						selectFile()
-							.then((file) => this.getFile(file))
-							.then((fileObject) => new FileUpload(fileObject, { encrypt: true, extraInfo: {} }))
-							.then((file) => {
-								this.sendMessage.emit({
-									files: [file],
-									text: ""
-								})
-							})
-					}
-				}, {
 					text: this.translate.instant("general.cancel"),
 					icon: !this.platform.is("ios") ? "close" : null,
 					role: "cancel"
