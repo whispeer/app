@@ -1,13 +1,6 @@
 <ion-header>
 	<ion-navbar [color]="'primary'" no-border>
-		<ion-title [ngClass]="{'title--force-back': forceBackButton}" (click)="goToDetails()">
-
-			<!-- Back button -->
-			<div class="messages__header__fake-back">
-				<button *ngIf="forceBackButton" (click)="navCtrl.pop()" class="bar-button bar-button-ios" color="light" ion-button icon-only clear>
-					<ion-icon name="arrow-back"></ion-icon> {{ 'general.backButtonText' | translate }}
-				</button>
-			</div>
+		<ion-title (click)="goToDetails()">
 
 			<!-- Actual navbar title -->
 			<span class="messages__header__username" [ngClass]="{'messages__header__username--no-image': partners.length > 1}">

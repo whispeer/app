@@ -8,7 +8,7 @@ const BLOB_CACHE_DIR = "blobCache"
 const LOCK_TIMEOUT = 30 * 1000
 const FILE = new File()
 
-const fixFileReader = () => {
+export const fixFileReader = () => {
 	const win: any = window
 	const delegateName = win.Zone.__symbol__('OriginalDelegate')
 	if (win.FileReader[delegateName]) {

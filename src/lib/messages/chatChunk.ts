@@ -11,7 +11,6 @@ import ObjectLoader from "../services/cachedObjectLoader"
 const keyStore = require("services/keyStore.service").default;
 const sessionService = require("services/session.service").default;
 
-import { Message } from "./message"
 import ChatTitleUpdate from "./chatTitleUpdate"
 
 const debugName = "whispeer:chunk";
@@ -35,7 +34,7 @@ export class Chunk extends Observer {
 	private admins: number[]
 	private titleUpdate: ChatTitleUpdate
 
-	constructor({ content, server, meta, receiverObjects }) {
+	constructor({ content, server, meta, receiverObjects }, public chunkData?) {
 		super()
 
 		var err = validator.validate("topic", meta);
@@ -72,6 +71,14 @@ export class Chunk extends Observer {
 		if (predecessorID && ChunkLoader.isLoaded(predecessorID)) {
 			ChunkLoader.getLoaded(predecessorID).setSuccessor(this.getID())
 		}
+	}
+
+	create = ({ server: { id, chatID }}) => {
+		this.id = id
+		this.chatID = chatID
+
+		ChunkLoader.addLoaded(id, this)
+		ChunkLoader.removeLoaded(-1)
 	}
 
 	getChatID = () => this.chatID
@@ -332,46 +339,6 @@ export class Chunk extends Observer {
 			}, cryptInfo)
 		})
 	};
-
-	static createData(receiver, message, images) {
-		Message.prepare(images)
-
-		const uploadImages = (chunkKey) => {
-			return Bluebird.all(images.map((image) => {
-				return image.upload(chunkKey)
-			}))
-		}
-
-		return Bluebird.try(async function () {
-			const chunkData = await Chunk.createRawData(receiver, { content: {} })
-			const chunkStub = new Chunk({
-				meta: chunkData.chunk.meta,
-				content: {},
-				server: {},
-				receiverObjects: []
-			});
-
-			const messageMeta = {
-				createTime: new Date().getTime()
-			}
-
-			const secured = Message.createRawSecuredData(message, messageMeta, chunkStub)
-
-			await Message.setAttachmentsInfo(secured, { images, files: [], voicemails: [] })
-
-			const messageData = await secured._signAndEncrypt(userService.getOwn().getSignKey(), chunkStub.getKey())
-
-			const imageKeys = await uploadImages(chunkStub.getKey())
-
-			return {
-				...chunkData,
-				message: {
-					...messageData,
-					imageKeys: h.array.flatten(imageKeys).map(keyStore.upload.getKey)
-				}
-			};
-		})
-	}
 }
 
 Observer.extend(Chunk);

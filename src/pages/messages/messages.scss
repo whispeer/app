@@ -85,12 +85,6 @@ topicWithBursts {
 }
 
 .md {
-	.messages__header__fake-back {
-		position: absolute;
-		left: 3px;
-		top: 50%;
-		margin-top: -17.5px;
-	}
 	.messages__header-image {
 		position: absolute;
 		top: 50%;
@@ -103,24 +97,9 @@ topicWithBursts {
 	.messages__header__username--no-image {
 		padding-left: 0;
 	}
-
-	.title--force-back {
-		.messages__header-image {
-			left: 37px;
-		}
-		.messages__header__username {
-			padding-left: 57px;
-		}
-	}
 }
 
 .ios {
-	.messages__header__fake-back {
-		position: absolute;
-		left: 0.5em;
-		top: 50%;
-		margin-top: -17.5px;
-	}
 	.messages__header-image {
 		position: absolute;
 
