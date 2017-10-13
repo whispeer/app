@@ -96,7 +96,6 @@ export class MessageComponent {
 
 			return blobCache.getFileMimeType(url).then((mimeType) => {
 				return new Bluebird((success, error) => {
-					// window.plugins.socialsharing.shareWithOptions({ files: [url] }, success, error);
 					window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
 				})
 			})
