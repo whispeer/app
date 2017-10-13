@@ -264,12 +264,12 @@ export class MessagesPage {
 		}, 0)
 	}
 
-	sendMessage = ({ images = [], text, voicemails = [] }) => {
-		if (text.length === 0 && images.length === 0 && voicemails.length === 0) {
+	sendMessage = ({ text, images = [], files = [], voicemails = [] }) => {
+		if (text.length === 0 && images.length === 0 && files.length === 0 && voicemails.length === 0) {
 			return;
 		}
 
-		const sendPromise = this.chat.sendMessage(text, { images, files: [], voicemails })
+		const sendPromise = this.chat.sendMessage(text, { images, files, voicemails })
 
 		if (this.chat.isDraft()) {
 			sendPromise.then(() => {

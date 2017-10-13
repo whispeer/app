@@ -9,7 +9,7 @@ import Cache from "../services/Cache"
 import sessionService from "../services/session.service"
 var initService = require("services/initService");
 
-import ChunkLoader, { Chunk } from "../messages/chatChunk"
+import ChunkLoader from "../messages/chatChunk"
 import ChatLoader from "../messages/chat"
 import MessageLoader from "../messages/message"
 import ChatListLoader from "../messages/chatList"

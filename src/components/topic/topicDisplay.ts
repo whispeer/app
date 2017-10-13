@@ -46,6 +46,19 @@ const ImagePickerOptions = {
 
 const INFINITE_SCROLLING_THRESHOLD = 1000
 
+const isIOS = () => window.device && window.device.platform === 'iOS'
+
+const selectFileIOS = () =>
+	new Bluebird<string>((resolve, reject) => window.FilePicker.pickFile(resolve, reject, "public.item"))
+		.then((url) => `file://${url}`)
+
+const selectFileAndroid = () =>
+	new Bluebird<string>((resolve, reject) => window.fileChooser.open(resolve, reject))
+
+const selectFile = () => isIOS() ? selectFileIOS() : selectFileAndroid()
+
+const FILE = new File()
+
 @Component({
 	selector: "topicWithBursts",
 	templateUrl: "topic.html"
@@ -91,7 +104,6 @@ export class TopicComponent {
 		private actionSheetCtrl: ActionSheetController,
 		private platform: Platform,
 		private imagePicker: ImagePicker,
-		private file: File,
 		private camera: Camera,
 		private translate: TranslateService,
 		private media: Media
@@ -172,13 +184,13 @@ export class TopicComponent {
 		this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(({ path, recording, duration }:recordingType) => {
 			const { directory, name } = unpath(path)
 
-			return this.file.moveFile(
+			return FILE.moveFile(
 				this.platform.is("ios") ? "file://" + directory : directory,
 				name,
-				this.file.cacheDirectory,
+				FILE.cacheDirectory,
 				name
 			).then(() => ({
-				path: `${this.file.cacheDirectory}${name}`,
+				path: `${FILE.cacheDirectory}${name}`,
 				duration, recording
 			}))
 		}).map((voicemail:recordingType) => {
@@ -231,8 +243,8 @@ export class TopicComponent {
 	}
 
 	getFile = (url: string, type?: string) : Bluebird<any> => {
-		return Bluebird.resolve(this.file.resolveLocalFilesystemUrl(url))
-			.then((entry: FileEntry) => new Bluebird((resolve, reject) => entry.file(resolve, reject)))
+		return Bluebird.resolve(FILE.resolveLocalFilesystemUrl(url))
+			.then((file: FileEntry) => new Bluebird((resolve, reject) => file.file(resolve, reject)))
 			.then((file: any) => {
 				file.originalUrl = url;
 				if(this.platform.is("ios")) {
@@ -280,10 +292,10 @@ export class TopicComponent {
 
 	getRecordingDir = () => {
 		if (!this.platform.is("ios")) {
-			return this.file.externalRootDirectory
+			return FILE.externalRootDirectory
 		}
 
-		return this.file.tempDirectory.replace(/^file:\/\//, '')
+		return FILE.tempDirectory.replace(/^file:\/\//, '')
 	}
 
 	getRecordingFileName = () => {

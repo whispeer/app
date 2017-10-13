@@ -18,5 +18,7 @@ export class LoadingProgress {
 		console.log(this.className)
 	}
 
+	getProgress = () => Math.floor(this.progress() * 100)
+
 	constructor() {}
 }

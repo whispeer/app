@@ -1,8 +1,21 @@
+declare type positionType = { x: number, y: number, width: number, height: number }
+
 declare global {
 	interface Window {
 		device: any;
 		Zone: any;
 		whispeerGetStorage: any;
+		FilePicker: {
+			pickFile: (resolve: Function, reject: Function, utis?: string[] | string, position?: positionType) => void
+		};
+		fileChooser: {
+			open: (resolve: Function, reject: Function) => void
+		},
+		FilePath: {
+			resolveNativePath: (url: string, resolve: Function, reject: Function) => void
+		},
+		cordova: any,
+		plugins: any
 	}
 
 	const IONIC_ENV: string

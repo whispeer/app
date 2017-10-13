@@ -126,6 +126,10 @@ class MyBlob {
 		}).then((event: any) => {
 			const target = event.currentTarget || event.target;
 
+			if (target.error) {
+				return Bluebird.reject(target.error)
+			}
+
 			return target.result;
 		});
 	}
