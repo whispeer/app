@@ -1,5 +1,4 @@
 import { Component, Input } from "@angular/core";
-import { FileOpener } from '@ionic-native/file-opener'
 
 const prettysize = require("prettysize")
 
@@ -12,8 +11,6 @@ import h from "../../lib/helper/helper"
 import Progress from "../../lib/asset/Progress"
 import blobService from "../../lib/services/blobService"
 import blobCache from "../../lib/asset/blobCache"
-
-const fileOpener = new FileOpener()
 
 @Component({
 	selector: "Message",
@@ -101,7 +98,11 @@ export class MessageComponent {
 			file.loaded = true
 			file.url = url
 
-			return fileOpener.open(url, file.type)
+			return blobCache.getFileMimeType(url).then((mimeType) => {
+				return new Bluebird((success, error) => {
+					window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
+				})
+			})
 		}).catch((e) => {
 			console.error(e)
 			if (parseInt(e.status, 10) === 9) {

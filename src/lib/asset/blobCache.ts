@@ -1,5 +1,5 @@
 import * as Bluebird from "bluebird"
-import { File } from '@ionic-native/file'
+import { File, FileEntry } from '@ionic-native/file'
 
 import Cache from "../services/Cache"
 import h from "../helper/helper" // tslint:disable-line:no-unused-variable
@@ -155,6 +155,10 @@ const blobCache = {
 			return `${path}${filename}`
 		})
 	},
+
+	getFileMimeType: (url) => Bluebird.resolve(FILE.resolveLocalFilesystemUrl(url))
+		.then((file: FileEntry) => new Bluebird<any>((resolve, reject) => file.file(resolve, reject))
+		.then((file) => file.type)),
 
 	isLoaded: (blobID) => blobCache.getBlobUrl(blobID).then(() => true).catch(() => false),
 

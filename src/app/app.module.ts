@@ -13,7 +13,8 @@ declare global {
 		},
 		FilePath: {
 			resolveNativePath: (url: string, resolve: Function, reject: Function) => void
-		}
+		},
+		cordova: any
 	}
 
 	const IONIC_ENV: string
