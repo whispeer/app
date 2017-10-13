@@ -146,7 +146,7 @@ const blobCache = {
 			const cacheDir = await getCacheDirectory()
 			const blobFile = idToFileName(blobID)
 			const exists = await existsFile(cacheDir, blobFile)
-			const path = isAndroid() ? `${FILE.externalRootDirectory}Download/` : `${FILE.tempDirectory}`
+			const path = isAndroid() ? `${FILE.externalRootDirectory}Download/` : `${FILE.documentsDirectory}`
 
 			if (!exists) {
 				throw new Error(`cannot copy blob, blob does not exist: ${filename}`)
