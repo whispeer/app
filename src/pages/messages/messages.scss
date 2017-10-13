@@ -85,12 +85,6 @@ topicWithBursts {
 }
 
 .md {
-	.messages__header__fake-back {
-		position: absolute;
-		left: 3px;
-		top: 50%;
-		margin-top: -17.5px;
-	}
 	.messages__header-image {
 		position: absolute;
 		top: 50%;
@@ -103,24 +97,9 @@ topicWithBursts {
 	.messages__header__username--no-image {
 		padding-left: 0;
 	}
-
-	.title--force-back {
-		.messages__header-image {
-			left: 37px;
-		}
-		.messages__header__username {
-			padding-left: 57px;
-		}
-	}
 }
 
 .ios {
-	.messages__header__fake-back {
-		position: absolute;
-		left: 0.5em;
-		top: 50%;
-		margin-top: -17.5px;
-	}
 	.messages__header-image {
 		position: absolute;
 
@@ -130,21 +109,6 @@ topicWithBursts {
 		right: 1em;
 		transform: translateY(-50%);
 	}
-}
-.messages__message {
-	position: relative;
-	padding: 5px 20px;
-	border-radius: 20px;
-
-	box-sizing: border-box;
-
-	max-width: 75%;
-	word-wrap: break-word;
-	white-space: normal;
-}
-
-.md .messages__message {
-	border-radius: 5px;
 }
 
 .messages__burst {
@@ -281,10 +245,8 @@ topicWithBursts {
 .message__file__progress__bar {
 	position: relative;
 	height: 100%;
-
-	background: map-get($colors, light);
-
 	transition: width 0.1s ease;
+	background: map-get($colors, light);
 }
 
 .message__file__progress__icon {
@@ -337,6 +299,94 @@ topicWithBursts {
 	text-overflow: initial;
 }
 
+$padding-within-burst: 3px;
+$bubble-padding-vertical: 9px;
+$bubble-padding-horizontal: 12px;
+$bubble-radius-ios: 17.5px;
+$bubble-radius-android: 5px;
+
+.messages__message {
+	position: relative;
+	padding: $bubble-padding-vertical $bubble-padding-horizontal;
+	border-radius: $bubble-radius-ios;
+	.md & { border-radius: $bubble-radius-android; } // .md seems to be an android hack.
+	box-sizing: border-box;
+	max-width: 75%;
+	word-wrap: break-word;
+	white-space: normal;
+
+	.burst--me & {
+		margin: auto 5px $padding-within-burst 10px;
+		background: $message-bubble-color;
+		order: 2;
+		color: #fff;
+
+		&.message__file { margin-left: 20px; }
+		&.sending { background: $message-sending-bubble-color; }
+	}
+
+	.burst--other & {
+		margin: auto 10px $padding-within-burst 5px;
+		background: map-get($colors, other_grey);
+		color: map-get($colors, dark);
+
+		&.message__file { margin-right: 20px; }
+	}
+}
+
+message:last-of-type .messages__message {
+
+	$outer-radius: 16px 14px;
+	$inner-radius: 10px;
+	$size: 20px;
+
+	&:before {
+		content: "";
+		position: absolute;
+		bottom: -2px;
+		height: $size;
+		transform: translate(0, -2px);
+
+		.burst--me & {
+			z-index: 1;
+			right: -7px;
+			border-right: $size solid $message-bubble-color;
+			border-bottom-left-radius: $outer-radius;
+		}
+
+		.burst--other & {
+			z-index: 2;
+			left: -7px;
+			border-left: $size solid map-get($colors, other_grey);
+			border-bottom-right-radius: $outer-radius;
+		}
+	}
+
+	&.sending:before { border-color: $message-sending-bubble-color; }
+
+	&:after {
+		content: "";
+		position: absolute;
+		bottom: -2px;
+		height: $size;
+		width: 26px;
+		transform: translate(-30px, -2px);
+		background: white;
+
+		.burst--me & {
+			z-index: 2;
+			right: -56px;
+			border-bottom-left-radius: $inner-radius;
+		}
+
+		.burst--other & {
+			z-index: 3;
+			left: 4px;
+			border-bottom-right-radius: $inner-radius;
+		}
+	}
+}
+
 .burst--me {
 	a {
 		color: white;
@@ -345,47 +395,6 @@ topicWithBursts {
 	.messages__time {
 		order: 1;
 		margin: auto 0 auto auto;
-	}
-
-	.messages__message {
-		margin: auto 5px 1px 10px;
-		order: 2;
-
-		background: $message-bubble-color;
-		color: #fff;
-
-		&.message__file{
-			margin-left: 20.5px + 10px;
-		}
-	}
-
-	.messages__wrap:last-child {
-		.messages__message {
-			&:before {
-				content: "";
-				position: absolute;
-				z-index: 1;
-				bottom: -2px;
-				right: -7px;
-				height: 20px;
-				border-right: 20px solid $message-bubble-color;
-				border-bottom-left-radius: 16px 14px;
-				transform: translate(0, -2px);
-			}
-
-			&:after {
-				content: "";
-				position: absolute;
-				z-index: 2;
-				bottom: -2px;
-				right: -56px;
-				width: 26px;
-				height: 20px;
-				background: white;
-				border-bottom-left-radius: 10px;
-				transform: translate(-30px, -2px);
-			}
-		}
 	}
 
 	.message__file__info {
@@ -408,16 +417,6 @@ topicWithBursts {
 }
 
 .burst--other {
-	.messages__message {
-		background: map-get($colors, other_grey);
-		color: map-get($colors, dark);
-
-		margin: auto 10px 1px 5px;
-
-		&.message__file{
-			margin-right: 20px;
-		}
-	}
 	.messages__message-blocked {
 		background-color: white;
 		border: 1px solid $isabelline;
@@ -426,38 +425,10 @@ topicWithBursts {
 	.messages__time {
 		margin: auto auto auto 0;
 	}
-	.messages__wrap:last-child {
-		.messages__message {
-			&:before {
-				content:"";
-				position: absolute;
-				z-index: 2;
-				bottom: -2px;
-				left: -7px;
-				height: 20px;
-				border-left: 20px solid map-get($colors, other_grey);
-				border-bottom-right-radius: 16px 14px;
-				transform: translate(0, -2px);
-			}
-
-			&:after {
-				content: "";
-				position: absolute;
-				z-index: 3;
-				bottom: -2px;
-				left: 4px;
-				width: 26px;
-				height: 20px;
-				background: white;
-				border-bottom-right-radius: 10px;
-				transform:translate(-30px, -2px);
-			}
-		}
-
-		.messages__message-blocked:before {
-			border-left: 20px solid transparent;
-		}
+	.messages__message-blocked:before {
+		border-left: 20px solid transparent;
 	}
+
 	.message__file {
 		padding: 5px 25px 5px 0;
 	}
@@ -606,4 +577,16 @@ topicWithBursts {
 
 .messages__send-message {
 	position: relative;
+}
+
+.messageSpinner {
+	animation : delayedDisplay 1200ms linear forwards;
+	opacity: 0;
+	visibility: hidden;
+}
+
+@keyframes delayedDisplay {
+	0% { visibility: hidden; }
+	80% { visibility: visible; opacity: 0 }
+	100%{ visibility: visible; opacity: 1 }
 }

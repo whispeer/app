@@ -37,12 +37,31 @@ export class MessageComponent {
 		return this._message
 	}
 
-	private voicemailPlayer: VoicemailPlayer
-
 	constructor() {}
 
 	add = (arr, attr) => {
 		return arr.reduce((prev, next) => prev + next[attr], 0)
+	}
+
+	formatSize(size) {
+		return prettysize(size, false, false, 2)
+	}
+
+	private voicemailPlayer: VoicemailPlayer
+
+	voicemailDuration = () => {
+		if (this.voicemailPlayer.getDuration() > 0) {
+			return this.voicemailPlayer.getDuration()
+		}
+		return this.message.data.voicemails.reduce((prev, next) => prev + next.duration, 0)
+	}
+
+	voicemailPosition = () => {
+		if (!this.voicemailPlayer) {
+			return 0
+		}
+
+		return this.voicemailPlayer.getPosition()
 	}
 
 	voicemailProgress = () => {
@@ -59,22 +78,6 @@ export class MessageComponent {
 		}
 
 		return this.voicemailDownloadProgress.getProgress()
-	}
-
-	voicemailDuration = () => {
-		if (this.voicemailPlayer.getDuration() > 0) {
-			return this.voicemailPlayer.getDuration()
-		}
-
-		return this.message.data.voicemails.reduce((prev, next) => prev + next.duration, 0)
-	}
-
-	voicemailPosition = () => {
-		if (!this.voicemailPlayer) {
-			return 0
-		}
-
-		return this.voicemailPlayer.getPosition()
 	}
 
 	voicemailSize = () =>
@@ -135,8 +138,4 @@ export class MessageComponent {
 
 	pauseVoicemail = () =>
 		this.voicemailPlayer.pause()
-
-	formatSize(size) {
-		return prettysize(size, false, false, 2)
-	}
 }

@@ -32,6 +32,7 @@ export class Navigator {
 	settings: NodeWithBounds = null
 
 	onTap = () => {
+		clearTimeout(this.easterEgg)
 		if (this.open) {
 			this.open = false
 		} else {
@@ -119,6 +120,7 @@ export class Navigator {
 	}
 
 	close() {
+		clearTimeout(this.easterEgg)
 		this.open = false
 	}
 

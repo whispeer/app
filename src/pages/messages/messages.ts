@@ -5,8 +5,8 @@ import errorService from "../../lib/services/error.service";
 
 import messageService from "../../lib/messages/messageService";
 import Burst from "../../lib/messages/burst"
-import { Chat } from "../../lib/messages/chat"
-import MessageLoader, { Message } from "../../lib/messages/message"
+import ChatLoader, { Chat } from "../../lib/messages/chat"
+import MessageLoader from "../../lib/messages/message"
 
 const inView = require("in-view");
 
@@ -114,11 +114,26 @@ export class MessagesPage {
 
 	messages: any[];
 
-	constructor(public navParams: NavParams, private element: ElementRef) {
+	constructor(public navParams: NavParams, public navCtrl: NavController, private element: ElementRef) {
 	}
 
 	ngOnInit() {
 		this.chatID = parseFloat(this.navParams.get("chatID"));
+
+		/*if (ChatLoader.isLoaded(this.chatID)) {
+			navCtrl.push("Messages", { chatID: 34 }, { animate: false })
+			this.chat = ChatLoader.getLoaded(this.chatID)
+			this.messagesLoading = false
+			return
+		}*/
+
+		if (this.chatID < 0) {
+			if (!ChatLoader.isLoaded(this.chatID)) {
+				this.navCtrl.setRoot("Home")
+				this.navCtrl.popToRoot()
+				return
+			}
+		}
 
 		initService.awaitLoading().then(() =>
 			messageService.getChat(this.chatID)
@@ -254,9 +269,17 @@ export class MessagesPage {
 			return;
 		}
 
-		messageService.sendMessage(this.chat.getID(), text, { images, files, voicemails }).then(() => {
-			this.chat.newMessage = "";
-			this.markRead();
-		});
+		const sendPromise = this.chat.sendMessage(text, { images, files, voicemails })
+
+		if (this.chat.isDraft()) {
+			sendPromise.then(() => {
+				this.navCtrl.push("Messages", { chatID: this.chat.getID() }, { animate: false }).then(() => {
+					this.navCtrl.remove(this.navCtrl.length() - 2, 1)
+				})
+			})
+		}
+
+		this.chat.newMessage = ""
+		this.markRead()
 	}
 }

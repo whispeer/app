@@ -53,6 +53,8 @@ $colors_private: (
 	secondary: $prussian_blue_highlight,
 	danger: $red,
 
+	sending: $tea_green,
+
 	light: $white,
 	dark: $davys_grey,
 	grey: $grey,
@@ -75,6 +77,8 @@ $colors_business: (
 	secondary: $prussian_blue_highlight,
 	danger: $red,
 
+	sending: $border_grey,
+
 	light: $white,
 	dark: $davys_grey,
 	grey: $grey,
@@ -96,6 +100,7 @@ $login-input-color: $davys_grey;
 $login-business-switch-highlight-color: $prussian_blue;
 
 $message-bubble-color: map-get($colors, primary);
+$message-sending-bubble-color: map-get($colors, sending);
 
 $svg-fill-primary: map-get($colors, primary);
 $svg-fill-primaryDark: map-get($colors, primaryDarker);
