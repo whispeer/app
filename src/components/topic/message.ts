@@ -89,19 +89,15 @@ export class MessageComponent {
 		file.getProgress = () => loadProgress.getProgress()
 
 		blobService.getBlobUrl(file.blobID, loadProgress, file.size).then((url) => {
-			if (window.device && window.device.platform === 'Android') {
-				return blobCache.copyBlobToDownloads(file.blobID, file.name)
-			}
-
-			return url
+			return blobCache.copyBlobToDownloads(file.blobID, file.name)
 		}).then((url) => {
 			file.loaded = true
 			file.url = url
 
 			return blobCache.getFileMimeType(url).then((mimeType) => {
 				return new Bluebird((success, error) => {
-					window.plugins.socialsharing.shareWithOptions({ files: [url] }, success, error);
-					// window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
+					// window.plugins.socialsharing.shareWithOptions({ files: [url] }, success, error);
+					window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
 				})
 			})
 		}).catch((e) => {
