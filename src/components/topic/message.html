@@ -34,7 +34,7 @@
 
 	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
 		<div class="messages__message message__voicemail" [ngClass]="{'message__file--sending': voicemailSending()}">
-			<div class="message__file__info">
+			<div class="message__file__info message__voicemail__info">
 				<div class="message__voicemail__actions">
 					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
 					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>

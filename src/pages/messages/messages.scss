@@ -154,9 +154,22 @@ topicWithBursts {
 	padding: 5px 0 5px 5px;
 }
 
+.message__voicemail__info {
+	flex-wrap: nowrap !important;
+}
+
 .message__voicemail__actions {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	flex-shrink: 0;
+	flex-grow: 0;
+
 	width: 30px;
 	height: 30px;
+
+	margin-right: 10px;
 }
 
 .message__voicemail__action {
@@ -168,12 +181,15 @@ topicWithBursts {
 
 .message__voicemail__action,
 .message__voicemail__uploadSpinner {
-	margin-right: 10px;
+	margin: 0;
 }
 
 .message__voicemail__player {
 	display: inline-block;
 	position: relative;
+
+	flex-wrap: nowrap;
+	white-space: nowrap;
 
 	flex-grow: 1;
 }
@@ -253,12 +269,12 @@ topicWithBursts {
 
 	.burst--me & {
 		padding-left: 0;
-		padding-right: 15px;
+		padding-right: 0;
 	}
 
 	.burst--other & {
 		padding-left: 0;
-		padding-right: 15px;
+		padding-right: 0;
 	}
 }
 
