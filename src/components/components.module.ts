@@ -8,7 +8,6 @@ import { FilenameLimitPipe } from "../lib/pipes/filenameLimit";
 
 import { UserImageComponent } from "./userImage";
 import { Navigator } from "./navigator/navigator";
-import { ChooseFriends } from "./chooseFriends"
 import { LoadComponent } from "./load"
 import { LoadingProgress } from "./loadingProgress"
 
@@ -24,7 +23,6 @@ import { TranslateModule } from '@ngx-translate/core';
 		MaxValuePipe,
 		FilenameLimitPipe,
 		UserImageComponent,
-		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
 		HexagonComponent,
@@ -42,7 +40,6 @@ import { TranslateModule } from '@ngx-translate/core';
 		MaxValuePipe,
 		FilenameLimitPipe,
 		UserImageComponent,
-		ChooseFriends,
 		LoadComponent,
 		LoadingProgress,
 		HexagonComponent,
