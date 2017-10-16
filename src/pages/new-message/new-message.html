@@ -1,5 +1,105 @@
-<ion-content *ngIf="loading">
-	<ion-spinner text-center margin-vertical class="spinner--full"></ion-spinner>
-</ion-content>
+<ion-header>
+	<ion-navbar [color]="'primary'">
+		<ion-title>
+			{{ 'chooseFriends.title' | translate }}
+		</ion-title>
+	</ion-navbar>
+	<ion-toolbar class="toolbar--search" [color]="'primary'" *ngIf="!loading">
+		<ion-searchbar
+			*ngIf="!contactsLoading"
+			animated
+			[placeholder]="'chooseFriends.search' | translate"
+			[(ngModel)]="searchTerm"
+			(ngModelChange)="executeSearch()" [showCancelButton]="true" [cancelButtonText]="'general.cancel' | translate">
+		</ion-searchbar>
+	</ion-toolbar>
+</ion-header>
 
-<chooseFriends *ngIf="!loading" (chooseReceivers)="send($event)"></chooseFriends>
+<ion-content>
+	<ion-spinner *ngIf="contactsLoading || loading" text-center margin-vertical class="spinner--full"></ion-spinner>
+
+	<ion-list *ngIf="selectedUsers.length > 0 && !loading" class="friends__list">
+		<ion-list-header class="friends__list__header" padding-top>
+			{{ 'chooseFriends.selectedContacts' | translate }}
+		</ion-list-header>
+	</ion-list>
+	<ion-list [virtualScroll]="selectedUsers" class="friends__list" *ngIf="!loading">
+		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
+			<ion-label class="checkbox__label--user checkbox__label--user-selected">
+				<ion-avatar class="hexagon--border"
+						[ngClass]="{'hexagon__image--active': contact.online}" item-left>
+					<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
+				</ion-avatar>
+				<h2 class="checkbox__label__username">
+					<strong *ngIf="contact.names.firstname">
+						{{contact.names.firstname}}
+					</strong>
+					<span *ngIf="contact.names.firstname && contact.names.lastname">
+						{{contact.names.lastname}}
+					</span>
+					<strong
+						*ngIf="!contact.names.firstname && contact.names.lastname">
+						{{contact.names.lastname}}
+					</strong>
+					<strong
+						*ngIf="!contact.names.firstname && !contact.names.lastname">
+						{{contact.name}}
+					</strong>
+				</h2>
+			</ion-label>
+
+			<div item-content class="checkbox checkbox-hexagon checkbox-hexagon--remove" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
+			</div>
+		</ion-item>
+	</ion-list>
+	<p class="text-grey" padding-horizontal *ngIf="selectedUsers.length > 0 && !loading" [innerHTML]="'chooseFriends.selectedExplain' | translate">
+	</p>
+	<ion-item-divider class="friends__divider" *ngIf="searchTerm.length > 0 && !loading">
+		{{ 'chooseFriends.search' | translate }}
+	</ion-item-divider>
+	<ion-list [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list space-for-fab" *ngIf="!loading">
+		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0 && selectedUsers.length === 0}">
+			{{ header }}
+		</ion-item-divider>
+
+		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
+			<ion-label class="checkbox__label--user">
+				<ion-avatar class="hexagon--border"
+						[ngClass]="{'hexagon__image--active': contact.online}" item-left>
+					<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
+				</ion-avatar>
+				<h2>
+					<strong *ngIf="contact.names.firstname">
+						{{contact.names.firstname}}
+					</strong>
+					<span *ngIf="contact.names.firstname && contact.names.lastname">
+						{{contact.names.lastname}}
+					</span>
+					<strong
+						*ngIf="!contact.names.firstname && contact.names.lastname">
+						{{contact.names.lastname}}
+					</strong>
+					<strong
+						*ngIf="!contact.names.firstname && !contact.names.lastname">
+						{{contact.name}}
+					</strong>
+				</h2>
+			</ion-label>
+			<div item-content class="checkbox checkbox-hexagon" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">
+				<div class="checkbox-icon" [class.checkbox-checked]="selectedUserMap[contact.id]"><div class="checkbox-inner"></div></div>
+			</div>
+		</ion-item>
+	</ion-list>
+	<ion-spinner *ngIf="searchResultsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
+
+	<div class="space-for-fab" *ngIf="!loading">
+		<p class="text-grey not-found-footer" padding>
+			<span *ngIf="searchTerm.length > 0">
+				{{ 'contacts.searchResultExplain' | translate }}
+			</span>
+		</p>
+	</div>
+
+	<navigator [icon]="'arrow'" (invoke)="create()" ion-fixed *ngIf="!loading"></navigator>
+</ion-content>
