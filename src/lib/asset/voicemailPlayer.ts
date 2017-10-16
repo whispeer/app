@@ -87,7 +87,7 @@ export default class VoicemailPlayer {
 		this.position = 0
 		this.interval = null
 
-		if (this !== VoicemailPlayer.activePlayer) {
+		if (VoicemailPlayer.activePlayer && this !== VoicemailPlayer.activePlayer) {
 			VoicemailPlayer.activePlayer.reset()
 		}
 		VoicemailPlayer.activePlayer = null
