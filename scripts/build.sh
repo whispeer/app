@@ -12,6 +12,8 @@ function signAndCopy {
 	rm -f ./release/whispeer-$extra-unsigned.apk
 }
 
+npm run businessSass
+
 echo "build for android >= 5"
 
 sed -i .bak 's/android-minSdkVersion" value="16"/android-minSdkVersion" value="21"/g' config.xml
