@@ -42,3 +42,5 @@ ionic info
 # platform specific tools
 checkVersion ios-deploy -V '1.9.2'
 
+# tools
+checkVersion python --version 'Python 2.7.10'
