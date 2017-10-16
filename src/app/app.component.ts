@@ -121,7 +121,7 @@ export class MyApp {
 				}
 			})
 
-			sessionService.loadLogin().then((loggedin) => {
+			sessionService.bootLogin().then((loggedin) => {
 
 				Bluebird.delay(SPLASH_SCREEN_HIDE_DELAY).then(() => this.splashScreen.hide())
 				if (!loggedin && this.nav.length() > 0) {
