@@ -131,7 +131,7 @@ class MyBlob {
 			}
 
 			return target.result;
-		});
+		}).timeout(2 * 60 * 1000)
 	}
 
 	encryptAndUpload (key) {
