@@ -2,7 +2,7 @@
 
 PACKAGE_JSON="package.json"
 PACKAGE_JSON_TMP=".package.json"
-INDENT_SCRIPT="import sys, json; json.dump(json.load(sys.stdin), sys.stdout, indent=2)"
+INDENT_SCRIPT="import sys, json; json.dump(json.load(sys.stdin), sys.stdout, indent=2, sort_keys=True, separators=(',', ': '))"
 cat $PACKAGE_JSON | python -c "$INDENT_SCRIPT" > $PACKAGE_JSON_TMP
 
 if [ $? -eq 0 ]; then
