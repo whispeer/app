@@ -54,6 +54,7 @@ const selectFileIOS = () =>
 
 const selectFileAndroid = () =>
 	new Bluebird<string>((resolve, reject) => window.fileChooser.open(resolve, reject))
+		.then((url) => `file://${url}`)
 
 const selectFile = () => isIOS() ? selectFileIOS() : selectFileAndroid()
 
@@ -415,6 +416,23 @@ export class TopicComponent {
 								text: ""
 							});
 						});
+					}
+				}, {
+					text: this.translate.instant("topic.selectFile"),
+					icon: !this.platform.is("ios") ? "document": null,
+					handler: () => {
+						selectFile()
+							.then((file) => {
+								console.log(file)
+								return this.getFile(file)
+							})
+							.then((fileObject) => new FileUpload(fileObject, { encrypt: true, extraInfo: {} }))
+							.then((file) => {
+								this.sendMessage.emit({
+									files: [file],
+									text: ""
+								})
+							})
 					}
 				}, {
 					text: this.translate.instant("general.cancel"),
