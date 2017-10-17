@@ -105,13 +105,13 @@ class MyBlob {
 	}
 
 	private getArrayBuffer() {
+		fixFileReader()
+
 		if (this.blobData.originalUrl) {
 			const { directory, name } = unpath(this.blobData.originalUrl)
 
-			return blobCache.readFileAsArrayBuffer(directory, name)
+			return blobCache.readFileAsArrayBuffer(directory, name).timeout(2 * 60 * 1000)
 		}
-
-		fixFileReader()
 
 		return new Bluebird((resolve) => {
 			const reader = new FileReader();
@@ -131,7 +131,7 @@ class MyBlob {
 			}
 
 			return target.result;
-		});
+		}).timeout(2 * 60 * 1000)
 	}
 
 	encryptAndUpload (key) {

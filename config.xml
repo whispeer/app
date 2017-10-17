@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="whispeer.app" version="0.3.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="whispeer.app" version="0.3.5" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name short="whispeer">whispeer Messenger</name>
     <description>Whispeer Messenger.</description>
     <author email="support@whispeer.de" href="https://whispeer.de/">Whispeer Team</author>
@@ -95,6 +95,7 @@
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
     <hook src="scripts/checkVersions.sh" type="before_prepare" />
     <hook src="scripts/copyPushIcon.js" type="after_prepare" />
+    <hook src="scripts/fixPackageFormatting.sh" type="after_prepare" />
     <hook src="scripts/correctIOSSimVersion.sh" type="after_platform_add" />
     <engine name="android" spec="~6.2.1" />
     <engine name="ios" spec="^4.5.0" />

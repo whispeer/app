@@ -61,7 +61,7 @@
 		},
 		"add": {
 			"title": "Kontate hinzufügen",
-			"selectedExplain": "Above contacts will be added to the conversation."
+			"selectedExplain": "Oben genannte Kontakte werden zur aktuellen Konversation hinzugefügt."
 		}
 	},
 	"chooseFriends": {
