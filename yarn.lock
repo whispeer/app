@@ -1733,9 +1733,9 @@ cordova-plugin-file@~4.3.1:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-4.3.3.tgz#012e97aa1afb91f84916e6341b548366d23de9b9"
 
-cordova-plugin-filechooser@^1.0.1:
+"cordova-plugin-filechooser@https://github.com/whispeer/cordova-filechooser.git#feature/full_path":
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-filechooser/-/cordova-plugin-filechooser-1.0.1.tgz#fa59e97b8cdd91260be0bec460db8ec5de93488f"
+  resolved "https://github.com/whispeer/cordova-filechooser.git#433f515017de106522d9025a57156df0bada6bd9"
 
 cordova-plugin-filepicker@^1.1.4:
   version "1.1.4"
