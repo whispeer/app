@@ -17,8 +17,11 @@ import blobCache from "../../lib/asset/blobCache"
 	templateUrl: "message.html"
 })
 export class MessageComponent {
+
 	_message: Message
+
 	voicemailDownloadProgress: Progress
+
 
 	@Input() set message(_message: Message) {
 		const voicemails = _message.data.voicemails

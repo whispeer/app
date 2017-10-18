@@ -34,7 +34,6 @@ namespace BurstHelper {
 				currentBurst = new Burst();
 				bursts.push(currentBurst);
 			}
-
 			currentBurst.addItem(messageOrUpdate);
 		});
 

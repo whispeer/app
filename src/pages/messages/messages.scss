@@ -159,17 +159,17 @@ topicWithBursts {
 }
 
 .message__voicemail__actions {
-	display: flex;
 	align-items: center;
 	justify-content: center;
 
+	display: flex;
 	flex-shrink: 0;
 	flex-grow: 0;
 
 	width: 30px;
-	height: 30px;
-
-	margin-right: 10px;
+	max-width: 30px;
+	height: auto;
+	margin-right: 12px;
 }
 
 .message__voicemail__action {
@@ -243,20 +243,6 @@ topicWithBursts {
 
 	* {
 		stroke: map-get($colors, light) !important;
-	}
-}
-
-.message__file--sending {
-	background: map-get($colors, primary_faded) !important;
-
-	&:before {
-		border-right-color: map-get($colors, primary_faded) !important;
-	}
-
-	.message__file__hexagon {
-		.content, .border {
-			fill: map-get($colors, other_grey);
-		}
 	}
 }
 
@@ -390,7 +376,6 @@ $bubble-radius-android: 5px;
 		order: 2;
 		color: #fff;
 
-		&.message__file { margin-left: 20px }
 		&.sending { background: $message-sending-bubble-color; }
 	}
 
@@ -398,8 +383,6 @@ $bubble-radius-android: 5px;
 		margin: auto 10px $padding-within-burst 5px;
 		background: map-get($colors, other_grey);
 		color: map-get($colors, dark);
-
-		&.message__file { margin-right: 20px }
 	}
 }
 
@@ -431,7 +414,9 @@ message:last-of-type .messages__message {
 		}
 	}
 
-	&.sending:before { border-color: $message-sending-bubble-color; }
+	.burst--me & {
+		&.sending:before { border-color: $message-sending-bubble-color; }
+	}
 
 	&:after {
 		content: "";

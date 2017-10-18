@@ -62421,10 +62421,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 }
 
 .message__voicemail__actions {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
   -webkit-box-align: center;
   -webkit-align-items: center;
   -ms-flex-align: center;
@@ -62433,6 +62429,10 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
   flex-shrink: 0;
@@ -62441,8 +62441,9 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   -ms-flex-positive: 0;
   flex-grow: 0;
   width: 30px;
-  height: 30px;
-  margin-right: 10px;
+  max-width: 30px;
+  height: auto;
+  margin-right: 12px;
 }
 
 .message__voicemail__action {
@@ -62657,10 +62658,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   color: #fff;
 }
 
-.burst--me .messages__message.message__file {
-  margin-left: 20px;
-}
-
 .burst--me .messages__message.sending {
   background: #d5d8da;
 }
@@ -62669,10 +62666,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   margin: auto 10px 3px 5px;
   background: #ebeced;
   color: #545b5e;
-}
-
-.burst--other .messages__message.message__file {
-  margin-right: 20px;
 }
 
 message:last-of-type .messages__message:before {
