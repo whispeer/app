@@ -170,6 +170,12 @@ topicWithBursts {
 	max-width: 30px;
 	height: auto;
 	margin-right: 12px;
+
+	.burst--other & {
+		order: 2;
+		margin-right: 0;
+		margin-left: 12px;
+	}
 }
 
 .message__voicemail__action {
@@ -473,13 +479,13 @@ message:last-of-type .messages__message {
 		border-left: 20px solid transparent;
 	}
 
-	.message__file {
-		padding: 5px 25px 5px 0;
-	}
-	.message__file__hexagon-wrap {
-		left: auto;
-		right: -10px;
-	}
+	// .message__file {
+	// 	padding: 5px 25px 5px 0;
+	// }
+	// .message__file__hexagon-wrap {
+	// 	left: auto;
+	// 	right: -10px;
+	// }
 	.message__file__memo-play-icon {
 		color: map-get($colors, dark);
 	}

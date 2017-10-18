@@ -62446,6 +62446,15 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   margin-right: 12px;
 }
 
+.burst--other .message__voicemail__actions {
+  -webkit-box-ordinal-group: 3;
+  -webkit-order: 2;
+  -ms-flex-order: 2;
+  order: 2;
+  margin-right: 0;
+  margin-left: 12px;
+}
+
 .message__voicemail__action {
   font-size: 30px;
   -webkit-box-flex: 0;
@@ -62746,15 +62755,6 @@ message:last-of-type .messages__message:after {
 
 .burst--other .messages__message-blocked:before {
   border-left: 20px solid transparent;
-}
-
-.burst--other .message__file {
-  padding: 5px 25px 5px 0;
-}
-
-.burst--other .message__file__hexagon-wrap {
-  left: auto;
-  right: -10px;
 }
 
 .burst--other .message__file__memo-play-icon {
