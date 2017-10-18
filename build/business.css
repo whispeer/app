@@ -62520,18 +62520,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   stroke: #fff !important;
 }
 
-.message__file--sending {
-  background: #d5d8da !important;
-}
-
-.message__file--sending:before {
-  border-right-color: #d5d8da !important;
-}
-
-.message__file--sending .message__file__hexagon .content, .message__file--sending .message__file__hexagon .border {
-  fill: #ebeced;
-}
-
 .message__file__info {
   display: -webkit-box;
   display: -webkit-flex;
@@ -62674,7 +62662,7 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 }
 
 .burst--me .messages__message.sending {
-  background: #cde9B6;
+  background: #d5d8da;
 }
 
 .burst--other .messages__message {
@@ -62710,8 +62698,8 @@ message:last-of-type .messages__message:before {
   border-bottom-right-radius: 16px 14px;
 }
 
-message:last-of-type .messages__message.sending:before {
-  border-color: #cde9B6;
+.burst--me message:last-of-type .messages__message.sending:before {
+  border-color: #d5d8da;
 }
 
 message:last-of-type .messages__message:after {
