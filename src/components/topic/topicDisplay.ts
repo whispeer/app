@@ -394,52 +394,62 @@ export class TopicComponent {
 	}
 
 	presentActionSheet = () => {
+		const cameraButton = {
+			text: this.translate.instant("topic.takePhoto"),
+			icon: !this.platform.is("ios") ? "camera": null,
+			handler: () => {
+				this.takeImage();
+			}
+		}
+
+		const galleryButton = {
+			text: this.translate.instant("topic.selectGallery"),
+			icon: !this.platform.is("ios") ? "image": null,
+			handler: () => {
+				Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
+					return this.getFile(result, "image/png");
+				}).map((file: any) => {
+					return new ImageUpload(file);
+				}).then((images) => {
+					this.sendMessage.emit({
+						images,
+						text: ""
+					});
+				});
+			}
+		}
+
+		const fileButton = {
+			text: this.translate.instant("topic.selectFile"),
+			icon: !this.platform.is("ios") ? "document": null,
+			handler: () => {
+				selectFile()
+					.then((file) => {
+						console.log(file)
+						return this.getFile(file)
+					})
+					.then((fileObject) => new FileUpload(fileObject, { encrypt: true, extraInfo: {} }))
+					.then((file) => {
+						this.sendMessage.emit({
+							files: [file],
+							text: ""
+						})
+					})
+			}
+		}
+
+		const cancelButton = {
+			text: this.translate.instant("general.cancel"),
+			icon: !this.platform.is("ios") ? "close" : null,
+			role: "cancel"
+		}
+
+		const buttons = featureToggles.isFeatureEnabled("chat.fileTransfer") ?
+			[ cameraButton, galleryButton, fileButton, cancelButton ] :
+			[ cameraButton, galleryButton, cancelButton ]
+
 		let actionSheet = this.actionSheetCtrl.create({
-			buttons: [
-				{
-					text: this.translate.instant("topic.takePhoto"),
-					icon: !this.platform.is("ios") ? "camera": null,
-					handler: () => {
-						this.takeImage();
-					}
-				}, {
-					text: this.translate.instant("topic.selectGallery"),
-					icon: !this.platform.is("ios") ? "image": null,
-					handler: () => {
-						Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
-							return this.getFile(result, "image/png");
-						}).map((file: any) => {
-							return new ImageUpload(file);
-						}).then((images) => {
-							this.sendMessage.emit({
-								images,
-								text: ""
-							});
-						});
-					}
-				}, {
-					text: this.translate.instant("topic.selectFile"),
-					icon: !this.platform.is("ios") ? "document": null,
-					handler: () => {
-						selectFile()
-							.then((file) => {
-								console.log(file)
-								return this.getFile(file)
-							})
-							.then((fileObject) => new FileUpload(fileObject, { encrypt: true, extraInfo: {} }))
-							.then((file) => {
-								this.sendMessage.emit({
-									files: [file],
-									text: ""
-								})
-							})
-					}
-				}, {
-					text: this.translate.instant("general.cancel"),
-					icon: !this.platform.is("ios") ? "close" : null,
-					role: "cancel"
-				}
-			]
+			buttons
 		});
 
 		actionSheet.present();
