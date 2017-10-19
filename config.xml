@@ -109,6 +109,13 @@
         <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value="whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts." />
     </plugin>
     <plugin name="cordova-plugin-compat" spec="~1.1.0" />
+    <plugin name="cordova-plugin-crosswalk-webview" spec="^2.3.0">
+        <variable name="XWALK_COMMANDLINE" value="--disable-pull-to-refresh-effect" />
+        <variable name="XWALK_LITEVERSION" value="xwalk_core_library_canary:17+" />
+        <variable name="XWALK_MODE" value="embedded" />
+        <variable name="XWALK_MULTIPLEAPK" value="true" />
+        <variable name="XWALK_VERSION" value="23+" />
+    </plugin>
     <plugin name="cordova-plugin-device" spec="~1.1.4" />
     <plugin name="cordova-plugin-file" spec="~4.3.1" />
     <plugin name="cordova-plugin-file-opener2" spec="^2.0.19" />
