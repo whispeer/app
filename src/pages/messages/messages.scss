@@ -384,6 +384,10 @@ $bubble-radius-android: 5px;
 	word-wrap: break-word;
 	white-space: normal;
 
+	span {
+		-webkit-user-select: auto;
+	}
+
 	.burst--me & {
 		margin: auto 5px $padding-within-burst 10px;
 		background: $message-bubble-color;
