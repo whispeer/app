@@ -51,6 +51,7 @@
 	"topic": {
 		"takePhoto": "Foto aufnehmen",
 		"selectGallery": "Aus Galerie auswählen",
+		"selectFile": "Datei versenden",
 		"changed": "änderte den Titel zu",
 		"detail": {
 			"reportTopic": "Diesen Chat melden",
