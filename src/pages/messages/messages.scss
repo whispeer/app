@@ -383,6 +383,7 @@ $bubble-radius-android: 5px;
 	max-width: 75%;
 	word-wrap: break-word;
 	white-space: normal;
+	-webkit-user-select: auto;
 
 	.burst--me & {
 		margin: auto 5px $padding-within-burst 10px;
