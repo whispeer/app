@@ -62657,6 +62657,10 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   border-radius: 5px;
 }
 
+.messages__message span {
+  -webkit-user-select: auto;
+}
+
 .burst--me .messages__message {
   margin: auto 5px 3px 10px;
   background: #788286;

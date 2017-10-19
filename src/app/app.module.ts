@@ -173,7 +173,7 @@ export class AppModule {
 		translate.setDefaultLang("en");
 
 		// this used to be a huge problem with long click in chrome.
-		this.disableContextMenues()
+		// this.disableContextMenues()
 
 		platform.ready().then(() => {
 			this.globalization.getPreferredLanguage().then(({ value }) => {
