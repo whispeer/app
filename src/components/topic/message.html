@@ -1,4 +1,4 @@
-<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.isBlockedSince()">
+<div *ngIf="message.isBlockedSince()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
 	<div class="messages__message messages__message-blocked">
 		<span>{{ 'blocked.messageReplacement' | translate }}</span>
 	</div>
@@ -15,12 +15,11 @@
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
 
-	<div *ngFor="let file of message.data.files" class="messages__wrap messages__wrap--file">
-		<div class="messages__message message__file" [ngClass]="{'message__file--sending': voicemailSending()}">
-			<div class="message__file__hexagon-wrap">
-				<hexagon class="message__file__hexagon"></hexagon>
-				<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)"></ion-icon>
-				<ion-icon name="md-document" class="message__file__hexagon-icon" *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)"></ion-icon>
+	<div *ngFor="let file of message.data.files" class="messages__wrap">
+		<div class="messages__message message__file" [ngClass]="{'sending': !message.hasBeenSent()}">
+			<div class="message__voicemail__actions">
+				<ion-icon *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)" class="message__voicemail__action" name="md-download"></ion-icon>
+				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>
 				<loading-progress *ngIf="(!file.loaded && file.getProgress) || file.sending" [progress]="file.getProgress" [inverse]="voicemailSending()"></loading-progress>
 			</div>
 			<span class="message__file__info">
@@ -32,7 +31,7 @@
 	</div>
 
 	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
-		<div class="messages__message message__voicemail" [ngClass]="{'message__file--sending': voicemailSending()}">
+		<div class="messages__message message__voicemail" [ngClass]="{'sending': voicemailSending()}">
 			<div class="message__file__info message__voicemail__info">
 				<div class="message__voicemail__actions">
 					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>

@@ -51,6 +51,9 @@
 	"topic": {
 		"takePhoto": "Foto aufnehmen",
 		"selectGallery": "Aus Galerie auswählen",
+		"selectFile": "Datei versenden",
+		"fileTooBigTitle": "Datei zu groß!",
+		"fileTooBigDetail": "Dateiübertragungen für Privatnutzer sind derzeit auf {{max_size}}MB beschränkt.",
 		"changed": "änderte den Titel zu",
 		"detail": {
 			"reportTopic": "Diesen Chat melden",

@@ -66,6 +66,7 @@ export class Message {
 
 		this.setDefaultData()
 
+
 		this.data.sender = sender.data
 		this.isOwnMessage = sender.isOwn()
 
