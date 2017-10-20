@@ -6,7 +6,7 @@ import { NavController, ActionSheetController, Platform } from "ionic-angular"
 import * as Bluebird from "bluebird"
 
 import { ImagePicker } from '@ionic-native/image-picker'
-import { File } from '@ionic-native/file'
+import { File, FileEntry } from '@ionic-native/file'
 import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
@@ -22,7 +22,6 @@ import uuidv4 from 'uuid/v4'
 import VoicemailPlayer, { recordingType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
-import { Message } from "../../lib/messages/message"
 import Burst from "../../lib/messages/burst"
 import featureToggles from "../../lib/services/featureToggles"
 
@@ -57,7 +56,6 @@ export class TopicComponent {
 	@Input() messageBurstsFunction;
 	@Input() loadMoreMessages;
 	@Input() messagesLoading;
-	@Input() forceBackButton;
 
 	@Output() sendMessage = new EventEmitter();
 
@@ -186,7 +184,7 @@ export class TopicComponent {
 		}).map((voicemail:recordingType) => {
 			const { path, duration } = voicemail
 
-			return this.getFile(path, "").then((fileObject) =>
+			return this.getFile(path).then((fileObject) =>
 				new FileUpload(fileObject, { encrypt: true, extraInfo: { duration } })
 			)
 		}).then((voicemails) => {
@@ -232,20 +230,21 @@ export class TopicComponent {
 		return this.newMessageText.length === 0
 	}
 
-	getFile = (url: string, type: string) : Bluebird<any> => {
-		return new Bluebird((resolve, reject) => {
-			this.file.resolveLocalFilesystemUrl(url).then((entry: any) => {
-				return entry.file(resolve, reject);
-			});
-		}).then((file: any) => {
-			file.originalUrl = url;
-			if(this.platform.is("ios")) {
-				file.localURL = url.replace("file://", `http://${window.location.host}`);
-			}
-			file.type = type;
+	getFile = (url: string, type?: string) : Bluebird<any> => {
+		return Bluebird.resolve(this.file.resolveLocalFilesystemUrl(url))
+			.then((entry: FileEntry) => new Bluebird((resolve, reject) => entry.file(resolve, reject)))
+			.then((file: any) => {
+				file.originalUrl = url;
+				if(this.platform.is("ios")) {
+					file.localURL = url.replace("file://", `http://${window.location.host}`);
+				}
 
-			return file;
-		});
+				if (type) {
+					file.type = type;
+				}
+
+				return file;
+			});
 	}
 
 	takeImage = () => {
@@ -305,13 +304,10 @@ export class TopicComponent {
 		}
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
-
 		this.recordingInfo.startTime = Date.now()
-
 		this.recordingFile.startRecord();
 
 		clearInterval(this.recordingInfo.updateInterval)
-
 		this.recordingInfo.updateInterval = window.setInterval(() => {
 			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
 		}, 100)
@@ -343,7 +339,6 @@ export class TopicComponent {
 	toggleRecording = () => {
 		if (RecordingStateMachine.is(RecordingStates.Recording)) {
 			RecordingStateMachine.go(RecordingStates.Paused)
-
 			clearInterval(this.recordingInfo.updateInterval)
 
 			this.recordingFile.stopRecord()
@@ -351,11 +346,9 @@ export class TopicComponent {
 			this.recordingFile = null
 
 			this.recordingPlayer.addRecording(this.getRecordingFileName(), this.recordingInfo.duration)
-
 			this.recordingInfo.duration = 0
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)
-
 			this.startRecording()
 		}
 	}

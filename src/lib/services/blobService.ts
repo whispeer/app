@@ -16,7 +16,7 @@ const debug = require("debug")
 import h from "../helper/helper"
 import Progress from "../asset/Progress"
 
-import blobCache from "../asset/blobCache"
+import blobCache, { fixFileReader } from "../asset/blobCache"
 
 import socketService from "./socket.service"
 import BlobDownloader from "./blobDownloader.service"
@@ -110,6 +110,8 @@ class MyBlob {
 
 			return blobCache.readFileAsArrayBuffer(directory, name)
 		}
+
+		fixFileReader()
 
 		return new Bluebird((resolve) => {
 			const reader = new FileReader();

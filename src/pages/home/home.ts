@@ -94,11 +94,6 @@ export class HomePage {
 	ngOnInit() {}
 
 	ionViewDidEnter = () => {
-		// this should hide the search bar
-		// but it runs too early when redirected from login. (works in messages...)
-		// another problem is that the search bars have different heights.
-
-		//this.content.scrollTo(0, 58, 0)
 		this.loadTopics()
 		this.loadRequests()
 
@@ -107,26 +102,27 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
-		this.numberOfChatsToDisplay = messageService.getChatIDs()
-			.filter((chatID) => ChatLoader.isLoaded(chatID))
-			.length
+		this.numberOfChatsToDisplay = CHATS_PER_SCREEN
 
 		console.warn("load more chats?", this.getLoadedChats().length)
 		if (this.getLoadedChats().length >= CHATS_PER_SCREEN) {
 			return
 		}
 
+		this.numberOfChatsToDisplay = 0
+
 		messageService.loadMoreChats(CHATS_PER_SCREEN).then((chats) => {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.chatsLoading = false
-			this.numberOfChatsToDisplay += chats.length
+
+			this.numberOfChatsToDisplay = CHATS_PER_SCREEN
 		}).catch(errorService.criticalError);
 	}
 
 	getChatCount = () => messageService.getChatIDs().length
 
 	checkNoMissingChats = () => {
-		if (this.numberOfChatsToDisplay === 0) {
+		if (this.chatsLoading) {
 			return
 		}
 

@@ -1745,9 +1745,9 @@ cordova-plugin-keyboard@~1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/cordova-plugin-keyboard/-/cordova-plugin-keyboard-1.1.5.tgz#5e04b5205d195622caaadddb2f34adb52a1c96c4"
 
-cordova-plugin-media@~3.0.1:
+"cordova-plugin-media@https://github.com/whispeer/cordova-plugin-media.git#fix/voicemail-recording-crash":
   version "3.0.1"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-media/-/cordova-plugin-media-3.0.1.tgz#5e46e76cfa77d4ed28a87598cb0728e4ebab6f27"
+  resolved "https://github.com/whispeer/cordova-plugin-media.git#fe2e61e8571bff85ffd152b29947202f1d130eb4"
 
 "cordova-plugin-splashscreen@https://github.com/whispeer/cordova-plugin-splashscreen.git#adaptedSpinner":
   version "4.0.3"

@@ -74,7 +74,7 @@ export class Message {
 		this.setImagesInfo()
 	}
 
-	private initializePending = (chat: Chat, message, attachments, id) => {
+	private initializePending = (chat: Chat, message, attachments: attachments, id) => {
 		this.wasSent = false
 
 		this.chat = chat
@@ -209,14 +209,6 @@ export class Message {
 		return Bluebird.try(async () => {
 			await socket.awaitConnection()
 
-			const chunk = await ChunkLoader.get(this.chat.getLatestChunk())
-
-			this.securedData.setParent(chunk.getSecuredData())
-
-			await Message.setAttachmentsInfo(this.securedData, this.attachments)
-
-			const chunkKey = chunk.getKey()
-
 			const messageIDs = this.chat.getMessages()
 
 			const messages = messageIDs.filter(({ id }) =>
@@ -225,14 +217,22 @@ export class Message {
 				MessageLoader.getLoaded(id)
 			)
 
-			const sentMessages = messages.filter((m) => m.hasBeenSent())
 			const unsentMessages = messages.filter((m) => !m.hasBeenSent())
-
 			const messageIndex = unsentMessages.findIndex((m) => m === this)
 
 			if (unsentMessages[messageIndex - 1]) {
 				await unsentMessages[messageIndex - 1].sendContinously()
 			}
+
+			const chunk = await ChunkLoader.get(this.chat.getLatestChunk())
+
+			this.securedData.setParent(chunk.getSecuredData())
+
+			await Message.setAttachmentsInfo(this.securedData, this.attachments)
+
+			const chunkKey = chunk.getKey()
+
+			const sentMessages = messages.filter((m) => m.hasBeenSent())
 
 			const newest = h.array.last(sentMessages)
 
@@ -244,6 +244,30 @@ export class Message {
 			const keys = await this.uploadAttachments(chunkKey)
 			const request = await signAndEncryptPromise
 
+			if (this.chat.isDraft()) {
+				const {
+					receiverKeys, keys, chunk: initialChunk
+				} = chunk.chunkData
+				const response = await socket.emit("chat.create", {
+					initialChunk,
+					firstMessage: request,
+					receiverKeys,
+					keys
+				});
+
+				const chatInfo = response.chat.chat
+				const messageInfo = response.chat.messages[0]
+				const chunkInfo = response.chat.chunks[0]
+
+				chunk.create(chunkInfo)
+				this.chat.create(chatInfo)
+
+				this.sendSuccess()
+				this.setServerInfo(messageInfo.server)
+
+				return true
+			}
+
 			const response = await socket.emit("chat.message.create", {
 				chunkID: chunk.getID(),
 				message: request,
@@ -251,20 +275,11 @@ export class Message {
 			})
 
 			if (response.success) {
-				this.wasSent = true
-				this.data.sent = true
-
-				this.setAttachmentInfo("files")
-				this.setAttachmentInfo("voicemails")
-				this.setImagesInfo()
+				this.sendSuccess()
 			}
 
 			if (response.server) {
-				this.sendTime = h.parseDecimal(response.server.sendTime)
-				this.serverID = h.parseDecimal(response.server.id)
-				this.chunkID = h.parseDecimal(response.server.chunkID)
-				this.previousID = response.server.previousMessage
-				this.data.timestamp = this.getTime()
+				this.setServerInfo(response.server)
 			}
 
 			return response.success
@@ -274,6 +289,23 @@ export class Message {
 		}).catch(socket.errors.Server, () => {
 			return false
 		})
+	}
+
+	sendSuccess = () => {
+		this.wasSent = true
+		this.data.sent = true
+
+		this.setAttachmentInfo("files")
+		this.setAttachmentInfo("voicemails")
+		this.setImagesInfo()
+	}
+
+	setServerInfo = ({ sendTime, id, chunkID, previousMessage }) => {
+		this.sendTime = h.parseDecimal(sendTime)
+		this.serverID = h.parseDecimal(id)
+		this.chunkID = h.parseDecimal(chunkID)
+		this.previousID = previousMessage
+		this.data.timestamp = this.getTime()
 	}
 
 	getSecuredData = () => {
