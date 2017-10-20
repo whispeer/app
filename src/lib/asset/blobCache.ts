@@ -118,7 +118,7 @@ const blobCache = {
 
 			return `${path}${filename}`
 		}).catch((e) => {
-			console.error(e)
+			console.warn("Storing blob failed")
 			return Bluebird.reject(e)
 		}).finally(() => {
 			storing--
