@@ -8,8 +8,8 @@ if [ ! -d "./platforms/ios" ]; then
   exit 0
 fi
 
-echo "Installing correct version of npm package ios-sim@5.0.13"
+echo "Installing correct version of npm package ios-sim@6.1.1"
 
 cd platforms/ios/cordova
-npm i ios-sim@5.0.13
+npm i ios-sim@6.1.1
 cd ../../..

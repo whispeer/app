@@ -33,7 +33,7 @@ checkVersion npm -v '4.2.0'
 checkVersion yarn -v '1.1.0'
 
 # check cordova and ionic
-checkVersion cordova -v '7.0.1'
+checkVersion cordova -v '7.1.0'
 checkVersion ionic -v '3.9.2'
 
 # for completeness, show ionic info
