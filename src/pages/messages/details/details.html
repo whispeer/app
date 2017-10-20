@@ -62,8 +62,6 @@
 
 	<button *ngIf="!loading" ion-button full color="danger" (click)="report()">{{ 'topic.detail.reportTopic' | translate }}</button>
 
-	<div text-center class="space-for-fab" *ngIf="!loading"></div>
-
-	<navigator [icon]="'close'" (invoke)="close()" ion-fixed></navigator>
+	<div text-center *ngIf="!loading"></div>
 
 </ion-content>
