@@ -121,7 +121,9 @@ export class AddPage extends ContactsWithSearch {
 		}).then((data) => {
 			return this.chat.addReceivers(data)
 		}).then(() => {
-			this.navCtrl.push("Chat Details", { chatID: this.chat.getID() })
+			this.navCtrl.push("Chat Details", { chatID: this.chat.getID() }).then(() => {
+				this.navCtrl.remove(this.navCtrl.length() - 3, 2)
+			})
 		});
 	}
 
