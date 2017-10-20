@@ -1725,9 +1725,21 @@ cordova-plugin-device@~1.1.4:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/cordova-plugin-device/-/cordova-plugin-device-1.1.6.tgz#2d21764cad7c9b801523e4e09a30e024b249334b"
 
+cordova-plugin-file-opener2@^2.0.19:
+  version "2.0.19"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-file-opener2/-/cordova-plugin-file-opener2-2.0.19.tgz#ca3ae1225395b77ab1fe5b20accbfecc688e2493"
+
 cordova-plugin-file@~4.3.1:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-4.3.3.tgz#012e97aa1afb91f84916e6341b548366d23de9b9"
+
+cordova-plugin-filechooser@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-filechooser/-/cordova-plugin-filechooser-1.0.1.tgz#fa59e97b8cdd91260be0bec460db8ec5de93488f"
+
+cordova-plugin-filepicker@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-filepicker/-/cordova-plugin-filepicker-1.1.4.tgz#34aa7e6f756bad690fed3401e9cf366421f55ae7"
 
 cordova-plugin-globalization@~1.0.5:
   version "1.0.7"

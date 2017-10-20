@@ -9,7 +9,7 @@ import Cache from "../services/Cache"
 import sessionService from "../services/session.service"
 var initService = require("services/initService");
 
-import ChunkLoader, { Chunk } from "../messages/chatChunk"
+import ChunkLoader from "../messages/chatChunk"
 import ChatLoader from "../messages/chat"
 import MessageLoader from "../messages/message"
 import ChatListLoader from "../messages/chatList"
@@ -111,7 +111,7 @@ messageService = {
 		)
 	}),
 	sendUnsentMessages: function () {
-		var unsentMessages = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
+		var unsentMessages = new Cache("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });
 
 		return unsentMessages.all().map(function (unsentMessage: any) {
 			var data = JSON.parse(unsentMessage.data);
@@ -151,8 +151,8 @@ socket.channel("notify.chat", function (e, data) {
 	}
 });
 
-initService.listen(function () {
-	messageService.sendUnsentMessages();
-}, "initDone");
+initService.awaitLoading().then(() => {
+	messageService.sendUnsentMessages()
+})
 
 export default messageService

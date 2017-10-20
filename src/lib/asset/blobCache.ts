@@ -1,5 +1,5 @@
 import * as Bluebird from "bluebird"
-import { File } from '@ionic-native/file'
+import { File, FileEntry } from '@ionic-native/file'
 
 import Cache from "../services/Cache"
 import h from "../helper/helper" // tslint:disable-line:no-unused-variable
@@ -7,6 +7,8 @@ import h from "../helper/helper" // tslint:disable-line:no-unused-variable
 const BLOB_CACHE_DIR = "blobCache"
 const LOCK_TIMEOUT = 30 * 1000
 const FILE = new File()
+
+const isAndroid = () => window.device && window.device.platform === "Android"
 
 export const fixFileReader = () => {
 	const win: any = window
@@ -40,7 +42,7 @@ const readFileAsBlob = (path, filename, type) => {
 	fixFileReader()
 	return FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
 }
-const writeToFile = (path, filename, data: Blob) => {
+const writeToFile = (path, filename, data: Blob | string) => {
 	fixFileReader()
 	return FILE.writeFile(path, filename, data)
 }
@@ -138,6 +140,32 @@ const blobCache = {
 			return `${path}${filename}`
 		})
 	},
+
+	copyBlobToDownloads: (blobID, filename: string) => {
+		return Bluebird.try(async () => {
+			const cacheDir = await getCacheDirectory()
+			const blobFile = idToFileName(blobID)
+			const path = isAndroid() ? `${FILE.externalRootDirectory}Download/` : `${FILE.documentsDirectory}`
+			const existsSource = await existsFile(cacheDir, blobFile)
+			const existsDestination = await existsFile(path, filename)
+
+			if (!existsSource) {
+				throw new Error(`cannot copy blob, blob does not exist: ${filename}`)
+			}
+
+			if (existsDestination) {
+				await FILE.removeFile(path, filename)
+			}
+
+			await FILE.copyFile(cacheDir, blobFile, path, filename)
+
+			return `${path}${filename}`
+		})
+	},
+
+	getFileMimeType: (url) => Bluebird.resolve(FILE.resolveLocalFilesystemUrl(url))
+		.then((file: FileEntry) => new Bluebird<any>((resolve, reject) => file.file(resolve, reject))
+		.then((file) => file.type)),
 
 	isLoaded: (blobID) => blobCache.getBlobUrl(blobID).then(() => true).catch(() => false),
 

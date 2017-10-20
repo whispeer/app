@@ -9,6 +9,8 @@ import VoicemailPlayer from "../../lib/asset/voicemailPlayer"
 
 import h from "../../lib/helper/helper"
 import Progress from "../../lib/asset/Progress"
+import blobService from "../../lib/services/blobService"
+import blobCache from "../../lib/asset/blobCache"
 
 @Component({
 	selector: "Message",
@@ -80,6 +82,32 @@ export class MessageComponent {
 
 	voicemailLoaded = () =>
 		this.message.data.voicemails.reduce((prev, next) => prev && next.loaded, true)
+
+	downloadFile = (file) => {
+		const loadProgress = new Progress()
+
+		file.getProgress = () => loadProgress.getProgress()
+
+		blobService.getBlobUrl(file.blobID, loadProgress, file.size).then((url) => {
+			return blobCache.copyBlobToDownloads(file.blobID, file.name)
+		}).then((url) => {
+			file.loaded = true
+			file.url = url
+
+			return blobCache.getFileMimeType(url).then((mimeType) => {
+				return new Bluebird((success, error) => {
+					window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
+				})
+			})
+		}).catch((e) => {
+			console.error(e)
+			if (parseInt(e.status, 10) === 9) {
+				alert(`Could not open file. No app found to open file type for ${file.name}`)
+			} else {
+				alert(`Something went wrong trying to load file ${file.name}`)
+			}
+		})
+	}
 
 	downloadVoicemail = h.cacheResult<Bluebird<void>>(() => {
 		this.voicemailDownloadProgress = new Progress()

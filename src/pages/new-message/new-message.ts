@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, IonicPage } from 'ionic-angular'
+import { Platform, NavController, NavParams, IonicPage } from 'ionic-angular'
+import { TranslateService } from '@ngx-translate/core';
 
 import messageService from "../../lib/messages/messageService"
 import ChatLoader, { Chat } from "../../lib/messages/chat"
 import ChunkLoader, { Chunk } from "../../lib/messages/chatChunk"
+import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
+import h from "../../lib/helper/helper";
 
-const userService = require("../../lib/users/userService").default;
+import userService from "../../lib/users/userService"
+const friendsService = require("../../lib/services/friendsService");
 
 import * as Bluebird from 'bluebird';
 
@@ -17,11 +21,53 @@ import * as Bluebird from 'bluebird';
 	selector: 'page-new-message',
 	templateUrl: 'new-message.html'
 })
-export class NewMessagePage {
+export class NewMessagePage extends ContactsWithSearch {
+	friends: any[];
+	searchTerm: string = "";
+	selectedUserMap: any = {};
+	selectedUsers: any[] = [];
+	ios: boolean = false;
+
+	constructor(public navCtrl: NavController, public translate: TranslateService, private platform: Platform, public navParams: NavParams) { // tslint:disable-line:no-unused-variable
+		// super(translate)
+		super(translate)
+
+		this.ios = platform.is("ios")
+	}
+
+
+	addSelectedUser = (user) => {
+		if (this.selectedUsers.indexOf(user) === -1) {
+			this.selectedUsers.push(user);
+		}
+
+		this.selectedUserMap[user.id] = true
+	}
+
+	removeSelectedUser = (user) => {
+		h.removeArray(this.selectedUsers, user);
+
+		delete this.selectedUserMap[user.id]
+	}
+
+	updateSelectedUsers = (user) => {
+		if (this.selectedUserMap[user.id]) {
+			this.removeSelectedUser(user);
+		} else {
+			this.addSelectedUser(user);
+		}
+	}
+
+	create = () => {
+		this.send(this.selectedUsers);
+	}
+
+	close = () => {
+		this.navCtrl.pop();
+	}
+
 	receiverString: string;
 	loading: boolean = true;
-
-	constructor(public navCtrl: NavController, public navParams: NavParams) {}
 
 	ngOnInit() {
 		this.receiverString = this.navParams.get("receiverIds");
@@ -32,6 +78,13 @@ export class NewMessagePage {
 			})
 			return
 		}
+
+		friendsService.awaitLoading().then(() => {
+			friendsService.listen(this.loadContactsUsers);
+			this.loadContactsUsers().then(() => {
+				this.contactsLoading = false
+			});
+		});
 
 		this.loading = false
 	}

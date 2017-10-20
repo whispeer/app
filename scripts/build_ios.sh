@@ -1,3 +1,4 @@
+npm run businessSass
 rm -rf node_modules platforms plugins www/*
 yarn
 cordova prepare

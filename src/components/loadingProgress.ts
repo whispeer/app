@@ -5,8 +5,20 @@ import { Component, Input } from "@angular/core";
 	templateUrl: "loadingProgress.html"
 })
 export class LoadingProgress {
-	@Input() progress: any;
-	@Input() inverse: boolean = false;
+	className: string = ""
+	@Input() progress: any
+	@Input() inverse: boolean = false
+	@Input()
+	set color(color: string) {
+		color = color || ""
+		this.className = "radial-progress"
+		if(color.length > 0) {
+			this.className = `${this.className}--${color}`
+		}
+		console.log(this.className)
+	}
 
-	constructor() {};
+	getProgress = () => Math.floor(this.progress() * 100)
+
+	constructor() {}
 }

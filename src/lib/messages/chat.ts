@@ -17,7 +17,7 @@ import sessionService from "../services/session.service"
 
 const initService = require("services/initService");
 
-const messageSendCache = new Cache("messageSend", { maxEntries: -1, maxBlobSize: -1 });
+const messageSendCache = new Cache("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });
 
 let unreadChatIDs = []
 
@@ -599,11 +599,11 @@ export class Chat extends Observer {
 			return
 		}
 
-		return this.sendMessage(messageData.message, { images: [], files: [] }, messageData.id);
+		return this.sendMessage(messageData.message, { images: [], files: [], voicemails: [] }, messageData.id);
 	};
 
 	private storeMessage = (messageObject, message, id) => {
-		if (!id) {
+		if (id) {
 			return Bluebird.resolve()
 		}
 
@@ -611,7 +611,7 @@ export class Chat extends Observer {
 			return Bluebird.resolve()
 		}
 
-		if (message.hasAttachments()) {
+		if (messageObject.hasAttachments()) {
 			return Bluebird.resolve()
 		}
 
@@ -621,7 +621,7 @@ export class Chat extends Observer {
 				{
 					chatID: this.getID(),
 					id: messageObject.getClientID(),
-					message: message
+					message
 				}
 			)
 		)
