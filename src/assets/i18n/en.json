@@ -52,6 +52,8 @@
 		"takePhoto": "Take a Photo",
 		"selectGallery": "Select from Gallery",
 		"selectFile": "Send a File",
+		"fileTooBigTitle": "The size is too damn high!",
+		"fileTooBigDetail": "File uploads for private users are currently limited to {{max_size}}MB.",
 		"changed": "changed the title to",
 		"detail": {
 			"reportTopic": "Report this Chat",

@@ -1,5 +1,6 @@
 import { Component, ViewChild, Input, Output, EventEmitter, ElementRef, SimpleChanges } from "@angular/core" // tslint:disable-line:no-unused-variable
-import { Media, MediaObject } from '@ionic-native/media';
+import { Media, MediaObject } from '@ionic-native/media'
+import { AlertController } from 'ionic-angular'
 
 import { NavController, ActionSheetController, Platform } from "ionic-angular"
 
@@ -14,7 +15,7 @@ import { TranslateService } from '@ngx-translate/core'
 import ImageUpload from "../../lib/services/imageUpload.service"
 import FileUpload from "../../lib/services/fileUpload.service"
 
-import h from "../../lib/helper/helper";
+import h from "../../lib/helper/helper"
 import { TypeState } from "typestate"
 
 import uuidv4 from 'uuid/v4'
@@ -25,13 +26,15 @@ import { unpath } from "../../lib/services/blobService"
 import Burst from "../../lib/messages/burst"
 import featureToggles from "../../lib/services/featureToggles"
 
+import { isBusinessVersion } from "../../lib/services/location.manager";
+
 enum RecordingStates {
 	NotRecording,
 	Recording,
 	Paused
 }
 
-var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording);
+var RecordingStateMachine = new TypeState.FiniteStateMachine<RecordingStates>(RecordingStates.NotRecording)
 
 RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.Recording)
 RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording)
@@ -42,9 +45,11 @@ const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
 	maximumImagesCount: 6
-};
+}
 
 const INFINITE_SCROLLING_THRESHOLD = 1000
+
+const MAXIMUM_FILE_SIZE_MB = isBusinessVersion() ? 50 : 10
 
 const isIOS = () => window.device && window.device.platform === 'iOS'
 
@@ -65,23 +70,23 @@ const FILE = new File()
 	templateUrl: "topic.html"
 })
 export class TopicComponent {
-	@Input() partners;
-	@Input() chat;
-	@Input() messageBurstsFunction;
-	@Input() loadMoreMessages;
-	@Input() messagesLoading;
+	@Input() partners
+	@Input() chat
+	@Input() messageBurstsFunction
+	@Input() loadMoreMessages
+	@Input() messagesLoading
 
-	@Output() sendMessage = new EventEmitter();
+	@Output() sendMessage = new EventEmitter()
 
-	@ViewChild('content') content: ElementRef;
-	@ViewChild('footer') footer: ElementRef;
+	@ViewChild('content') content: ElementRef
+	@ViewChild('footer') footer: ElementRef
 
 	recordingPlayer: VoicemailPlayer
 
 	private recordingFile: MediaObject
 
 	firstRender: Boolean = true
-	newMessageText = "";
+	newMessageText = ""
 	moreMessagesAvailable = true
 	inViewMessages: any[] = []
 	oldScrollFromBottom: number = 0
@@ -107,7 +112,8 @@ export class TopicComponent {
 		private imagePicker: ImagePicker,
 		private camera: Camera,
 		private translate: TranslateService,
-		private media: Media
+		private media: Media,
+		private alertController: AlertController
 	) {
 		this.cameraOptions = {
 			quality: 50,
@@ -137,15 +143,15 @@ export class TopicComponent {
 	}
 
 	ngAfterViewInit() {
-		window.addEventListener('resize', this.keyboardChange);
+		window.addEventListener('resize', this.keyboardChange)
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 
-		this.mutationObserver = new MutationObserver(this.mutationListener);
-		this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true });
+		this.mutationObserver = new MutationObserver(this.mutationListener)
+		this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true })
 	}
 
 	ngOnDestroy() {
-		window.removeEventListener('resize', this.keyboardChange);
+		window.removeEventListener('resize', this.keyboardChange)
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
@@ -162,7 +168,7 @@ export class TopicComponent {
 
 		const updateScroll = mutations.some((mutation) => {
 			return [].slice.call(mutation.addedNodes).some((element) => {
-				const position = firstElement.compareDocumentPosition(element);
+				const position = firstElement.compareDocumentPosition(element)
 
 				return position & 0x02
 			})
@@ -226,13 +232,13 @@ export class TopicComponent {
 
 		this.sendMessage.emit({
 			text: this.newMessageText
-		});
+		})
 
-		this.newMessageText = "";
+		this.newMessageText = ""
 
 		document.querySelector("textarea").focus()
 
-		this.change();
+		this.change()
 	}
 
 	showRecordIcon() {
@@ -243,35 +249,47 @@ export class TopicComponent {
 		return this.newMessageText.length === 0
 	}
 
+	showFileTooBigWarning() {
+		const alert = this.alertController.create({
+			title: this.translate.instant("topic.fileTooBigTitle"),
+		  subTitle: this.translate.instant("topic.fileTooBigDetail", { max_size: MAXIMUM_FILE_SIZE_MB }),
+		  buttons: ['OK']
+		})
+		alert.present()
+	}
+
 	getFile = (url: string, type?: string) : Bluebird<any> => {
 		return Bluebird.resolve(FILE.resolveLocalFilesystemUrl(url))
 			.then((file: FileEntry) => new Bluebird((resolve, reject) => file.file(resolve, reject)))
 			.then((file: any) => {
-				file.originalUrl = url;
+				file.originalUrl = url
 				if(this.platform.is("ios")) {
-					file.localURL = url.replace("file://", `http://${window.location.host}`);
+					file.localURL = url.replace("file://", `http://${window.location.host}`)
 				}
-
+				if (file.size > MAXIMUM_FILE_SIZE_MB * 1000 * 1000) {
+					this.showFileTooBigWarning()
+					throw new Error("File too big, not sending.")
+				}
 				if (type) {
-					file.type = type;
+					file.type = type
 				}
 
-				return file;
-			});
+				return file
+			})
 	}
 
 	takeImage = () => {
 		this.camera.getPicture(this.cameraOptions).then((url: any) => {
-			return this.getFile(url, "image/png");
+			return this.getFile(url, "image/png")
 		}).then((file: any) => {
-			return new ImageUpload(file);
+			return new ImageUpload(file)
 		}).then((image) => {
 			this.sendMessage.emit({
 				images: [image],
 				text: ""
-			});
-		});
-	};
+			})
+		})
+	}
 
 	toggleInputFocus = () =>
 		this.inputFocus = !this.inputFocus
@@ -300,7 +318,7 @@ export class TopicComponent {
 	}
 
 	getRecordingFileName = () => {
-		const recordingID = this.recordingPlayer.getRecordings().length;
+		const recordingID = this.recordingPlayer.getRecordings().length
 		const extension = this.platform.is("ios") ? "m4a" : "aac"
 		const dir = this.getRecordingDir()
 
@@ -318,7 +336,7 @@ export class TopicComponent {
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
 		this.recordingInfo.startTime = Date.now()
-		this.recordingFile.startRecord();
+		this.recordingFile.startRecord()
 
 		clearInterval(this.recordingInfo.updateInterval)
 		this.recordingInfo.updateInterval = window.setInterval(() => {
@@ -398,7 +416,7 @@ export class TopicComponent {
 			text: this.translate.instant("topic.takePhoto"),
 			icon: !this.platform.is("ios") ? "camera": null,
 			handler: () => {
-				this.takeImage();
+				this.takeImage()
 			}
 		}
 
@@ -407,15 +425,15 @@ export class TopicComponent {
 			icon: !this.platform.is("ios") ? "image": null,
 			handler: () => {
 				Bluebird.resolve(this.imagePicker.getPictures(ImagePickerOptions)).map((result: any) => {
-					return this.getFile(result, "image/png");
+					return this.getFile(result, "image/png")
 				}).map((file: any) => {
-					return new ImageUpload(file);
+					return new ImageUpload(file)
 				}).then((images) => {
 					this.sendMessage.emit({
 						images,
 						text: ""
-					});
-				});
+					})
+				})
 			}
 		}
 
@@ -424,12 +442,9 @@ export class TopicComponent {
 			icon: !this.platform.is("ios") ? "document": null,
 			handler: () => {
 				selectFile()
-					.then((file) => {
-						console.log(file)
-						return this.getFile(file)
-					})
-					.then((fileObject) => new FileUpload(fileObject, { encrypt: true, extraInfo: {} }))
-					.then((file) => {
+					.then(file => this.getFile(file))
+					.then(file => new FileUpload(file, { encrypt: true, extraInfo: {} }))
+					.then(file => {
 						this.sendMessage.emit({
 							files: [file],
 							text: ""
@@ -450,9 +465,9 @@ export class TopicComponent {
 
 		let actionSheet = this.actionSheetCtrl.create({
 			buttons
-		});
+		})
 
-		actionSheet.present();
+		actionSheet.present()
 	}
 
 	realScrollHeight(element) {
@@ -503,7 +518,7 @@ export class TopicComponent {
 
 	scrollFromBottom = () => {
 		const element = this.content.nativeElement
-		return this.realScrollHeight(element) - element.scrollTop;
+		return this.realScrollHeight(element) - element.scrollTop
 	}
 
 	stabilizeScrollIfHeightChanged = (height, scrollFromBottom) => {
@@ -561,15 +576,15 @@ export class TopicComponent {
 
 		const { changed, bursts } = this.messageBurstsFunction({
 			after: id
-		});
+		})
 
-		return { changed, bursts };
+		return { changed, bursts }
 	}
 
 	allBurstMessages() {
-		const { bursts } = this.messageBurstsFunction();
+		const { bursts } = this.messageBurstsFunction()
 
-		return bursts;
+		return bursts
 	}
 
 	messageBursts = () => {
@@ -621,26 +636,26 @@ export class TopicComponent {
 				this.chat.newMessage = this.newMessageText
 			}
 
-			const fontSize = 16;
+			const fontSize = 16
 
-			const minSize = 30;
-			const maxSize = fontSize*7;
+			const minSize = 30
+			const maxSize = fontSize*7
 
-			const footerElement = this.footer.nativeElement;
+			const footerElement = this.footer.nativeElement
 
-			const textarea  = footerElement.getElementsByTagName("textarea")[0];
+			const textarea  = footerElement.getElementsByTagName("textarea")[0]
 
-			textarea.style.minHeight  = "0";
-			textarea.style.height     = "0";
+			textarea.style.minHeight  = "0"
+			textarea.style.height     = "0"
 
-			const scroll_height = Math.max(minSize, Math.min(textarea.scrollHeight, maxSize));
+			const scroll_height = Math.max(minSize, Math.min(textarea.scrollHeight, maxSize))
 
 			// apply new style
-			textarea.style.minHeight  = scroll_height + "px";
-			textarea.style.height     = scroll_height + "px";
+			textarea.style.minHeight  = scroll_height + "px"
+			textarea.style.height     = scroll_height + "px"
 
 			this.stabilizeScroll()
-		}, 100);
+		}, 100)
 	}
 
 	goToDetails() {
@@ -650,7 +665,7 @@ export class TopicComponent {
 
 		this.navCtrl.push("Chat Details", {
 			chatID: this.chat.id
-		});
+		})
 	}
 
 	goToProfile(userId: number) {
@@ -660,6 +675,7 @@ export class TopicComponent {
 
 		this.navCtrl.push("Profile", {
 			userId
-		});
+		})
+
 	}
 }
