@@ -57,12 +57,6 @@ export class DetailPage {
 		})
 	}
 
-	close() {
-		this.navCtrl.push("Messages", {
-			chatID: this.chat.getID()
-		})
-	}
-
 	promote = (user) => {
 		this.saving = true
 
