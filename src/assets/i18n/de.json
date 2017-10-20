@@ -68,6 +68,7 @@
 		"title": "Kontakte auswählen",
 		"selected": "Ausgewählt",
 		"search": "Suche",
+		"searchFor": "Suche nach \"{{searchTerm}}\"",
 		"contacts": "Kontakte",
 		"global": "Weltweit",
 		"selectedContacts": "Ausgewählte Kontakte",

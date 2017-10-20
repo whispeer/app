@@ -208,13 +208,13 @@ ion-fab-list[side="top"] {
 	height: 62px !important;
 
 	.border {
-		fill: map-get($colors, grey);
+		fill: map-get($colors, other_grey);
 	}
 }
 
 .hexagon--border {
 	.border {
-		fill: map-get($colors, grey);
+		fill: map-get($colors, other_grey);
 	}
 }
 
@@ -248,8 +248,6 @@ ion-fab-list[side="top"] {
 }
 
 .checkbox-hexagon {
-	margin-right: 34px !important;
-
 	.checkbox-icon {
 		border-radius: 0;
 		border: none !important;

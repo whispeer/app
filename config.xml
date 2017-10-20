@@ -86,6 +86,7 @@
     <preference name="KeyboardShrinksView" value="true" />
     <preference name="xwalkMultipleApk" value="false" />
     <preference name="Orientation" value="portrait" />
+    <preference name="KeyboardDisplayRequiresUserAction" value="false" />
     <feature name="StatusBar">
         <param name="ios-package" onload="true" value="CDVStatusBar" />
     </feature>
