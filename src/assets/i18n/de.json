@@ -53,6 +53,12 @@
 		"selectGallery": "Aus Galerie auswählen",
 		"changed": "änderte den Titel zu",
 		"detail": {
+			"title": "Details",
+			"chatTitle": "Konversationstitel",
+			"allMembers": "Alle Mitglieder",
+			"admin": "Administrator",
+			"member": "Mitglied",
+			"addMore": "Nutzer hinzufügen...",
 			"reportTopic": "Diesen Chat melden",
 			"reportConfirm": {
 				"title": "Diesen Chat melden?",

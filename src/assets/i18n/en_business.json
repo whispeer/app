@@ -53,6 +53,13 @@
 		"selectGallery": "Select from Gallery",
 		"changed": "changed the title to",
 		"detail": {
+			"title": "Details",
+			"chatTitle": "Conversation Title",
+			"allMembers": "All Members",
+			"admin": "Administrator",
+			"member": "Member",
+			"addMore": "Add more contacts...",
+			"reportTopic": "Report this Chat",
 			"reportTopic": "Report this Chat",
 			"reportConfirm": {
 				"title": "Report this Chat?",
