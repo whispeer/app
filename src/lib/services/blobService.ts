@@ -194,7 +194,7 @@ class MyBlob {
 			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
 
 			return blobCache.store(this).catch((e) => {
-				console.log("Could not store blob", e)
+				console.log("Could not store blob")
 				return this.toURL()
 			})
 		})

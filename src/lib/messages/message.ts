@@ -154,7 +154,7 @@ export class Message {
 
 				securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
 				securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
-			} else {
+			} else if (typeof securedData.contentGet() !== "string") {
 				securedData.contentSet(securedData.contentGet().message)
 			}
 		})
