@@ -99,6 +99,10 @@ export class NewMessagePage extends ContactsWithSearch {
 	}
 
 	send = (users) => {
+		if (users.length === 0) {
+			return
+		}
+
 		this.loading = true
 		this.sendToUserTopic(users).then((chatID) => {
 			if (chatID) {
