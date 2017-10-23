@@ -14,6 +14,7 @@ interface imageInfo {
 	loaded: boolean,
 	loading: boolean,
 	url: SafeUrl | string,
+	originalUrl: string,
 	width?: number,
 	height?: number
 }
@@ -51,7 +52,7 @@ export class GalleryComponent {
 		const blobid = data.blobID
 
 		if (data.loaded) {
-			return Bluebird.resolve(data.url.toString())
+			return Bluebird.resolve(data.originalUrl)
 		}
 
 		data.loading = true
@@ -63,6 +64,7 @@ export class GalleryComponent {
 				data.url = this.sanitizer.bypassSecurityTrustUrl(
 					window.device && window.device.platform === 'iOS' ? url.replace('file://', '') : url
 				)
+				data.originalUrl = url
 
 				return url
 			})
