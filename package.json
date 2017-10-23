@@ -18,6 +18,7 @@
         "CAMERA_USAGE_DESCRIPTION": "whispeer needs access to your Camera to allow you to take Photos directly from the app.",
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
       },
+      "cordova-filechooser": {},
       "cordova-plugin-camera": {
         "CAMERA_USAGE_DESCRIPTION": "whispeer needs access to your Camera to allow you to take Photos directly from the app.",
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
@@ -33,7 +34,6 @@
       "cordova-plugin-device": {},
       "cordova-plugin-file": {},
       "cordova-plugin-file-opener2": {},
-      "cordova-plugin-filechooser": {},
       "cordova-plugin-filepicker": {},
       "cordova-plugin-globalization": {},
       "cordova-plugin-inappbrowser": {},
@@ -91,6 +91,7 @@
     "com-sarriaroman-photoviewer": "~1.1.10",
     "com.synconset.imagepicker": "https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse",
     "cordova-android": "~6.3.0",
+    "cordova-filechooser": "https://github.com/whispeer/cordova-filechooser.git#feature/full_path",
     "cordova-ios": "^4.5.2",
     "cordova-plugin-camera": "https://github.com/whispeer/cordova-plugin-camera.git#fix/tmp-image-reuse",
     "cordova-plugin-compat": "~1.1.0",
@@ -98,7 +99,6 @@
     "cordova-plugin-device": "~1.1.4",
     "cordova-plugin-file": "~4.3.1",
     "cordova-plugin-file-opener2": "^2.0.19",
-    "cordova-plugin-filechooser": "https://github.com/whispeer/cordova-filechooser.git#feature/full_path",
     "cordova-plugin-filepicker": "^1.1.4",
     "cordova-plugin-globalization": "~1.0.5",
     "cordova-plugin-inappbrowser": "~1.7.1",
