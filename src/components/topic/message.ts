@@ -77,11 +77,12 @@ export class MessageComponent {
 	}
 
 	voicemailProgress = () => {
-		if(this.voicemailSending()) {
-			return this.message.data.voicemails.reduce((acc, v) => {
+		const { message } = this
+		if(!message.hasBeenSent()) {
+			return message.data.voicemails.reduce((acc, v) => {
 				if(!v) return acc;
 
-				return acc + v.getProgress() / this.message.data.voicemails.length;
+				return acc + v.getProgress() / message.data.voicemails.length;
 			}, 0);
 		}
 
@@ -139,9 +140,6 @@ export class MessageComponent {
 
 	voicemailPlaying = () =>
 		this.voicemailPlayer.isPlaying()
-
-	voicemailSending = () =>
-		!this.message.data.sent
 
 	playVoicemail = () =>
 		this.downloadVoicemail().then(() =>

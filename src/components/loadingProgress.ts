@@ -5,9 +5,12 @@ import { Component, Input } from "@angular/core";
 	templateUrl: "loadingProgress.html"
 })
 export class LoadingProgress {
+
 	className: string = ""
+
 	@Input() progress: any
 	@Input() inverse: boolean = false
+
 	@Input()
 	set color(color: string) {
 		color = color || ""

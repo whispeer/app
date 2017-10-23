@@ -20,7 +20,11 @@
 			<div class="message__voicemail__actions">
 				<ion-icon *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)" class="message__voicemail__action" name="md-download"></ion-icon>
 				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>
-				<loading-progress *ngIf="(!file.loaded && file.getProgress) || file.sending" [progress]="file.getProgress" [inverse]="voicemailSending()"></loading-progress>
+				<loading-progress
+					*ngIf="(!file.loaded && file.getProgress) || file.sending"
+					[progress]="file.getProgress"
+					[inverse]="!message.hasBeenSent()">
+				</loading-progress>
 			</div>
 			<span class="message__file__info">
 				<span class="message__file__name">{{ file.name | filenameLimit: 25 }}</span>
@@ -36,8 +40,14 @@
 				<div class="message__voicemail__actions">
 					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
 					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>
-					<loading-progress class="message__voicemail__action" *ngIf="!voicemailLoaded() && voicemailDownloadProgress" [progress]="voicemailProgress" [inverse]="voicemailSending()" [color]="(message.isOwn() ? 'primary' : 'isabelline')"></loading-progress>
-					<ion-spinner *ngIf="voicemailSending()" class="message__voicemail__uploadSpinner"></ion-spinner>
+					<loading-progress
+						class="message__voicemail__action"
+						*ngIf="!voicemailLoaded() && voicemailDownloadProgress"
+						[progress]="voicemailProgress"
+						[inverse]="!message.hasBeenSent()"
+						[color]="(message.isOwn() ? 'primary' : 'isabelline')">
+					</loading-progress>
+					<ion-spinner *ngIf="!message.hasBeenSent()" class="message__voicemail__uploadSpinner"></ion-spinner>
 					<ion-icon name="md-pause" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
 				</div>
 				<div class="message__voicemail__player">
