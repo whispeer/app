@@ -1,7 +1,4 @@
 import { Component, Input } from "@angular/core";
-
-const prettysize = require("prettysize")
-
 import * as Bluebird from "bluebird"
 
 import { Message } from "../../lib/messages/message"
@@ -11,6 +8,8 @@ import h from "../../lib/helper/helper"
 import Progress from "../../lib/asset/Progress"
 import blobService from "../../lib/services/blobService"
 import blobCache from "../../lib/asset/blobCache"
+
+const EMOJIS = ["💩", "👻", "🤖", "🐋", "🌍"]
 
 @Component({
 	selector: "Message",
@@ -44,7 +43,20 @@ export class MessageComponent {
 	}
 
 	formatSize(size) {
-		return prettysize(size, false, false, 2)
+		const emoji = EMOJIS[size % EMOJIS.length]
+		if (size < 1000) {
+			return `${size} B`
+		} else if (size < 1000 * 1000) {
+			return `${Math.round(size / 100) / 10} kB`
+		} else if (size < 1000 * 1000 * 1000) {
+			return `${Math.round(size / (100 * 1000)) / 10} MB`
+		} else if (size < 1000 * 1000 * 1000 * 1000) {
+			return `${Math.round(size / (100 * 1000 * 1000)) / 10} GB`
+		} else if (size < 1000 * 1000 * 1000 * 1000 * 1000) {
+			return `${emoji} TB`
+		} else {
+			return `${emoji} PB`
+		}
 	}
 
 	private voicemailPlayer: VoicemailPlayer
