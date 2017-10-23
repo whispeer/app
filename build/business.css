@@ -60209,11 +60209,11 @@ ion-fab-list[side="top"] button:last-child {
 }
 
 .hexagon__image .border {
-  fill: #788286;
+  fill: #ebeced;
 }
 
 .hexagon--border .border {
-  fill: #788286;
+  fill: #ebeced;
 }
 
 .hexagon__image--large {
@@ -60237,10 +60237,6 @@ ion-fab-list[side="top"] button:last-child {
   left: 1px;
   height: calc(100% - 2px) !important;
   width: calc(100% - 2px) !important;
-}
-
-.checkbox-hexagon {
-  margin-right: 34px !important;
 }
 
 .checkbox-hexagon .checkbox-icon {
