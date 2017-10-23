@@ -1,6 +1,6 @@
 import { Component, Input } from "@angular/core"
 
-import { DomSanitizer } from '@angular/platform-browser' // tslint:disable-line:no-unused-variable
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser' // tslint:disable-line:no-unused-variable
 
 import errorService from "../../lib/services/error.service"
 import blobService from "../../lib/services/blobService"
@@ -9,20 +9,36 @@ import * as Bluebird from "bluebird"
 
 import { PhotoViewer } from '@ionic-native/photo-viewer'
 
+interface imageInfo {
+	blobID: string,
+	loaded: boolean,
+	loading: boolean,
+	url: SafeUrl | string,
+	width?: number,
+	height?: number
+}
+
+interface imageQualities {
+	highest: imageInfo,
+	middle: imageInfo,
+	lowest: imageInfo,
+	upload: {}
+}
+
 @Component({
 	selector: "gallery",
 	templateUrl: "gallery.html"
 })
 export class GalleryComponent {
-	_images
+	_images: imageQualities[]
 
-	@Input() set images(value: string) {
+	@Input() set images(value: imageQualities[]) {
 		this._images = value
 
 		this.loadPreviews()
 	}
 
-	get images(): string {
+	get images(): imageQualities[] {
 		return this._images
 	}
 
@@ -31,29 +47,33 @@ export class GalleryComponent {
 
 	constructor(private sanitizer:DomSanitizer, private photoViewer: PhotoViewer){}
 
-	loadImage(data) {
+	loadImage(data: imageInfo) {
 		const blobid = data.blobID
 
 		if (data.loaded) {
-			return
+			return Bluebird.resolve(data.url.toString())
 		}
 
 		data.loading = true
 
-		Bluebird.try(() => {
-			return blobService.getBlobUrl(blobid)
-		}).then((url) => {
-			data.loading = false
-			data.loaded = true
-			data.url = this.sanitizer.bypassSecurityTrustUrl(
-				window.device && window.device.platform === 'iOS' ? url.replace('file://', '') : url
-			)
-		}).catch(errorService.criticalError)
+		debugger
+
+		return Bluebird.try(() => blobService.getBlobUrl(blobid))
+			.then((url) => {
+				data.loading = false
+				data.loaded = true
+				data.url = this.sanitizer.bypassSecurityTrustUrl(
+					window.device && window.device.platform === 'iOS' ? url.replace('file://', '') : url
+				)
+
+				return url
+			})
+			.catch(errorService.criticalError)
 	}
 
-	loadImagePreviews(images) {
+	loadImagePreviews(images: imageQualities[]) {
 		images.forEach((image) => {
-			if (image.upload && typeof image.lowest.url === "string") {
+			if (typeof image.lowest.url === "string" && typeof image.highest.url === "string") {
 				image.highest.url = this.sanitizer.bypassSecurityTrustUrl(image.highest.url)
 				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(image.lowest.url)
 				return
@@ -72,17 +92,29 @@ export class GalleryComponent {
 		})
 	}
 
+	isLoading = () => {
+		return this._images.reduce((prev, image) =>
+			prev || image.highest.loading || image.middle.loading || image.lowest.loading
+		, false)
+	}
+
+	isSending = () => {
+		return false
+	}
+
+	getProgress = () => {
+		return 0
+	}
+
 	displayImage = (image) => {
 		if (image.upload) {
 			this.photoViewer.show(image.upload._file.originalUrl)
 			return
 		}
 
-		const blobID = image.lowest.blobID
-
-		blobService.getBlobUrl(blobID).then((url) =>
+		this.loadImage(image.highest).then((url) => {
 			this.photoViewer.show(url)
-		)
+		})
 	}
 
 	loadMoreImages() {
