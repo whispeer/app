@@ -22,6 +22,7 @@
 				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>
 				<loading-progress
 					*ngIf="(!file.loaded && file.getProgress) || file.sending"
+					parentBackgroundClass="messages__message"
 					[progress]="file.getProgress"
 					[inverse]="!message.hasBeenSent()">
 				</loading-progress>
@@ -35,17 +36,19 @@
 	</div>
 
 	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
-		<div class="messages__message message__voicemail" [ngClass]="{'sending': voicemailSending()}">
+		<div class="messages__message message__voicemail" [ngClass]="{'sending': !message.hasBeenSent()}">
 			<div class="message__file__info message__voicemail__info">
 				<div class="message__voicemail__actions">
-					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
-					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>
+					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && message.hasBeenSent()" (click)="downloadVoicemail()"></ion-icon>
+					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && message.hasBeenSent()" (click)="playVoicemail()"></ion-icon>
 					<loading-progress
+						parentBackgroundClass="messages__message"
 						class="message__voicemail__action"
 						*ngIf="!voicemailLoaded() && voicemailDownloadProgress"
 						[progress]="voicemailProgress"
 						[inverse]="!message.hasBeenSent()"
-						[color]="(message.isOwn() ? 'primary' : 'isabelline')">
+						[color]="(message.isOwn() ? 'primary' : 'isabelline')"
+					>
 					</loading-progress>
 					<ion-spinner *ngIf="!message.hasBeenSent()" class="message__voicemail__uploadSpinner"></ion-spinner>
 					<ion-icon name="md-pause" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>

@@ -217,8 +217,29 @@ topicWithBursts {
 		width: 100%;
 	}
 
-	.radial-progress {
-		margin-top: -17px;
+	// .radial-progress {
+	// 	margin-top: -17px;
+	// }
+}
+
+$circleRadius: 27px;
+$circleThickness: 3px;
+
+.progressbar {
+	width: $circleRadius;
+	height: $circleRadius;
+	border: none;
+	border-radius: 50%;
+	position: relative;
+	background-color: blue;
+	.hole {
+		width: $circleRadius - 2*$circleThickness;
+		height: $circleRadius - 2*$circleThickness;
+		position: absolute;
+		top: $circleThickness;
+		left: $circleThickness;
+		border-radius: 50%;
+		background-color: red;
 	}
 }
 
