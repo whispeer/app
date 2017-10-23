@@ -9,7 +9,7 @@
 
 	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
 		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
-			<span whispeerSyntaxify content="{{message.data.text}}"></span>
+			<span whispeerSyntaxify content="{{message.data.text}}" *ngIf="message.data.text"></span>
 			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
 		</div>
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>

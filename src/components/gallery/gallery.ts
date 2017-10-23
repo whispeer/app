@@ -56,8 +56,6 @@ export class GalleryComponent {
 
 		data.loading = true
 
-		debugger
-
 		return Bluebird.try(() => blobService.getBlobUrl(blobid))
 			.then((url) => {
 				data.loading = false
@@ -96,10 +94,6 @@ export class GalleryComponent {
 		return this._images.reduce((prev, image) =>
 			prev || image.highest.loading || image.middle.loading || image.lowest.loading
 		, false)
-	}
-
-	isSending = () => {
-		return false
 	}
 
 	getProgress = () => {

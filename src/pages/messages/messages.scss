@@ -368,7 +368,7 @@ $bubble-radius-android: 5px;
 
 .messages__message {
 	position: relative;
-	padding: $bubble-padding-vertical $bubble-padding-horizontal;
+	padding: 6px;
 	border-radius: $bubble-radius-ios;
 	.md & { border-radius: $bubble-radius-android; } // .md seems to be an android hack.
 	box-sizing: border-box;
@@ -376,8 +376,10 @@ $bubble-radius-android: 5px;
 	word-wrap: break-word;
 	white-space: normal;
 
-	span {
+	> span {
 		-webkit-user-select: auto;
+		padding: 3px 6px;
+		display: inline-block;
 	}
 
 	.burst--me & {
@@ -410,14 +412,12 @@ message:last-of-type .messages__message {
 		transform: translate(0, -2px);
 
 		.burst--me & {
-			z-index: 1;
 			right: -7px;
 			border-right: $size solid $message-bubble-color;
 			border-bottom-left-radius: $outer-radius;
 		}
 
 		.burst--other & {
-			z-index: 2;
 			left: -7px;
 			border-left: $size solid map-get($colors, other_grey);
 			border-bottom-right-radius: $outer-radius;
