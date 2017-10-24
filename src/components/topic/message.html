@@ -23,7 +23,7 @@
 				<loading-progress
 					*ngIf="(!file.loaded && file.getProgress) || file.sending"
 					parentBackgroundClass="messages__message"
-					[progress]="file.getProgress"
+					[progress]="file.getProgress">
 				</loading-progress>
 			</div>
 			<span class="message__file__info">

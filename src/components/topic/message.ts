@@ -85,7 +85,6 @@ export class MessageComponent {
 				return acc + v.getProgress() / message.data.voicemails.length;
 			}, 0);
 		}
-
 		if (!this.voicemailDownloadProgress) {
 			return 0
 		}
