@@ -60332,7 +60332,6 @@ ion-fab-list[side="top"] button:last-child {
   color: #545b5e;
 }
 
-/* Circular Progress */
 .ios ion-nav > .ion-page .toolbar.statusbar-padding:first-child,
 .ios ion-nav > .ion-page ion-header > .toolbar.statusbar-padding:first-child,
 .ios ion-tab > .ion-page ion-header > .toolbar.statusbar-padding:first-child,
@@ -61187,27 +61186,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 
 .message__file__hexagon-wrap svg {
   width: 100%;
-}
-
-.progressbar {
-  width: 27px;
-  height: 27px;
-  border: none;
-  border-radius: 50%;
-  position: relative;
-}
-
-.progressbar .hole {
-  width: 21px;
-  height: 21px;
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  border-radius: 50%;
-}
-
-.progressbar .dummy {
-  display: none;
 }
 
 .progressIndicator {
@@ -62275,4 +62253,25 @@ page-sales strong {
   visibility: visible;
   opacity: 1;
   top: 50%;
+}
+
+.progressbar {
+  width: 27px;
+  height: 27px;
+  border: none;
+  border-radius: 50%;
+  position: relative;
+}
+
+.progressbar .hole {
+  width: 21px;
+  height: 21px;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+}
+
+.progressbar .dummy {
+  display: none;
 }

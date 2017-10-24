@@ -1,0 +1,19 @@
+$circleRadius: 27px;
+$circleThickness: 3px;
+
+.progressbar {
+	width: $circleRadius;
+	height: $circleRadius;
+	border: none;
+	border-radius: 50%;
+	position: relative;
+	.hole {
+		width: $circleRadius - 2*$circleThickness;
+		height: $circleRadius - 2*$circleThickness;
+		position: absolute;
+		top: $circleThickness;
+		left: $circleThickness;
+		border-radius: 50%;
+	}
+	.dummy { display: none; }
+}
