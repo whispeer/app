@@ -22,7 +22,8 @@
 				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>
 				<loading-progress
 					*ngIf="(!file.loaded && file.getProgress) || file.sending"
-					parentBackgroundClass="messages__message"
+					backgroundClass="messages__message"
+					foregroundClass="progressIndicator"
 					[progress]="file.getProgress">
 				</loading-progress>
 			</div>
@@ -40,10 +41,9 @@
 				<div class="message__voicemail__actions">
 					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && message.hasBeenSent()" (click)="downloadVoicemail()"></ion-icon>
 					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && message.hasBeenSent()" (click)="playVoicemail()"></ion-icon>
-					<loading-progress
-						*ngIf="!voicemailLoaded() && voicemailDownloadProgress"
-						parentBackgroundClass="messages__message"
-						class="message__voicemail__action"
+					<loading-progress *ngIf="!voicemailLoaded() && voicemailDownloadProgress"
+						backgroundClass="messages__message"
+						foregroundClass="progressIndicator"
 						[progress]="voicemailProgress"
 					>
 					</loading-progress>

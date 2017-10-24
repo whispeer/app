@@ -60333,12 +60333,6 @@ ion-fab-list[side="top"] button:last-child {
 }
 
 /* Circular Progress */
-.loading-progress {
-  position: relative;
-  width: 30px;
-  height: 30px;
-}
-
 .ios ion-nav > .ion-page .toolbar.statusbar-padding:first-child,
 .ios ion-nav > .ion-page ion-header > .toolbar.statusbar-padding:first-child,
 .ios ion-tab > .ion-page ion-header > .toolbar.statusbar-padding:first-child,
@@ -61166,22 +61160,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   margin-left: 12px;
 }
 
-.message__voicemail__action {
-  font-size: 30px;
-  -webkit-box-flex: 0;
-  -webkit-flex-grow: 0;
-  -ms-flex-positive: 0;
-  flex-grow: 0;
-  -webkit-flex-shrink: 0;
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-}
-
-.message__voicemail__action,
-.message__voicemail__uploadSpinner {
-  margin: 0;
-}
-
 .message__voicemail__player {
   display: inline-block;
   position: relative;
@@ -61217,7 +61195,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   border: none;
   border-radius: 50%;
   position: relative;
-  background-color: blue;
 }
 
 .progressbar .hole {
@@ -61227,7 +61204,15 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   top: 3px;
   left: 3px;
   border-radius: 50%;
-  background-color: red;
+}
+
+.progressbar .dummy {
+  display: none;
+}
+
+.progressIndicator {
+  color: red;
+  background-color: blue;
 }
 
 .message__file__hexagon {

@@ -178,18 +178,18 @@ topicWithBursts {
 	}
 }
 
-.message__voicemail__action {
-	font-size: 30px;
-
-	flex-grow: 0;
-	flex-shrink: 0;
-}
-
-.message__voicemail__action,
-.message__voicemail__uploadSpinner {
-	margin: 0;
-}
-
+// .message__voicemail__action {
+// 	font-size: 30px;
+//
+// 	flex-grow: 0;
+// 	flex-shrink: 0;
+// }
+//
+// .message__voicemail__action,
+// .message__voicemail__uploadSpinner {
+// 	margin: 0;
+// }
+//
 .message__voicemail__player {
 	display: inline-block;
 	position: relative;
@@ -231,7 +231,6 @@ $circleThickness: 3px;
 	border: none;
 	border-radius: 50%;
 	position: relative;
-	background-color: blue;
 	.hole {
 		width: $circleRadius - 2*$circleThickness;
 		height: $circleRadius - 2*$circleThickness;
@@ -239,8 +238,13 @@ $circleThickness: 3px;
 		top: $circleThickness;
 		left: $circleThickness;
 		border-radius: 50%;
-		background-color: red;
 	}
+	.dummy { display: none; }
+}
+
+.progressIndicator {
+	color: red;
+	background-color: blue;
 }
 
 .message__file__hexagon {
