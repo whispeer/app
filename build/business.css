@@ -61211,8 +61211,13 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 }
 
 .progressIndicator {
-  color: red;
-  background-color: blue;
+  color: #545b5e;
+  background-color: #a0a7aa;
+}
+
+.burst--me .progressIndicator {
+  color: #fff;
+  background-color: #939B9E;
 }
 
 .message__file__hexagon {

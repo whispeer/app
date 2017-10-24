@@ -213,13 +213,7 @@ topicWithBursts {
 	.border, .content {
 		fill: map-get($colors, dark_grey);
 	}
-	svg {
-		width: 100%;
-	}
-
-	// .radial-progress {
-	// 	margin-top: -17px;
-	// }
+	svg { width: 100%; }
 }
 
 $circleRadius: 27px;
@@ -243,8 +237,16 @@ $circleThickness: 3px;
 }
 
 .progressIndicator {
-	color: red;
-	background-color: blue;
+	color: map-get($colors, dark);
+	background-color: map-get($colors, dark_grey);
+	.burst--me & {
+		color: map-get($colors, light);
+		@if $business == 1 {
+			background-color: #939B9E;
+		} @else {
+			background-color: #79C730;
+		}
+	}
 }
 
 .message__file__hexagon {
