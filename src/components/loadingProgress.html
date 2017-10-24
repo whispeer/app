@@ -1,5 +1,5 @@
 <div class="loading-progress" *ngIf="progress && progress() < 1">
-	<div class="progressbar">
-		<div class="hole"></div>
+	<div class="progressbar" [ngStyle]="{  }">
+		<div class="hole" [ngStyle]="{'background-color': background }"></div>
 	</div>
 </div>

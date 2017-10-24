@@ -24,7 +24,6 @@
 					*ngIf="(!file.loaded && file.getProgress) || file.sending"
 					parentBackgroundClass="messages__message"
 					[progress]="file.getProgress"
-					[inverse]="!message.hasBeenSent()">
 				</loading-progress>
 			</div>
 			<span class="message__file__info">
@@ -42,12 +41,10 @@
 					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && message.hasBeenSent()" (click)="downloadVoicemail()"></ion-icon>
 					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && message.hasBeenSent()" (click)="playVoicemail()"></ion-icon>
 					<loading-progress
+						*ngIf="!voicemailLoaded() && voicemailDownloadProgress"
 						parentBackgroundClass="messages__message"
 						class="message__voicemail__action"
-						*ngIf="!voicemailLoaded() && voicemailDownloadProgress"
 						[progress]="voicemailProgress"
-						[inverse]="!message.hasBeenSent()"
-						[color]="(message.isOwn() ? 'primary' : 'isabelline')"
 					>
 					</loading-progress>
 					<ion-spinner *ngIf="!message.hasBeenSent()" class="message__voicemail__uploadSpinner"></ion-spinner>
