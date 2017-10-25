@@ -180,18 +180,18 @@ topicWithBursts {
 	}
 }
 
-.message__voicemail__action {
-	font-size: 30px;
-
-	flex-grow: 0;
-	flex-shrink: 0;
-}
-
-.message__voicemail__action,
-.message__voicemail__uploadSpinner {
-	margin: 0;
-}
-
+// .message__voicemail__action {
+// 	font-size: 30px;
+//
+// 	flex-grow: 0;
+// 	flex-shrink: 0;
+// }
+//
+// .message__voicemail__action,
+// .message__voicemail__uploadSpinner {
+// 	margin: 0;
+// }
+//
 .message__voicemail__player {
 	display: inline-block;
 	position: relative;
@@ -215,12 +215,19 @@ topicWithBursts {
 	.border, .content {
 		fill: map-get($colors, dark_grey);
 	}
-	svg {
-		width: 100%;
-	}
+	svg { width: 100%; }
+}
 
-	.radial-progress {
-		margin-top: -17px;
+.progressIndicator {
+	color: map-get($colors, dark);
+	background-color: map-get($colors, dark_grey);
+	.burst--me & {
+		color: map-get($colors, light);
+		@if $business == 1 {
+			background-color: #939B9E;
+		} @else {
+			background-color: #79C730;
+		}
 	}
 }
 

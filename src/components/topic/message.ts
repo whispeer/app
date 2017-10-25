@@ -1,7 +1,4 @@
 import { Component, Input } from "@angular/core";
-
-const prettysize = require("prettysize")
-
 import * as Bluebird from "bluebird"
 
 import { Message } from "../../lib/messages/message"
@@ -11,6 +8,10 @@ import h from "../../lib/helper/helper"
 import Progress from "../../lib/asset/Progress"
 import blobService from "../../lib/services/blobService"
 import blobCache from "../../lib/asset/blobCache"
+
+const EMOJIS = ["💩", "👻", "🤖", "🐋", "🌍"]
+
+const FILE_DOWNLOAD_DELAY = 500
 
 @Component({
 	selector: "Message",
@@ -44,7 +45,20 @@ export class MessageComponent {
 	}
 
 	formatSize(size) {
-		return prettysize(size, false, false, 2)
+		const emoji = EMOJIS[size % EMOJIS.length]
+		if (size < 1000) {
+			return `${size} B`
+		} else if (size < 1000 * 1000) {
+			return `${Math.round(size / 100) / 10} kB`
+		} else if (size < 1000 * 1000 * 1000) {
+			return `${Math.round(size / (100 * 1000)) / 10} MB`
+		} else if (size < 1000 * 1000 * 1000 * 1000) {
+			return `${Math.round(size / (100 * 1000 * 1000)) / 10} GB`
+		} else if (size < 1000 * 1000 * 1000 * 1000 * 1000) {
+			return `${emoji} TB`
+		} else {
+			return `${emoji} PB`
+		}
 	}
 
 	private voicemailPlayer: VoicemailPlayer
@@ -65,11 +79,12 @@ export class MessageComponent {
 	}
 
 	voicemailProgress = () => {
-		if(this.voicemailSending()) {
-			return this.message.data.voicemails.reduce((acc, v) => {
+		const { message } = this
+		if(!message.hasBeenSent()) {
+			return message.data.voicemails.reduce((acc, v) => {
 				if(!v) return acc;
 
-				return acc + v.getProgress() / this.message.data.voicemails.length;
+				return acc + v.getProgress() / message.data.voicemails.length;
 			}, 0);
 		}
 
@@ -91,25 +106,24 @@ export class MessageComponent {
 
 		file.getProgress = () => loadProgress.getProgress()
 
-		blobService.getBlobUrl(file.blobID, loadProgress, file.size).then((url) => {
-			return blobCache.copyBlobToDownloads(file.blobID, file.name)
-		}).then((url) => {
-			file.loaded = true
-			file.url = url
-
-			return blobCache.getFileMimeType(url).then((mimeType) => {
-				return new Bluebird((success, error) => {
-					window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
-				})
+		blobService
+			.getBlobUrl(file.blobID, loadProgress, file.size)
+			.then(url => blobCache.copyBlobToDownloads(file.blobID, file.name))
+			.delay(FILE_DOWNLOAD_DELAY)
+			.then((url) => {
+				file.loaded = true
+				file.url = url
+				return blobCache.getFileMimeType(url).then(mimeType =>
+					new Bluebird((success, error) =>
+						window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
+					)
+				)
 			})
-		}).catch((e) => {
-			console.error(e)
-			if (parseInt(e.status, 10) === 9) {
-				alert(`Could not open file. No app found to open file type for ${file.name}`)
-			} else {
-				alert(`Something went wrong trying to load file ${file.name}`)
-			}
-		})
+			.catch(e =>
+				alert(parseInt(e.status, 10) === 9
+					? `Could not open file. No app found to open file type for ${file.name}`
+					: `Something went wrong trying to load file ${file.name}`)
+		)
 	}
 
 	downloadVoicemail = h.cacheResult<Bluebird<void>>(() => {
@@ -127,9 +141,6 @@ export class MessageComponent {
 
 	voicemailPlaying = () =>
 		this.voicemailPlayer.isPlaying()
-
-	voicemailSending = () =>
-		!this.message.data.sent
 
 	playVoicemail = () =>
 		this.downloadVoicemail().then(() =>

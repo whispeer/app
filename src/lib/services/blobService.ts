@@ -20,9 +20,9 @@ import blobCache, { fixFileReader } from "../asset/blobCache"
 
 import socketService from "./socket.service"
 import BlobDownloader from "./blobDownloader.service"
+import Queue from '../asset/Queue'
 
 const initService = require("services/initService");
-const Queue = require("asset/Queue");
 const keyStore = require("crypto/keyStore");
 
 const knownBlobURLs = {};

@@ -4,7 +4,7 @@ import h from "../helper/helper"
 import Progress from "../asset/Progress"
 import blobService, { BlobType, unpath } from "./blobService"
 import blobCache from "../asset/blobCache"
-var Queue = require("asset/Queue");
+import Queue from '../asset/Queue'
 
 const defaultUploadOptions = {
 	encrypt: true,

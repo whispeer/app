@@ -1,15 +1,4 @@
-<div class="loading-progress" *ngIf="progress && progress() < 1">
-	<div class="radial-progress" [ngClass]="[className, inverse ? 'radial-progress--inverse' : '']" [attr.data-progress]="getProgress()">
-		<div class="circle">
-			<div class="mask full">
-				<div class="fill"></div>
-			</div>
-			<div class="mask half">
-				<div class="fill"></div>
-				<div class="fill fix"></div>
-			</div>
-			<div class="shadow"></div>
-			<div class="inset"></div>
-		</div>
-	</div>
+<div *ngIf="progress && progress() <= 1" [ngStyle]="{'background-image': progressArc}" class="progressbar">
+	<div class="dummy" [ngClass]="foregroundClass"></div>
+	<div class="hole" [ngStyle]="{'background-color': background}"></div>
 </div>
