@@ -1,4 +1,4 @@
-<div *ngIf="progress && progress() < 1" [ngStyle]="{'background-image': progressArc}" class="progressbar">
+<div *ngIf="progress && progress() <= 1" [ngStyle]="{'background-image': progressArc}" class="progressbar">
 	<div class="dummy" [ngClass]="foregroundClass"></div>
 	<div class="hole" [ngStyle]="{'background-color': background}"></div>
 </div>
