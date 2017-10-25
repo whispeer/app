@@ -1,5 +1,7 @@
 import { Component, Input, ElementRef } from "@angular/core";
 
+const INTERPOLATION_SCALING = 12
+
 @Component({
 	selector: "loading-progress",
 	templateUrl: "loadingProgress.html"
@@ -56,20 +58,49 @@ export class LoadingProgress {
 		return this._background
 	}
 
-	get progressArc() {
-		const progress = this.progress()
+	private progressArc() {
 		const { progressBackground, progressColor } = this
 		if (!progressBackground || !progressColor) { return "" }
 		let deg, result
-		if (progress <= 0.5) {
-			deg = 90 + 180 * progress * 2
+		if (this.interpolatedProgress <= 0.5) {
+			deg = 90 + 180 * this.interpolatedProgress * 2
 			result = `linear-gradient(90deg, ${progressBackground} 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(${deg}deg, ${progressColor} 50%, ${progressBackground} 50%, ${progressBackground})`
 		} else {
-			deg = -90 + 180 * (2 * (progress-.5))
+			deg = -90 + 180 * (2 * (this.interpolatedProgress-.5))
 			result = `linear-gradient(${deg}deg, ${progressColor} 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, ${progressColor} 50%, ${progressBackground} 50%, ${progressBackground})`
 		}
 		return result
 	}
 
-	constructor(private element: ElementRef) { }
+	private divToStyle
+	private interpolatedProgress = 0
+	private animationStep = (time) => {
+
+		if (!this.divToStyle) {
+			window.requestAnimationFrame(this.animationStep)
+			this.divToStyle = this.element.nativeElement.querySelector('div')
+
+		} else {
+			const progress = this.progress()
+
+			if (progress < this.interpolatedProgress || progress === 1) {
+				this.interpolatedProgress = progress
+
+			} else {
+				this.interpolatedProgress += (progress - this.interpolatedProgress) / INTERPOLATION_SCALING
+			}
+
+			this.divToStyle.setAttribute("style", `background-image: ${this.progressArc()}`);
+
+			if (this.interpolatedProgress !== 1) {
+				window.requestAnimationFrame(this.animationStep)
+			}
+		}
+	}
+
+	constructor(private element: ElementRef) {
+
+		// [ngStyle]="{'background-image': progressArc}"
+		window.requestAnimationFrame(this.animationStep)
+	}
 }
