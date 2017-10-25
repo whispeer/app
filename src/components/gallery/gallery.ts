@@ -5,7 +5,6 @@ import errorService from "../../lib/services/error.service"
 import blobService from "../../lib/services/blobService"
 
 import * as Bluebird from "bluebird"
-
 import { PhotoViewer } from '@ionic-native/photo-viewer'
 
 interface imageInfo {
@@ -34,7 +33,6 @@ export class GalleryComponent {
 
 	@Input() set images(value: imageQualities[]) {
 		this._images = value
-
 		this.loadPreviews()
 	}
 
