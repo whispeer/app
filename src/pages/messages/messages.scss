@@ -422,12 +422,14 @@ message:last-of-type .messages__message {
 		transform: translate(0, -2px);
 
 		.burst--me & {
+			z-index: -1;
 			right: -7px;
 			border-right: $size solid $message-bubble-color;
 			border-bottom-left-radius: $outer-radius;
 		}
 
 		.burst--other & {
+			z-index: -1;
 			left: -7px;
 			border-left: $size solid map-get($colors, other_grey);
 			border-bottom-right-radius: $outer-radius;
