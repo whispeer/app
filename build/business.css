@@ -61144,6 +61144,7 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   -webkit-flex-grow: 0;
   -ms-flex-positive: 0;
   flex-grow: 0;
+  padding-left: 6px;
   width: 30px;
   max-width: 30px;
   height: auto;
@@ -61338,12 +61339,13 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 
 .messages__message {
   position: relative;
-  padding: 9px 12px;
+  padding: 6px;
   border-radius: 17.5px;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   max-width: 75%;
   word-wrap: break-word;
+  word-break: break-word;
   white-space: normal;
 }
 
@@ -61351,8 +61353,10 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   border-radius: 5px;
 }
 
-.messages__message span {
+.messages__message > span {
   -webkit-user-select: auto;
+  padding: 3px 6px;
+  display: inline-block;
 }
 
 .burst--me .messages__message {
@@ -61385,14 +61389,12 @@ message:last-of-type .messages__message:before {
 }
 
 .burst--me message:last-of-type .messages__message:before {
-  z-index: 1;
   right: -7px;
   border-right: 20px solid #788286;
   border-bottom-left-radius: 16px 14px;
 }
 
 .burst--other message:last-of-type .messages__message:before {
-  z-index: 2;
   left: -7px;
   border-left: 20px solid #ebeced;
   border-bottom-right-radius: 16px 14px;
@@ -62253,6 +62255,46 @@ page-sales strong {
   visibility: visible;
   opacity: 1;
   top: 50%;
+}
+
+gallery > div {
+  position: relative;
+  overflow: hidden;
+  font-size: 0;
+  line-height: 0;
+  border-radius: 13px;
+}
+
+.md gallery > div {
+  border-radius: 3px;
+}
+
+gallery > div.loading {
+  background-color: white;
+}
+
+gallery > div.loading > img {
+  opacity: .5;
+}
+
+gallery .overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
 .progressbar {
