@@ -5,7 +5,7 @@
 	<span class="messages__time"></span>
 </div>
 
-<div *ngIf="!message.isBlockedSince()">
+<ng-container *ngIf="!message.isBlockedSince()">
 
 	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
 		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
@@ -65,7 +65,7 @@
 		</div>
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
-</div>
+</ng-container>
 
 <ng-template #message_time>
 		<span *ngIf="message.hasBeenSent()" class="messages__time">
