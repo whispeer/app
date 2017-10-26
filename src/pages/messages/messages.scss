@@ -408,8 +408,7 @@ $bubble-radius-android: 5px;
 	}
 }
 
-message:last-of-type .messages__message {
-
+message:last-of-type > div:last-of-type .messages__message {
 	$outer-radius: 16px 14px;
 	$inner-radius: 10px;
 	$size: 20px;
