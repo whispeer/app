@@ -24,13 +24,6 @@
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
       },
       "cordova-plugin-compat": {},
-      "cordova-plugin-crosswalk-webview": {
-        "XWALK_COMMANDLINE": "--disable-pull-to-refresh-effect",
-        "XWALK_LITEVERSION": "xwalk_core_library_canary:17+",
-        "XWALK_MODE": "embedded",
-        "XWALK_MULTIPLEAPK": "true",
-        "XWALK_VERSION": "23+"
-      },
       "cordova-plugin-device": {},
       "cordova-plugin-file": {},
       "cordova-plugin-file-opener2": {},
@@ -95,7 +88,6 @@
     "cordova-ios": "^4.5.2",
     "cordova-plugin-camera": "https://github.com/whispeer/cordova-plugin-camera.git#fix/tmp-image-reuse",
     "cordova-plugin-compat": "~1.1.0",
-    "cordova-plugin-crosswalk-webview": "^2.3.0",
     "cordova-plugin-device": "~1.1.4",
     "cordova-plugin-file": "~4.3.1",
     "cordova-plugin-file-opener2": "^2.0.19",
