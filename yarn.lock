@@ -243,6 +243,10 @@
     "@types/tapable" "*"
     "@types/uglify-js" "*"
 
+"ImagePicker@https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse":
+  version "2.1.8"
+  resolved "https://github.com/whispeer/ImagePicker.git#2810f3506cd86b82c731609718db4aa8798ced05"
+
 abbrev@1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.0.tgz#d0554c2256636e2f56e7c2e5ad183f859428d81f"
@@ -1574,10 +1578,6 @@ com-sarriaroman-photoviewer@~1.1.10:
   version "1.1.10"
   resolved "https://registry.yarnpkg.com/com-sarriaroman-photoviewer/-/com-sarriaroman-photoviewer-1.1.10.tgz#e18f1535751fe105ae180c4fc5a164120471900d"
 
-"com.synconset.imagepicker@https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse":
-  version "2.1.8"
-  resolved "https://github.com/whispeer/ImagePicker.git#7ce8644312a4c74efa9c8e7820a67b2096ce0bc8"
-
 combined-stream@^1.0.5, combined-stream@~1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
@@ -1723,6 +1723,10 @@ cordova-common@^2.1.0:
     underscore "^1.8.3"
     unorm "^1.3.3"
 
+"cordova-filechooser@https://github.com/whispeer/cordova-filechooser.git#feature/full_path":
+  version "1.0.1"
+  resolved "https://github.com/whispeer/cordova-filechooser.git#16df0ff08a6a3d70457a45c4e86326dcaa724e08"
+
 cordova-ios@^4.5.2:
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/cordova-ios/-/cordova-ios-4.5.2.tgz#46b410fe2d14b449547c1d617e988aa6d80da37c"
@@ -1759,10 +1763,6 @@ cordova-plugin-file-opener2@^2.0.19:
 cordova-plugin-file@~4.3.1:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-4.3.3.tgz#012e97aa1afb91f84916e6341b548366d23de9b9"
-
-"cordova-filechooser@https://github.com/whispeer/cordova-filechooser.git#feature/full_path":
-  version "1.0.1"
-  resolved "https://github.com/whispeer/cordova-filechooser.git#16df0ff08a6a3d70457a45c4e86326dcaa724e08"
 
 cordova-plugin-filepicker@^1.1.4:
   version "1.1.4"

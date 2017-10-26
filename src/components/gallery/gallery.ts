@@ -70,7 +70,7 @@ export class GalleryComponent {
 
 	loadImagePreviews(images: imageQualities[]) {
 		images.forEach((image) => {
-			if (typeof image.lowest.url === "string" && typeof image.highest.url === "string") {
+			if (image.lowest && typeof image.lowest.url === "string" && image.highest && typeof image.highest.url === "string") {
 				image.highest.url = this.sanitizer.bypassSecurityTrustUrl(image.highest.url)
 				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(image.lowest.url)
 				return
@@ -90,8 +90,10 @@ export class GalleryComponent {
 	}
 
 	isLoading = () => {
-		return this._images.reduce((prev, image) =>
-			prev || image.highest.loading || image.middle.loading || image.lowest.loading
+		return this._images.reduce((prev, image) => prev
+			|| image.highest && image.highest.loading
+			|| image.middle && image.middle.loading
+			|| image.lowest && image.lowest.loading
 		, false)
 	}
 
@@ -105,7 +107,7 @@ export class GalleryComponent {
 			return
 		}
 
-		this.loadImage(image.highest).then((url) => {
+		this.loadImage(image.highest || image.middle || image.lowest).then((url) => {
 			this.photoViewer.show(url)
 		})
 	}
