@@ -49,7 +49,7 @@ const ImagePickerOptions = {
 
 const INFINITE_SCROLLING_THRESHOLD = 1000
 
-const MAXIMUM_FILE_SIZE_MB = isBusinessVersion() ? 50 : 10
+const MAXIMUM_FILE_SIZE_MB = isBusinessVersion() ? 15 : 10
 
 const isIOS = () => window.device && window.device.platform === 'iOS'
 
