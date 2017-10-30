@@ -61178,7 +61178,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   width: 40px;
   top: 4px;
   left: -12px;
-  z-index: 3;
 }
 
 .message__file__hexagon-wrap .border, .message__file__hexagon-wrap .content {
@@ -61416,13 +61415,11 @@ message:last-of-type .messages__message:after {
 }
 
 .burst--me message:last-of-type .messages__message:after {
-  z-index: 2;
   right: -56px;
   border-bottom-left-radius: 10px;
 }
 
 .burst--other message:last-of-type .messages__message:after {
-  z-index: 3;
   left: 4px;
   border-bottom-right-radius: 10px;
 }
@@ -61449,12 +61446,13 @@ message:last-of-type .messages__message:after {
   color: #a0a7aa;
 }
 
-.burst--other .messages__time {
-  margin: auto auto auto 0;
+.burst--other .messages__message-blocked:before {
+  display: none;
+  border-left: 20px solid transparent;
 }
 
-.burst--other .messages__message-blocked:before {
-  border-left: 20px solid transparent;
+.burst--other .messages__time {
+  margin: auto auto auto 0;
 }
 
 .burst--other .message__file__memo-play-icon {

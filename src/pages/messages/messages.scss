@@ -210,8 +210,6 @@ topicWithBursts {
 	top: 4px;
 	left: -12px;
 
-	z-index: 3;
-
 	.border, .content {
 		fill: map-get($colors, dark_grey);
 	}
@@ -408,10 +406,12 @@ $bubble-radius-android: 5px;
 	}
 }
 
-message:last-of-type > div:last-of-type .messages__message {
+message:last-of-type .messages__message {
 	$outer-radius: 16px 14px;
 	$inner-radius: 10px;
 	$size: 20px;
+
+	// &.messages__message-blocked:before { display: none; }
 
 	&:before {
 		content: "";
@@ -421,14 +421,12 @@ message:last-of-type > div:last-of-type .messages__message {
 		transform: translate(0, -2px);
 
 		.burst--me & {
-			z-index: -1;
 			right: -7px;
 			border-right: $size solid $message-bubble-color;
 			border-bottom-left-radius: $outer-radius;
 		}
 
 		.burst--other & {
-			z-index: -1;
 			left: -7px;
 			border-left: $size solid map-get($colors, other_grey);
 			border-bottom-right-radius: $outer-radius;
@@ -449,13 +447,11 @@ message:last-of-type > div:last-of-type .messages__message {
 		background: white;
 
 		.burst--me & {
-			z-index: 2;
 			right: -56px;
 			border-bottom-left-radius: $inner-radius;
 		}
 
 		.burst--other & {
-			z-index: 3;
 			left: 4px;
 			border-bottom-right-radius: $inner-radius;
 		}
@@ -482,16 +478,19 @@ message:last-of-type > div:last-of-type .messages__message {
 }
 
 .burst--other {
+
 	.messages__message-blocked {
 		background-color: white;
 		border: 1px solid $isabelline;
 		color: $dark-grey;
+		&:before {
+			display: none;
+			border-left: 20px solid transparent;
+		}
 	}
+
 	.messages__time {
 		margin: auto auto auto 0;
-	}
-	.messages__message-blocked:before {
-		border-left: 20px solid transparent;
 	}
 
 	// .message__file {
