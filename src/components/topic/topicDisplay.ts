@@ -188,8 +188,8 @@ export class TopicComponent {
 	private sendVoicemail = () => {
 		const voicemails = this.recordingPlayer.getRecordings()
 
-		this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(({ path, recording, duration }:recordingType) => {
-			const { directory, name } = unpath(path)
+		this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(({ url, audio, duration }:recordingType) => {
+			const { directory, name } = unpath(url)
 
 			return FILE.moveFile(
 				this.platform.is("ios") ? "file://" + directory : directory,
@@ -197,13 +197,13 @@ export class TopicComponent {
 				FILE.cacheDirectory,
 				name
 			).then(() => ({
-				path: `${FILE.cacheDirectory}${name}`,
-				duration, recording
+				url: `${FILE.cacheDirectory}${name}`,
+				duration
 			}))
 		}).map((voicemail:recordingType) => {
-			const { path, duration } = voicemail
+			const { url, duration } = voicemail
 
-			return this.getFile(path).then((fileObject) =>
+			return this.getFile(url).then((fileObject) =>
 				new FileUpload(fileObject, { encrypt: true, extraInfo: { duration } })
 			)
 		}).then((voicemails) => {
@@ -376,7 +376,7 @@ export class TopicComponent {
 			this.recordingFile.release()
 			this.recordingFile = null
 
-			this.recordingPlayer.addRecording(this.getRecordingFileName(), this.recordingInfo.duration)
+			// TODO vm this.recordingPlayer.addRecording(this.getRecordingFileName(), this.recordingInfo.duration)
 			this.recordingInfo.duration = 0
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)

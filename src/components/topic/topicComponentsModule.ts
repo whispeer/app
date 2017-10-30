@@ -7,11 +7,10 @@ import { SeperatorDatePipe } from "../../lib/pipes/seperatorDate";
 import { TopicComponent } from "./topicDisplay"
 import { BurstDifferenceComponent } from "./burstDifference"
 import { MessageComponent } from "./message"
+import { VoicemailPlayerComponent } from "./voicemailPlayer"
 
 import { SyntaxifyDirective } from "../syntaxify"
-
 import { GalleryComponent } from "../gallery/gallery"
-
 import { ComponentsModule } from "../components.module"
 
 import { TranslateModule } from '@ngx-translate/core';
@@ -24,6 +23,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		SyntaxifyDirective,
 		GalleryComponent,
 		MessageComponent,
+		VoicemailPlayerComponent,
 	],
 	imports: [
 		ComponentsModule,
@@ -38,6 +38,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		SyntaxifyDirective,
 		GalleryComponent,
 		MessageComponent,
+		VoicemailPlayerComponent,
 
 		CommonModule,
 	]
