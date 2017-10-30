@@ -55,19 +55,6 @@ export default class Profile extends Observer {
 		return this.isPublicProfile ? "public-" + this.id : "private-" + this.id;
 	};
 
-	getUpdatedData = (signKey: string) => {
-		//pad updated profile
-		//merge paddedProfile and updatedPaddedProfile
-		//sign/hash merge
-		//encrypt merge
-
-		if (this.isPublicProfile) {
-			return this.sign(signKey);
-		}
-
-		return this.securedData.getUpdatedData(signKey);
-	};
-
 	sign = (signKey: string, cb?: Function) => {
 		if (!this.isPublicProfile) {
 			throw new Error("please encrypt private profiles!");
@@ -133,7 +120,7 @@ type ProfileCache = {
 export class ProfileLoader extends ObjectLoader<Profile, ProfileCache>({
 	cacheName: "profile",
 	getID: ({ meta, signKey }) => `${signKey}-${meta._signature}`,
-	download: id => { throw new Error("profile get by id is not implemented") },
+	download: () => { throw new Error("profile get by id is not implemented") },
 	load: ({ content, meta, isPublic, signKey }): Bluebird<ProfileCache> => {
 
 		const securedData = isPublic ?
