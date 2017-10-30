@@ -394,12 +394,12 @@ export class ProfilePage {
 				icon: !this.platform.is("ios") ? "eye": null,
 				text: this.translate.instant("profile.image.view"),
 				handler: () => {
-					this.userObject.getProfileAttribute("imageBlob").then(({ blobid }) => {
-						return blobService.getBlobUrl(blobid)
-					}).then((url) => {
+					const { blobid } = this.userObject.getProfileAttribute("imageBlob")
+					console.log("view image")
+
+					return blobService.getBlobUrl(blobid).then((url) => {
 						this.photoViewer.show(url);
 					});
-					console.log("view image")
 				}
 			}, {
 				icon: !this.platform.is("ios") ? "camera": null,
