@@ -132,6 +132,18 @@ export class Message {
 	isBlocked = () =>
 		settings.isBlocked(this.data.sender.id)
 
+	hasFiles = () =>
+		this.data.files && this.data.files.length > 0
+
+	hasVoicemail = () =>
+		this.data.voicemails && this.data.voicemails.length > 0
+
+	hasText = () =>
+		this.data.text && this.data.text.length > 0
+
+	hasImages = () =>
+		this.data.images && this.data.images.length > 0
+
 	private prepareAttachments = () => {
 		return Bluebird.all([
 			Message.prepare(this.attachments.files),

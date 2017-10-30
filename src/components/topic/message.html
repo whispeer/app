@@ -7,7 +7,7 @@
 
 <ng-container *ngIf="!message.isBlockedSince()">
 
-	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
+	<div *ngIf="message.hasText() || message.hasImages()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
 		<div class="messages__message last" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
 			<span whispeerSyntaxify content="{{message.data.text}}" *ngIf="message.data.text"></span>
 			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
@@ -35,7 +35,7 @@
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
 
-	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
+	<div *ngIf="message.hasVoicemail()" class="messages__wrap messages__wrap--file">
 		<div class="messages__message message__voicemail last" [ngClass]="{'sending': !message.hasBeenSent()}">
 			<div class="message__file__info message__voicemail__info">
 				<div class="message__voicemail__actions">
@@ -71,7 +71,10 @@
 		<span *ngIf="message.hasBeenSent()" class="messages__time">
 			{{ message.sendTime | date: "shortTime" }}
 		</span>
-		<span *ngIf="!message.hasBeenSent()" class="messages__time messageSpinner">
-			<ion-spinner text-center name="ios-small"></ion-spinner>
-		</span>
+		<ng-container *ngIf="!message.hasBeenSent()">
+			<span *ngIf="message.hasVoicemail() || message.hasFiles()" class="messages__time"> </span>
+			<span *ngIf="!message.hasVoicemail() && !message.hasFiles()" class="messages__time messageSpinner">
+				<ion-spinner text-center name="ios-small"></ion-spinner>
+			</span>
+		</ng-container>
 </ng-template>
