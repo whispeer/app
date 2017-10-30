@@ -60,7 +60,7 @@
 		</ion-item>
 	</ion-list>
 
-	<button *ngIf="!loading" ion-button full color="danger" (click)="report()">{{ 'topic.detail.reportTopic' | translate }}</button>
+	<button *ngIf="!loading && !chat.isDraft()" ion-button full color="danger" (click)="report()">{{ 'topic.detail.reportTopic' | translate }}</button>
 
 	<div text-center *ngIf="!loading"></div>
 

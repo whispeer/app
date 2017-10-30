@@ -173,6 +173,11 @@ export class Chunk extends Observer {
 		return this.title
 	}
 
+	setTitle = (title) => {
+		this.title = title
+	}
+
+
 	isAdmin = (user) => {
 		return this.getAdmins().indexOf(user.getID()) > -1
 	}

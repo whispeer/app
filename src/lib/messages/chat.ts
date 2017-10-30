@@ -428,7 +428,7 @@ export class Chat extends Observer {
 	amIAdmin = () => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
-		return latestChunk.amIAdmin()
+		return !this.isDraft() && latestChunk.amIAdmin()
 	}
 
 	getReceivers = () => {
