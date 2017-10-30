@@ -266,15 +266,8 @@ topicWithBursts {
 	justify-content: flex-start;
 	width: 100%;
 
-	.burst--me & {
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	.burst--other & {
-		padding-left: 0;
-		padding-right: 0;
-	}
+	.burst--me & { padding-left: 0 }
+	.burst--other & { padding-right: 0 }
 }
 
 .message__file__info__size {

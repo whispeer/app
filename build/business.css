@@ -61245,11 +61245,9 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 
 .burst--me .message__file__info {
   padding-left: 0;
-  padding-right: 0;
 }
 
 .burst--other .message__file__info {
-  padding-left: 0;
   padding-right: 0;
 }
 
