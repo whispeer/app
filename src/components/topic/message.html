@@ -8,15 +8,15 @@
 <ng-container *ngIf="!message.isBlockedSince()">
 
 	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
-		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
+		<div class="messages__message last" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
 			<span whispeerSyntaxify content="{{message.data.text}}" *ngIf="message.data.text"></span>
 			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
 		</div>
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
 
-	<div *ngFor="let file of message.data.files" class="messages__wrap">
-		<div class="messages__message message__file" [ngClass]="{'sending': !message.hasBeenSent()}">
+	<div *ngFor="let file of message.data.files; let last = last;" class="messages__wrap">
+		<div class="messages__message message__file" [ngClass]="{'sending': !message.hasBeenSent(), 'last': last}">
 			<div class="message__voicemail__actions">
 				<ion-icon *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)" class="message__voicemail__action" name="md-download"></ion-icon>
 				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>
@@ -36,7 +36,7 @@
 	</div>
 
 	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
-		<div class="messages__message message__voicemail" [ngClass]="{'sending': !message.hasBeenSent()}">
+		<div class="messages__message message__voicemail last" [ngClass]="{'sending': !message.hasBeenSent()}">
 			<div class="message__file__info message__voicemail__info">
 				<div class="message__voicemail__actions">
 					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && message.hasBeenSent()" (click)="downloadVoicemail()"></ion-icon>

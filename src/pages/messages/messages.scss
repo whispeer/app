@@ -399,7 +399,7 @@ $bubble-radius-android: 5px;
 	}
 }
 
-message:last-of-type .messages__message {
+message:last-of-type .messages__message.last {
 	$outer-radius: 16px 14px;
 	$inner-radius: 10px;
 	$size: 20px;
@@ -479,7 +479,6 @@ message:last-of-type .messages__message {
 		border: 1px solid $isabelline;
 		color: $dark-grey;
 		&:before {
-			display: none;
 			border-left: 20px solid transparent;
 		}
 	}
@@ -488,13 +487,6 @@ message:last-of-type .messages__message {
 		margin: auto auto auto 0;
 	}
 
-	// .message__file {
-	// 	padding: 5px 25px 5px 0;
-	// }
-	// .message__file__hexagon-wrap {
-	// 	left: auto;
-	// 	right: -10px;
-	// }
 	.message__file__memo-play-icon {
 		color: map-get($colors, dark);
 	}

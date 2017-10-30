@@ -61376,7 +61376,7 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   color: #545b5e;
 }
 
-message:last-of-type .messages__message:before {
+message:last-of-type .messages__message.last:before {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -61386,23 +61386,23 @@ message:last-of-type .messages__message:before {
   z-index: -1;
 }
 
-.burst--me message:last-of-type .messages__message:before {
+.burst--me message:last-of-type .messages__message.last:before {
   right: -7px;
   border-right: 20px solid #788286;
   border-bottom-left-radius: 16px 14px;
 }
 
-.burst--other message:last-of-type .messages__message:before {
+.burst--other message:last-of-type .messages__message.last:before {
   left: -7px;
   border-left: 20px solid #ebeced;
   border-bottom-right-radius: 16px 14px;
 }
 
-.burst--me message:last-of-type .messages__message.sending:before {
+.burst--me message:last-of-type .messages__message.last.sending:before {
   border-color: #d5d8da;
 }
 
-message:last-of-type .messages__message:after {
+message:last-of-type .messages__message.last:after {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -61414,12 +61414,12 @@ message:last-of-type .messages__message:after {
   z-index: -1;
 }
 
-.burst--me message:last-of-type .messages__message:after {
+.burst--me message:last-of-type .messages__message.last:after {
   right: -56px;
   border-bottom-left-radius: 10px;
 }
 
-.burst--other message:last-of-type .messages__message:after {
+.burst--other message:last-of-type .messages__message.last:after {
   left: 4px;
   border-bottom-right-radius: 10px;
 }
@@ -61447,7 +61447,6 @@ message:last-of-type .messages__message:after {
 }
 
 .burst--other .messages__message-blocked:before {
-  display: none;
   border-left: 20px solid transparent;
 }
 
