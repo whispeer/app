@@ -61383,6 +61383,7 @@ message:last-of-type .messages__message:before {
   height: 20px;
   -webkit-transform: translate(0, -2px);
   transform: translate(0, -2px);
+  z-index: -1;
 }
 
 .burst--me message:last-of-type .messages__message:before {
@@ -61410,6 +61411,7 @@ message:last-of-type .messages__message:after {
   -webkit-transform: translate(-30px, -2px);
   transform: translate(-30px, -2px);
   background: white;
+  z-index: -1;
 }
 
 .burst--me message:last-of-type .messages__message:after {

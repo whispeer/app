@@ -412,6 +412,7 @@ message:last-of-type .messages__message {
 		bottom: -2px;
 		height: $size;
 		transform: translate(0, -2px);
+		z-index: -1;
 
 		.burst--me & {
 			right: -7px;
@@ -438,6 +439,7 @@ message:last-of-type .messages__message {
 		width: 26px;
 		transform: translate(-30px, -2px);
 		background: white;
+		z-index: -1;
 
 		.burst--me & {
 			right: -56px;
