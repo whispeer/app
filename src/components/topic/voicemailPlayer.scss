@@ -74,6 +74,14 @@ voicemailplayer {
 		}
 	}
 
+	.vom--duration, .vom--position {
+		min-width: 35px;
+		display: inline-block;
+
+		&.vom--duration { text-align: left }
+		&.vom--position { text-align: right }
+	}
+
 	.vom--progress--bar {
 		height: 100%;
 

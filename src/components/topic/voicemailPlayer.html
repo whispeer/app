@@ -13,12 +13,12 @@
 	</div>
 	<div class="vom--info" [ngClass]="{'vom--playing': isPlaying()}">
 		<ion-icon icon name="stats"></ion-icon>
-		<span class="vom--position" *ngIf="isLoaded()">00:00</span>
+		<span class="vom--position" *ngIf="isLoaded()">0:00</span>
 		<span class="vom--dividor" *ngIf="isLoaded()"> / </span>
 		<span class="vom--duration">{{ formatPosition(getDuration()) }}</span>
 		<span class="vom--size" *ngIf="!isLoaded()">[{{formatSize(getSize())}}]</span>
 
-		<div class="vom--progress">
+		<div class="vom--progress" *ngIf="isLoaded()">
 			<div class="vom--progress--bar"></div>
 		</div>
 	</div>

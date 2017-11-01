@@ -77,10 +77,9 @@ export class VoicemailPlayerComponent {
 		const minutes = Math.floor(position / 60)
 		const seconds = Math.floor(position % 60)
 
-		const minutesString = `0${minutes}`.substr(-2)
 		const secondsString = `0${seconds}`.substr(-2)
 
-		return `${minutesString}:${secondsString}`
+		return `${minutes}:${secondsString}`
 	}
 
 	formatSize = formatSize
