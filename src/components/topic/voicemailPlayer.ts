@@ -34,19 +34,21 @@ export class VoicemailPlayerComponent {
 		loaded: boolean
 		getProgress: () => number
 	}[]
+	@Input() hasBeenSent: boolean = true
 	private player: VoicemailPlayer
 	private previousTime: number
 	private startTime: number = 0
-	message = { hasBeenSent: () => true }
 	seekVal: number = 0
 
 	toggle = () => this.isPlaying() ? this.pause() : this.play()
+
+	downloadable = () => !this.isLoaded() && this.hasBeenSent
 
 	isPlaying = () => this.player ? this.player.isPlaying() : false
 
 	isLoading = () => !!this.voicemails.find(({ loading }) => loading)
 
-	getProgress = () => this.voicemails.reduce((prev, { getProgress }) => getProgress ? prev + getProgress(): 0, 0)
+	getProgress = () => this.voicemails.reduce((prev, { getProgress }) => getProgress ? prev + getProgress(): 0, 0) / this.voicemails.length
 
 	getSize = () => this.voicemails.reduce((prev, { size }) => prev + size, 0)
 

@@ -20,7 +20,7 @@ import { TypeState } from "typestate"
 
 import uuidv4 from 'uuid/v4'
 
-import VoicemailPlayer, { recordingType } from "../../lib/asset/voicemailPlayer"
+import VoicemailPlayer, { audioInfo, recordingType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
 import Burst from "../../lib/messages/burst"
@@ -82,6 +82,7 @@ export class TopicComponent {
 	@ViewChild('footer') footer: ElementRef
 
 	recordingPlayer: VoicemailPlayer
+	recordings: audioInfo[] = []
 
 	private recordingFile: MediaObject
 
@@ -376,7 +377,13 @@ export class TopicComponent {
 			this.recordingFile.release()
 			this.recordingFile = null
 
-			// TODO vm this.recordingPlayer.addRecording(this.getRecordingFileName(), this.recordingInfo.duration)
+			this.recordings.push({
+				url: this.getRecordingFileName(),
+				estimatedDuration: this.recordingInfo.duration
+			})
+
+			this.recordingPlayer = new VoicemailPlayer(this.recordings)
+
 			this.recordingInfo.duration = 0
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)

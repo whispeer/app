@@ -37,7 +37,7 @@
 
 	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
 		<div class="messages__message message__voicemail" [ngClass]="{'sending': !message.hasBeenSent()}">
-			<voicemailplayer [voicemails]="message.data.voicemails"></voicemailplayer>
+			<voicemailplayer [voicemails]="message.data.voicemails" [hasBeenSent]="message.hasBeenSent()"></voicemailplayer>
 		</div>
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
