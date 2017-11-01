@@ -1,6 +1,6 @@
 <ng-container>
 	<div class="vom--icon">
-		<ion-icon name="md-play" *ngIf="!isPlaying() && hasBeenSent" (click)="play()"></ion-icon>
+		<ion-icon name="md-play" *ngIf="!isLoading() && !isPlaying() && hasBeenSent" (click)="play()"></ion-icon>
 		<ion-icon name="md-pause" *ngIf="isPlaying()" (click)="pause()"></ion-icon>
 		<loading-progress *ngIf="isLoading() || !hasBeenSent"
 			backgroundClass="messages__message"
