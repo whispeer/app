@@ -59,7 +59,7 @@ export class VoicemailPlayerComponent {
 
 		const ele : HTMLElement = this.element.nativeElement
 
-		const progressBar = ele.querySelector(".message__file__progress__bar")
+		const progressBar = ele.querySelector(".vom--progress--bar")
 
 		if (progressBar instanceof HTMLElement) {
 			progressBar.style.width = `${Math.round(progress * 10) / 10}%`
@@ -70,7 +70,7 @@ export class VoicemailPlayerComponent {
 		}
 
 		this.previousTime = time
-		ele.querySelector(".position").innerHTML = this.formatPosition(time)
+		ele.querySelector(".vom--position").innerHTML = this.formatPosition(time)
 	}
 
 	formatPosition = (position: number) => {

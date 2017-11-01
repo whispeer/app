@@ -143,8 +143,8 @@ topicWithBursts {
 .message__file,
 .message__voicemail {
 	display: flex;
-	min-height: 55px;
-	width: 100%;
+	width: 192px;
+	height: 47px;
 
 	overflow: visible;
 	padding: 5px 0 5px 25px;
@@ -152,10 +152,6 @@ topicWithBursts {
 
 .message__voicemail {
 	padding: 5px 0 5px 5px;
-}
-
-.message__voicemail__info {
-	flex-wrap: nowrap !important;
 }
 
 .message__voicemail__actions {
@@ -178,26 +174,6 @@ topicWithBursts {
 		margin-right: 0;
 		margin-left: 12px;
 	}
-}
-
-// .message__voicemail__action {
-// 	font-size: 30px;
-//
-// 	flex-grow: 0;
-// 	flex-shrink: 0;
-// }
-//
-// .message__voicemail__action,
-// .message__voicemail__uploadSpinner {
-// 	margin: 0;
-// }
-//
-.message__voicemail__player {
-	display: inline-block;
-	position: relative;
-
-	flex-wrap: nowrap;
-	white-space: nowrap;
 }
 
 .progressIndicator {
@@ -423,14 +399,6 @@ message:last-of-type > div:last-of-type .messages__message {
 		order: 1;
 		margin: auto 0 auto auto;
 	}
-
-	.message__file__memo-play-icon {
-		color: map-get($colors, light);
-	}
-
-	.message__file__memo-play-icon--active {
-		color: map-get($colors, blue);
-	}
 }
 
 .burst--other {
@@ -444,13 +412,6 @@ message:last-of-type > div:last-of-type .messages__message {
 	}
 	.messages__message-blocked:before {
 		border-left: 20px solid transparent;
-	}
-
-	.message__file__memo-play-icon {
-		color: map-get($colors, dark);
-	}
-	.message__file__memo-play-icon--active {
-		color: map-get($colors, kelly_green);
 	}
 }
 
