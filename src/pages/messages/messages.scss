@@ -200,22 +200,6 @@ topicWithBursts {
 	white-space: nowrap;
 }
 
-.message__file__hexagon-wrap {
-	position: absolute;
-
-	width: 40px;
-
-	top: 4px;
-	left: -12px;
-
-	z-index: 3;
-
-	.border, .content {
-		fill: map-get($colors, dark_grey);
-	}
-	svg { width: 100%; }
-}
-
 .progressIndicator {
 	color: map-get($colors, dark);
 	background-color: map-get($colors, dark_grey);
@@ -226,36 +210,6 @@ topicWithBursts {
 		} @else {
 			background-color: #79C730;
 		}
-	}
-}
-
-.message__file__hexagon {
-	display: block;
-	width: 100%;
-}
-
-// this might not work out 100% well, but using flexbox was a real pain here :/
-.message__file__hexagon-icon {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-
-	margin-top: -11px;
-	margin-left: -6px;
-
-	color: map-get($colors, light) !important;
-}
-
-.message__file__hexagon-spinner {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-
-	margin-top: -15px;
-	margin-left: -14px;
-
-	* {
-		stroke: map-get($colors, light) !important;
 	}
 }
 
@@ -492,13 +446,6 @@ message:last-of-type > div:last-of-type .messages__message {
 		border-left: 20px solid transparent;
 	}
 
-	// .message__file {
-	// 	padding: 5px 25px 5px 0;
-	// }
-	// .message__file__hexagon-wrap {
-	// 	left: auto;
-	// 	right: -10px;
-	// }
 	.message__file__memo-play-icon {
 		color: map-get($colors, dark);
 	}

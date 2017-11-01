@@ -60,11 +60,9 @@ export class VoicemailPlayerComponent {
 		const ele : HTMLElement = this.element.nativeElement
 
 		const progressBar = ele.querySelector(".message__file__progress__bar")
-		const progressIcon = ele.querySelector(".message__file__progress__icon")
 
-		if (progressBar instanceof HTMLElement && progressIcon instanceof HTMLElement) {
+		if (progressBar instanceof HTMLElement) {
 			progressBar.style.width = `${Math.round(progress * 10) / 10}%`
-			// progressIcon.style.marginLeft = `${progress}%`
 		}
 
 		if (this.previousTime === time) {

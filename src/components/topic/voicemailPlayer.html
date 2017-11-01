@@ -13,13 +13,10 @@
 	</div>
 	<div class="message__voicemail__player">
 		<ion-icon icon name="stats" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': isPlaying()}"></ion-icon>&nbsp;
-		<span><span class="position"></span> / {{ formatPosition(getDuration()) }}&nbsp;</span>
+		<span><span class="position">00:00</span> / {{ formatPosition(getDuration()) }}&nbsp;</span>
 		<span *ngIf="!isLoaded()" class="message__file__info__size">[{{formatSize(getSize())}}]</span>
 		<div class="message__file__progress" *ngIf="isLoaded()">
 			<div class="message__file__progress__bar"></div>
-			<div class="message__file__progress__icon">
-				<hexagon class="message__file__progress__icon__hex"></hexagon>
-			</div>
 		</div>
 	</div>
 </div>
