@@ -187,9 +187,11 @@ export class TopicComponent {
 	}
 
 	private sendVoicemail = () => {
-		const voicemails = this.recordingPlayer.getRecordings()
+		const player = new VoicemailPlayer(this.recordings)
 
-		this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(({ url, audio, duration }:recordingType) => {
+		this.resetRecordingState()
+
+		player.awaitLoading().then(() => player.getRecordings()).map(({ url, audio, duration }:recordingType) => {
 			const { directory, name } = unpath(url)
 
 			return FILE.moveFile(
@@ -216,8 +218,6 @@ export class TopicComponent {
 			console.error("Sending voicemail failed", e)
 			// TODO
 		})
-
-		this.resetRecordingState()
 	}
 
 	sendMessageToChat = () => {
@@ -401,22 +401,16 @@ export class TopicComponent {
 
 		this.recordingPlayer.reset()
 		this.recordingPlayer = new VoicemailPlayer([])
+		this.recordings = []
 
 		RecordingStateMachine.go(RecordingStates.NotRecording)
 	}
 
-	discardRecording = () => {
-		this.recordingPlayer.destroy()
-		this.resetRecordingState()
-	}
+	discardRecording = () => this.resetRecordingState()
 
-	getPosition = () => {
-		return this.recordingPlayer.getPosition()
-	}
+	getPosition = () => this.recordingPlayer ? this.recordingPlayer.getPosition() : 0
 
-	togglePlayback = () => {
-		this.recordingPlayer.toggle()
-	}
+	togglePlayback = () => this.recordingPlayer ? this.recordingPlayer.toggle() : null
 
 	presentActionSheet = () => {
 		const cameraButton = {
