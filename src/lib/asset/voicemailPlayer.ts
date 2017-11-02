@@ -134,7 +134,7 @@ export default class VoicemailPlayer {
 	isLoaded = () => this.loaded
 
 	private addRecording(url: string, duration: number) {
-		const audio = new Audio(url)
+		const audio = new Audio(`${url}?r=${Math.random()}`)
 
 		const audioInfo = {
 			url,
