@@ -376,6 +376,7 @@ $bubble-radius-android: 5px;
 	word-wrap: break-word;
 	word-break: break-word;
 	white-space: normal;
+	z-index: 0;
 
 	> span {
 		-webkit-user-select: auto;
