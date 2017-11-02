@@ -210,8 +210,6 @@ topicWithBursts {
 	top: 4px;
 	left: -12px;
 
-	z-index: 3;
-
 	.border, .content {
 		fill: map-get($colors, dark_grey);
 	}
@@ -268,15 +266,8 @@ topicWithBursts {
 	justify-content: flex-start;
 	width: 100%;
 
-	.burst--me & {
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	.burst--other & {
-		padding-left: 0;
-		padding-right: 0;
-	}
+	.burst--me & { padding-left: 0 }
+	.burst--other & { padding-right: 0 }
 }
 
 .message__file__info__size {
@@ -408,10 +399,12 @@ $bubble-radius-android: 5px;
 	}
 }
 
-message:last-of-type > div:last-of-type .messages__message {
+message:last-of-type .messages__message.last {
 	$outer-radius: 16px 14px;
 	$inner-radius: 10px;
 	$size: 20px;
+
+	// &.messages__message-blocked:before { display: none; }
 
 	&:before {
 		content: "";
@@ -419,16 +412,15 @@ message:last-of-type > div:last-of-type .messages__message {
 		bottom: -2px;
 		height: $size;
 		transform: translate(0, -2px);
+		z-index: -1;
 
 		.burst--me & {
-			z-index: -1;
 			right: -7px;
 			border-right: $size solid $message-bubble-color;
 			border-bottom-left-radius: $outer-radius;
 		}
 
 		.burst--other & {
-			z-index: -1;
 			left: -7px;
 			border-left: $size solid map-get($colors, other_grey);
 			border-bottom-right-radius: $outer-radius;
@@ -447,15 +439,14 @@ message:last-of-type > div:last-of-type .messages__message {
 		width: 26px;
 		transform: translate(-30px, -2px);
 		background: white;
+		z-index: -1;
 
 		.burst--me & {
-			z-index: 2;
 			right: -56px;
 			border-bottom-left-radius: $inner-radius;
 		}
 
 		.burst--other & {
-			z-index: 3;
 			left: 4px;
 			border-bottom-right-radius: $inner-radius;
 		}
@@ -482,25 +473,20 @@ message:last-of-type > div:last-of-type .messages__message {
 }
 
 .burst--other {
+
 	.messages__message-blocked {
 		background-color: white;
 		border: 1px solid $isabelline;
 		color: $dark-grey;
+		&:before {
+			border-left: 20px solid transparent;
+		}
 	}
+
 	.messages__time {
 		margin: auto auto auto 0;
 	}
-	.messages__message-blocked:before {
-		border-left: 20px solid transparent;
-	}
 
-	// .message__file {
-	// 	padding: 5px 25px 5px 0;
-	// }
-	// .message__file__hexagon-wrap {
-	// 	left: auto;
-	// 	right: -10px;
-	// }
 	.message__file__memo-play-icon {
 		color: map-get($colors, dark);
 	}
