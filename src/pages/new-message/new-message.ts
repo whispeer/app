@@ -160,6 +160,6 @@ export class NewMessagePage extends ContactsWithSearch {
 	}
 
 	closeSearchBar = ($event) => {
-		console.log($event.srcElement.blur())
+		$event.srcElement.blur()
 	}
 }
