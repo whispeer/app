@@ -54,7 +54,7 @@ const existsFile = (path, filename) =>
 		return Bluebird.reject(e)
 	})
 
-const idToFileName = (blobID) => `${blobID}.m4a`
+const idToFileName = (blobID) => `${blobID}.aac`
 
 let clearing = false
 let storing = 0
