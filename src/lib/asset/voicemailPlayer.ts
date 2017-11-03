@@ -134,7 +134,7 @@ export default class VoicemailPlayer {
 	isLoaded = () => this.loaded
 
 	private addRecording(url: string, duration: number) {
-		const audio = new Audio(`${url}?r=${Math.random()}`)
+		const audio = new Audio(url)
 
 		const audioInfo = {
 			url,
@@ -145,7 +145,7 @@ export default class VoicemailPlayer {
 		audio.addEventListener("ended", this.onEnded)
 
 		const loadingPromise =
-			new Bluebird((resolve) => audio.addEventListener("canplaythrough", resolve))
+			new Bluebird((resolve) => audio.addEventListener("loadedmetadata", resolve))
 
 		this.loadingPromises.push(loadingPromise)
 		this.recordings.push(audioInfo)

@@ -41,6 +41,8 @@ RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording)
 
 RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused)
 
+const RECORDING_STOP_DELAY = 100
+
 const ImagePickerOptions = {
 	width: 2560,
 	height: 1440,
@@ -81,6 +83,7 @@ export class TopicComponent {
 	@ViewChild('content') content: ElementRef
 	@ViewChild('footer') footer: ElementRef
 
+	stopRecordingPromise = Bluebird.resolve()
 	recordingPlayer: VoicemailPlayer
 	recordings: audioInfo[] = []
 
@@ -226,9 +229,7 @@ export class TopicComponent {
 				this.toggleRecording()
 			}
 
-			this.sendVoicemail()
-
-			return
+			return this.stopRecordingPromise.then(() => this.sendVoicemail())
 		}
 
 		this.sendMessage.emit({
@@ -319,11 +320,10 @@ export class TopicComponent {
 	}
 
 	getRecordingFileName = () => {
-		const recordingID = this.recordingPlayer.getRecordings().length
 		const extension = this.platform.is("ios") ? "m4a" : "aac"
 		const dir = this.getRecordingDir()
 
-		return `${dir}recording_${this.recordingInfo.UUID}_${recordingID}.${extension}`
+		return `${dir}recording_${this.recordingInfo.UUID}.${extension}`
 	}
 
 	private startRecording() {
@@ -331,9 +331,7 @@ export class TopicComponent {
 			return
 		}
 
-		if (!this.recordingInfo.UUID) {
-			this.recordingInfo.UUID = uuidv4()
-		}
+		this.recordingInfo.UUID = uuidv4()
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
 		this.recordingInfo.startTime = Date.now()
@@ -369,25 +367,31 @@ export class TopicComponent {
 	}
 
 	toggleRecording = () => {
+		if (this.stopRecordingPromise.isPending()) {
+			return
+		}
+
 		if (RecordingStateMachine.is(RecordingStates.Recording)) {
-			RecordingStateMachine.go(RecordingStates.Paused)
-			clearInterval(this.recordingInfo.updateInterval)
+			this.stopRecordingPromise = Bluebird.resolve().delay(RECORDING_STOP_DELAY).then(() => {
+				RecordingStateMachine.go(RecordingStates.Paused)
 
-			this.recordingFile.stopRecord()
-			this.recordingFile.release()
-			this.recordingFile = null
+				this.recordingFile.stopRecord()
+				this.recordingFile.release()
+				this.recordingFile = null
 
-			this.recordings.push({
-				url: this.getRecordingFileName(),
-				estimatedDuration: this.recordingInfo.duration
+				this.recordings.push({
+					url: this.getRecordingFileName(),
+					estimatedDuration: this.recordingInfo.duration
+				})
+
+				clearInterval(this.recordingInfo.updateInterval)
+				this.recordingInfo.duration = 0
+
+				this.recordingPlayer = new VoicemailPlayer(this.recordings)
 			})
-
-			this.recordingPlayer = new VoicemailPlayer(this.recordings)
-
-			this.recordingInfo.duration = 0
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)
-			this.startRecording()
+			return this.startRecording()
 		}
 	}
 
