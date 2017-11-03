@@ -158,4 +158,8 @@ export class NewMessagePage extends ContactsWithSearch {
 			this.navCtrl.remove(this.navCtrl.length() - 2, 1)
 		})
 	}
+
+	closeSearchBar = ($event) => {
+		$event.srcElement.blur()
+	}
 }

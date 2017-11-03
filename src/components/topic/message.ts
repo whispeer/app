@@ -6,6 +6,7 @@ import { Message } from "../../lib/messages/message"
 import Progress from "../../lib/asset/Progress"
 import blobService from "../../lib/services/blobService"
 import blobCache from "../../lib/asset/blobCache"
+import { queue as fileTransferQueue } from '../../lib/services/fileTransferQueue'
 
 const EMOJIS = ["💩", "👻", "🤖", "🐋", "🌍"]
 
@@ -78,23 +79,23 @@ export class MessageComponent {
 
 		file.getProgress = () => loadProgress.getProgress()
 
-		blobService
-			.getBlobUrl(file.blobID, loadProgress, file.size)
-			.then(url => blobCache.copyBlobToDownloads(file.blobID, file.name))
-			.delay(FILE_DOWNLOAD_DELAY)
-			.then((url) => {
-				file.loaded = true
-				file.url = url
-				return blobCache.getFileMimeType(url).then(mimeType =>
-					new Bluebird((success, error) =>
-						window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
-					)
-				)
-			})
-			.catch(e =>
-				alert(parseInt(e.status, 10) === 9
-					? `Could not open file. No app found to open file type for ${file.name}`
-					: `Something went wrong trying to load file ${file.name}`)
-		)
+		fileTransferQueue.enqueue(1, () =>
+			blobService
+				.getBlobUrl(file.blobID, loadProgress, file.size)
+				.then(url => blobCache.copyBlobToDownloads(file.blobID, file.name))
+				.delay(FILE_DOWNLOAD_DELAY)
+				.then((url) => {
+					file.loaded = true
+					file.url = url
+					return blobCache.getFileMimeType(url).then(mimeType =>
+						new Bluebird((success, error) =>
+							window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
+						)
+					)})
+				.catch(e =>
+					alert(parseInt(e.status, 10) === 9
+						? `Could not open file. No app found to open file type for ${file.name}`
+						: `Something went wrong trying to load file ${file.name}`))
+			)
 	}
 }
