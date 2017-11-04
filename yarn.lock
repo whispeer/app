@@ -72,6 +72,10 @@
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/@ionic-native/in-app-browser/-/in-app-browser-3.6.1.tgz#5005e0bc3e6068b6e58de4f478bf6b47ab52493c"
 
+"@ionic-native/keyboard@^4.3.3":
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@ionic-native/keyboard/-/keyboard-4.3.3.tgz#86280749066fe8d16da055e9c078fcc7372a76b3"
+
 "@ionic-native/media@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@ionic-native/media/-/media-4.1.0.tgz#f884e921b59a3b32791dd2a099a6c87adc6a4cfe"

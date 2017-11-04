@@ -6,6 +6,7 @@ import { SplashScreen } from "@ionic-native/splash-screen";
 import { StatusBar } from "@ionic-native/status-bar";
 import { Globalization } from '@ionic-native/globalization';
 import { Push } from '@ionic-native/push';
+import { Keyboard } from '@ionic-native/keyboard';
 
 import { PushService } from "../lib/services/push.service";
 import socketService from "../lib/services/socket.service";
@@ -91,7 +92,8 @@ export class MyApp {
 		private statusBar: StatusBar,
 		private globalization: Globalization,
 		private push: Push,
-		private changeDetector: ChangeDetectorRef
+		private changeDetector: ChangeDetectorRef,
+		private keyboard: Keyboard
 	) {
 		platform.ready().then(() => {
 			// Okay, so the platform is ready and our plugins are available.
@@ -102,6 +104,8 @@ export class MyApp {
 			pushService.register();
 
 			if(platform.is("ios")) {
+				this.keyboard.disableScroll(true)
+
 				window.addEventListener('native.keyboardshow', (e: any) => {
 					this.keyboardHeight = e.keyboardHeight
 

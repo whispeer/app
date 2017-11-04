@@ -63,6 +63,7 @@
     "@ionic-native/globalization": "3.6.1",
     "@ionic-native/image-picker": "3.6.1",
     "@ionic-native/in-app-browser": "3.6.1",
+    "@ionic-native/keyboard": "^4.3.3",
     "@ionic-native/media": "^4.1.0",
     "@ionic-native/photo-viewer": "3.6.1",
     "@ionic-native/push": "3.6.1",
