@@ -101,7 +101,7 @@ export class SettingsPage {
 
 			return c.toDataURL()
 		}).then((url: string) => {
-			this.photoViewer.show(URL.createObjectURL(url))
+			this.photoViewer.show(url)
 		})
 	}
 
