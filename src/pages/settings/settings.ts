@@ -5,6 +5,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { PhotoViewer } from '@ionic-native/photo-viewer'
 
 import Bluebird from "bluebird";
+// yep this looks weird. importing / requireing this
+// by module name did not resolve to the right path somehow
 const qr = require("qrious/dist/qrious.js");
 
 import Tutorial from "../../app/tutorial";
