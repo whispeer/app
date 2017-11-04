@@ -1,4 +1,9 @@
-<ion-nav #navigation [root]="rootPage"></ion-nav>
+<ion-nav #navigation [root]="rootPage"
+	[ngStyle]="{
+		'height': 'calc(100% - ' +  keyboardHeight + 'px)',
+		'top.px': keyboardHeight
+	}"
+></ion-nav>
 
 <div *ngIf="showTutorial()" class="tutorial" (click)="tutorialClicked($event)">
 	<img [src]="currentSlide()" alt="">

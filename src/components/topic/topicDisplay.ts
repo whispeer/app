@@ -105,6 +105,8 @@ export class TopicComponent {
 		updateInterval: 0
 	}
 
+	private resizeEvent: string
+
 	constructor(
 		public navCtrl: NavController,
 		private actionSheetCtrl: ActionSheetController,
@@ -140,10 +142,14 @@ export class TopicComponent {
 			this.recordingPlayer.reset()
 			return true
 		})
+
+		this.resizeEvent = this.platform.is("ios") ?
+			"native.keyboardshow" : "resize"
 	}
 
 	ngAfterViewInit() {
-		window.addEventListener('resize', this.keyboardChange)
+		window.addEventListener(this.resizeEvent, this.keyboardChange)
+
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 
 		this.mutationObserver = new MutationObserver(this.mutationListener)
@@ -151,7 +157,7 @@ export class TopicComponent {
 	}
 
 	ngOnDestroy() {
-		window.removeEventListener('resize', this.keyboardChange)
+		window.removeEventListener(this.resizeEvent, this.keyboardChange)
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, ChangeDetectorRef } from "@angular/core";
 import { Platform, NavController } from "ionic-angular";
 import * as Bluebird from 'bluebird';
 
@@ -25,7 +25,7 @@ const TUTORIAL_SLIDES = 7
 })
 
 export class MyApp {
-
+	keyboardHeight = 0;
 	rootPage = "Home";
 
 	@ViewChild("navigation") nav: NavController;
@@ -90,7 +90,8 @@ export class MyApp {
 		private splashScreen: SplashScreen,
 		private statusBar: StatusBar,
 		private globalization: Globalization,
-		private push: Push
+		private push: Push,
+		private changeDetector: ChangeDetectorRef
 	) {
 		platform.ready().then(() => {
 			// Okay, so the platform is ready and our plugins are available.
@@ -99,6 +100,24 @@ export class MyApp {
 
 			const pushService = new PushService(this.nav, platform, this.push);
 			pushService.register();
+
+			if(this.platform.is("ios")) {
+				window.addEventListener('native.keyboardshow', (e: any) => {
+					this.keyboardHeight = e.keyboardHeight
+
+					// i had to add this to prevent delays where half the screen
+					// is hidden by the keyboard or white
+					changeDetector.detectChanges()
+				})
+
+				window.addEventListener('native.keyboardhide', () => {
+					this.keyboardHeight = 0
+
+					// i had to add this to prevent delays where half the screen
+					// is hidden by the keyboard or white
+					changeDetector.detectChanges()
+				})
+			}
 
 			socketService.addInterceptor({
 				transformResponse: (response) => {
