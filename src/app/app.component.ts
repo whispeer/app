@@ -101,7 +101,7 @@ export class MyApp {
 			const pushService = new PushService(this.nav, platform, this.push);
 			pushService.register();
 
-			if(this.platform.is("ios")) {
+			if(platform.is("ios")) {
 				window.addEventListener('native.keyboardshow', (e: any) => {
 					this.keyboardHeight = e.keyboardHeight
 
