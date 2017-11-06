@@ -4,7 +4,6 @@ import { IonicModule } from 'ionic-angular';
 
 import { SeperatorDatePipe } from "../../lib/pipes/seperatorDate";
 
-import { TopicComponent } from "./topicDisplay"
 import { BurstDifferenceComponent } from "./burstDifference"
 import { MessageComponent } from "./message"
 import { VoicemailPlayerComponent } from "./voicemailPlayer"
@@ -18,7 +17,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
 	declarations: [
 		SeperatorDatePipe,
-		TopicComponent,
 		BurstDifferenceComponent,
 		SyntaxifyDirective,
 		GalleryComponent,
@@ -33,7 +31,6 @@ import { TranslateModule } from '@ngx-translate/core';
 	],
 	exports: [
 		SeperatorDatePipe,
-		TopicComponent,
 		BurstDifferenceComponent,
 		SyntaxifyDirective,
 		GalleryComponent,
