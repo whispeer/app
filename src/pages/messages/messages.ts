@@ -211,6 +211,12 @@ export class MessagesPage {
 			this.recordingPlayer.reset()
 			return true
 		})
+
+		document.addEventListener("pause", () => {
+			if (RecordingStateMachine.is(RecordingStates.Recording)) {
+				this.toggleRecording()
+			}
+		}, false);
 	}
 
 	@ViewChild('content') content: ElementRef
@@ -255,6 +261,12 @@ export class MessagesPage {
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
+	}
+
+	ionViewDidLeave() {
+		if (!RecordingStateMachine.is(RecordingStates.NotRecording)) {
+			this.discardRecording()
+		}
 	}
 
 	mutationListener = (mutations) => {
