@@ -54,45 +54,47 @@ export class SettingsPage {
 		alert(this.translate.instant("settings.pushAlert"));
 	}
 
-	async generateBackup() {
-		if(!confirm(this.translate.instant("settings.backup.confirm"))) {
-			return
-		}
+	generateBackup() {
+		return Bluebird.try(async () => {
+			if(!confirm(this.translate.instant("settings.backup.confirm"))) {
+				return
+			}
 
-		const keyData = await userService.getOwn().createBackupKey();
+			const keyData = await userService.getOwn().createBackupKey();
 
-		const image: any = await new Bluebird((resolve) => {
-			const image = new Image(100, 200);
-			image.onload = resolve.bind(null, image);
+			const image: any = await new Bluebird((resolve) => {
+				const image = new Image(100, 200);
+				image.onload = resolve.bind(null, image);
 
-			new qr({
-				element: image,
-				value: keyData,
-				size: 175, // old was 7 and internally multiplied by 25
-				level: "L"
+				new qr({
+					element: image,
+					value: keyData,
+					size: 175, // old was 7 and internally multiplied by 25
+					level: "L"
+				});
 			});
-		});
 
-		const c = document.createElement("canvas");
-		c.width = image.width + 200;
-		c.height = image.height + 200;
+			const c = document.createElement("canvas");
+			c.width = image.width + 200;
+			c.height = image.height + 200;
 
-		const ctx = c.getContext("2d");
+			const ctx = c.getContext("2d");
 
-		ctx.fillStyle = "white";
-		ctx.fillRect(0,0,c.width,c.height);
+			ctx.fillStyle = "white";
+			ctx.fillRect(0,0,c.width,c.height);
 
-		ctx.drawImage(image,0,0);
+			ctx.drawImage(image,0,0);
 
-		ctx.fillStyle = "black";
-		ctx.font="20px Arial";
-		ctx.fillText(keyData.substr(0, 26), 10, image.height + 50);
-		ctx.fillText(keyData.substr(26), 10, image.height + 75);
+			ctx.fillStyle = "black";
+			ctx.font="20px Arial";
+			ctx.fillText(keyData.substr(0, 26), 10, image.height + 50);
+			ctx.fillText(keyData.substr(26), 10, image.height + 75);
 
-		ctx.fillText("whispeer-Passwort vergessen?", 10, image.height + 125);
-		ctx.fillText("https://whilogispeer.de/recovery", 10, image.height + 150);
+			ctx.fillText("whispeer-Passwort vergessen?", 10, image.height + 125);
+			ctx.fillText("https://whilogispeer.de/recovery", 10, image.height + 150);
 
-		this.photoViewer.show(c.toDataURL())
+			this.photoViewer.show(c.toDataURL())
+		})
 	}
 
 	goBack() {
