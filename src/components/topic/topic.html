@@ -89,7 +89,7 @@
 			</span>
 			<span *ngIf="isPaused()">
 				<span *ngIf="isPlayback()">
-					<ion-icon icon name="ios-barcode-outline" color="primary"></ion-icon>
+					<ion-icon icon name="ios-stats" color="primary"></ion-icon>
 					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>
 				</span>
 				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>
@@ -141,7 +141,7 @@
 			</span>
 			<span *ngIf="isPaused()">
 				<span *ngIf="isPlayback()">
-					<ion-icon icon name="ios-barcode-outline" color="primary"></ion-icon>
+					<ion-icon icon name="ios-stats" color="primary"></ion-icon>
 					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>
 				</span>
 				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>
