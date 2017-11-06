@@ -159,6 +159,10 @@ export class TopicComponent {
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
+
+		if (RecordingStateMachine.is(RecordingStates.NotRecording)) {
+			this.discardRecording()
+		}
 	}
 
 	mutationListener = (mutations) => {

@@ -13,6 +13,7 @@ $size-other: $grey;
 @if $business == 1 {
 	$playing-icon-me: $kelly_green;
 	$progress-background-me: $davys_grey;
+	$size-me: $border_grey;
 }
 
 voicemailplayer {
