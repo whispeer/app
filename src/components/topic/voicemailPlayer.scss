@@ -1,0 +1,97 @@
+$playing-icon-me: $dark_cerulean;
+$playing-icon-other: $kelly_green;
+
+$progress-background-me: $napier_green;
+$progress-background-other: $white;
+
+$progress-bar-me: $white;
+$progress-bar-other: $davys_grey;
+
+$size-me: $tea_green;
+$size-other: $grey;
+
+@if $business == 1 {
+	$playing-icon-me: $kelly_green;
+	$progress-background-me: $davys_grey;
+	$size-me: $border_grey;
+}
+
+voicemailplayer {
+	display: flex;
+	justify-content: center;
+	flex-direction: row;
+
+	.vom--icon {
+		width: 31px;
+		text-align: center;
+		margin: auto 6px;
+		.icon {
+			font-size: 24px;
+		}
+	}
+
+	.ion-ios-stats, .ion-md-stats {
+		width: 15px;
+		text-align: center;
+		margin-right: 1px;
+		font-size: 16px;
+	}
+
+	.vom--playing .ion-ios-stats, .vom--playing .ion-md-stats {
+		.burst--me & { color: $playing-icon-me }
+		.burst--other & { color: $playing-icon-other }
+	}
+
+	.vom--info {
+		margin-top: 9px;
+		font-size: 15px;
+		letter-spacing: -0.24px;
+		line-height: 19px;
+		position: relative;
+	}
+
+	.vom--size {
+		.burst--me & {
+			color: $size-me;
+		}
+
+		.burst--other & {
+			color: $size-other;
+		}
+	}
+
+	.vom--progress {
+		height: 2px;
+		width: 114px;
+		position: absolute;
+		bottom: 0px;
+
+		.burst--me & {
+			background-color: $progress-background-me;
+		}
+
+		.burst--other & {
+			background-color: $progress-background-other;
+		}
+	}
+
+	.vom--duration, .vom--position {
+		min-width: 35px;
+		display: inline-block;
+
+		&.vom--duration { text-align: left }
+		&.vom--position { text-align: right }
+	}
+
+	.vom--progress--bar {
+		height: 100%;
+
+		.burst--me & {
+			background-color: $progress-bar-me;
+		}
+
+		.burst--other & {
+			background-color: $progress-bar-other;
+		}
+	}
+}

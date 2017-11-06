@@ -61108,20 +61108,14 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  min-height: 55px;
-  width: 100%;
+  width: 192px;
+  height: 47px;
   overflow: visible;
   padding: 5px 0 5px 25px;
 }
 
 .message__voicemail {
   padding: 5px 0 5px 5px;
-}
-
-.message__voicemail__info {
-  -webkit-flex-wrap: nowrap !important;
-  -ms-flex-wrap: nowrap !important;
-  flex-wrap: nowrap !important;
 }
 
 .message__voicemail__actions {
@@ -61160,34 +61154,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   margin-left: 12px;
 }
 
-.message__voicemail__player {
-  display: inline-block;
-  position: relative;
-  -webkit-flex-wrap: nowrap;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-}
-
-.message__file__hexagon-wrap {
-  position: absolute;
-  width: 40px;
-  top: 4px;
-  left: -12px;
-}
-
-.message__file__hexagon-wrap .border, .message__file__hexagon-wrap .content {
-  fill: #a0a7aa;
-}
-
-.message__file__hexagon-wrap svg {
-  width: 100%;
-}
-
 .progressIndicator {
   color: #545b5e;
   background-color: #a0a7aa;
@@ -61196,32 +61162,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 .burst--me .progressIndicator {
   color: #fff;
   background-color: #939B9E;
-}
-
-.message__file__hexagon {
-  display: block;
-  width: 100%;
-}
-
-.message__file__hexagon-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -11px;
-  margin-left: -6px;
-  color: #fff !important;
-}
-
-.message__file__hexagon-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -15px;
-  margin-left: -14px;
-}
-
-.message__file__hexagon-spinner * {
-  stroke: #fff !important;
 }
 
 .message__file__info {
@@ -61280,8 +61220,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
 .message__file__progress__bar {
   position: relative;
   height: 100%;
-  -webkit-transition: width 0.1s ease;
-  transition: width 0.1s ease;
   background: #fff;
 }
 
@@ -61436,10 +61374,6 @@ message:last-of-type .messages__message.last:after {
   margin: auto 0 auto auto;
 }
 
-.burst--me .message__file__memo-play-icon {
-  color: #fff;
-}
-
 .burst--other .messages__message-blocked {
   background-color: white;
   border: 1px solid #ebeced;
@@ -61452,10 +61386,6 @@ message:last-of-type .messages__message.last:after {
 
 .burst--other .messages__time {
   margin: auto auto auto 0;
-}
-
-.burst--other .message__file__memo-play-icon {
-  color: #545b5e;
 }
 
 .messages__message--emoji-only {
@@ -62313,4 +62243,101 @@ gallery .overlay {
 
 .progressbar .dummy {
   display: none;
+}
+
+voicemailplayer {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+
+voicemailplayer .vom--icon {
+  width: 31px;
+  text-align: center;
+  margin: auto 6px;
+}
+
+voicemailplayer .vom--icon .icon {
+  font-size: 24px;
+}
+
+voicemailplayer .ion-ios-stats {
+  width: 15px;
+  text-align: center;
+  margin-right: 1px;
+  font-size: 16px;
+}
+
+.burst--me voicemailplayer .vom--playing .ion-ios-stats {
+  color: #5ab70d;
+}
+
+.burst--other voicemailplayer .vom--playing .ion-ios-stats {
+  color: #5ab70d;
+}
+
+voicemailplayer .vom--info {
+  margin-top: 9px;
+  font-size: 15px;
+  letter-spacing: -0.24px;
+  line-height: 19px;
+  position: relative;
+}
+
+.burst--me voicemailplayer .vom--size {
+  color: #cde9B6;
+}
+
+.burst--other voicemailplayer .vom--size {
+  color: #788286;
+}
+
+voicemailplayer .vom--progress {
+  height: 2px;
+  width: 114px;
+  position: absolute;
+  bottom: 0px;
+}
+
+.burst--me voicemailplayer .vom--progress {
+  background-color: #545b5e;
+}
+
+.burst--other voicemailplayer .vom--progress {
+  background-color: #fff;
+}
+
+voicemailplayer .vom--duration, voicemailplayer .vom--position {
+  min-width: 35px;
+  display: inline-block;
+}
+
+voicemailplayer .vom--duration.vom--duration, voicemailplayer .vom--position.vom--duration {
+  text-align: left;
+}
+
+voicemailplayer .vom--duration.vom--position, voicemailplayer .vom--position.vom--position {
+  text-align: right;
+}
+
+voicemailplayer .vom--progress--bar {
+  height: 100%;
+}
+
+.burst--me voicemailplayer .vom--progress--bar {
+  background-color: #fff;
+}
+
+.burst--other voicemailplayer .vom--progress--bar {
+  background-color: #545b5e;
 }

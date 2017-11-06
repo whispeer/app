@@ -37,31 +37,7 @@
 
 	<div *ngIf="message.hasVoicemail()" class="messages__wrap messages__wrap--file">
 		<div class="messages__message message__voicemail last" [ngClass]="{'sending': !message.hasBeenSent()}">
-			<div class="message__file__info message__voicemail__info">
-				<div class="message__voicemail__actions">
-					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && message.hasBeenSent()" (click)="downloadVoicemail()"></ion-icon>
-					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && message.hasBeenSent()" (click)="playVoicemail()"></ion-icon>
-					<loading-progress *ngIf="!voicemailLoaded() && voicemailDownloadProgress"
-						backgroundClass="messages__message"
-						foregroundClass="progressIndicator"
-						[progress]="voicemailProgress"
-					>
-					</loading-progress>
-					<ion-spinner *ngIf="!message.hasBeenSent()" class="message__voicemail__uploadSpinner"></ion-spinner>
-					<ion-icon name="md-pause" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
-				</div>
-				<div class="message__voicemail__player">
-					<ion-icon icon name="stats" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': voicemailPlaying()}"></ion-icon>&nbsp;
-					<span><span *ngIf="voicemailLoaded()">{{ voicemailPosition() * 1000 | date: 'mm:ss' }} /&nbsp;</span>{{ voicemailDuration() * 1000 | date: 'mm:ss' }}&nbsp;</span>
-					<span *ngIf="!voicemailLoaded()" class="message__file__info__size">[{{formatSize(voicemailSize())}}]</span>
-					<div class="message__file__progress" *ngIf="voicemailLoaded() && voicemailPosition() > 0">
-						<div class="message__file__progress__bar" [ngStyle]="{'width.%': voicemailPosition() * 100 / voicemailDuration()}"></div>
-						<div class="message__file__progress__icon" [ngStyle]="{'margin-left.%': voicemailPosition() * 100 / voicemailDuration()}">
-							<hexagon class="message__file__progress__icon__hex"></hexagon>
-						</div>
-					</div>
-				</div>
-			</div>
+			<voicemailplayer [voicemails]="message.data.voicemails" [hasBeenSent]="message.hasBeenSent()"></voicemailplayer>
 		</div>
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
