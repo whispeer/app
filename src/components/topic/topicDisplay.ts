@@ -105,7 +105,7 @@ export class TopicComponent {
 		updateInterval: 0
 	}
 
-	private resizeEvent: string
+	private resizeEvents: string[]
 
 	constructor(
 		public navCtrl: NavController,
@@ -143,12 +143,21 @@ export class TopicComponent {
 			return true
 		})
 
-		this.resizeEvent = this.platform.is("ios") ?
-			"native.keyboardshow" : "resize"
+		if(this.platform.is("ios")) {
+			this.resizeEvents = [
+				"resize",
+				"native.keyboardshow",
+				"native.keyboardhide"
+			]
+		} else {
+			this.resizeEvents = ["resize"]
+		}
 	}
 
 	ngAfterViewInit() {
-		window.addEventListener(this.resizeEvent, this.keyboardChange)
+		this.resizeEvents.forEach(resizeEvent =>
+			window.addEventListener(resizeEvent, this.keyboardChange)
+		)
 
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 
@@ -157,7 +166,10 @@ export class TopicComponent {
 	}
 
 	ngOnDestroy() {
-		window.removeEventListener(this.resizeEvent, this.keyboardChange)
+		this.resizeEvents.forEach(resizeEvent =>
+			window.removeEventListener(resizeEvent, this.keyboardChange)
+		)
+
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
