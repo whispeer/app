@@ -54,25 +54,13 @@ export class SettingsPage {
 		alert(this.translate.instant("settings.pushAlert"));
 	}
 
-	generateBackup() {
-		let image
-		let keyData
+	async generateBackup() {
+		if(confirm(this.translate.instant("settings.backup.confirm"))) {
+			const keyData = await userService.getOwn().createBackupKey();
 
-		Bluebird.resolve(
-			confirm(this.translate.instant("settings.backup.confirm"))
-		).then((answer) => {
-			if(!answer) {
-				return Bluebird.reject(false)
-			}
-		}).then(() =>
-			userService.getOwn().createBackupKey()
-		).then((_keyData) => {
-			keyData = _keyData;
-
-			return new Bluebird((resolve) => {
-				image = new Image(100, 200);
-
-				image.onload = resolve;
+			const image: any = await new Bluebird((resolve) => {
+				const image = new Image(100, 200);
+				image.onload = resolve.bind(null, image);
 
 				new qr({
 					element: image,
@@ -81,12 +69,12 @@ export class SettingsPage {
 					level: "L"
 				});
 			});
-		}).then((): string => {
-			var c = document.createElement("canvas");
+
+			const c = document.createElement("canvas");
 			c.width = image.width + 200;
 			c.height = image.height + 200;
 
-			var ctx = c.getContext("2d");
+			const ctx = c.getContext("2d");
 
 			ctx.fillStyle = "white";
 			ctx.fillRect(0,0,c.width,c.height);
@@ -101,10 +89,8 @@ export class SettingsPage {
 			ctx.fillText("whispeer-Passwort vergessen?", 10, image.height + 125);
 			ctx.fillText("https://whilogispeer.de/recovery", 10, image.height + 150);
 
-			return c.toDataURL()
-		}).then((url: string) => {
-			this.photoViewer.show(url)
-		})
+			this.photoViewer.show(c.toDataURL())
+		}
 	}
 
 	goBack() {
