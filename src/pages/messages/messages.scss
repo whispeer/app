@@ -186,6 +186,10 @@ page-messages {
 	}
 }
 
+.sending .progressIndicator {
+	background-color: $message-sending-bubble-color;
+}
+
 .message__file__info {
 	display: flex;
 	flex-wrap: wrap;
@@ -203,70 +207,6 @@ page-messages {
 
 	.burst--other & {
 		color: map-get($colors, grey);
-	}
-}
-
-.message__file__progress {
-	position: relative;
-
-	height: 2px;
-	width: 100%;
-
-	margin-top: 2px;
-	margin-left: 0;
-
-	.burst--me & {
-		margin-right: 20px;
-		background: map-get($colors, primaryDarker) !important;
-	}
-
-	.burst--other & {
-		margin-right: 25px;
-		background: map-get($colors, light) !important;
-	}
-}
-
-.message__file__progress__bar {
-	position: relative;
-	height: 100%;
-	// transition: width 0.1s ease;
-	background: map-get($colors, light);
-
-	.burst--other & {
-		background: map-get($colors, dark);
-	}
-}
-
-.message__file__progress__icon {
-	position: absolute;
-	top: -4px;
-	left: -4.5px;
-
-	display: block;
-	height: 9px;
-	width: 9px;
-
-	transition: margin 0.1s ease;
-}
-
-.message__file__progress__icon__hex {
-	position: absolute;
-	top: 0;
-	left: 0;
-
-	width: 100%;
-	height: 100%;
-
-	.border, .content {
-		fill: map-get($colors, light);
-	}
-
-	svg {
-		width: 100%;
-
-		position: absolute;
-		top: 0;
-		left: 0;
 	}
 }
 
