@@ -143,6 +143,7 @@ export default class VoicemailPlayer {
 		}
 
 		audio.addEventListener("ended", this.onEnded)
+		audio.addEventListener("pause", () => this.pause())
 
 		const loadingPromise =
 			new Bluebird((resolve) => audio.addEventListener("loadedmetadata", resolve))
