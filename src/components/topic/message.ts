@@ -92,10 +92,12 @@ export class MessageComponent {
 							window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success, error })
 						)
 					)})
-				.catch(e =>
+				.catch(e => {
+					delete file.getProgress
 					alert(parseInt(e.status, 10) === 9
 						? `Could not open file. No app found to open file type for ${file.name}`
-						: `Something went wrong trying to load file ${file.name}`))
+						: `Download of file ${file.name} failed`)
+				})
 			)
 	}
 }
