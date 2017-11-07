@@ -74,7 +74,7 @@ export default class VoicemailPlayer {
 	}
 
 	getDuration(beforeIndex?: number) {
-		return this.recordings.slice(0, beforeIndex).reduce((prev, next) => prev + next.duration, 0)
+		return this.recordings.slice(0, beforeIndex).reduce((prev, next) => prev + next.audio.duration || next.duration, 0)
 	}
 
 	getPosition() {
@@ -143,7 +143,6 @@ export default class VoicemailPlayer {
 		}
 
 		audio.addEventListener("ended", this.onEnded)
-		audio.addEventListener("pause", () => this.pause())
 
 		const loadingPromise =
 			new Bluebird((resolve) => audio.addEventListener("loadedmetadata", resolve))
@@ -168,17 +167,17 @@ export default class VoicemailPlayer {
 
 	private onEnded = () => {
 		if (this.isPlaying()) {
+			this.recordPlayingIndex += 1
+
+			if (this.recordPlayingIndex >= this.recordings.length) {
+				this.reset()
+				return
+			}
+
+			this.recordings[this.recordPlayingIndex].audio.play()
+
 			// Use a Promise to trigger the angular zone. Zones are bad. Angular DI is bad.
-			Bluebird.resolve().then(() => {
-				this.recordPlayingIndex += 1
-
-				if (this.recordPlayingIndex >= this.recordings.length) {
-					this.reset()
-					return
-				}
-
-				this.recordings[this.recordPlayingIndex].audio.play()
-			})
+			Bluebird.resolve().then(() => {})
 		}
 	}
 }
