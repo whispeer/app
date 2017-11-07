@@ -2,10 +2,17 @@ import { Component } from "@angular/core";
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { NavController, NavParams, AlertController, IonicPage } from "ionic-angular";
 import { TranslateService } from '@ngx-translate/core';
+import { PhotoViewer } from '@ionic-native/photo-viewer'
+
+import Bluebird from "bluebird";
+// yep this looks weird. importing / requireing this
+// by module name did not resolve to the right path somehow
+const qr = require("qrious/dist/qrious.js");
 
 import Tutorial from "../../app/tutorial";
 import sessionService from "../../lib/services/session.service";
 import settings from "../../lib/services/settings.service"
+import userService from "../../lib/users/userService";
 
 @IonicPage({
 	name: "Settings",
@@ -36,7 +43,7 @@ export class SettingsPage {
 		}
 	}
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService, private iab: InAppBrowser) {}
+	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService, private iab: InAppBrowser, private photoViewer: PhotoViewer) {}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
@@ -45,6 +52,49 @@ export class SettingsPage {
 	pushWarning() {
 		this.pushEnabled = true;
 		alert(this.translate.instant("settings.pushAlert"));
+	}
+
+	generateBackup() {
+		return Bluebird.try(async () => {
+			if(!confirm(this.translate.instant("settings.backup.confirm"))) {
+				return
+			}
+
+			const keyData = await userService.getOwn().createBackupKey();
+
+			const image: any = await new Bluebird((resolve) => {
+				const image = new Image(100, 200);
+				image.onload = resolve.bind(null, image);
+
+				new qr({
+					element: image,
+					value: keyData,
+					size: 175, // old was 7 and internally multiplied by 25
+					level: "L"
+				});
+			});
+
+			const c = document.createElement("canvas");
+			c.width = image.width + 200;
+			c.height = image.height + 200;
+
+			const ctx = c.getContext("2d");
+
+			ctx.fillStyle = "white";
+			ctx.fillRect(0,0,c.width,c.height);
+
+			ctx.drawImage(image,0,0);
+
+			ctx.fillStyle = "black";
+			ctx.font="20px Arial";
+			ctx.fillText(keyData.substr(0, 26), 10, image.height + 50);
+			ctx.fillText(keyData.substr(26), 10, image.height + 75);
+
+			ctx.fillText("whispeer-Passwort vergessen?", 10, image.height + 125);
+			ctx.fillText("https://whilogispeer.de/recovery", 10, image.height + 150);
+
+			this.photoViewer.show(c.toDataURL())
+		})
 	}
 
 	goBack() {
