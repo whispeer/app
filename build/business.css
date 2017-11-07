@@ -62255,6 +62255,14 @@ page-sales strong {
   top: 50%;
 }
 
+gallery {
+  display: block;
+}
+
+span ~ gallery {
+  margin-top: 8px;
+}
+
 gallery > div {
   position: relative;
   overflow: hidden;
@@ -62269,6 +62277,7 @@ gallery > div {
 }
 
 gallery > div .loading {
+  position: relative;
   background-color: white;
 }
 
@@ -62281,7 +62290,7 @@ gallery img {
   width: 100%;
 }
 
-gallery img ~ img {
+gallery .imageContainer ~ .imageContainer {
   margin-top: 3px;
 }
 

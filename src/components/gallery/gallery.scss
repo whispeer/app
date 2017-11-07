@@ -2,6 +2,12 @@ gallery {
 	$bubble-radius-ios: 15px;
 	$bubble-radius-android: 3px;
 
+	display: block;
+
+	span ~ & {
+		margin-top: 8px;
+	}
+
 	> div {
 		position: relative;
 		overflow: hidden;
@@ -12,6 +18,7 @@ gallery {
 		.md & { border-radius: $bubble-radius-android; } // .md seems to be an android hack.
 
 		.loading {
+			position: relative;
 			background-color: white;
 			> img { opacity: .5 }
 		}
@@ -22,7 +29,9 @@ gallery {
 		width: 100%;
 	}
 
-	img ~ img { margin-top: 3px; }
+	.imageContainer ~ .imageContainer {
+		margin-top: 3px;
+	}
 
 	.overlay {
 		position: absolute;
