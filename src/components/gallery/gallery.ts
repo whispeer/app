@@ -89,12 +89,10 @@ export class GalleryComponent {
 		})
 	}
 
-	isLoading = () => {
-		return this._images.reduce((prev, image) => prev
-			|| image.highest && image.highest.loading
+	isLoading = (image) => {
+		return image.highest && image.highest.loading
 			|| image.middle && image.middle.loading
 			|| image.lowest && image.lowest.loading
-		, false)
 	}
 
 	getProgress = () => {
