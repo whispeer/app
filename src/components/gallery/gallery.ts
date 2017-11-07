@@ -78,10 +78,8 @@ export class GalleryComponent {
 
 			if (!image.lowest.url && image.lowest.width && image.lowest.height) {
 				const canvas = document.createElement("canvas")
-
 				canvas.width = image.lowest.width
 				canvas.height = image.lowest.height
-
 				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(canvas.toDataURL())
 			}
 
@@ -95,9 +93,7 @@ export class GalleryComponent {
 			|| image.lowest && image.lowest.loading
 	}
 
-	getProgress = () => {
-		return 0
-	}
+	getProgress = () => 0
 
 	displayImage = (image) => {
 		if (image.upload) {
