@@ -62268,11 +62268,11 @@ gallery > div {
   border-radius: 3px;
 }
 
-gallery > div.loading {
+gallery > div .loading {
   background-color: white;
 }
 
-gallery > div.loading > img {
+gallery > div .loading > img {
   opacity: .5;
 }
 

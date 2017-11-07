@@ -11,7 +11,7 @@ gallery {
 		border-radius: $bubble-radius-ios;
 		.md & { border-radius: $bubble-radius-android; } // .md seems to be an android hack.
 
-		&.loading {
+		.loading {
 			background-color: white;
 			> img { opacity: .5 }
 		}
