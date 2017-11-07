@@ -78,10 +78,8 @@ export class GalleryComponent {
 
 			if (!image.lowest.url && image.lowest.width && image.lowest.height) {
 				const canvas = document.createElement("canvas")
-
 				canvas.width = image.lowest.width
 				canvas.height = image.lowest.height
-
 				image.lowest.url = this.sanitizer.bypassSecurityTrustUrl(canvas.toDataURL())
 			}
 
@@ -89,17 +87,13 @@ export class GalleryComponent {
 		})
 	}
 
-	isLoading = () => {
-		return this._images.reduce((prev, image) => prev
-			|| image.highest && image.highest.loading
+	isLoading = (image) => {
+		return image.highest && image.highest.loading
 			|| image.middle && image.middle.loading
 			|| image.lowest && image.lowest.loading
-		, false)
 	}
 
-	getProgress = () => {
-		return 0
-	}
+	getProgress = () => 0
 
 	displayImage = (image) => {
 		if (image.upload) {

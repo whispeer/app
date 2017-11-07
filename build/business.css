@@ -62126,24 +62126,43 @@ page-sales strong {
   top: 50%;
 }
 
+gallery {
+  display: block;
+}
+
+span ~ gallery {
+  margin-top: 8px;
+}
+
 gallery > div {
   position: relative;
   overflow: hidden;
   font-size: 0;
   line-height: 0;
-  border-radius: 13px;
+  margin: -3px;
+  border-radius: 15px;
 }
 
 .md gallery > div {
   border-radius: 3px;
 }
 
-gallery > div.loading {
+gallery > div .loading {
+  position: relative;
   background-color: white;
 }
 
-gallery > div.loading > img {
+gallery > div .loading > img {
   opacity: .5;
+}
+
+gallery img {
+  max-width: 100%;
+  width: 100%;
+}
+
+gallery .imageContainer ~ .imageContainer {
+  margin-top: 3px;
 }
 
 gallery .overlay {
