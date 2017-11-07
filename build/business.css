@@ -62185,6 +62185,10 @@ gallery .overlay {
   align-items: center;
 }
 
+gallery button.button {
+  background: transparent;
+}
+
 .progressbar {
   width: 27px;
   height: 27px;
