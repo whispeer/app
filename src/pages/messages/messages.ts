@@ -217,6 +217,12 @@ export class MessagesPage {
 				this.toggleRecording()
 			}
 		}, false);
+
+		document.addEventListener("resume", () => {
+			if (this.isRecordingUIVisible()) {
+				this.recordingPlayer = new VoicemailPlayer(this.recordings)
+			}
+		})
 	}
 
 	@ViewChild('content') content: ElementRef
@@ -449,6 +455,9 @@ export class MessagesPage {
 		this.recordingInfo.updateInterval = window.setInterval(() => {
 			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
 		}, 100)
+
+		VoicemailPlayer.activePlayer.pause()
+		VoicemailPlayer.setPlaybackBlocked(true)
 	}
 
 	formatTime = (seconds) => {
@@ -496,6 +505,8 @@ export class MessagesPage {
 				this.recordingInfo.duration = 0
 
 				this.recordingPlayer = new VoicemailPlayer(this.recordings)
+
+				VoicemailPlayer.setPlaybackBlocked(false)
 			})
 		} else {
 			RecordingStateMachine.go(RecordingStates.Recording)
@@ -509,6 +520,7 @@ export class MessagesPage {
 			this.recordingFile = null
 		}
 
+		VoicemailPlayer.setPlaybackBlocked(false)
 		clearInterval(this.recordingInfo.updateInterval)
 
 		this.recordingPlayer.reset()

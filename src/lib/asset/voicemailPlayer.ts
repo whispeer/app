@@ -13,9 +13,11 @@ export type audioInfo = {
 
 export type recordingsType = recordingType[]
 
+let playBackBlocked = false
+
 export default class VoicemailPlayer {
 
-	private static activePlayer: VoicemailPlayer = null
+	static activePlayer: VoicemailPlayer = null
 	private playing = false
 	private loaded = false
 	private recordings: recordingsType = []
@@ -29,6 +31,10 @@ export default class VoicemailPlayer {
 	}
 
 	play() {
+		if (playBackBlocked) {
+			return
+		}
+
 		if (VoicemailPlayer.activePlayer) {
 			VoicemailPlayer.activePlayer.pause()
 		}
@@ -180,4 +186,6 @@ export default class VoicemailPlayer {
 			Bluebird.resolve().then(() => {})
 		}
 	}
+
+	static setPlaybackBlocked = (blocked: boolean) => playBackBlocked = blocked
 }

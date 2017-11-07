@@ -21,6 +21,8 @@ const loadVoicemail = (voicemail) => {
 	})
 }
 
+let playBackBlocked = false
+
 @Component({
 	selector: "voicemailplayer",
 	templateUrl: "voicemailPlayer.html"
