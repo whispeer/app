@@ -61344,6 +61344,7 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   word-wrap: break-word;
   word-break: break-word;
   white-space: normal;
+  z-index: 0;
 }
 
 .md .messages__message {
@@ -62259,7 +62260,8 @@ gallery > div {
   overflow: hidden;
   font-size: 0;
   line-height: 0;
-  border-radius: 13px;
+  margin: -3px;
+  border-radius: 15px;
 }
 
 .md gallery > div {
@@ -62272,6 +62274,15 @@ gallery > div.loading {
 
 gallery > div.loading > img {
   opacity: .5;
+}
+
+gallery img {
+  max-width: 100%;
+  width: 100%;
+}
+
+gallery img ~ img {
+  margin-top: 3px;
 }
 
 gallery .overlay {
