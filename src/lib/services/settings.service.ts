@@ -140,19 +140,14 @@ const migrateToFormat2 = (givenOldSettings: any) => {
 		var oldSettings = new EncryptedData(givenOldSettings);
 		return oldSettings.decrypt();
 	}).then(decryptedSettings => {
-		var data = turnOldSettingsToNew(decryptedSettings);
+		var { meta, content } = turnOldSettingsToNew(decryptedSettings);
 
-		data.meta.initialLanguage = h.getLanguageFromPath();
+		meta.initialLanguage = h.getLanguageFromPath();
 
-		var ownUser = require("users/userService").default.getOwn();
+		const ownUser = require("users/userService").default.getOwn()
+		const transformedSettings = new Settings(content, meta)
 
-		return SecuredData.createAsync(data.content,
-			data.meta,
-			securedDataOptions,
-			ownUser.getSignKey(),
-			ownUser.getMainKey()
-		)
-
+		return transformedSettings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
 	}).then(signedAndEncryptedSettings => {
 		const settings = SecuredData.load(
 			signedAndEncryptedSettings.content,
@@ -214,13 +209,11 @@ class Settings {
 let settings: Settings
 
 const loadSettings = (givenSettings: any) => {
-	return Bluebird.try(() => {
-		if (givenSettings.ct) {
-			return migrateToFormat2(givenSettings)
-		} else {
-			return SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions)
-		}
-	}).then((secured) => {
+	return Bluebird.try(() =>
+		givenSettings.ct ?
+		migrateToFormat2(givenSettings) :
+		SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions)
+	).then((secured) => {
 		const ownUser = require("users/userService").default.getOwn()
 
 		return Bluebird.all([
