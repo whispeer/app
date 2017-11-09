@@ -94,7 +94,7 @@ function runCacheCallbacks(initRequests) {
 			return !request.options.cache;
 		}
 
-		return request.options.cacheCallback(request.cache).thenReturn(true);
+		return request.options.cacheCallback(request.cache).finally(() => console.log(`inits done: ${request.domain}`)).thenReturn(true);
 	});
 }
 
@@ -144,7 +144,7 @@ function loadData() {
 		time("runCacheCallbacks")
 
 		return Bluebird.all([
-			runInitCacheCallbacks(),
+			runInitCacheCallbacks().finally(() => console.log("inits done")),
 			runCacheCallbacks(initRequests)
 		]).spread(function (customCacheResults, simpleCacheResults) {
 			if (simpleCacheResults.reduce(h.and, true)) {

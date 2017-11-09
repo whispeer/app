@@ -95,8 +95,8 @@ export class SecuredData {
 	};
 
 	sign = (signKey, cb?) => {
-		var toSign = h.deepCopyObj(this._updated.meta);
-		var hashVersion = config.hashVersion;
+		const toSign = h.deepCopyObj(this._updated.meta);
+		const hashVersion = config.hashVersion;
 
 		return Bluebird.try(() => {
 			toSign._version = 1;
@@ -247,20 +247,21 @@ export class SecuredData {
 	};
 
 	_decrypt = () => {
+		debugger
 		if (!this.decryptionPromise) {
 			this.decryptionPromise = keyStore.sym.decryptObject(
-							this.original.encryptedContent,
-							this.encryptDepth,
-							undefined,
-							this.original.meta._key
-					).bind(this).then((decryptedData) => {
-						this.decrypted = true;
-						this.original.paddedContent = decryptedData;
-						this.original.content = keyStore.hash.removePaddingFromObject(decryptedData, 128);
-						this._updated.content = h.deepCopyObj(this.original.content);
+					this.original.encryptedContent,
+					this.encryptDepth,
+					undefined,
+					this.original.meta._key
+			).then((decryptedData) => {
+				this.decrypted = true;
+				this.original.paddedContent = decryptedData;
+				this.original.content = keyStore.hash.removePaddingFromObject(decryptedData, 128);
+				this._updated.content = h.deepCopyObj(this.original.content);
 
-						return this.verifyContentHash();
-					});
+				return this.verifyContentHash();
+			});
 		}
 
 		return this.decryptionPromise;
@@ -269,7 +270,7 @@ export class SecuredData {
 	decrypt = (cb?) => {
 		return Bluebird.resolve().bind(this).then(() => {
 			if (this._hasContent && !this.decrypted) {
-				return this.decrypt();
+				return this._decrypt();
 			}
 		}).then(() => {
 			if (!this._hasContent) {

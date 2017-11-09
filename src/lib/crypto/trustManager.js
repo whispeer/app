@@ -1,7 +1,7 @@
 "use strict";
 
 const Observer = require("asset/observer");
-const SecuredData = require("asset/securedDataWithMetaData").default;
+const SecuredData = require("../asset/securedDataWithMetaData").default;
 const Enum = require("asset/enum");
 const errors = require("asset/errors");
 const Bluebird = require("bluebird");
