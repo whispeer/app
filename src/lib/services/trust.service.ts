@@ -11,7 +11,7 @@ import sessionService from "./session.service";
 const initService = require("services/initService");
 
 import h from "../helper/helper";
-const trustManager = require("crypto/trustManager");
+const trustManager = require("crypto/trustManager").default;
 const signatureCache = require("crypto/signatureCache");
 
 const debug = require("debug");

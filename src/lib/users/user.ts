@@ -24,7 +24,7 @@ import { ProfileLoader } from "../users/profile"
 import { SignedKeysLoader } from "../users/signedKeys"
 
 const friendsService = require("services/friendsService")
-const trustManager = require("crypto/trustManager")
+const trustManager = require("crypto/trustManager").default
 
 const RELOAD_DELAY_MIN = 10 * 1000
 const RELOAD_DELAY_MAX = 60 * 1000

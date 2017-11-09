@@ -1,18 +1,22 @@
 "use strict";
 
-const Observer = require("asset/observer");
-const SecuredData = require("../asset/securedDataWithMetaData").default;
-const Enum = require("asset/enum");
+import Observer from "asset/observer"
+import SecuredData from "../asset/securedDataWithMetaData"
+import Enum from "../asset/enum"
 const errors = require("asset/errors");
-const Bluebird = require("bluebird");
-var database, loaded = false,
+import * as Bluebird from "bluebird"
+
+let database, loaded = false,
 	trustManager;
+let fakeKeyExistence = 0,
+	ownKey, specialKeys = ["me", "nicknames", "ids"];
 
-var sortedTrustStates = ["BROKEN", "UNTRUSTED", "TIMETRUSTED", "WHISPEERVERIFIED", "NETWORKVERIFIED", "VERIFIED", "OWN"];
 
-var trustStates = new Enum.default(sortedTrustStates);
+const sortedTrustStatesNames = ["BROKEN", "UNTRUSTED", "TIMETRUSTED", "WHISPEERVERIFIED", "NETWORKVERIFIED", "VERIFIED", "OWN"];
 
-sortedTrustStates = sortedTrustStates.map(function(trustLevel) {
+const trustStates = new Enum(sortedTrustStatesNames);
+
+const sortedTrustStates = sortedTrustStatesNames.map(function(trustLevel) {
 	return trustStates.fromString("|" + trustLevel + "|");
 });
 
@@ -68,10 +72,10 @@ function KeyTrustData(data) {
 	};
 }
 
-function userToDataSet({ key, userid, nickname }, trustLevel) {
+function userToDataSet({ key, userid, nickname }, trustLevel = trustStates.UNTRUSTED) {
 	var content = {
 		added: new Date().getTime(),
-		trust: serializeTrust(trustLevel || trustStates.UNTRUSTED),
+		trust: serializeTrust(trustLevel),
 		key,
 		userid,
 		nickname
@@ -79,9 +83,6 @@ function userToDataSet({ key, userid, nickname }, trustLevel) {
 
 	return content;
 }
-
-var fakeKeyExistence = 0,
-	ownKey, specialKeys = ["me", "nicknames", "ids"];
 
 trustManager = {
 	allow: function(count) {
@@ -97,7 +98,7 @@ trustManager = {
 		return loaded;
 	},
 	createDatabase: function({ key, userid, nickname }) {
-		var data = {};
+		var data : any = {};
 
 		data.nicknames = {}
 		data.ids = {}
@@ -261,4 +262,4 @@ trustManager = {
 
 Observer.extend(trustManager);
 
-module.exports = trustManager;
+export default trustManager;

@@ -24,6 +24,7 @@ export class InternalSymbol {
 }
 
 export default class Enum {
+  [x: string]: any
   _symbols: InternalSymbol[] = [];
 
   constructor(obj: any) {

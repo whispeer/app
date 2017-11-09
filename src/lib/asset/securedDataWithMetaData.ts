@@ -242,7 +242,6 @@ export class SecuredData {
 	};
 
 	_decrypt = () => {
-		debugger
 		if (!this.decryptionPromise) {
 			this.decryptionPromise = keyStore.sym.decryptObject(
 					this.original.encryptedContent,
