@@ -227,7 +227,7 @@ const loadSettings = (givenSettings: any) => {
 
 		return Bluebird.all([
 			secured.decrypt(),
-			secured.verify(ownUser.getSignKey(), null, "settings")
+			secured.verifyAsync(ownUser.getSignKey(), "settings")
 		]).thenReturn(secured)
 	}).then((secured) => ({
 		content: secured.contentGet(),
