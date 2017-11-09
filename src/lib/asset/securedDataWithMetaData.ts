@@ -31,7 +31,6 @@ export class SecuredData {
 	private attributesNotVerified: string[]
 	private decrypted: boolean
 	private _hasContent: boolean
-	private isKeyVerified: boolean
 	private changed: boolean
 
 	private original
@@ -72,8 +71,6 @@ export class SecuredData {
 		}
 
 		this._updated = h.deepCopyObj(this.original);
-
-		this.isKeyVerified = false;
 	}
 
 	private blockDisallowedAttributes = (data) => {
@@ -153,11 +150,11 @@ export class SecuredData {
 			throw new Error("can only sign and not encrypt");
 		}
 
-		if (this.original.meta._key && (this.original.meta._key !== cryptKey || !this.isKeyVerified)) {
+		if (this.original.meta._key && this.original.meta._key !== cryptKey) {
 			throw new Error("can not re-encrypt an old object with new key!");
 		}
 
-		return keyStore.hash.addPaddingToObject(this._updated.content, 128).bind(this).then((paddedContent) => {
+		return keyStore.hash.addPaddingToObject(this._updated.content, 128).then((paddedContent) => {
 			this._updated.paddedContent = paddedContent;
 
 			this._updated.meta._key = keyStore.correctKeyIdentifier(cryptKey);
@@ -198,7 +195,7 @@ export class SecuredData {
 			//check contentHash is correct
 			//check signature is correct
 
-		return Bluebird.resolve().bind(this).then(() => {
+		return Bluebird.resolve().then(() => {
 			var metaCopy = h.deepCopyObj(this.original.meta);
 
 			this.attributesNotVerified.forEach((attr) => {
@@ -232,8 +229,6 @@ export class SecuredData {
 
 			return this.verifyContentHash();
 		}).then(() => {
-			this.isKeyVerified = true;
-
 			return true;
 		});
 	};
@@ -268,7 +263,7 @@ export class SecuredData {
 	};
 
 	decrypt = (cb?) => {
-		return Bluebird.resolve().bind(this).then(() => {
+		return Bluebird.resolve().then(() => {
 			if (this._hasContent && !this.decrypted) {
 				return this._decrypt();
 			}
@@ -286,40 +281,24 @@ export class SecuredData {
 			return Bluebird.resolve()
 		}
 
-		return Bluebird.bind(this).then(() => {
-			return keyStore.hash.hashObjectOrValueHexAsync(this.original.paddedContent || this.original.content);
-		}).then((hash) => {
+		return Bluebird.try(() =>
+			keyStore.hash.hashObjectOrValueHexAsync(this.original.paddedContent || this.original.content)
+		).then((hash) => {
 			if (hash !== this.original.meta._contentHash) {
 				throw new errors.SecurityError("content hash did not match");
 			}
 		})
 	};
 
-	isChanged = () => {
-		return this.changed;
-	};
-	isEncrypted = () => {
-		return !this.decrypted;
-	};
-	isDecrypted = () => {
-		return this.decrypted;
-	};
+	isChanged = () => this.changed
+	isEncrypted = () => !this.decrypted
+	isDecrypted = () => this.decrypted;
 
-	contentGet = () => {
-		return h.deepCopyObj(this._updated.content);
-	};
-	metaGet = () => {
-		return h.deepCopyObj(this._updated.meta);
-	};
-	metaHasAttr = (attr) => {
-		return this._updated.meta.hasOwnProperty(attr);
-	};
-	metaKeys = () => {
-		return Object.keys(this._updated.meta).filter((key) => key[0] !== "_")
-	};
-	metaAttr = (attr) => {
-		return h.deepCopyObj(this._updated.meta[attr]);
-	};
+	contentGet = () => h.deepCopyObj(this._updated.content)
+	metaGet = () => h.deepCopyObj(this._updated.meta)
+	metaHasAttr = (attr) => this._updated.meta.hasOwnProperty(attr)
+	metaKeys = () => Object.keys(this._updated.meta).filter((key) => key[0] !== "_")
+	metaAttr = (attr) =>  h.deepCopyObj(this._updated.meta[attr])
 
 	/** sets the whole content to the given data
 			@param newContent new value for this objects content
