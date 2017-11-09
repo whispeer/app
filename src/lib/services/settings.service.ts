@@ -132,73 +132,116 @@ const turnOldSettingsToNew = (settings: any) => {
 	return result;
 }
 
-class SettingsService extends Observer {
+const migrateToFormat2 = (givenOldSettings: any) => {
+	console.warn("migrating settings to format 2");
 
-	settings: any;
-	serverSettings = {};
+	return Bluebird.try(() => {
+		keyStore.security.allowPrivateActions();
+		var oldSettings = new EncryptedData(givenOldSettings);
+		return oldSettings.decrypt();
+	}).then(decryptedSettings => {
+		var data = turnOldSettingsToNew(decryptedSettings);
+
+		data.meta.initialLanguage = h.getLanguageFromPath();
+
+		var ownUser = require("users/userService").default.getOwn();
+
+		return SecuredData.createAsync(data.content,
+			data.meta,
+			securedDataOptions,
+			ownUser.getSignKey(),
+			ownUser.getMainKey()
+		)
+
+	}).then(signedAndEncryptedSettings => {
+		const settings = SecuredData.load(
+			signedAndEncryptedSettings.content,
+			signedAndEncryptedSettings.meta,
+			securedDataOptions
+		)
+
+		return socketService.emit("settings.setSettings", {
+			settings: signedAndEncryptedSettings,
+		}).thenReturn(settings);
+	})
+}
+
+class Settings {
+	private changed = false
+
+	constructor (private content, private meta, private server = {}) {}
+
+	getContent = () => this.content
+	getMeta = () => this.meta
+	getServer = () => this.server
+
+	getBranch = (branchName) => {
+		if (isBranchServer(branchName)) {
+			return this.server[branchName];
+		}
+
+		if (isBranchPublic(branchName)) {
+			return this.meta[branchName];
+		}
+
+		return this.content[branchName];
+	}
+
+	isChanged = () => this.changed
+
+	setBranch = (branchName, value) => {
+		if (isBranchServer(branchName)) {
+			this.server[branchName] = value
+		} else if (isBranchPublic(branchName)) {
+			this.meta[branchName] = value
+		} else {
+			this.content[branchName] = value
+		}
+
+		this.changed = true
+	}
+
+	getUpdatedData = (signKey, encryptKey) =>
+		SecuredData.createAsync(this.content, this.meta, securedDataOptions, signKey, encryptKey)
+			.then((encryptedSettings) => {
+				return {
+					...encryptedSettings,
+					server: this.server
+				}
+			})
+}
+
+let settings: Settings
+
+const loadSettings = (givenSettings: any) => {
+	return Bluebird.try(() => {
+		if (givenSettings.ct) {
+			return migrateToFormat2(givenSettings)
+		} else {
+			return SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions)
+		}
+	}).then((secured) => {
+		const ownUser = require("users/userService").default.getOwn()
+
+		return Bluebird.all([
+			secured.decrypt(),
+			secured.verify(ownUser.getSignKey(), null, "settings")
+		]).thenReturn(secured)
+	}).then((secured) => {
+		settings = new Settings(secured.contentGet(), secured.metaGet(), givenSettings.server)
+	})
+}
+
+class SettingsService extends Observer {
 	api: any;
 
 	loadCachePromise = Bluebird.resolve();
-
-	private migrateToFormat2 = (givenOldSettings: any) => {
-		console.warn("migrating settings to format 2");
-
-		return Bluebird.try(() => {
-			keyStore.security.allowPrivateActions();
-			var oldSettings = new EncryptedData(givenOldSettings);
-			return oldSettings.decrypt();
-		}).then(decryptedSettings => {
-			var data = turnOldSettingsToNew(decryptedSettings);
-
-			data.meta.initialLanguage = h.getLanguageFromPath();
-
-			var ownUser = require("users/userService").default.getOwn();
-
-			return SecuredData.createAsync(data.content,
-				data.meta,
-				securedDataOptions,
-				ownUser.getSignKey(),
-				ownUser.getMainKey()
-			)
-
-		}).then(signedAndEncryptedSettings => {
-			this.settings = SecuredData.load(
-				signedAndEncryptedSettings.content,
-				signedAndEncryptedSettings.meta,
-				securedDataOptions
-			)
-
-			return socketService.emit("settings.setSettings", {
-				settings: signedAndEncryptedSettings,
-			}).thenReturn(this.settings);
-		})
-	}
-
-	loadSettings = (givenSettings: any) => {
-		this.serverSettings = givenSettings.server || {};
-
-		return Bluebird.try(() => {
-			if (givenSettings.ct) {
-				return this.migrateToFormat2(givenSettings);
-			} else {
-				return SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions);
-			}
-		}).then(_settings => {
-			this.settings = _settings;
-
-			var decryptAsync = Bluebird.promisify(this.decrypt.bind(this));
-
-			return decryptAsync();
-		}).then(() => {
-			this.notify("", "loaded");
-		});
-	}
 
 	loadFromCache = (cacheEntry: any) => {
 		var userService = require("users/userService").default;
 
 		this.loadCachePromise = userService.getOwnAsync().then(() => {
-			return this.loadSettings(cacheEntry.data);
+			return loadSettings(cacheEntry.data);
 		});
 
 		return this.loadCachePromise;
@@ -215,13 +258,13 @@ class SettingsService extends Observer {
 
 			var userService = require("users/userService").default;
 			return userService.getOwnAsync().then(() => {
-				return this.loadSettings(givenSettings);
+				return loadSettings(givenSettings);
 			}).thenReturn(toCache);
 		});
 	}
 
 	constructor() {
-		super();
+		super()
 
 		initService.get("settings.get", this.loadFromServer, {
 			cacheCallback: this.loadFromCache
@@ -230,35 +273,12 @@ class SettingsService extends Observer {
 
 	setDefaultLanguage = (language: string) => defaultSettings.uiLanguage = language
 
-	getContent = () => this.settings.contentGet()
+	getContent = () => settings.getContent()
 
-	setContent = (content: any) => this.settings.contentSet(content)
-
-	decrypt = (cb: Function) => {
-		return Bluebird.try(() => {
-			var ownUser = require("users/userService").default.getOwn();
-
-			return Bluebird.all([
-				this.settings.decrypt(),
-				this.settings.verify(ownUser.getSignKey(), null, "settings")
-			]);
-		}).nodeify(cb);
-	};
-
-	getBranchContent = (branchName: string) => {
-		if (isBranchServer(branchName)) {
-			return this.serverSettings[branchName];
-		}
-
-		if (isBranchPublic(branchName)) {
-			return this.settings.metaAttr(branchName);
-		}
-
-		return this.settings.contentGet()[branchName];
-	}
+	getBranchContent = (branchName: string) => settings.getBranch(branchName)
 
 	getBranch = (branchName: string) => {
-		if (!this.settings) {
+		if (!settings) {
 			return defaultSettings[branchName];
 		}
 
@@ -271,17 +291,10 @@ class SettingsService extends Observer {
 		return branchContent;
 	};
 
-	updateBranch = (branchName: any, value: any) => {
-		if (isBranchServer(branchName)) {
-			this.serverSettings[branchName] = value;
-		} else if (isBranchPublic(branchName)) {
-			this.settings.metaSetAttr(branchName, value);
-		} else {
-			this.settings.contentSetAttr(branchName, value);
-		}
-
+	updateBranch = (branchName: string, value: any) => {
+		settings.setBranch(branchName, value)
 		this.notify("", "updated");
-	};
+	}
 
 
 	setPrivacy = (privacy: any) => {
@@ -310,23 +323,16 @@ class SettingsService extends Observer {
 	}
 
 	uploadChangedData = () => {
-		if (!this.settings.isChanged()) {
+		if (!settings.isChanged()) {
 			return Bluebird.resolve(true)
 		}
 
-		var userService = require("users/userService").default;
+		const userService = require("users/userService").default;
+		const ownUser = userService.getOwn()
 
-		return this.settings.getUpdatedData(
-				userService.getOwn().getSignKey()
-			).then((newEncryptedSettings: any) => {
-				newEncryptedSettings.server = this.serverSettings;
-
-				return socketService.emit("settings.setSettings", {
-					settings: newEncryptedSettings
-				});
-			}).then((result: any) =>
-				result.success
-			)
+		return settings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
+			.then((settings: any) => socketService.emit("settings.setSettings", { settings }))
+			.then((result: any) => result.success)
 	};
 
 	getBlockedUsers = (): blockedUserInfo[] => this.getBranch("safety").blockedUsers
