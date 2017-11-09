@@ -61,16 +61,6 @@ function getServerData(initRequests) {
 			responseKey: "content"
 		};
 
-		var id = request.id;
-
-		if (typeof id === "function") {
-			id = id();
-		}
-
-		if (typeof id !== "undefined") {
-			requestObject.id = id;
-		}
-
 		if (request.cache && request.cache.data) {
 			if (request.cache.data._signature) {
 				requestObject.cacheSignature = request.cache.data._signature;
