@@ -106,22 +106,21 @@ function runCallbacks(initResponses) {
 	});
 }
 
-function runInitCallbacks() {
-	return Bluebird.all(initCallbacks.map((func) => func()));
-}
+const getCaches = (initRequests) =>
+	Bluebird.all(initRequests.map((initRequest) => getCache(initRequest)))
 
 function loadData() {
 	keyStore.security.blockPrivateActions();
 
-	var promise = Bluebird.resolve().then(function () {
+	var promise = Bluebird.resolve().then(() => {
 		time("getCache");
-		return initRequestsList;
-	}).map((initRequest) => getCache(initRequest)).then(function (initRequests) {
+		return getCaches(initRequestsList)
+	}).then(function (initRequests) {
 		timeEnd("getCache");
 		time("runCacheCallbacks")
 
 		return Bluebird.all([
-			runInitCallbacks(),
+			Bluebird.all(initCallbacks.map((func) => func())),
 			runCacheCallbacks(initRequests).catch(errorService.criticalError)
 		]).thenReturn(initRequests);
 	}).then(function (initRequests) {
