@@ -54,8 +54,7 @@ class TrustService {
 		window.setInterval(this.storeSignatureCache, STORESIGNATURECACHEINTERVAL);
 
 		initService.get("trustManager.get", this.onInit, {
-			cacheCallback: this.loadFromCache,
-			cache: true
+			cacheCallback: this.loadFromCache
 		});
 
 		socketService.channel("notify.trustManager", function (_e: any, data: any) {

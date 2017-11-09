@@ -89,39 +89,25 @@ function getServerData(initRequests) {
 
 function runCacheCallbacks(initRequests) {
 	return Bluebird.all(initRequests).map(function (request) {
-		if (!request.cache || !request.options.cacheCallback) {
-			return !request.options.cache;
-		}
-
 		return request.options.cacheCallback(request.cache).thenReturn(true);
 	});
 }
 
 function runCallbacks(initResponses) {
 	return Bluebird.all(initResponses).map(function (response) {
-		var callback = response.callback;
+		return response.callback(response.data.content).then(function (transformedData) {
+			initServiceDebug("Callback done:" + response.domain);
+			if (!transformedData) {
+				return;
+			}
 
-		if (response.options.cache) {
-			return callback(response.data.content).then(function (transformedData) {
-				initServiceDebug("Callback done:" + response.domain);
-				if (!transformedData) {
-					return;
-				}
-
-				return setCache(response, transformedData);
-			});
-		}
-
-		return callback(response.data.content);
+			return setCache(response, transformedData);
+		});
 	});
 }
 
-function runFunction(func) {
-	return func();
-}
-
 function runInitCallbacks() {
-	return Bluebird.all(initCallbacks.map(runFunction));
+	return Bluebird.all(initCallbacks.map((func) => func()));
 }
 
 function loadData() {
@@ -130,20 +116,14 @@ function loadData() {
 	var promise = Bluebird.resolve().then(function () {
 		time("getCache");
 		return initRequestsList;
-	}).map(function (initRequest) {
-		if (initRequest.options.cache) {
-			return getCache(initRequest);
-		} else {
-			return initRequest;
-		}
-	}).then(function (initRequests) {
+	}).map((initRequest) => getCache(initRequest)).then(function (initRequests) {
 		timeEnd("getCache");
 		time("runCacheCallbacks")
 
 		return Bluebird.all([
 			runInitCallbacks(),
-			runCacheCallbacks(initRequests)
-		]).catch(errorService.criticalError).thenReturn(initRequests);
+			runCacheCallbacks(initRequests).catch(errorService.criticalError)
+		]).thenReturn(initRequests);
 	}).then(function (initRequests) {
 		timeEnd("runCacheCallbacks")
 

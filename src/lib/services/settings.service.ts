@@ -224,8 +224,7 @@ class SettingsService extends Observer {
 		super();
 
 		initService.get("settings.get", this.loadFromServer, {
-			cacheCallback: this.loadFromCache,
-			cache: true
+			cacheCallback: this.loadFromCache
 		});
 	}
 
