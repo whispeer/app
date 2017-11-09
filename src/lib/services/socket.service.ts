@@ -2,7 +2,7 @@ const APIVERSION = "0.0.3";
 
 const debug = require("debug");
 import h from "../helper/helper";
-import { connect } from "socket.io-client";
+import SocketIOClient, { connect } from "socket.io-client"; // tslint:disable-line:no-unused-variable
 
 const config = require('../config.js');
 import * as Bluebird from "bluebird";

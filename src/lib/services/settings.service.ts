@@ -5,6 +5,10 @@ import * as keyStore from "../crypto/keyStore.js";
 import Observer from "../asset/observer";
 
 const initService = require("services/initService");
+import sessionService from "services/session.service"
+import MutableObjectLoader, { UpdateEvent } from "../services/mutableObjectLoader"
+
+const RELOAD_DELAY = 10000
 
 interface IVisibility {
 	encrypt: boolean,
@@ -196,6 +200,13 @@ class Settings {
 		this.changed = true
 	}
 
+	update = (content, meta, server) => {
+		this.content = content
+		this.meta = meta
+		this.server = server
+		this.changed = false
+	}
+
 	getUpdatedData = (signKey, encryptKey) =>
 		SecuredData.createAsync(this.content, this.meta, securedDataOptions, signKey, encryptKey)
 			.then((encryptedSettings) => {
@@ -205,8 +216,6 @@ class Settings {
 				}
 			})
 }
-
-let settings: Settings
 
 const loadSettings = (givenSettings: any) => {
 	return Bluebird.try(() =>
@@ -220,58 +229,27 @@ const loadSettings = (givenSettings: any) => {
 			secured.decrypt(),
 			secured.verify(ownUser.getSignKey(), null, "settings")
 		]).thenReturn(secured)
-	}).then((secured) => {
-		settings = new Settings(secured.contentGet(), secured.metaGet(), givenSettings.server)
-	})
+	}).then((secured) => ({
+		content: secured.contentGet(),
+		meta: secured.metaGet(),
+		server: givenSettings.server
+	}))
 }
 
 class SettingsService extends Observer {
 	api: any;
+	settings: Settings
 
-	loadCachePromise = Bluebird.resolve();
-
-	loadFromCache = (cacheEntry: any) => {
-		var userService = require("users/userService").default;
-
-		this.loadCachePromise = userService.getOwnAsync().then(() => {
-			return loadSettings(cacheEntry.data);
-		});
-
-		return this.loadCachePromise;
-	}
-
-	loadFromServer = (data: any) => {
-		return this.loadCachePromise.then(() => {
-			if (data.unChanged) {
-				return Bluebird.resolve();
-			}
-
-			var givenSettings = data.content;
-			var toCache = h.deepCopyObj(givenSettings);
-
-			var userService = require("users/userService").default;
-			return userService.getOwnAsync().then(() => {
-				return loadSettings(givenSettings);
-			}).thenReturn(toCache);
-		});
-	}
-
-	constructor() {
-		super()
-
-		initService.get("settings.get", this.loadFromServer, {
-			cacheCallback: this.loadFromCache
-		});
-	}
+	constructor() { super() }
 
 	setDefaultLanguage = (language: string) => defaultSettings.uiLanguage = language
 
-	getContent = () => settings.getContent()
+	getContent = () => this.settings.getContent()
 
-	getBranchContent = (branchName: string) => settings.getBranch(branchName)
+	getBranchContent = (branchName: string) => this.settings.getBranch(branchName)
 
 	getBranch = (branchName: string) => {
-		if (!settings) {
+		if (!this.settings) {
 			return defaultSettings[branchName];
 		}
 
@@ -285,10 +263,9 @@ class SettingsService extends Observer {
 	};
 
 	updateBranch = (branchName: string, value: any) => {
-		settings.setBranch(branchName, value)
+		this.settings.setBranch(branchName, value)
 		this.notify("", "updated");
 	}
-
 
 	setPrivacy = (privacy: any) => {
 		return Bluebird.try(() => {
@@ -316,14 +293,14 @@ class SettingsService extends Observer {
 	}
 
 	uploadChangedData = () => {
-		if (!settings.isChanged()) {
+		if (!this.settings.isChanged()) {
 			return Bluebird.resolve(true)
 		}
 
 		const userService = require("users/userService").default;
 		const ownUser = userService.getOwn()
 
-		return settings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
+		return this.settings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
 			.then((settings: any) => socketService.emit("settings.setSettings", { settings }))
 			.then((result: any) => result.success)
 	};
@@ -381,3 +358,53 @@ class SettingsService extends Observer {
 };
 
 export default new SettingsService();
+
+
+type CachedSettings = {
+	content: any,
+	meta: any,
+	server: any
+}
+
+class SettingsLoader extends MutableObjectLoader<Settings, CachedSettings>({
+	download: (id, previousInstance: Settings) =>
+		socketService.awaitConnection()
+			.then(() => socketService.definitlyEmit("settings.get", {
+				responseKey: "content",
+				cacheSignature: previousInstance && previousInstance.getMeta()._signature
+			}))
+			.then((response) => response.content),
+	load: (response, previousInstance) => {
+		if (previousInstance && response.unChanged) {
+			return Bluebird.resolve({
+				content: previousInstance.getContent(),
+				meta: previousInstance.getMeta(),
+				server: response.content.server
+			})
+		}
+
+		return loadSettings(response.content)
+	},
+	restore: ({ content, meta, server }, previousInstance) => {
+		if (previousInstance) {
+			previousInstance.update(content, meta, server)
+			return previousInstance
+		}
+
+		return new Settings(content, meta, server)
+	},
+	shouldUpdate: (event, instance) => {
+		if (event === UpdateEvent.wake) {
+			return Bluebird.delay(RELOAD_DELAY).thenReturn(true)
+		}
+
+		return Bluebird.resolve(false)
+	},
+	getID: (settingsData) => sessionService.getUserID(),
+	cacheName: "settings"
+}) {}
+
+initService.registerCallback(() =>
+	SettingsLoader.get(sessionService.getUserID())
+		.then((settings) => this.settings = settings)
+)
