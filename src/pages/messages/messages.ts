@@ -273,6 +273,10 @@ export class MessagesPage {
 		if (!RecordingStateMachine.is(RecordingStates.NotRecording)) {
 			this.discardRecording()
 		}
+
+		if (VoicemailPlayer.activePlayer) {
+			VoicemailPlayer.activePlayer.reset()
+		}
 	}
 
 	mutationListener = (mutations) => {
