@@ -13,11 +13,12 @@
       "ios"
     ],
     "plugins": {
-      "com-sarriaroman-photoviewer": {},
-      "com.synconset.imagepicker": {
+      "ImagePicker": {
         "CAMERA_USAGE_DESCRIPTION": "whispeer needs access to your Camera to allow you to take Photos directly from the app.",
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
       },
+      "com-sarriaroman-photoviewer": {},
+      "cordova-filechooser": {},
       "cordova-plugin-camera": {
         "CAMERA_USAGE_DESCRIPTION": "whispeer needs access to your Camera to allow you to take Photos directly from the app.",
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
@@ -26,7 +27,6 @@
       "cordova-plugin-device": {},
       "cordova-plugin-file": {},
       "cordova-plugin-file-opener2": {},
-      "cordova-plugin-filechooser": {},
       "cordova-plugin-filepicker": {},
       "cordova-plugin-globalization": {},
       "cordova-plugin-inappbrowser": {},
@@ -76,21 +76,21 @@
     "@types/node": "^6.0.52",
     "@types/socket.io-client": "^1.4.29",
     "@types/webpack": "^2.0.0",
+    "ImagePicker": "https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse",
     "amanda": "~0.4.7",
     "angular2-qrcode": "^2.0.1",
     "bluebird": "^3.4.7",
     "blueimp-canvas-to-blob": "^3.11.0",
     "blueimp-load-image": "^2.10.0",
     "com-sarriaroman-photoviewer": "~1.1.10",
-    "com.synconset.imagepicker": "https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse",
-    "cordova-android": "~6.2.1",
-    "cordova-ios": "^4.5.0",
+    "cordova-android": "~6.3.0",
+    "cordova-filechooser": "https://github.com/whispeer/cordova-filechooser.git#feature/full_path",
+    "cordova-ios": "^4.5.2",
     "cordova-plugin-camera": "https://github.com/whispeer/cordova-plugin-camera.git#fix/tmp-image-reuse",
     "cordova-plugin-compat": "~1.1.0",
     "cordova-plugin-device": "~1.1.4",
     "cordova-plugin-file": "~4.3.1",
     "cordova-plugin-file-opener2": "^2.0.19",
-    "cordova-plugin-filechooser": "^1.0.1",
     "cordova-plugin-filepicker": "^1.1.4",
     "cordova-plugin-globalization": "~1.0.5",
     "cordova-plugin-inappbrowser": "~1.7.1",
@@ -111,7 +111,7 @@
     "moment": "^2.18.1",
     "phonegap-plugin-barcodescanner": "~6.0.6",
     "phonegap-plugin-push": "1.9.1",
-    "prettysize": "^0.1.0",
+    "qrious": "^4.0.2",
     "rxjs": "~5.4.0",
     "sjcl": "git+https://github.com/whispeer/sjcl.git#custom-build",
     "socket.io-client": "~2.0.2",
@@ -152,5 +152,5 @@
     "ionic:serve": "ionic-app-scripts serve --dev",
     "start": "npm run ionic:serve"
   },
-  "version": "0.3.5"
+  "version": "0.3.7"
 }

@@ -51,8 +51,18 @@
 	"topic": {
 		"takePhoto": "Take a Photo",
 		"selectGallery": "Select from Gallery",
+		"selectFile": "Send a File",
+		"fileTooBigTitle": "The size is too damn high!",
+		"fileTooBigDetail": "File uploads are currently limited to {{max_size}}MB.",
 		"changed": "changed the title to",
 		"detail": {
+			"title": "Details",
+			"chatTitle": "Conversation Title",
+			"allMembers": "All Members",
+			"admin": "Administrator",
+			"member": "Member",
+			"addMore": "Add more contacts...",
+			"reportTopic": "Report this Chat",
 			"reportTopic": "Report this Chat",
 			"reportConfirm": {
 				"title": "Report this Chat?",
@@ -90,7 +100,11 @@
 		"humanRights": "for human rights",
 		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
 		"logoutWarning": "Do you want to log out from this device?",
-		"blocked": "Blocked Users"
+		"blocked": "Blocked Users",
+		"backup": {
+			"button": "Show Backup-Key",
+			"confirm": "This key is used to recover your password in case you forget it. Please handle this key with care."
+		}
 	},
 	"blocked": {
 		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",

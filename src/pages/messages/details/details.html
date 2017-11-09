@@ -1,7 +1,7 @@
 <ion-header>
 
 	<ion-navbar [color]="'primary'" no-border>
-		<ion-title>Details</ion-title>
+		<ion-title>{{ "topic.detail.title" | translate }}</ion-title>
 	</ion-navbar>
 
 </ion-header>
@@ -13,7 +13,7 @@
 	<ion-list *ngIf="!loading">
 
 		<ion-list-header padding-top>
-			Conversation Title
+			{{ "topic.detail.chatTitle" | translate }}
 		</ion-list-header>
 
 		<ion-item class="no--padding--right">
@@ -25,7 +25,7 @@
 		</ion-item>
 
 		<ion-list-header padding-top>
-			All Members
+			{{ "topic.detail.allMembers" | translate }}
 		</ion-list-header>
 
 		<ion-item-sliding #item *ngFor="let receiver of getReceivers();">
@@ -39,10 +39,10 @@
 						{{ receiver.name }}
 					</h2>
 					<small *ngIf="isAdmin(receiver.user)">
-						Administrator
+						{{ "topic.detail.admin" | translate }}
 					</small>
 					<small *ngIf="!isAdmin(receiver.user)">
-						Member
+						{{ "topic.detail.member" | translate }}
 					</small>
 				</span>
 			</ion-item>
@@ -56,14 +56,12 @@
 		</ion-item-sliding>
 
 		<ion-item detail-push tappable (click)="addContact()" *ngIf="featureEnabled('chat.addReceiver') && amIAdmin()">
-			Add more contacts...
+			{{ "topic.detail.addMore" | translate }}
 		</ion-item>
 	</ion-list>
 
-	<button *ngIf="!loading" ion-button full color="danger" (click)="report()">{{ 'topic.detail.reportTopic' | translate }}</button>
+	<button *ngIf="!loading && !chat.isDraft()" ion-button full color="danger" (click)="report()">{{ 'topic.detail.reportTopic' | translate }}</button>
 
-	<div text-center class="space-for-fab" *ngIf="!loading"></div>
-
-	<navigator [icon]="'close'" (invoke)="close()" ion-fixed></navigator>
+	<div text-center *ngIf="!loading"></div>
 
 </ion-content>

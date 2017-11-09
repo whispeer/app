@@ -99,6 +99,10 @@ export class NewMessagePage extends ContactsWithSearch {
 	}
 
 	send = (users) => {
+		if (users.length === 0) {
+			return
+		}
+
 		this.loading = true
 		this.sendToUserTopic(users).then((chatID) => {
 			if (chatID) {
@@ -153,5 +157,9 @@ export class NewMessagePage extends ContactsWithSearch {
 		this.navCtrl.push("Messages", { chatID }).then(() => {
 			this.navCtrl.remove(this.navCtrl.length() - 2, 1)
 		})
+	}
+
+	closeSearchBar = ($event) => {
+		$event.srcElement.blur()
 	}
 }

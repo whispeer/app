@@ -145,6 +145,7 @@ $searchbar-toolbar-ios-background-color: #3f9908;
 	$login-business-switch-highlight-color: $isabelline;
 
 	$message-bubble-color: map-get($colors, grey);
+	$message-sending-bubble-color: map-get($colors, sending);
 
 	$svg-fill-primary: map-get($colors, primary);
 	$svg-fill-primaryDark: map-get($colors, primary);

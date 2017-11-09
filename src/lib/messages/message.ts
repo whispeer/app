@@ -66,6 +66,7 @@ export class Message {
 
 		this.setDefaultData()
 
+
 		this.data.sender = sender.data
 		this.isOwnMessage = sender.isOwn()
 
@@ -131,6 +132,18 @@ export class Message {
 	isBlocked = () =>
 		settings.isBlocked(this.data.sender.id)
 
+	hasFiles = () =>
+		this.data.files && this.data.files.length > 0
+
+	hasVoicemail = () =>
+		this.data.voicemails && this.data.voicemails.length > 0
+
+	hasText = () =>
+		this.data.text && this.data.text.length > 0
+
+	hasImages = () =>
+		this.data.images && this.data.images.length > 0
+
 	private prepareAttachments = () => {
 		return Bluebird.all([
 			Message.prepare(this.attachments.files),
@@ -154,7 +167,7 @@ export class Message {
 
 				securedData.metaSetAttr("voicemails", voicemailsInfo.map((info) => info.meta))
 				securedData.contentSetAttr("voicemails", voicemailsInfo.map((info) => info.content))
-			} else {
+			} else if (typeof securedData.contentGet() !== "string") {
 				securedData.contentSet(securedData.contentGet().message)
 			}
 		})
@@ -179,9 +192,7 @@ export class Message {
 		return this.chunkID || this.chat.getLatestChunk()
 	}
 
-	hasBeenSent = () => {
-		return this.wasSent
-	}
+	hasBeenSent = () => this.wasSent
 
 	uploadAttachments = h.cacheResult<Bluebird<any>>((chunkKey) => {
 		return this.prepareAttachments().then(() => {

@@ -243,6 +243,10 @@
     "@types/tapable" "*"
     "@types/uglify-js" "*"
 
+"ImagePicker@https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse":
+  version "2.1.8"
+  resolved "https://github.com/whispeer/ImagePicker.git#2810f3506cd86b82c731609718db4aa8798ced05"
+
 abbrev@1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.0.tgz#d0554c2256636e2f56e7c2e5ad183f859428d81f"
@@ -310,6 +314,10 @@ amanda@~0.4.7:
 amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
+
+android-versions@^1.2.0:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/android-versions/-/android-versions-1.2.1.tgz#3f50baf693e73a512c3c5403542291cead900063"
 
 angular2-qrcode@^2.0.1:
   version "2.0.1"
@@ -1570,10 +1578,6 @@ com-sarriaroman-photoviewer@~1.1.10:
   version "1.1.10"
   resolved "https://registry.yarnpkg.com/com-sarriaroman-photoviewer/-/com-sarriaroman-photoviewer-1.1.10.tgz#e18f1535751fe105ae180c4fc5a164120471900d"
 
-"com.synconset.imagepicker@https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse":
-  version "2.1.8"
-  resolved "https://github.com/whispeer/ImagePicker.git#7ce8644312a4c74efa9c8e7820a67b2096ce0bc8"
-
 combined-stream@^1.0.5, combined-stream@~1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
@@ -1671,18 +1675,19 @@ cookiejar@^2.0.6:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/cookiejar/-/cookiejar-2.1.1.tgz#41ad57b1b555951ec171412a81942b1e8200d34a"
 
-cordova-android@~6.2.1:
-  version "6.2.3"
-  resolved "https://registry.yarnpkg.com/cordova-android/-/cordova-android-6.2.3.tgz#249f21b6ce5f1f1c847a7ab83b16909dbed5aa28"
+cordova-android@~6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/cordova-android/-/cordova-android-6.3.0.tgz#da5418433d25c75a5977b428244bbe437d0128d2"
   dependencies:
-    cordova-common "^2.0.1"
+    android-versions "^1.2.0"
+    cordova-common "^2.1.0"
     elementtree "0.1.6"
     nopt "^3.0.1"
     properties-parser "^0.2.3"
     q "^1.4.1"
     shelljs "^0.5.3"
 
-cordova-common@2.1.0, cordova-common@^2.0.1:
+cordova-common@2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cordova-common/-/cordova-common-2.1.0.tgz#bb357ee1b9825031ed9db3c56b592efe973d1640"
   dependencies:
@@ -1700,12 +1705,34 @@ cordova-common@2.1.0, cordova-common@^2.0.1:
     underscore "^1.8.3"
     unorm "^1.3.3"
 
-cordova-ios@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/cordova-ios/-/cordova-ios-4.5.0.tgz#ca7621760dda876175458077c927eaa7eb645285"
+cordova-common@^2.1.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/cordova-common/-/cordova-common-2.1.1.tgz#e3a16a4f3d29a8e2b523128ac65478aca9ea1749"
+  dependencies:
+    ansi "^0.3.1"
+    bplist-parser "^0.1.0"
+    cordova-registry-mapper "^1.1.8"
+    elementtree "0.1.6"
+    glob "^5.0.13"
+    minimatch "^3.0.0"
+    osenv "^0.1.3"
+    plist "^1.2.0"
+    q "^1.4.1"
+    semver "^5.0.1"
+    shelljs "^0.5.3"
+    underscore "^1.8.3"
+    unorm "^1.3.3"
+
+"cordova-filechooser@https://github.com/whispeer/cordova-filechooser.git#feature/full_path":
+  version "1.0.1"
+  resolved "https://github.com/whispeer/cordova-filechooser.git#16df0ff08a6a3d70457a45c4e86326dcaa724e08"
+
+cordova-ios@^4.5.2:
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/cordova-ios/-/cordova-ios-4.5.2.tgz#46b410fe2d14b449547c1d617e988aa6d80da37c"
   dependencies:
     cordova-common "2.1.0"
-    ios-sim "^6.0.0"
+    ios-sim "^6.1.2"
     nopt "^3.0.6"
     plist "^1.2.0"
     q "^1.4.1"
@@ -1732,10 +1759,6 @@ cordova-plugin-file-opener2@^2.0.19:
 cordova-plugin-file@~4.3.1:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/cordova-plugin-file/-/cordova-plugin-file-4.3.3.tgz#012e97aa1afb91f84916e6341b548366d23de9b9"
-
-cordova-plugin-filechooser@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-filechooser/-/cordova-plugin-filechooser-1.0.1.tgz#fa59e97b8cdd91260be0bec460db8ec5de93488f"
 
 cordova-plugin-filepicker@^1.1.4:
   version "1.1.4"
@@ -2883,7 +2906,7 @@ ionicons@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/ionicons/-/ionicons-3.0.0.tgz#40b8daf4fd7a31150bd002160f66496e22a98c3c"
 
-ios-sim@^6.0.0:
+ios-sim@^6.1.2:
   version "6.1.2"
   resolved "https://registry.yarnpkg.com/ios-sim/-/ios-sim-6.1.2.tgz#7b9df7c35abd5b9d4c014248174e8b9e5b97ecc4"
   dependencies:
@@ -4121,10 +4144,6 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
 
-prettysize@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/prettysize/-/prettysize-0.1.0.tgz#38ee534e2d298bc945fb7243203dd873cefc9679"
-
 private@^0.1.6, private@~0.1.5:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/private/-/private-0.1.7.tgz#68ce5e8a1ef0a23bb570cc28537b5332aba63ef1"
@@ -4198,6 +4217,10 @@ qrious@^2.2.0:
   resolved "https://registry.yarnpkg.com/qrious/-/qrious-2.2.0.tgz#6a3510725d0911b063c71a0739fa855102b36f59"
   optionalDependencies:
     canvas "^1.3.12"
+
+qrious@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/qrious/-/qrious-4.0.2.tgz#09c4d4079d2b961617f62c69cff3b9bb66a39693"
 
 qs@6.4.0, qs@^6.1.0, qs@^6.4.0:
   version "6.4.0"

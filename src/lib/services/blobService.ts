@@ -20,9 +20,9 @@ import blobCache, { fixFileReader } from "../asset/blobCache"
 
 import socketService from "./socket.service"
 import BlobDownloader from "./blobDownloader.service"
+import Queue from '../asset/Queue'
 
 const initService = require("services/initService");
-const Queue = require("asset/Queue");
 const keyStore = require("crypto/keyStore");
 
 const knownBlobURLs = {};
@@ -194,7 +194,7 @@ class MyBlob {
 			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
 
 			return blobCache.store(this).catch((e) => {
-				console.log("Could not store blob", e)
+				console.log("Could not store blob")
 				return this.toURL()
 			})
 		})

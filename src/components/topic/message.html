@@ -1,27 +1,31 @@
-<div attr.data-messageid="{{message.data.id}}" class="messages__wrap" *ngIf="message.isBlockedSince()">
+<div *ngIf="message.isBlockedSince()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
 	<div class="messages__message messages__message-blocked">
 		<span>{{ 'blocked.messageReplacement' | translate }}</span>
 	</div>
 	<span class="messages__time"></span>
 </div>
 
-<div *ngIf="!message.isBlockedSince()">
+<ng-container *ngIf="!message.isBlockedSince()">
 
-	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
-		<div class="messages__message" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
-			<span whispeerSyntaxify content="{{message.data.text}}"></span>
+	<div *ngIf="message.hasText() || message.hasImages()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
+		<div class="messages__message last" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
+			<span whispeerSyntaxify content="{{message.data.text}}" *ngIf="message.data.text"></span>
 			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>
 		</div>
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
 
-	<div *ngFor="let file of message.data.files" class="messages__wrap messages__wrap--file">
-		<div class="messages__message message__file" [ngClass]="{'message__file--sending': voicemailSending()}">
-			<div class="message__file__hexagon-wrap">
-				<hexagon class="message__file__hexagon"></hexagon>
-				<ion-icon name="md-download" class="message__file__hexagon-icon" *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)"></ion-icon>
-				<ion-icon name="md-document" class="message__file__hexagon-icon" *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)"></ion-icon>
-				<loading-progress *ngIf="(!file.loaded && file.getProgress) || file.sending" [progress]="file.getProgress" [inverse]="voicemailSending()"></loading-progress>
+	<div *ngFor="let file of message.data.files; let last = last;" class="messages__wrap">
+		<div class="messages__message message__file" [ngClass]="{'sending': !message.hasBeenSent(), 'last': last}">
+			<div class="message__voicemail__actions">
+				<ion-icon *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)" class="message__voicemail__action" name="md-download"></ion-icon>
+				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>
+				<loading-progress
+					*ngIf="(!file.loaded && file.getProgress) || file.sending"
+					backgroundClass="messages__message"
+					foregroundClass="progressIndicator"
+					[progress]="file.getProgress">
+				</loading-progress>
 			</div>
 			<span class="message__file__info">
 				<span class="message__file__name">{{ file.name | filenameLimit: 25 }}</span>
@@ -31,38 +35,22 @@
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
 
-	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">
-		<div class="messages__message message__voicemail" [ngClass]="{'message__file--sending': voicemailSending()}">
-			<div class="message__file__info message__voicemail__info">
-				<div class="message__voicemail__actions">
-					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && !voicemailSending()" (click)="downloadVoicemail()"></ion-icon>
-					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && !voicemailSending()" (click)="playVoicemail()"></ion-icon>
-					<loading-progress class="message__voicemail__action" *ngIf="!voicemailLoaded() && voicemailDownloadProgress" [progress]="voicemailProgress" [inverse]="voicemailSending()" [color]="(message.isOwn() ? 'primary' : 'isabelline')"></loading-progress>
-					<ion-spinner *ngIf="voicemailSending()" class="message__voicemail__uploadSpinner"></ion-spinner>
-					<ion-icon name="md-pause" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>
-				</div>
-				<div class="message__voicemail__player">
-					<ion-icon icon name="stats" class="message__file__memo-play-icon" [ngClass]="{'message__file__memo-play-icon--active': voicemailPlaying()}"></ion-icon>&nbsp;
-					<span><span *ngIf="voicemailLoaded()">{{ voicemailPosition() * 1000 | date: 'mm:ss' }} /&nbsp;</span>{{ voicemailDuration() * 1000 | date: 'mm:ss' }}&nbsp;</span>
-					<span *ngIf="!voicemailLoaded()" class="message__file__info__size">[{{formatSize(voicemailSize())}}]</span>
-					<div class="message__file__progress" *ngIf="voicemailLoaded() && voicemailPosition() > 0">
-						<div class="message__file__progress__bar" [ngStyle]="{'width.%': voicemailPosition() * 100 / voicemailDuration()}"></div>
-						<div class="message__file__progress__icon" [ngStyle]="{'margin-left.%': voicemailPosition() * 100 / voicemailDuration()}">
-							<hexagon class="message__file__progress__icon__hex"></hexagon>
-						</div>
-					</div>
-				</div>
-			</div>
+	<div *ngIf="message.hasVoicemail()" class="messages__wrap messages__wrap--file">
+		<div class="messages__message message__voicemail last" [ngClass]="{'sending': !message.hasBeenSent()}">
+			<voicemailplayer [voicemails]="message.data.voicemails" [hasBeenSent]="message.hasBeenSent()"></voicemailplayer>
 		</div>
 		<ng-container *ngTemplateOutlet="message_time"></ng-container>
 	</div>
-</div>
+</ng-container>
 
 <ng-template #message_time>
 		<span *ngIf="message.hasBeenSent()" class="messages__time">
 			{{ message.sendTime | date: "shortTime" }}
 		</span>
-		<span *ngIf="!message.hasBeenSent()" class="messages__time messageSpinner">
-			<ion-spinner text-center name="ios-small"></ion-spinner>
-		</span>
+		<ng-container *ngIf="!message.hasBeenSent()">
+			<span *ngIf="message.hasVoicemail() || message.hasFiles()" class="messages__time"> </span>
+			<span *ngIf="!message.hasVoicemail() && !message.hasFiles()" class="messages__time messageSpinner">
+				<ion-spinner text-center name="ios-small"></ion-spinner>
+			</span>
+		</ng-container>
 </ng-template>

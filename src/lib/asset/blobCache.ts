@@ -1,5 +1,5 @@
 import * as Bluebird from "bluebird"
-import { File, FileEntry } from '@ionic-native/file'
+import { File, FileEntry, Entry } from '@ionic-native/file'
 
 import Cache from "../services/Cache"
 import h from "../helper/helper" // tslint:disable-line:no-unused-variable
@@ -38,6 +38,15 @@ const getCacheDirectory = () => {
 	return cacheDirectoryPromise
 }
 
+const removeOldFiles = () => {
+	getCacheDirectory()
+		.then(() => FILE.listDir(FILE.cacheDirectory, BLOB_CACHE_DIR))
+		.filter((entry: Entry) => entry.isFile && entry.name.endsWith(".blob"))
+		.map((file: FileEntry) => new Bluebird((resolve, reject) => file.remove(resolve, reject)))
+}
+
+document.addEventListener("deviceready", removeOldFiles, false);
+
 const readFileAsBlob = (path, filename, type) => {
 	fixFileReader()
 	return FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
@@ -54,7 +63,7 @@ const existsFile = (path, filename) =>
 		return Bluebird.reject(e)
 	})
 
-const idToFileName = (blobID) => `${blobID}.blob`
+const idToFileName = (blobID) => `${blobID}.aac`
 
 let clearing = false
 let storing = 0
@@ -118,7 +127,7 @@ const blobCache = {
 
 			return `${path}${filename}`
 		}).catch((e) => {
-			console.error(e)
+			console.warn("Storing blob failed")
 			return Bluebird.reject(e)
 		}).finally(() => {
 			storing--

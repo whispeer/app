@@ -4,3 +4,9 @@
 [submodule "src/assets/validation"]
 	path = src/lib/validation
 	url = https://github.com/whispeer/whispeerValidations.git
+[submodule "platforms/android"]
+	path = platforms/android
+	url = git@github.com:whispeer/messenger-android.git
+[submodule "platforms/ios"]
+	path = platforms/ios
+	url = git@github.com:whispeer/messenger-ios.git

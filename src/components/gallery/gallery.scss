@@ -1,0 +1,50 @@
+gallery {
+	$bubble-radius-ios: 15px;
+	$bubble-radius-android: 3px;
+
+	display: block;
+
+	span ~ & {
+		margin-top: 8px;
+	}
+
+	> div {
+		position: relative;
+		overflow: hidden;
+		font-size: 0;
+		line-height: 0;
+		margin: -3px;
+		border-radius: $bubble-radius-ios;
+		.md & { border-radius: $bubble-radius-android; } // .md seems to be an android hack.
+
+		.loading {
+			position: relative;
+			background-color: white;
+			> img { opacity: .5 }
+		}
+	}
+
+	img {
+		max-width: 100%;
+		width: 100%;
+	}
+
+	.imageContainer ~ .imageContainer {
+		margin-top: 3px;
+	}
+
+	.overlay {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	button.button {
+		background: transparent;
+	}
+}

@@ -1,12 +1,17 @@
-<div *ngFor="let image of images">
-	<span *ngIf="image.lowest.url">
-		<img class="post-image" *ngIf="!runGif($index)" [src]="image.lowest.url" (click)="displayImage(image)" />
-		<span class="post-image--play fa fa-play fa-2x" *ngIf="image.lowest.gif && !runGif($index)"></span>
-		<div *ngIf="runGif($index)">
-			<img class="post-image" [src]="image.highest.url" *ngIf="!image.highest.loading" />
-			<img class="post-image" [src]="image.lowest.url" *ngIf="image.highest.loading" />
+<div>
+	<ng-container *ngFor="let image of images">
+		<div class="imageContainer" [ngClass]="{'loading': isLoading(image) }" *ngIf="image.lowest.url">
+			<img class="post-image" *ngIf="!runGif($index)" [src]="image.lowest.url" (click)="displayImage(image)" />
+			<span class="post-image--play fa fa-play fa-2x" *ngIf="image.lowest.gif && !runGif($index)"></span>
+			<div *ngIf="runGif($index)">
+				<img class="post-image" [src]="image.highest.url" *ngIf="!image.highest.loading" />
+				<img class="post-image" [src]="image.lowest.url" *ngIf="image.highest.loading" />
+			</div>
+			<div *ngIf="isLoading(image)" class="overlay">
+				<ion-spinner text-center name="ios-small"></ion-spinner>
+			</div>
 		</div>
-	</span>
+	</ng-container>
 </div>
 
 <div *ngIf="images.length > preview">
