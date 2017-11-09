@@ -89,18 +89,6 @@ userService = {
 	}
 }
 
-initService.registerCacheCallback(function () {
-	return UserLoader.get(sessionService.getUserID()).catch(function (e) {
-		if (e instanceof sjcl.exception.corrupt) {
-			alert("Password did not match. Logging out")
-			sessionService.logout()
-			return new Bluebird(function () {})
-		}
-
-		return Bluebird.reject(e)
-	})
-})
-
 initService.registerCallback(function () {
 	return UserLoader.get(sessionService.getUserID()).catch(function (e) {
 		if (e instanceof sjcl.exception.corrupt) {

@@ -6,7 +6,6 @@ var keyStore = require("crypto/keyStore");
 var socketService = require("services/socket.service").default;
 var CacheService = require("./Cache").default;
 
-var h = require("../helper/helper").default;
 var debug = require("debug");
 var Observer = require("asset/observer");
 var Bluebird = require("bluebird");
@@ -28,7 +27,7 @@ function timeEnd(name) {
 	}
 }
 
-var initRequestsList = [], initCallbacks = [], initCacheCallbacks = [], initService;
+var initRequestsList = [], initCallbacks = [], initService;
 
 function getCache(initRequest) {
 	return new CacheService(initRequest.domain).get(initRequest.id || sessionService.getUserID()).then(function (cache) {
@@ -121,16 +120,14 @@ function runFunction(func) {
 	return func();
 }
 
-function runInitCacheCallbacks() {
-	return Bluebird.all(initCacheCallbacks.map(runFunction));
+function runInitCallbacks() {
+	return Bluebird.all(initCallbacks.map(runFunction));
 }
 
 function loadData() {
 	keyStore.security.blockPrivateActions();
 
-	var runningInitCallbacks;
 	var promise = Bluebird.resolve().then(function () {
-
 		time("getCache");
 		return initRequestsList;
 	}).map(function (initRequest) {
@@ -144,20 +141,11 @@ function loadData() {
 		time("runCacheCallbacks")
 
 		return Bluebird.all([
-			runInitCacheCallbacks(),
+			runInitCallbacks(),
 			runCacheCallbacks(initRequests)
-		]).spread(function (customCacheResults, simpleCacheResults) {
-			if (simpleCacheResults.reduce(h.and, true)) {
-				initService.notify("", "initCacheDone");
-			} else {
-				initServiceDebug("Could not load cache!");
-			}
-
-			return null;
-		}).catch(errorService.criticalError).thenReturn(initRequests);
+		]).catch(errorService.criticalError).thenReturn(initRequests);
 	}).then(function (initRequests) {
 		timeEnd("runCacheCallbacks")
-		runningInitCallbacks = initCallbacks.map(runFunction);
 
 		time("getServer");
 		return getServerData(initRequests);
@@ -165,9 +153,6 @@ function loadData() {
 		timeEnd("getServer");
 		time("runMainCallbacks");
 		return runCallbacks(initResponses);
-	}).then(function () {
-		initServiceDebug("Callbacks done!");
-		return Bluebird.all(runningInitCallbacks);
 	}).then(function () {
 		timeEnd("runMainCallbacks");
 		keyStore.security.allowPrivateActions();
@@ -200,9 +185,6 @@ initService = {
 			callback: cb,
 			options: options || {}
 		});
-	},
-	registerCacheCallback: function (cb) {
-		initCacheCallbacks.push(cb);
 	},
 	registerCallback: function (cb) {
 		initCallbacks.push(cb);
