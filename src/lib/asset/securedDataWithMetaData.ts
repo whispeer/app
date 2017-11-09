@@ -12,10 +12,10 @@ const attributesNeverVerified = ["_signature", "_hashObject"];
 
 type optionsType = {
 	type: string,
-	alternativeType: string,
-	removeEmpty: boolean,
-	encryptDepth: number,
-	attributesNotVerified: string[]
+	alternativeType?: string,
+	removeEmpty?: boolean,
+	encryptDepth?: number,
+	attributesNotVerified?: string[]
 }
 
 /** crypted content with metadata
@@ -23,7 +23,7 @@ type optionsType = {
 		@param meta metadata for the content
 		@param isDecrypted whether the content is decrypted
 */
-class SecuredDataWithMetaData {
+export class SecuredData {
 	private type: string
 	private alternativeType: string
 	private removeEmpty: boolean
@@ -39,7 +39,7 @@ class SecuredDataWithMetaData {
 
 	private decryptionPromise
 
-	constructor(content, meta, options: optionsType, isDecrypted = false) {
+	constructor(content, meta, options: optionsType, isDecrypted: boolean) {
 			//we need to somehow ensure that we have the correct object type.
 		if (!options || typeof options.type !== "string") {
 			throw new Error("need a type for security!");
@@ -52,9 +52,7 @@ class SecuredDataWithMetaData {
 		this.encryptDepth = options.encryptDepth || 0;
 
 		this.attributesNotVerified = options.attributesNotVerified || [];
-		this.attributesNotVerified.filter(function (val) {
-			return val.match(/^A-z0-9$/);
-		});
+		this.attributesNotVerified.filter((val) => val.match(/^A-z0-9$/))
 		this.attributesNotVerified = attributesNeverVerified.concat(this.attributesNotVerified);
 
 		this.decrypted = isDecrypted;
@@ -85,7 +83,7 @@ class SecuredDataWithMetaData {
 	}
 
 	hasContent = () => {
-		return this.hasContent
+		return this._hasContent
 	}
 
 	getHash = () => {
@@ -96,7 +94,7 @@ class SecuredDataWithMetaData {
 		return this.original.meta._key;
 	};
 
-	sign = (signKey, cb) => {
+	sign = (signKey, cb?) => {
 		var toSign = h.deepCopyObj(this._updated.meta);
 		var hashVersion = config.hashVersion;
 
@@ -107,26 +105,26 @@ class SecuredDataWithMetaData {
 			toSign._hashVersion = hashVersion;
 
 					//do not sign attributes which should not be verified
-			this.attributesNotVerified.forEach(function(attr) {
-				delete toSign[attr];
-			});
+			this.attributesNotVerified.forEach((attr) => {
+				delete toSign[attr]
+			})
 
 			if (this._updated.paddedContent || this._updated.content) {
 				var hashContent = this._updated.paddedContent || this._updated.content;
 
-				return keyStore.hash.hashObjectOrValueHexAsync(hashContent).then(function (contentHash) {
+				return keyStore.hash.hashObjectOrValueHexAsync(hashContent).then((contentHash) => {
 					toSign._contentHash = contentHash;
 
 									//create new ownHash
 					delete toSign._ownHash;
 					return keyStore.hash.hashObjectOrValueHexAsync(toSign);
-				}).then(function (ownHash) {
+				}).then((ownHash) => {
 					toSign._ownHash = ownHash;
 				});
 			}
-		}).then(function () {
+		}).then(() => {
 			return keyStore.sign.signObject(toSign, signKey, hashVersion);
-		}).then(function (signature) {
+		}).then((signature) => {
 			toSign._signature = signature;
 
 			return toSign;
@@ -134,8 +132,8 @@ class SecuredDataWithMetaData {
 	};
 
 	getUpdatedData = (signKey, cb) => {
-		return this.verify(signKey).bind(this).then(function () {
-			if (this.hasContent) {
+		return this.verify(signKey).then(() => {
+			if (this._hasContent) {
 				keyStore.security.addEncryptionIdentifier(this.original.meta._key);
 				return this.signAndEncrypt(signKey, this.original.meta._key);
 			}
@@ -150,8 +148,8 @@ class SecuredDataWithMetaData {
 			@param signKey key to use for signing
 			@param cb callback(cryptedData, metaData),
 	*/
-	_signAndEncrypt = (signKey, cryptKey) => {
-		if (!this.hasContent) {
+	signAndEncrypt = (signKey, cryptKey) => {
+		if (!this._hasContent) {
 			throw new Error("can only sign and not encrypt");
 		}
 
@@ -159,7 +157,7 @@ class SecuredDataWithMetaData {
 			throw new Error("can not re-encrypt an old object with new key!");
 		}
 
-		return keyStore.hash.addPaddingToObject(this._updated.content, 128).bind(this).then(function (paddedContent) {
+		return keyStore.hash.addPaddingToObject(this._updated.content, 128).bind(this).then((paddedContent) => {
 			this._updated.paddedContent = paddedContent;
 
 			this._updated.meta._key = keyStore.correctKeyIdentifier(cryptKey);
@@ -168,7 +166,7 @@ class SecuredDataWithMetaData {
 				keyStore.sym.encryptObject(paddedContent, cryptKey, this.encryptDepth),
 				this.sign(signKey)
 			]);
-		}).spread(function (cryptedData, meta) {
+		}).spread((cryptedData, meta) => {
 			this._updated.meta = meta;
 
 			return {
@@ -176,10 +174,6 @@ class SecuredDataWithMetaData {
 				meta: meta
 			};
 		})
-	};
-
-	signAndEncrypt = (signKey, cryptKey) => {
-		return this.signAndEncrypt(signKey, cryptKey)
 	};
 
 	hasType = (type) => {
@@ -200,14 +194,14 @@ class SecuredDataWithMetaData {
 			@param id id for signature caching
 			@throw SecurityError: contenthash or signature wrong
 	*/
-	verifyAsync = (signKey, id) => {
+	verifyAsync = (signKey, id?) => {
 			//check contentHash is correct
 			//check signature is correct
 
-		return Bluebird.resolve().bind(this).then(function () {
+		return Bluebird.resolve().bind(this).then(() => {
 			var metaCopy = h.deepCopyObj(this.original.meta);
 
-			this.attributesNotVerified.forEach(function(attr) {
+			this.attributesNotVerified.forEach((attr) => {
 				delete metaCopy[attr];
 			});
 
@@ -230,14 +224,14 @@ class SecuredDataWithMetaData {
 			}
 
 			return keyStore.sign.verifyObject(this.original.meta._signature, metaCopy, signKey, hashVersion, id);
-		}).then(function (correctSignature) {
+		}).then((correctSignature) => {
 			if (!correctSignature) {
 				alert("Bug: signature did not match (" + this.original.meta._type + ") Please report this bug!");
 				throw new errors.SecurityError("signature did not match " + this.original.meta._type);
 			}
 
 			return this.verifyContentHash();
-		}).then(function () {
+		}).then(() => {
 			this.isKeyVerified = true;
 
 			return true;
@@ -259,7 +253,7 @@ class SecuredDataWithMetaData {
 							this.encryptDepth,
 							undefined,
 							this.original.meta._key
-					).bind(this).then(function (decryptedData) {
+					).bind(this).then((decryptedData) => {
 						this.decrypted = true;
 						this.original.paddedContent = decryptedData;
 						this.original.content = keyStore.hash.removePaddingFromObject(decryptedData, 128);
@@ -272,13 +266,13 @@ class SecuredDataWithMetaData {
 		return this.decryptionPromise;
 	};
 
-	decrypt = (cb) => {
-		return Bluebird.resolve().bind(this).then(function () {
-			if (this.hasContent && !this.decrypted) {
+	decrypt = (cb?) => {
+		return Bluebird.resolve().bind(this).then(() => {
+			if (this._hasContent && !this.decrypted) {
 				return this.decrypt();
 			}
-		}).then(function () {
-			if (!this.hasContent) {
+		}).then(() => {
+			if (!this._hasContent) {
 				return;
 			}
 
@@ -286,18 +280,18 @@ class SecuredDataWithMetaData {
 		}).nodeify(cb);
 	};
 
-	_verifyContentHash = (cb) => {
-		if (!this.hasContent || !this.decrypted) {
-			return Bluebird.resolve().nodeify(cb);
+	private verifyContentHash = () => {
+		if (!this._hasContent || !this.decrypted) {
+			return Bluebird.resolve()
 		}
 
-		return Bluebird.bind(this).then(function () {
+		return Bluebird.bind(this).then(() => {
 			return keyStore.hash.hashObjectOrValueHexAsync(this.original.paddedContent || this.original.content);
-		}).then(function (hash) {
+		}).then((hash) => {
 			if (hash !== this.original.meta._contentHash) {
 				throw new errors.SecurityError("content hash did not match");
 			}
-		}).nodeify(cb);
+		})
 	};
 
 	isChanged = () => {
@@ -320,9 +314,7 @@ class SecuredDataWithMetaData {
 		return this._updated.meta.hasOwnProperty(attr);
 	};
 	metaKeys = () => {
-		return Object.keys(this._updated.meta).filter(function (key) {
-			return key[0] !== "_";
-		});
+		return Object.keys(this._updated.meta).filter((key) => key[0] !== "_")
 	};
 	metaAttr = (attr) => {
 		return h.deepCopyObj(this._updated.meta[attr]);
@@ -446,17 +438,17 @@ var api = {
 		var secured = api.createRaw(content, meta, options)
 
 		Bluebird.resolve().delay(1).then(function () {
-			return secured._signAndEncrypt(signKey, cryptKey);
+			return secured.signAndEncrypt(signKey, cryptKey);
 		}).nodeify(cb);
 
 		return secured;
 	},
 	load: function (content, meta, options) {
-		return new SecuredDataWithMetaData(content, meta, options);
+		return new SecuredData(content, meta, options, false);
 	},
 	createRaw: function (content, meta, options) {
-		return new SecuredDataWithMetaData(content, meta, options, true);
+		return new SecuredData(content, meta, options, true);
 	}
 }
 
-module.exports = api;
+export default api

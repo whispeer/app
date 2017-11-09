@@ -51,7 +51,7 @@ interface ISettings {
 
 import h from "../helper/helper";
 const EncryptedData = require("crypto/encryptedData");
-const SecuredData = require("asset/securedDataWithMetaData");
+import SecuredDataApi from "../asset/securedDataWithMetaData"
 
 const notVisible:IVisibility = {
 	encrypt: true,
@@ -154,7 +154,7 @@ class SettingsService extends Observer {
 
 			var ownUser = require("users/userService").default.getOwn();
 
-			return SecuredData.createAsync(data.content,
+			return SecuredDataApi.createAsync(data.content,
 				data.meta,
 				securedDataOptions,
 				ownUser.getSignKey(),
@@ -162,7 +162,7 @@ class SettingsService extends Observer {
 			)
 
 		}).then(signedAndEncryptedSettings => {
-			this.settings = SecuredData.load(
+			this.settings = SecuredDataApi.load(
 				signedAndEncryptedSettings.content,
 				signedAndEncryptedSettings.meta,
 				securedDataOptions
@@ -181,7 +181,7 @@ class SettingsService extends Observer {
 			if (givenSettings.ct) {
 				return this.migrateToFormat2(givenSettings);
 			} else {
-				return SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions);
+				return SecuredDataApi.load(givenSettings.content, givenSettings.meta, securedDataOptions);
 			}
 		}).then(_settings => {
 			this.settings = _settings;

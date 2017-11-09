@@ -1,7 +1,7 @@
 import h from "../helper/helper";
 const validator = require("validation/validator");
 import Observer from "../asset/observer"
-const SecuredData = require("asset/securedDataWithMetaData");
+import SecuredDataApi from "../asset/securedDataWithMetaData"
 import * as Bluebird from "bluebird"
 const debug = require("debug");
 
@@ -44,7 +44,7 @@ export class Chunk extends Observer {
 
 		meta.receiver.sort();
 
-		this.securedData = SecuredData.createRaw(content, meta, CHUNK_SECURED_DATA_OPTIONS);
+		this.securedData = SecuredDataApi.createRaw(content, meta, CHUNK_SECURED_DATA_OPTIONS);
 
 		this.id = server.id
 		this.chatID = server.chatID
@@ -326,7 +326,7 @@ export class Chunk extends Observer {
 				creator: userService.getOwn().getID(),
 			}
 
-			const secured = SecuredData.createRaw(content, chunkMeta, { type: "topic" })
+			const secured = SecuredDataApi.createRaw(content, chunkMeta, { type: "topic" })
 
 			if (predecessorChunk) {
 				secured.setParent(predecessorChunk.getSecuredData())
@@ -351,7 +351,7 @@ const decryptAndVerifyTitleUpdate = (titleUpdate) => {
 
 		const { content, meta, server } = titleUpdate
 
-		const securedData = SecuredData.load(content, meta, { type: "topicUpdate" });
+		const securedData = SecuredDataApi.load(content, meta, { type: "topicUpdate" });
 
 		const sender = await userService.get(meta.userID);
 
@@ -417,7 +417,7 @@ export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 	},
 	load: ({ content, meta, server, latestTitleUpdate }) : Bluebird<ChunkCache> => {
 		return Bluebird.try(async function () {
-			const securedData = SecuredData.load(content, meta, CHUNK_SECURED_DATA_OPTIONS)
+			const securedData = SecuredDataApi.load(content, meta, CHUNK_SECURED_DATA_OPTIONS)
 
 			const creator = await userService.get(securedData.metaAttr("creator"))
 
