@@ -5,8 +5,12 @@ import * as keyStore from "../crypto/keyStore.js";
 import Observer from "../asset/observer";
 
 const initService = require("services/initService");
-import sessionService from "services/session.service"
+import sessionService from "../services/session.service"
 import MutableObjectLoader, { UpdateEvent } from "../services/mutableObjectLoader"
+import SecuredDataApi, { SecuredData } from "../asset/securedDataWithMetaData"
+
+import h from "../helper/helper"
+const EncryptedData = require("crypto/encryptedData")
 
 const RELOAD_DELAY = 10000
 
@@ -52,10 +56,6 @@ interface ISettings {
 	},
 	uiLanguage: string
 }
-
-import h from "../helper/helper";
-const EncryptedData = require("crypto/encryptedData");
-const SecuredData = require("asset/securedDataWithMetaData");
 
 const notVisible:IVisibility = {
 	encrypt: true,
@@ -153,10 +153,11 @@ const migrateToFormat2 = (givenOldSettings: any) => {
 
 		return transformedSettings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
 	}).then(signedAndEncryptedSettings => {
-		const settings = SecuredData.load(
+		const settings = new SecuredData(
 			signedAndEncryptedSettings.content,
 			signedAndEncryptedSettings.meta,
-			securedDataOptions
+			securedDataOptions,
+			false
 		)
 
 		return socketService.emit("settings.setSettings", {
@@ -208,7 +209,7 @@ class Settings {
 	}
 
 	getUpdatedData = (signKey, encryptKey) =>
-		SecuredData.createAsync(this.content, this.meta, securedDataOptions, signKey, encryptKey)
+		SecuredDataApi.createAsync(this.content, this.meta, securedDataOptions, signKey, encryptKey)
 			.then((encryptedSettings) => {
 				return {
 					...encryptedSettings,
@@ -221,7 +222,7 @@ const loadSettings = (givenSettings: any) => {
 	return Bluebird.try(() =>
 		givenSettings.ct ?
 		migrateToFormat2(givenSettings) :
-		SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions)
+		new SecuredData(givenSettings.content, givenSettings.meta, securedDataOptions, false)
 	).then((secured) => {
 		const ownUser = require("users/userService").default.getOwn()
 

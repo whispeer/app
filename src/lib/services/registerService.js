@@ -8,7 +8,7 @@ var Bluebird = require("bluebird");
 var h = require("../helper/helper").default;
 
 var trustManager = require("crypto/trustManager");
-var SecuredData = require("asset/securedDataWithMetaData");
+var SecuredData = require("../asset/securedDataWithMetaData").default;
 
 var keyGenPromise, sessionStorage = Storage.withPrefix("whispeer.session"), clientStorage = Storage.withPrefix("whispeer.client");
 var registerPromise;
