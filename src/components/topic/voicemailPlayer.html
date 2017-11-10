@@ -1,0 +1,23 @@
+<ng-container>
+	<div class="vom--icon">
+		<ion-icon name="md-play" *ngIf="!isLoading() && !isPlaying() && hasBeenSent" (click)="play()"></ion-icon>
+		<ion-icon name="md-pause" *ngIf="isPlaying()" (click)="pause()"></ion-icon>
+		<loading-progress *ngIf="isLoading() || !hasBeenSent"
+			backgroundClass="messages__message"
+			foregroundClass="progressIndicator"
+			[progress]="getProgress"
+		>
+		</loading-progress>
+	</div>
+	<div class="vom--info" [ngClass]="{'vom--playing': isPlaying()}">
+		<ion-icon icon name="stats"></ion-icon>
+		<span class="vom--position" *ngIf="!downloadable()">0:00</span>
+		<span class="vom--dividor" *ngIf="!downloadable()"> / </span>
+		<span class="vom--duration">{{ formatPosition(getDuration()) }}</span>
+		<span class="vom--size" *ngIf="downloadable()">[{{formatSize(getSize())}}]</span>
+
+		<div class="vom--progress" *ngIf="isLoaded()">
+			<div class="vom--progress--bar"></div>
+		</div>
+	</div>
+</ng-container>

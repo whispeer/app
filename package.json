@@ -112,6 +112,7 @@
     "moment": "^2.18.1",
     "phonegap-plugin-barcodescanner": "~6.0.6",
     "phonegap-plugin-push": "1.9.1",
+    "qrious": "^4.0.2",
     "rxjs": "~5.4.0",
     "sjcl": "git+https://github.com/whispeer/sjcl.git#custom-build",
     "socket.io-client": "~2.0.2",

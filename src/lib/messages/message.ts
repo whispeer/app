@@ -192,9 +192,7 @@ export class Message {
 		return this.chunkID || this.chat.getLatestChunk()
 	}
 
-	hasBeenSent = () => {
-		return this.wasSent
-	}
+	hasBeenSent = () => this.wasSent
 
 	uploadAttachments = h.cacheResult<Bluebird<any>>((chunkKey) => {
 		return this.prepareAttachments().then(() => {

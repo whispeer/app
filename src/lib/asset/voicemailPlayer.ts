@@ -1,55 +1,62 @@
-import { Media, MediaObject } from '@ionic-native/media';
 import * as Bluebird from "bluebird"
 
 export type recordingType = {
-	path: string,
-	recording: MediaObject,
+	url: string,
+	audio: HTMLAudioElement,
 	duration: number
+}
+
+export type audioInfo = {
+	url: string,
+	estimatedDuration: number
 }
 
 export type recordingsType = recordingType[]
 
-const media = new Media()
+let playBackBlocked = false
 
 export default class VoicemailPlayer {
 
-	private static activePlayer: VoicemailPlayer = null
+	static activePlayer: VoicemailPlayer = null
 	private playing = false
+	private loaded = false
 	private recordings: recordingsType = []
 
 	private recordPlayingIndex = 0
-	private position = 0
-	private interval : number = null
 	private loadingPromises : Bluebird<any>[] = []
+	private positionRAFListener: Function[] = []
 
-	constructor(recordings: recordingsType) {
-		this.recordings = recordings
+	constructor(recordings: audioInfo[]) {
+		recordings.map(({ url, estimatedDuration }) => this.addRecording(url, estimatedDuration))
 	}
 
 	play() {
-		this.awaitLoading().then(() => {
-			if (VoicemailPlayer.activePlayer) {
-				VoicemailPlayer.activePlayer.reset()
-			}
-			this.recordings[this.recordPlayingIndex].recording.play()
-			VoicemailPlayer.activePlayer = this
-			this.playing = true
+		if (playBackBlocked) {
+			return
+		}
 
-			clearInterval(this.interval)
-			this.interval = window.setInterval(() => {
-				const indexAtInvocation = this.recordPlayingIndex
-				this.recordings[this.recordPlayingIndex].recording.getCurrentPosition().then((pos: number) => {
-					if (indexAtInvocation === this.recordPlayingIndex && this.interval !== null && pos !== -1) {
-						this.position = pos
-					}
-				})
-			}, 100)
+		if (VoicemailPlayer.activePlayer) {
+			VoicemailPlayer.activePlayer.pause()
+		}
+		this.recordings[this.recordPlayingIndex].audio.play()
+		VoicemailPlayer.activePlayer = this
+		this.playing = true
+		this.loaded = true
 
-		})
+		this.positionListener()
+	}
+
+	private positionListener = () => {
+		const position = this.getPosition()
+		this.positionRAFListener.forEach((func) => func(position))
+
+		if (this.isPlaying()) {
+			window.requestAnimationFrame(this.positionListener)
+		}
 	}
 
 	pause() {
-		this.recordings[this.recordPlayingIndex].recording.pause()
+		this.recordings[this.recordPlayingIndex].audio.pause()
 		VoicemailPlayer.activePlayer = null
 		this.playing = false
 	}
@@ -62,6 +69,8 @@ export default class VoicemailPlayer {
 		}
 	}
 
+	onPositionUpdateRAF = (listener) => this.positionRAFListener.push(listener)
+
 	isPlaying() {
 		return this.playing
 	}
@@ -71,21 +80,20 @@ export default class VoicemailPlayer {
 	}
 
 	getDuration(beforeIndex?: number) {
-		return this.recordings.slice(0, beforeIndex).reduce((prev, next) => prev + next.duration, 0)
+		return this.recordings.slice(0, beforeIndex).reduce((prev, next) => prev + next.audio.duration || next.duration, 0)
 	}
 
 	getPosition() {
 		const currentDuration = this.getDuration(this.recordPlayingIndex)
-		return currentDuration + this.position
+		return currentDuration + this.recordings[this.recordPlayingIndex].audio.currentTime
 	}
 
 	reset() {
-		clearInterval(this.interval)
-
-		this.recordings.forEach(({ recording }) => recording.stop())
+		this.recordings.forEach(({ audio }) => {
+			audio.pause()
+			audio.currentTime = 0
+		})
 		this.recordPlayingIndex = 0
-		this.position = 0
-		this.interval = null
 
 		if (VoicemailPlayer.activePlayer && this !== VoicemailPlayer.activePlayer) {
 			VoicemailPlayer.activePlayer.reset()
@@ -94,51 +102,68 @@ export default class VoicemailPlayer {
 		this.playing = false
 	}
 
+	seekTo = (time) => {
+		let timeInTrack = time
+		const recordPlayingIndex = this.recordings.findIndex(({ duration }) => {
+			if (timeInTrack < duration) {
+				return true
+			}
+
+			timeInTrack -= duration
+			return false
+		})
+
+		if (recordPlayingIndex === -1) {
+			return
+		}
+
+		this.recordPlayingIndex = recordPlayingIndex
+
+		this.recordings[this.recordPlayingIndex].audio.currentTime = timeInTrack
+		this.positionListener()
+
+		if (this.isPlaying()) {
+			this.recordings.forEach(({ audio }, index) => {
+				if (index !== recordPlayingIndex) {
+					audio.pause()
+					audio.currentTime = 0
+				}
+			})
+			this.recordings[this.recordPlayingIndex].audio.play()
+		}
+	}
+
 	awaitLoading = () => {
 		return Bluebird.all(this.loadingPromises)
 	}
 
-	addRecording(path: string, estimatedDuration: number) {
-		const isIOS = window.device.platform === "iOS"
+	isLoaded = () => this.loaded
 
-		const currentRecording = media.create(isIOS ? path.replace(/^file:\/\//, '') : path)
+	private addRecording(url: string, duration: number) {
+		const audio = new Audio(url.replace("file://", ""))
 
-		currentRecording.play()
-
-		const recordingInfo = {
-			path,
-			recording: currentRecording,
-			duration: estimatedDuration
+		const audioInfo = {
+			url,
+			audio,
+			duration
 		}
 
-		const loadingPromise = new Bluebird((resolve) => {
-			const subscription = currentRecording.onStatusUpdate.subscribe((s) => {
-				if (s === media.MEDIA_RUNNING) {
-					currentRecording.stop()
-				}
+		audio.addEventListener("ended", this.onEnded)
 
-				if (s === media.MEDIA_STOPPED) {
-					subscription.unsubscribe()
-					resolve()
-				}
-			})
-		}).then(() => {
-			recordingInfo.duration = currentRecording.getDuration()
-
-			currentRecording.onStatusUpdate.subscribe(this.statusListener)
-		})
+		const loadingPromise =
+			new Bluebird((resolve) => audio.addEventListener("loadedmetadata", resolve))
 
 		this.loadingPromises.push(loadingPromise)
-
-		this.recordings.push(recordingInfo)
+		this.recordings.push(audioInfo)
 	}
 
 	destroy() {
-		this.recordings.forEach(({ recording, path }) => {
-			recording.release()
+		this.recordings.forEach(({ audio, url }) => {
+			audio.src = ""
+			audio.load()
 
 			// TODO delete file created!
-			console.warn("TODO: delete file:", path)
+			console.warn("TODO: delete file:", url)
 		})
 	}
 
@@ -146,20 +171,21 @@ export default class VoicemailPlayer {
 		return [...this.recordings]
 	}
 
-	private statusListener = (status) => {
-		if (status === media.MEDIA_STOPPED && this.isPlaying()) {
+	private onEnded = () => {
+		if (this.isPlaying()) {
+			this.recordPlayingIndex += 1
+
+			if (this.recordPlayingIndex >= this.recordings.length) {
+				this.reset()
+				return
+			}
+
+			this.recordings[this.recordPlayingIndex].audio.play()
+
 			// Use a Promise to trigger the angular zone. Zones are bad. Angular DI is bad.
-			Bluebird.resolve().then(() => {
-				this.recordPlayingIndex += 1
-				this.position = 0
-
-				if (this.recordPlayingIndex >= this.recordings.length) {
-					this.reset()
-					return
-				}
-
-				this.recordings[this.recordPlayingIndex].recording.play()
-			})
+			Bluebird.resolve().then(() => {})
 		}
 	}
+
+	static setPlaybackBlocked = (blocked: boolean) => playBackBlocked = blocked
 }

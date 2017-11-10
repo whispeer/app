@@ -1,7 +1,4 @@
-topicWithBursts {
-	background: white;
-	height: 100%;
-
+page-messages {
 	ion-spinner {
 		flex-shrink: 0;
 	}
@@ -143,8 +140,8 @@ topicWithBursts {
 .message__file,
 .message__voicemail {
 	display: flex;
-	min-height: 55px;
-	width: 100%;
+	width: 192px;
+	height: 47px;
 
 	overflow: visible;
 	padding: 5px 0 5px 25px;
@@ -152,10 +149,6 @@ topicWithBursts {
 
 .message__voicemail {
 	padding: 5px 0 5px 5px;
-}
-
-.message__voicemail__info {
-	flex-wrap: nowrap !important;
 }
 
 .message__voicemail__actions {
@@ -180,42 +173,6 @@ topicWithBursts {
 	}
 }
 
-// .message__voicemail__action {
-// 	font-size: 30px;
-//
-// 	flex-grow: 0;
-// 	flex-shrink: 0;
-// }
-//
-// .message__voicemail__action,
-// .message__voicemail__uploadSpinner {
-// 	margin: 0;
-// }
-//
-.message__voicemail__player {
-	display: inline-block;
-	position: relative;
-
-	flex-wrap: nowrap;
-	white-space: nowrap;
-
-	flex-grow: 1;
-}
-
-.message__file__hexagon-wrap {
-	position: absolute;
-
-	width: 40px;
-
-	top: 4px;
-	left: -12px;
-
-	.border, .content {
-		fill: map-get($colors, dark_grey);
-	}
-	svg { width: 100%; }
-}
-
 .progressIndicator {
 	color: map-get($colors, dark);
 	background-color: map-get($colors, dark_grey);
@@ -229,34 +186,8 @@ topicWithBursts {
 	}
 }
 
-.message__file__hexagon {
-	display: block;
-	width: 100%;
-}
-
-// this might not work out 100% well, but using flexbox was a real pain here :/
-.message__file__hexagon-icon {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-
-	margin-top: -11px;
-	margin-left: -6px;
-
-	color: map-get($colors, light) !important;
-}
-
-.message__file__hexagon-spinner {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-
-	margin-top: -15px;
-	margin-left: -14px;
-
-	* {
-		stroke: map-get($colors, light) !important;
-	}
+.sending .progressIndicator {
+	background-color: $message-sending-bubble-color;
 }
 
 .message__file__info {
@@ -276,70 +207,6 @@ topicWithBursts {
 
 	.burst--other & {
 		color: map-get($colors, grey);
-	}
-}
-
-.message__file__progress {
-	position: relative;
-
-	height: 2px;
-	width: 100%;
-
-	margin-top: 2px;
-	margin-left: 0;
-
-	.burst--me & {
-		margin-right: 20px;
-		background: map-get($colors, primaryDarker) !important;
-	}
-
-	.burst--other & {
-		margin-right: 25px;
-		background: map-get($colors, light) !important;
-	}
-}
-
-.message__file__progress__bar {
-	position: relative;
-	height: 100%;
-	transition: width 0.1s ease;
-	background: map-get($colors, light);
-
-	.burst--other & {
-		background: map-get($colors, dark);
-	}
-}
-
-.message__file__progress__icon {
-	position: absolute;
-	top: -4px;
-	left: -4.5px;
-
-	display: block;
-	height: 9px;
-	width: 9px;
-
-	transition: margin 0.1s ease;
-}
-
-.message__file__progress__icon__hex {
-	position: absolute;
-	top: 0;
-	left: 0;
-
-	width: 100%;
-	height: 100%;
-
-	.border, .content {
-		fill: map-get($colors, light);
-	}
-
-	svg {
-		width: 100%;
-
-		position: absolute;
-		top: 0;
-		left: 0;
 	}
 }
 
@@ -463,14 +330,6 @@ message:last-of-type .messages__message.last {
 		order: 1;
 		margin: auto 0 auto auto;
 	}
-
-	.message__file__memo-play-icon {
-		color: map-get($colors, light);
-	}
-
-	.message__file__memo-play-icon--active {
-		color: map-get($colors, blue);
-	}
 }
 
 .burst--other {
@@ -486,13 +345,6 @@ message:last-of-type .messages__message.last {
 
 	.messages__time {
 		margin: auto auto auto 0;
-	}
-
-	.message__file__memo-play-icon {
-		color: map-get($colors, dark);
-	}
-	.message__file__memo-play-icon--active {
-		color: map-get($colors, kelly_green);
 	}
 }
 

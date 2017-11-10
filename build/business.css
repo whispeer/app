@@ -60929,22 +60929,17 @@ page-login a {
   font-size: 1.3em;
 }
 
-topicWithBursts {
-  background: white;
-  height: 100%;
-}
-
-topicWithBursts ion-spinner {
+page-messages ion-spinner {
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
   flex-shrink: 0;
 }
 
-topicWithBursts .fixed-content {
+page-messages .fixed-content {
   display: none;
 }
 
-topicWithBursts .scroll-content {
+page-messages .scroll-content {
   overflow: hidden;
   display: -webkit-box;
   display: -webkit-flex;
@@ -60958,7 +60953,7 @@ topicWithBursts .scroll-content {
   padding: 0;
 }
 
-topicWithBursts .messages__list {
+page-messages .messages__list {
   -webkit-box-flex: 1;
   -webkit-flex: 1;
   -ms-flex: 1;
@@ -60979,38 +60974,38 @@ topicWithBursts .messages__list {
   contain: size style layout;
 }
 
-topicWithBursts .messages__list > .list {
+page-messages .messages__list > .list {
   margin-bottom: 0 !important;
 }
 
-topicWithBursts .messages_filler {
+page-messages .messages_filler {
   -webkit-box-flex: 1;
   -webkit-flex: 1 0 auto;
   -ms-flex: 1 0 auto;
   flex: 1 0 auto;
 }
 
-topicWithBursts .burst-seperator-date {
+page-messages .burst-seperator-date {
   color: #a0a7aa;
   margin-bottom: 22px;
 }
 
-topicWithBursts .burst-seperator-update {
+page-messages .burst-seperator-update {
   color: #788286;
 }
 
-topicWithBursts .burst-seperator {
+page-messages .burst-seperator {
   text-align: center;
 }
 
-topicWithBursts .burst-seperator .burst-seperator-text {
+page-messages .burst-seperator .burst-seperator-text {
   display: inline-block;
   position: relative;
   white-space: normal;
   font-size: 0.85em;
 }
 
-topicWithBursts .burst-seperator .burst-seperator-text:before, topicWithBursts .burst-seperator .burst-seperator-text:after {
+page-messages .burst-seperator .burst-seperator-text:before, page-messages .burst-seperator .burst-seperator-text:after {
   content: "";
   position: absolute;
   height: 1.5px;
@@ -61021,12 +61016,12 @@ topicWithBursts .burst-seperator .burst-seperator-text:before, topicWithBursts .
   width: 5000px;
 }
 
-topicWithBursts .burst-seperator .burst-seperator-text:before {
+page-messages .burst-seperator .burst-seperator-text:before {
   right: 100%;
   margin-right: 5px;
 }
 
-topicWithBursts .burst-seperator .burst-seperator-text:after {
+page-messages .burst-seperator .burst-seperator-text:after {
   left: 100%;
   margin-left: 5px;
 }
@@ -61108,20 +61103,14 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  min-height: 55px;
-  width: 100%;
+  width: 192px;
+  height: 47px;
   overflow: visible;
   padding: 5px 0 5px 25px;
 }
 
 .message__voicemail {
   padding: 5px 0 5px 5px;
-}
-
-.message__voicemail__info {
-  -webkit-flex-wrap: nowrap !important;
-  -ms-flex-wrap: nowrap !important;
-  flex-wrap: nowrap !important;
 }
 
 .message__voicemail__actions {
@@ -61160,34 +61149,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   margin-left: 12px;
 }
 
-.message__voicemail__player {
-  display: inline-block;
-  position: relative;
-  -webkit-flex-wrap: nowrap;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-}
-
-.message__file__hexagon-wrap {
-  position: absolute;
-  width: 40px;
-  top: 4px;
-  left: -12px;
-}
-
-.message__file__hexagon-wrap .border, .message__file__hexagon-wrap .content {
-  fill: #a0a7aa;
-}
-
-.message__file__hexagon-wrap svg {
-  width: 100%;
-}
-
 .progressIndicator {
   color: #545b5e;
   background-color: #a0a7aa;
@@ -61198,30 +61159,8 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   background-color: #939B9E;
 }
 
-.message__file__hexagon {
-  display: block;
-  width: 100%;
-}
-
-.message__file__hexagon-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -11px;
-  margin-left: -6px;
-  color: #fff !important;
-}
-
-.message__file__hexagon-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -15px;
-  margin-left: -14px;
-}
-
-.message__file__hexagon-spinner * {
-  stroke: #fff !important;
+.sending .progressIndicator {
+  background-color: #d5d8da;
 }
 
 .message__file__info {
@@ -61259,66 +61198,6 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   color: #788286;
 }
 
-.message__file__progress {
-  position: relative;
-  height: 2px;
-  width: 100%;
-  margin-top: 2px;
-  margin-left: 0;
-}
-
-.burst--me .message__file__progress {
-  margin-right: 20px;
-  background: #3a8100 !important;
-}
-
-.burst--other .message__file__progress {
-  margin-right: 25px;
-  background: #fff !important;
-}
-
-.message__file__progress__bar {
-  position: relative;
-  height: 100%;
-  -webkit-transition: width 0.1s ease;
-  transition: width 0.1s ease;
-  background: #fff;
-}
-
-.burst--other .message__file__progress__bar {
-  background: #545b5e;
-}
-
-.message__file__progress__icon {
-  position: absolute;
-  top: -4px;
-  left: -4.5px;
-  display: block;
-  height: 9px;
-  width: 9px;
-  -webkit-transition: margin 0.1s ease;
-  transition: margin 0.1s ease;
-}
-
-.message__file__progress__icon__hex {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.message__file__progress__icon__hex .border, .message__file__progress__icon__hex .content {
-  fill: #fff;
-}
-
-.message__file__progress__icon__hex svg {
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
 .message__file__name {
   display: inline-block;
   width: 100%;
@@ -61344,6 +61223,7 @@ topicWithBursts .burst-seperator .burst-seperator-text:after {
   word-wrap: break-word;
   word-break: break-word;
   white-space: normal;
+  z-index: 0;
 }
 
 .md .messages__message {
@@ -61436,10 +61316,6 @@ message:last-of-type .messages__message.last:after {
   margin: auto 0 auto auto;
 }
 
-.burst--me .message__file__memo-play-icon {
-  color: #fff;
-}
-
 .burst--other .messages__message-blocked {
   background-color: white;
   border: 1px solid #ebeced;
@@ -61452,10 +61328,6 @@ message:last-of-type .messages__message.last:after {
 
 .burst--other .messages__time {
   margin: auto auto auto 0;
-}
-
-.burst--other .message__file__memo-play-icon {
-  color: #545b5e;
 }
 
 .messages__message--emoji-only {
@@ -62254,24 +62126,43 @@ page-sales strong {
   top: 50%;
 }
 
+gallery {
+  display: block;
+}
+
+span ~ gallery {
+  margin-top: 8px;
+}
+
 gallery > div {
   position: relative;
   overflow: hidden;
   font-size: 0;
   line-height: 0;
-  border-radius: 13px;
+  margin: -3px;
+  border-radius: 15px;
 }
 
 .md gallery > div {
   border-radius: 3px;
 }
 
-gallery > div.loading {
+gallery > div .loading {
+  position: relative;
   background-color: white;
 }
 
-gallery > div.loading > img {
+gallery > div .loading > img {
   opacity: .5;
+}
+
+gallery img {
+  max-width: 100%;
+  width: 100%;
+}
+
+gallery .imageContainer ~ .imageContainer {
+  margin-top: 3px;
 }
 
 gallery .overlay {
@@ -62294,6 +62185,10 @@ gallery .overlay {
   align-items: center;
 }
 
+gallery button.button {
+  background: transparent;
+}
+
 .progressbar {
   width: 27px;
   height: 27px;
@@ -62313,4 +62208,101 @@ gallery .overlay {
 
 .progressbar .dummy {
   display: none;
+}
+
+voicemailplayer {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+
+voicemailplayer .vom--icon {
+  width: 31px;
+  text-align: center;
+  margin: auto 6px;
+}
+
+voicemailplayer .vom--icon .icon {
+  font-size: 24px;
+}
+
+voicemailplayer .ion-ios-stats, voicemailplayer .ion-md-stats {
+  width: 15px;
+  text-align: center;
+  margin-right: 1px;
+  font-size: 16px;
+}
+
+.burst--me voicemailplayer .vom--playing .ion-ios-stats, .burst--me voicemailplayer .vom--playing .ion-md-stats {
+  color: #5ab70d;
+}
+
+.burst--other voicemailplayer .vom--playing .ion-ios-stats, .burst--other voicemailplayer .vom--playing .ion-md-stats {
+  color: #5ab70d;
+}
+
+voicemailplayer .vom--info {
+  margin-top: 9px;
+  font-size: 15px;
+  letter-spacing: -0.24px;
+  line-height: 19px;
+  position: relative;
+}
+
+.burst--me voicemailplayer .vom--size {
+  color: #d5d8da;
+}
+
+.burst--other voicemailplayer .vom--size {
+  color: #788286;
+}
+
+voicemailplayer .vom--progress {
+  height: 2px;
+  width: 114px;
+  position: absolute;
+  bottom: 0px;
+}
+
+.burst--me voicemailplayer .vom--progress {
+  background-color: #545b5e;
+}
+
+.burst--other voicemailplayer .vom--progress {
+  background-color: #fff;
+}
+
+voicemailplayer .vom--duration, voicemailplayer .vom--position {
+  min-width: 35px;
+  display: inline-block;
+}
+
+voicemailplayer .vom--duration.vom--duration, voicemailplayer .vom--position.vom--duration {
+  text-align: left;
+}
+
+voicemailplayer .vom--duration.vom--position, voicemailplayer .vom--position.vom--position {
+  text-align: right;
+}
+
+voicemailplayer .vom--progress--bar {
+  height: 100%;
+}
+
+.burst--me voicemailplayer .vom--progress--bar {
+  background-color: #fff;
+}
+
+.burst--other voicemailplayer .vom--progress--bar {
+  background-color: #545b5e;
 }
