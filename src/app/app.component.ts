@@ -1,4 +1,4 @@
-import { Component, ViewChild, ChangeDetectorRef } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController } from "ionic-angular";
 import * as Bluebird from 'bluebird';
 
@@ -21,12 +21,19 @@ const SPLASH_SCREEN_HIDE_DELAY = 200
 
 const TUTORIAL_SLIDES = 7
 
+const setHeight = (height: number) => {
+	const ele = document.getElementsByTagName("ion-nav")[0]
+
+	if (ele instanceof HTMLElement) {
+		ele.style.height = `calc(100% - ${height}px)`
+	}
+}
+
 @Component({
 	templateUrl: "app.html"
 })
 
 export class MyApp {
-	keyboardHeight = 0;
 	rootPage = "Home";
 
 	@ViewChild("navigation") nav: NavController;
@@ -92,7 +99,6 @@ export class MyApp {
 		private statusBar: StatusBar,
 		private globalization: Globalization,
 		private push: Push,
-		private changeDetector: ChangeDetectorRef,
 		private keyboard: Keyboard
 	) {
 		platform.ready().then(() => {
@@ -106,21 +112,9 @@ export class MyApp {
 			if(platform.is("ios")) {
 				this.keyboard.disableScroll(true)
 
-				window.addEventListener('native.keyboardshow', (e: any) => {
-					this.keyboardHeight = e.keyboardHeight
+				window.addEventListener('native.keyboardshow', (e: any) => setHeight(e.keyboardHeight))
 
-					// i had to add this to prevent delays where half the screen
-					// is hidden by the keyboard or white
-					changeDetector.detectChanges()
-				})
-
-				window.addEventListener('native.keyboardhide', () => {
-					this.keyboardHeight = 0
-
-					// i had to add this to prevent delays where half the screen
-					// is hidden by the keyboard or white
-					changeDetector.detectChanges()
-				})
+				window.addEventListener('native.keyboardhide', () => setHeight(0))
 			}
 
 			socketService.addInterceptor({
