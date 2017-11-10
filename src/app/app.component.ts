@@ -25,8 +25,10 @@ const setHeight = (height: number) => {
 	const ele = document.getElementsByTagName("ion-nav")[0]
 
 	if (ele instanceof HTMLElement) {
-		ele.style.height = `calc(100% - ${height}px)`
+		ele.style.height = height ? `calc(100% - ${height}px)` : ""
 	}
+
+	return true
 }
 
 @Component({
@@ -113,7 +115,6 @@ export class MyApp {
 				this.keyboard.disableScroll(true)
 
 				window.addEventListener('native.keyboardshow', (e: any) => setHeight(e.keyboardHeight))
-
 				window.addEventListener('native.keyboardhide', () => setHeight(0))
 			}
 
