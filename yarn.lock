@@ -72,6 +72,10 @@
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/@ionic-native/in-app-browser/-/in-app-browser-3.6.1.tgz#5005e0bc3e6068b6e58de4f478bf6b47ab52493c"
 
+"@ionic-native/keyboard@^4.3.3":
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@ionic-native/keyboard/-/keyboard-4.3.3.tgz#86280749066fe8d16da055e9c078fcc7372a76b3"
+
 "@ionic-native/media@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@ionic-native/media/-/media-4.1.0.tgz#f884e921b59a3b32791dd2a099a6c87adc6a4cfe"
@@ -1776,10 +1780,6 @@ cordova-plugin-ionic-webview@^1.1.8:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/cordova-plugin-ionic-webview/-/cordova-plugin-ionic-webview-1.1.8.tgz#96a2ba2f4d7e921fd091eef528197d9879210bc2"
 
-cordova-plugin-keyboard@~1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-keyboard/-/cordova-plugin-keyboard-1.1.5.tgz#5e04b5205d195622caaadddb2f34adb52a1c96c4"
-
 "cordova-plugin-media@https://github.com/whispeer/cordova-plugin-media.git#fix/voicemail-recording-crash":
   version "3.0.1"
   resolved "https://github.com/whispeer/cordova-plugin-media.git#fe2e61e8571bff85ffd152b29947202f1d130eb4"
@@ -2889,6 +2889,10 @@ invert-kv@^1.0.0:
 ionic-angular@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/ionic-angular/-/ionic-angular-3.6.0.tgz#3c9222796c84cab37f5a3d090c268c9fe308e007"
+
+ionic-plugin-keyboard@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/ionic-plugin-keyboard/-/ionic-plugin-keyboard-2.2.1.tgz#f2a9e169bbe9b5522400347c9fd6d3467ee3fa12"
 
 ionic@^3.9.2:
   version "3.9.2"

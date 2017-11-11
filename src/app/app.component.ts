@@ -6,6 +6,7 @@ import { SplashScreen } from "@ionic-native/splash-screen";
 import { StatusBar } from "@ionic-native/status-bar";
 import { Globalization } from '@ionic-native/globalization';
 import { Push } from '@ionic-native/push';
+import { Keyboard } from '@ionic-native/keyboard';
 
 import { PushService } from "../lib/services/push.service";
 import socketService from "../lib/services/socket.service";
@@ -20,12 +21,21 @@ const SPLASH_SCREEN_HIDE_DELAY = 200
 
 const TUTORIAL_SLIDES = 7
 
+const setHeight = (height: number) => {
+	const ele = document.getElementsByTagName("ion-nav")[0]
+
+	if (ele instanceof HTMLElement) {
+		ele.style.height = height ? `calc(100% - ${height}px)` : ""
+	}
+
+	return true
+}
+
 @Component({
 	templateUrl: "app.html"
 })
 
 export class MyApp {
-
 	rootPage = "Home";
 
 	@ViewChild("navigation") nav: NavController;
@@ -90,7 +100,8 @@ export class MyApp {
 		private splashScreen: SplashScreen,
 		private statusBar: StatusBar,
 		private globalization: Globalization,
-		private push: Push
+		private push: Push,
+		private keyboard: Keyboard
 	) {
 		platform.ready().then(() => {
 			// Okay, so the platform is ready and our plugins are available.
@@ -99,6 +110,13 @@ export class MyApp {
 
 			const pushService = new PushService(this.nav, platform, this.push);
 			pushService.register();
+
+			if(platform.is("ios")) {
+				this.keyboard.disableScroll(true)
+
+				window.addEventListener('native.keyboardshow', (e: any) => setHeight(e.keyboardHeight))
+				window.addEventListener('native.keyboardhide', () => setHeight(0))
+			}
 
 			socketService.addInterceptor({
 				transformResponse: (response) => {
