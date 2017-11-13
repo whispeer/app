@@ -152,13 +152,7 @@ class TrustStoreLoader extends MutableObjectLoader<TrustStore, trustSet>({
 	},
 	restore: (content: trustSet, previousInstance: TrustStore) => {
 		if (previousInstance) {
-			const changed = previousInstance.update(content)
-
-			// TODO: schedule server update if changed! also schedule re-store if changed
-			if (changed) {
-				debugger
-			}
-
+			previousInstance.update(content)
 			return previousInstance
 		}
 

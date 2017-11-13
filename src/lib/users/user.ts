@@ -113,7 +113,7 @@ function deleteCache() {
 	})
 }
 
-interface UserInterface {
+export interface UserInterface {
 	getID: () => number
 
 	generateNewFriendsKey: () => any

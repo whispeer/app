@@ -8,14 +8,12 @@ import Enum from "../asset/enum"
 const errors = require("asset/errors");
 import * as Bluebird from "bluebird"
 import errorService from "../services/error.service";
-import sessionService from "../services/session.service";
 
-import CacheService from '../services/Cache';
+import { UserInterface } from "../users/user"
 
 const initService = require("services/initService");
 
 const THROTTLE = 50
-const trustManagerCache = new CacheService("trustManager.get");
 
 interface keyMap { [x: string]: string }
 
@@ -82,7 +80,9 @@ export class TrustStore {
 		trustIncreasedKeys
 			.forEach((key) => this.keys[key].trust = keys[key].trust)
 
-		return newKeys.length > 0 || trustIncreasedKeys.length > 0
+		if (newKeys.length > 0 || trustIncreasedKeys.length > 0) {
+			scheduleTrustmanagerUpload()
+		}
 	}
 
 	add = (dataSet: trustEntry) => {
@@ -196,20 +196,14 @@ export function userToDataSet({ key, userid, nickname }, trustLevel = trustState
 const uploadDatabase = () =>
 	initService.awaitLoading()
 		.then(() => trustStore.getUpdatedVersion())
-		.then((newTrustContent: any) => {
-			trustManagerCache.store(sessionService.getUserID().toString(), newTrustContent);
-
-			return socketService.emit("trustManager.set", {
-				content: newTrustContent
-			});
-		})
+		.then((content: any) => socketService.emit("trustManager.set", { content }))
 		.then((response: any) => !response.success ? errorService.criticalError(response) : null)
 
 const scheduleTrustmanagerUpload = h.aggregateOnce(THROTTLE, uploadDatabase);
 
 const trustManager = {
 	notify: <any> null,
-	listen: <any> null,
+	/*listen: <any> null,*/
 	allow: function(count) {
 		if (!loaded) {
 			fakeKeyExistence = count;
@@ -218,7 +212,6 @@ const trustManager = {
 	disallow: function() {
 		fakeKeyExistence = 0;
 	},
-	trustStates,
 	isLoaded: () => loaded,
 	setOwnSignKey: function(_ownKey) {
 		ownKey = _ownKey;
@@ -239,15 +232,7 @@ const trustManager = {
 			}
 
 			throw new errors.SecurityError("not my trust database");
-		}).then(function() {
-			const changed = trustStore.update(givenDatabase.metaGet())
-
-			if (changed) {
-				trustManager.notify("", "updated");
-			}
-
-			return changed;
-		}).nodeify(cb);
+		}).then(() => trustStore.update(givenDatabase.metaGet())).nodeify(cb);
 	},
 	hasKeyData: function(keyid) {
 		if (!loaded) {
@@ -271,30 +256,23 @@ const trustManager = {
 
 		throw new Error(`key not in trust database ${keyid}`)
 	},
-	addUser: function(userInfo) {
-		trustManager.addDataSet(userToDataSet(userInfo));
-	},
-	setKeyTrustLevel: function(signKey, trustLevel) {
-		if (trustLevel === trustStates.OWN) {
-			throw new Error("do not use setKeyTrustLevel for own keys.");
+	uploadDatabase,
+	verifyUser: (user: UserInterface) => {
+		const signKey = user.getSignKey()
+
+		if (signKey === ownKey) {
+			throw new Error("Tried to verify own user.")
 		}
 
 		if (trustStore.hasKeyData(signKey)) {
-			trustStore.setKeyTrustLevel(signKey, serializeTrust(trustLevel))
-
-			return true;
+			trustStore.setKeyTrustLevel(signKey, serializeTrust(trustStates.VERIFIED))
 		}
 
-		return false;
-	},
-	uploadDatabase,
-	verifyUser: (user: any) => {
-		trustManager.setKeyTrustLevel(user.getSignKey(), trustManager.trustStates.VERIFIED)
 		return uploadDatabase()
 	},
-	addNewUsers: (userInfo) => {
+	addNewUsers: (userInfo: { key: string, userid: any, nickname: string}) => {
 		if (trustManager.isLoaded() && !trustManager.hasKeyData(userInfo.key)) {
-			trustManager.addUser(userInfo);
+			trustManager.addDataSet(userToDataSet(userInfo))
 			scheduleTrustmanagerUpload()
 		}
 	},
