@@ -100,7 +100,11 @@
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
 		"logoutWarning": "Möchtest du dich auf diesem Gerät abmelden?",
-		"blocked": "Blockierte Nutzer"
+		"blocked": "Blockierte Nutzer",
+		"backup": {
+			"button": "Backup-Schlüssel abrufen",
+			"confirm": "Der Backup-Schlüssel wird dir nun zum Abspeichern angezeigt. Mit diesem Schlüssel kannst du dein Passwort zurücksetzen. Bitte gehe sorgfältig damit um."
+		}
 	},
 	"blocked": {
 		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Du kannst sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken.",

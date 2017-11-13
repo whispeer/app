@@ -1,9 +1,9 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
 module.exports = [
   {
-    "id": "com.synconset.imagepicker.ImagePicker",
-    "file": "plugins/com.synconset.imagepicker/www/imagepicker.js",
-    "pluginId": "com.synconset.imagepicker",
+    "id": "ImagePicker.ImagePicker",
+    "file": "plugins/ImagePicker/www/imagepicker.js",
+    "pluginId": "ImagePicker",
     "clobbers": [
       "plugins.imagePicker"
     ]
@@ -17,9 +17,9 @@ module.exports = [
     ]
   },
   {
-    "id": "cordova-plugin-filechooser.FileChooser",
-    "file": "plugins/cordova-plugin-filechooser/www/fileChooser.js",
-    "pluginId": "cordova-plugin-filechooser",
+    "id": "cordova-filechooser.FileChooser",
+    "file": "plugins/cordova-filechooser/www/fileChooser.js",
+    "pluginId": "cordova-filechooser",
     "clobbers": [
       "fileChooser"
     ]
@@ -287,14 +287,6 @@ module.exports = [
     ]
   },
   {
-    "id": "cordova-plugin-keyboard.keyboard",
-    "file": "plugins/cordova-plugin-keyboard/www/keyboard.js",
-    "pluginId": "cordova-plugin-keyboard",
-    "clobbers": [
-      "window.Keyboard"
-    ]
-  },
-  {
     "id": "cordova-plugin-media.MediaError",
     "file": "plugins/cordova-plugin-media/www/MediaError.js",
     "pluginId": "cordova-plugin-media",
@@ -327,6 +319,15 @@ module.exports = [
     ]
   },
   {
+    "id": "ionic-plugin-keyboard.keyboard",
+    "file": "plugins/ionic-plugin-keyboard/www/ios/keyboard.js",
+    "pluginId": "ionic-plugin-keyboard",
+    "clobbers": [
+      "cordova.plugins.Keyboard"
+    ],
+    "runs": true
+  },
+  {
     "id": "phonegap-plugin-barcodescanner.BarcodeScanner",
     "file": "plugins/phonegap-plugin-barcodescanner/www/barcodescanner.js",
     "pluginId": "phonegap-plugin-barcodescanner",
@@ -346,23 +347,23 @@ module.exports = [
 module.exports.metadata = 
 // TOP OF METADATA
 {
-  "com.synconset.imagepicker": "2.1.8",
-  "com-sarriaroman-photoviewer": "1.1.10",
-  "cordova-plugin-filechooser": "1.0.1",
+  "ImagePicker": "2.1.8",
+  "com-sarriaroman-photoviewer": "1.1.11",
+  "cordova-filechooser": "1.0.1",
   "cordova-plugin-compat": "1.2.0",
   "cordova-plugin-camera": "2.3.1",
-  "cordova-plugin-device": "1.1.6",
+  "cordova-plugin-device": "1.1.7",
   "cordova-plugin-file": "4.3.3",
   "cordova-plugin-file-opener2": "2.0.19",
   "cordova-plugin-filepicker": "1.1.4",
-  "cordova-plugin-globalization": "1.0.7",
-  "cordova-plugin-inappbrowser": "1.7.1",
+  "cordova-plugin-globalization": "1.0.8",
+  "cordova-plugin-inappbrowser": "1.7.2",
   "cordova-plugin-ionic-webview": "1.1.16",
-  "cordova-plugin-keyboard": "1.1.5",
   "cordova-plugin-media": "3.0.1",
   "cordova-plugin-splashscreen": "4.0.3",
   "cordova-plugin-statusbar": "2.2.3",
-  "cordova-plugin-whitelist": "1.3.2",
+  "cordova-plugin-whitelist": "1.3.3",
+  "ionic-plugin-keyboard": "2.2.1",
   "phonegap-plugin-barcodescanner": "6.0.8",
   "phonegap-plugin-push": "1.9.1"
 };
