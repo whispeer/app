@@ -223,6 +223,16 @@ export class MessagesPage {
 				this.recordingPlayer = new VoicemailPlayer(this.recordings)
 			}
 		})
+
+		if(this.platform.is("ios")) {
+			this.resizeEvents = [
+				"resize",
+				"native.keyboardshow",
+				"native.keyboardhide"
+			]
+		} else {
+			this.resizeEvents = ["resize"]
+		}
 	}
 
 	@ViewChild('content') content: ElementRef
@@ -254,8 +264,13 @@ export class MessagesPage {
 		updateInterval: 0
 	}
 
+	private resizeEvents: string[]
+
 	ngAfterViewInit() {
-		window.addEventListener('resize', this.keyboardChange)
+		this.resizeEvents.forEach(resizeEvent =>
+			window.addEventListener(resizeEvent, this.keyboardChange)
+		)
+
 		this.content.nativeElement.addEventListener('scroll', this.onScroll)
 
 		this.mutationObserver = new MutationObserver(this.mutationListener)
@@ -263,7 +278,10 @@ export class MessagesPage {
 	}
 
 	ngOnDestroy() {
-		window.removeEventListener('resize', this.keyboardChange)
+		this.resizeEvents.forEach(resizeEvent =>
+			window.removeEventListener(resizeEvent, this.keyboardChange)
+		)
+
 		this.content.nativeElement.removeEventListener('scroll', this.onScroll)
 
 		this.mutationObserver.disconnect()
