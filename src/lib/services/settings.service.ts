@@ -136,12 +136,16 @@ const turnOldSettingsToNew = (settings: any) => {
 	return result;
 }
 
-const migrateToFormat2 = (givenOldSettings: any) => {
+const migrate = (givenSettings: any) => {
 	console.warn("migrating settings to format 2");
+
+	if (!givenSettings.ct) {
+		return Bluebird.resolve(new SecuredData(givenSettings.content, givenSettings.meta, securedDataOptions, false))
+	}
 
 	return Bluebird.try(() => {
 		keyStore.security.allowPrivateActions();
-		var oldSettings = new EncryptedData(givenOldSettings);
+		var oldSettings = new EncryptedData(givenSettings);
 		return oldSettings.decrypt();
 	}).then(decryptedSettings => {
 		var { meta, content } = turnOldSettingsToNew(decryptedSettings);
@@ -219,22 +223,21 @@ class Settings {
 }
 
 const loadSettings = (givenSettings: any) => {
-	return Bluebird.try(() =>
-		givenSettings.ct ?
-		migrateToFormat2(givenSettings) :
-		new SecuredData(givenSettings.content, givenSettings.meta, securedDataOptions, false)
-	).then((secured) => {
-		const ownUser = require("users/userService").default.getOwn()
+	return Bluebird.try(async function () {
+		const secured = await migrate(givenSettings)
 
-		return Bluebird.all([
+		const ownUser = await require("users/userService").default.getOwnAsync()
+
+		await Bluebird.all([
 			secured.decrypt(),
 			secured.verifyAsync(ownUser.getSignKey(), "settings")
-		]).thenReturn(secured)
-	}).then((secured) => ({
-		content: secured.contentGet(),
-		meta: secured.metaGet(),
-		server: givenSettings.server
-	}))
+		])
+		return {
+			content: secured.contentGet(),
+			meta: secured.metaGet(),
+			server: givenSettings.server
+		}
+	})
 }
 
 class SettingsService extends Observer {

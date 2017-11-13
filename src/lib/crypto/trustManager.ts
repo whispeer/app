@@ -1,15 +1,140 @@
 "use strict";
 
 import Observer from "asset/observer"
-import SecuredData from "../asset/securedDataWithMetaData"
+import SecuredDataApi, { SecuredData } from "../asset/securedDataWithMetaData"
 import Enum from "../asset/enum"
 const errors = require("asset/errors");
 import * as Bluebird from "bluebird"
 
-let database, loaded = false,
-	trustManager;
-let fakeKeyExistence = 0,
-	ownKey, specialKeys = ["me", "nicknames", "ids"];
+interface keyMap { [x: string]: string }
+
+const SECURED_OPTIONS = {
+	type: "trustManager"
+}
+
+interface trustEntry {
+	added: number,
+	trust: string,
+	key: string,
+	userid: string,
+	nickname: string
+}
+
+interface legacyTrustSet {
+	nicknames: keyMap
+	ids: keyMap
+	me: string
+	[x: string]: any
+}
+
+interface trustSet {
+	keys: { [x: string]: trustEntry }
+	nicknames: keyMap
+	ids: keyMap
+	me: string
+}
+
+const transformLegacy = ({ nicknames, ids, me, ...rest }: legacyTrustSet) : trustSet => {
+	const keys : { [x: string]: trustEntry } = {}
+
+	Object.keys(rest).filter((key) => key.indexOf("_") === -1).forEach((key) => {
+		keys[key] = rest[key]
+	})
+
+	return {
+		nicknames,
+		ids,
+		me,
+		keys
+	}
+}
+
+class TrustStore {
+	private nicknames: { [x: string]: string }
+	private ids: { [x: string]: string }
+	private me: string
+	private keys: { [x: string]: trustEntry }
+
+	constructor({ nicknames, ids, me, keys } : trustSet) {
+		this.nicknames = nicknames
+		this.ids = ids
+		this.me = me
+		this.keys = keys
+	}
+
+	update = ({ nicknames, ids, me, keys } : trustSet) => {
+		const newKeys = Object.keys(keys)
+			.filter((key) => !this.keys.hasOwnProperty(key))
+
+		const trustIncreasedKeys = Object.keys(keys)
+			.filter((key) => this.keys.hasOwnProperty(key))
+			.filter((key) => {
+				const oldTrust = unserializeTrust(this.keys[key].trust);
+				const newTrust = unserializeTrust(keys[key].trust);
+
+				return sortedTrustStates.indexOf(oldTrust) < sortedTrustStates.indexOf(newTrust)
+			})
+
+		newKeys
+			.forEach((signKey) => this.add(keys[signKey]) )
+
+		trustIncreasedKeys
+			.forEach((key) => this.keys[key].trust = keys[key].trust)
+
+		return newKeys.length > 0 || trustIncreasedKeys.length > 0
+	}
+
+	add = (dataSet: trustEntry) => {
+		const { key, userid, nickname } = dataSet
+
+		const idKey = this.ids[userid]
+		const nicknameKey = this.nicknames[nickname]
+
+		if (idKey && idKey !== key) {
+			throw new errors.SecurityError("we already have got a key for this users id");
+		}
+
+		if (nicknameKey && nicknameKey !== key) {
+			throw new errors.SecurityError("we already have got a key for this users nickname");
+		}
+
+		this.keys[key] = dataSet
+
+		if (nickname) {
+			this.nicknames[nickname] = key
+		}
+
+		this.ids[userid] = key
+	}
+
+	get = (key: string) => this.keys[key]
+
+	setKeyTrustLevel = (key: string, trustLevel) => {
+		this.keys[key].trust = trustLevel
+	}
+
+	getUpdatedVersion = () => {
+		const info = {
+			nicknames: this.nicknames,
+			ids: this.ids,
+			me: this.me
+		}
+
+		Object.keys(this.keys).forEach((key) => {
+			info[key] = this.keys[key]
+		})
+
+		const secured = new SecuredData(null, info, SECURED_OPTIONS, true)
+		return secured.sign(ownKey)
+	}
+
+	hasKeyData = (key) => this.keys.hasOwnProperty(key)
+}
+
+let trustStore : TrustStore
+let loaded = false
+let fakeKeyExistence = 0
+let ownKey: string
 
 
 const sortedTrustStatesNames = ["BROKEN", "UNTRUSTED", "TIMETRUSTED", "WHISPEERVERIFIED", "NETWORKVERIFIED", "VERIFIED", "OWN"];
@@ -72,19 +197,19 @@ function KeyTrustData(data) {
 	};
 }
 
-function userToDataSet({ key, userid, nickname }, trustLevel = trustStates.UNTRUSTED) {
-	var content = {
+function userToDataSet({ key, userid, nickname }, trustLevel = trustStates.UNTRUSTED) : trustEntry {
+	return {
 		added: new Date().getTime(),
 		trust: serializeTrust(trustLevel),
 		key,
 		userid,
 		nickname
-	};
-
-	return content;
+	}
 }
 
-trustManager = {
+const trustManager = {
+	notify: <any> null,
+	listen: <any> null,
 	allow: function(count) {
 		if (!loaded) {
 			fakeKeyExistence = count;
@@ -97,21 +222,19 @@ trustManager = {
 	isLoaded: function() {
 		return loaded;
 	},
-	createDatabase: function({ key, userid, nickname }) {
-		var data : any = {};
-
-		data.nicknames = {}
-		data.ids = {}
-
-		data[key] = userToDataSet({ key, userid, nickname }, trustStates.OWN)
-
-		data.nicknames[nickname] = key
-		data.ids[userid] = key
-		data.me =  key
-
-		database = SecuredData.load(undefined, data, {
-			type: "trustManager"
-		});
+	createDatabase: function({ key, userid, nickname } : { key: string, userid: number, nickname: string }) {
+		trustStore = new TrustStore({
+			nicknames: {
+				[nickname]: key
+			},
+			ids: {
+				[userid]: key
+			},
+			me: key,
+			keys: {
+				[key]: userToDataSet({ key, userid, nickname }, trustStates.OWN)
+			}
+		})
 
 		loaded = true;
 	},
@@ -119,35 +242,15 @@ trustManager = {
 		ownKey = _ownKey;
 	},
 	addDataSet: function(dataSet) {
-		var signKey = dataSet.key;
-
-		var idKey = database.metaAttr(["ids", dataSet.userid]);
-		var nicknameKey = database.metaAttr(["nicknames", dataSet.nickname]);
-
-		if (idKey && idKey !== signKey) {
-			throw new errors.SecurityError("we already have got a key for this users id");
-		}
-
-		if (nicknameKey && nicknameKey !== signKey) {
-			throw new errors.SecurityError("we already have got a key for this users nickname");
-		}
-
-		database.metaAdd([signKey], dataSet);
-
-		if (dataSet.nickname) {
-			database.metaAdd(["nicknames", dataSet.nickname], signKey);
-		}
-
-		database.metaAdd(["ids", dataSet.userid], signKey);
+		trustStore.add(dataSet)
 	},
-	updateDatabase: function(data, cb) {
-		if (!loaded || data._signature === database.metaAttr("_signature")) {
-			return Bluebird.resolve().nodeify(cb);
+	updateDatabase: function(data, cb?) {
+		if (!loaded) {
+			throw new Error("cant update database: not loaded")
 		}
 
-		var givenDatabase = SecuredData.load(undefined, data, {
-			type: "trustManager"
-		});
+		var givenDatabase = SecuredDataApi.load(undefined, data, SECURED_OPTIONS);
+
 		return Bluebird.try(function() {
 			if (data.me === ownKey) {
 				return givenDatabase.verifyAsync(ownKey, "user");
@@ -155,38 +258,7 @@ trustManager = {
 
 			throw new errors.SecurityError("not my trust database");
 		}).then(function() {
-			var newKeys = givenDatabase.metaKeys().filter(function(key) {
-				return !database.metaHasAttr(key);
-			});
-
-			var oldKeys = givenDatabase.metaKeys().filter(function(key) {
-				return database.metaHasAttr(key);
-			}).filter(function(key) {
-				return specialKeys.indexOf(key) === -1;
-			});
-
-			var changed = false;
-
-			newKeys.forEach(function(signKey) {
-				changed = true;
-
-				var userDataSet = givenDatabase.metaAttr(signKey);
-
-				trustManager.addDataSet(userDataSet);
-			});
-
-			oldKeys.forEach(function(signKey) {
-				var oldValue = database.metaAttr(signKey);
-				var newValue = givenDatabase.metaAttr(signKey);
-
-				var oldTrust = unserializeTrust(oldValue.trust);
-				var newTrust = unserializeTrust(newValue.trust);
-
-				if (sortedTrustStates.indexOf(oldTrust) < sortedTrustStates.indexOf(newTrust)) {
-					changed = true;
-					database.metaAdd([signKey, "trust"], newValue.trust);
-				}
-			});
+			const changed = trustStore.update(givenDatabase.metaGet())
 
 			if (changed) {
 				trustManager.notify("", "updated");
@@ -195,7 +267,7 @@ trustManager = {
 			return changed;
 		}).nodeify(cb);
 	},
-	loadDatabase: function(data, cb) {
+	loadDatabase: function(data) {
 		if (loaded) {
 			return;
 		}
@@ -204,18 +276,17 @@ trustManager = {
 			throw new errors.SecurityError("not my trust database");
 		}
 
-		var givenDatabase = SecuredData.load(undefined, data, {
-			type: "trustManager"
-		});
+		var givenDatabase = SecuredDataApi.load(undefined, data, SECURED_OPTIONS);
 		return Bluebird.try(function() {
 			return givenDatabase.verifyAsync(ownKey, "user");
 		}).then(function() {
 			trustManager.disallow();
-			database = givenDatabase;
+
+			trustStore = new TrustStore(transformLegacy(givenDatabase.metaGet()));
 			loaded = true;
 
 			trustManager.notify("", "loaded");
-		}).nodeify(cb);
+		})
 	},
 	hasKeyData: function(keyid) {
 		if (!loaded) {
@@ -228,10 +299,10 @@ trustManager = {
 				throw new Error("trust manager not yet loaded");
 			}
 		}
-		return database.metaHasAttr(keyid);
+		return trustStore.hasKeyData(keyid)
 	},
 	getKeyData: function(keyid) {
-		var keyData = database.metaAttr(keyid);
+		var keyData = trustStore.get(keyid)
 
 		if (keyData) {
 			return new KeyTrustData(keyData);
@@ -247,16 +318,19 @@ trustManager = {
 			throw new Error("do not use setKeyTrustLevel for own keys.");
 		}
 
-		if (database.metaHasAttr(signKey)) {
-			database.metaAdd([signKey, "trust"], serializeTrust(trustLevel));
+		if (trustStore.hasKeyData(signKey)) {
+			trustStore.setKeyTrustLevel(signKey, serializeTrust(trustLevel))
 
 			return true;
 		}
 
 		return false;
 	},
-	getUpdatedVersion: function(cb) {
-		return database.sign(ownKey).nodeify(cb);
+	getUpdatedVersion: function() {
+		if (!loaded) {
+			throw new Error("trust manager not yet loaded can not get updated version")
+		}
+		return trustStore.getUpdatedVersion()
 	}
 };
 

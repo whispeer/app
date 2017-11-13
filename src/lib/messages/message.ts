@@ -30,7 +30,7 @@ export class Message {
 	private serverID: number
 	private clientID: any
 	private previousID: any
-	private securedData: any
+	private securedData: SecuredData
 	private attachments: attachments
 
 	private sendTime: number
@@ -251,7 +251,7 @@ export class Message {
 				this.securedData.setAfterRelationShip(newest.getSecuredData())
 			}
 
-			const signAndEncryptPromise = this.securedData._signAndEncrypt(userService.getOwn().getSignKey(), chunkKey)
+			const signAndEncryptPromise = this.securedData.signAndEncrypt(userService.getOwn().getSignKey(), chunkKey)
 			const keys = await this.uploadAttachments(chunkKey)
 			const request = await signAndEncryptPromise
 

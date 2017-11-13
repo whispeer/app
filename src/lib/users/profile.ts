@@ -73,7 +73,7 @@ export default class Profile extends Observer {
 			throw new Error("no encrypt for public profiles!");
 		}
 
-		return this.securedData._signAndEncrypt(signKey, cryptKey)
+		return this.securedData.signAndEncrypt(signKey, cryptKey)
 	};
 
 	updated = () => {
