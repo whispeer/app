@@ -153,48 +153,27 @@ function unserializeTrust(trustLevel) {
 	return trustStates.fromString(trustLevel);
 }
 
-function KeyTrustData(data) {
-	var trustSymbol = unserializeTrust(data.trust);
+class KeyTrustData {
+	private trustSymbol
 
-	this.getAddedTime = function() {
-		return data.added;
-	};
-	this.getKey = function() {
-		return data.key;
-	};
-	this.getUserID = function() {
-		return data.userid;
-	};
-	this.getNickname = function() {
-		return data.nickname;
-	};
-	this.getTrust = function() {
-		return trustSymbol;
-	};
+	constructor (private data: trustEntry) {
+		this.trustSymbol = unserializeTrust(data.trust);
+	}
 
+	getAddedTime = () => this.data.added
+	getKey = () => this.data.key
+	getUserID = () => this.data.userid
+	getNickname = () => this.data.nickname
+	getTrust = () => this.trustSymbol
 
-	this.isUntrusted = function() {
-		return trustSymbol === trustStates.UNTRUSTED;
-	};
-	this.isTimeTrusted = function() {
-		return trustSymbol === trustStates.TIMETRUSTED;
-	};
-	this.isWhispeerVerified = function() {
-		return trustSymbol === trustStates.WHISPEERVERIFIED;
-	};
-	this.isNetworkVerified = function() {
-		return trustSymbol === trustStates.NETWORKVERIFIED;
-	};
-	this.isVerified = function() {
-		return trustSymbol === trustStates.VERIFIED;
-	};
-	this.isOwn = function() {
-		return trustSymbol === trustStates.OWN;
-	};
+	isUntrusted = () => this.trustSymbol === trustStates.UNTRUSTED
+	isTimeTrusted = () => this.trustSymbol === trustStates.TIMETRUSTED
+	isWhispeerVerified = () => this.trustSymbol === trustStates.WHISPEERVERIFIED
+	isNetworkVerified = () => this.trustSymbol === trustStates.NETWORKVERIFIED
+	isVerified = () => this.trustSymbol === trustStates.VERIFIED
+	isOwn = () => this.trustSymbol === trustStates.OWN
 
-	this.setTrust = function(trustLevel) {
-		trustManager.setKeyTrustLevel(data.key, trustLevel);
-	};
+	setTrust = (trustLevel) => trustManager.setKeyTrustLevel(this.data.key, trustLevel)
 }
 
 function userToDataSet({ key, userid, nickname }, trustLevel = trustStates.UNTRUSTED) : trustEntry {
@@ -302,13 +281,13 @@ const trustManager = {
 		return trustStore.hasKeyData(keyid)
 	},
 	getKeyData: function(keyid) {
-		var keyData = trustStore.get(keyid)
+		const keyData = trustStore.get(keyid)
 
 		if (keyData) {
 			return new KeyTrustData(keyData);
 		}
 
-		return false;
+		throw new Error(`key not in trust database ${keyid}`)
 	},
 	addUser: function(userInfo) {
 		trustManager.addDataSet(userToDataSet(userInfo));
