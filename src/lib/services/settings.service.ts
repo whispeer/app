@@ -1,6 +1,6 @@
 import * as Bluebird from "bluebird";
 import socketService from "./socket.service";
-import * as keyStore from "../crypto/keyStore.js";
+const keyStore = require("../crypto/keyStore.js")
 
 import Observer from "../asset/observer";
 

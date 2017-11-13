@@ -84,9 +84,7 @@ userService = {
 	/** get own user. synchronous */
 	getOwn: () => UserLoader.getLoaded(sessionService.getUserID()),
 
-	getOwnAsync: () => {
-		return UserLoader.get(sessionService.getUserID())
-	}
+	getOwnAsync: () => UserLoader.get(sessionService.getUserID())
 }
 
 initService.registerCallback(function () {

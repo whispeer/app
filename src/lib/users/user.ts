@@ -7,12 +7,10 @@ import * as Bluebird from "bluebird"
 const initService = require("services/initService")
 import State from "../asset/state"
 const keyStoreService = require("crypto/keyStore")
-const signatureCache = require("crypto/signatureCache")
 
 import sessionService from "../services/session.service"
 import blobService from "../services/blobService"
 import Profile from "../users/profile"
-import trustService from "../services/trust.service"
 import settingsService from "../services/settings.service"
 import filterService from "../services/filter.service"
 import { reloadApp, isIOS } from "../services/location.manager"
@@ -489,7 +487,7 @@ class User implements UserInterface {
 				throw new Error("wrong code")
 			}
 
-			return trustService.verifyUser(this)
+			return trustManager.verifyUser(this)
 		}).then(() => {
 			this.data.trustLevel = 2
 		})
@@ -897,8 +895,6 @@ function enhanceOwnUser(userData) {
 
 	trustManager.setOwnSignKey(signKey)
 
-	trustService.ownKeysLoaded()
-
 	Bluebird.all([
 		requestKeyService.getKey(signKey),
 		requestKeyService.getKey(mainKey)
@@ -956,25 +952,20 @@ export default class UserLoader extends MutableObjectLoader<UserInterface, Cache
 
 			if (isMe) {
 				enhanceOwnUser(userData)
-				await signatureCache.awaitLoading()
 			}
 
 			const signKey = userData.signedKeys.sign
 			const nickname = userData.nickname
 
-			trustService.addNewUsers({ key: signKey, userid: userID, nickname })
+			if (!isMe) {
+				trustManager.addNewUsers({ key: signKey, userid: userID, nickname })
+			}
 
 			const signedKeys = await SignedKeysLoader.load({ signedKeys: userData.signedKeys, signKey })
 
 			const profiles = await getProfiles(userData, signKey, isMe)
 
-			const user = new User(userData, signedKeys, profiles)
-
-			if (isMe) {
-				trustService.ownUserLoaded(user)
-			}
-
-			return user
+			return new User(userData, signedKeys, profiles)
 		})
 	},
 	shouldUpdate: (event, instance) => {

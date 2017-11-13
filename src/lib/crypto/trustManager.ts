@@ -1,10 +1,21 @@
 "use strict";
 
-import Observer from "asset/observer"
+import h from "../helper/helper";
+import socketService from "../services/socket.service";
+import Observer from "../asset/observer"
 import SecuredDataApi, { SecuredData } from "../asset/securedDataWithMetaData"
 import Enum from "../asset/enum"
 const errors = require("asset/errors");
 import * as Bluebird from "bluebird"
+import errorService from "../services/error.service";
+import sessionService from "../services/session.service";
+
+import CacheService from '../services/Cache';
+
+const initService = require("services/initService");
+
+const THROTTLE = 50
+const trustManagerCache = new CacheService("trustManager.get");
 
 interface keyMap { [x: string]: string }
 
@@ -184,6 +195,20 @@ function userToDataSet({ key, userid, nickname }, trustLevel = trustStates.UNTRU
 	}
 }
 
+const uploadDatabase = () =>
+	initService.awaitLoading()
+		.then(() => trustStore.getUpdatedVersion())
+		.then((newTrustContent: any) => {
+			trustManagerCache.store(sessionService.getUserID().toString(), newTrustContent);
+
+			return socketService.emit("trustManager.set", {
+				content: newTrustContent
+			});
+		})
+		.then((response: any) => !response.success ? errorService.criticalError(response) : null)
+
+const scheduleTrustmanagerUpload = h.aggregateOnce(THROTTLE, uploadDatabase);
+
 const trustManager = {
 	notify: <any> null,
 	listen: <any> null,
@@ -303,14 +328,23 @@ const trustManager = {
 
 		return false;
 	},
-	getUpdatedVersion: function() {
-		if (!loaded) {
-			throw new Error("trust manager not yet loaded can not get updated version")
+	uploadDatabase,
+	verifyUser: (user: any) => {
+		trustManager.setKeyTrustLevel(user.getSignKey(), trustManager.trustStates.VERIFIED)
+		return uploadDatabase()
+	},
+	addNewUsers: (userInfo) => {
+		if (trustManager.isLoaded() && !trustManager.hasKeyData(userInfo.key)) {
+			trustManager.addUser(userInfo);
+			scheduleTrustmanagerUpload()
 		}
-		return trustStore.getUpdatedVersion()
 	}
 };
 
 Observer.extend(trustManager);
+
+socketService.channel("notify.trustManager", (_e: any, data: any) => {
+	trustManager.updateDatabase(data).catch(errorService.criticalError)
+})
 
 export default trustManager;
