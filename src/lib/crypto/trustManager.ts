@@ -282,6 +282,8 @@ const trustManager = {
 			throw new Error("trying to overwrite trust store. Please update instance")
 		}
 
+		trustManager.disallow()
+
 		trustStore = givenTrustStore
 		loaded = true
 		trustManager.notify("", "loaded")

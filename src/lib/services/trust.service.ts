@@ -18,7 +18,7 @@ import trustManager, {
 	userToDataSet,
 	TRUST_SECURED_OPTIONS,
 } from "../crypto/trustManager"
-import MutableObjectLoader from "../services/mutableObjectLoader"
+import MutableObjectLoader, { SYMBOL_UNCHANGED } from "../services/mutableObjectLoader"
 import socketService from "../services/socket.service";
 import userService from "../users/userService"
 const signatureCache = require("crypto/signatureCache");
@@ -85,11 +85,8 @@ const loadTrustInfo = (data) => {
 		}
 
 		const givenDatabase = SecuredDataApi.load(undefined, data, TRUST_SECURED_OPTIONS);
-		return givenDatabase.verifyAsync(ownKey, "user").then(() => {
-			trustManager.disallow();
-
-			return transformLegacy(givenDatabase.metaGet())
-		})
+		return givenDatabase.verifyAsync(ownKey, "user")
+			.then(() => transformLegacy(givenDatabase.metaGet()))
 	})
 }
 
@@ -140,12 +137,12 @@ class TrustStoreLoader extends MutableObjectLoader<TrustStore, trustSet>({
 		socketService.awaitConnection()
 			.then(() => socketService.definitlyEmit("trustManager.get", {
 				responseKey: "content",
-				cacheSignature: previousInstance.getSignature()
+				cacheSignature: previousInstance && previousInstance.getSignature()
 			}))
 			.then((response) => response.content),
 	load: (response, previousInstance: TrustStore) => {
 		if (previousInstance && response.unChanged) {
-			return Bluebird.resolve(previousInstance.getTrustSet())
+			return Bluebird.resolve(SYMBOL_UNCHANGED)
 		}
 
 		return loadTrustInfo(response.content)
