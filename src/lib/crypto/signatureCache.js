@@ -61,8 +61,8 @@ var cacheTypes = {
 	signedFriendList: "user",
 
 	circle: "me",
-	trustManager: "me",
-	settings: "me",
+	trustManager: "noCache",
+	settings: "noCache",
 
 	topicUpdate: "noCache",
 
