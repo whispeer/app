@@ -2,7 +2,7 @@ import * as Bluebird from 'bluebird';
 
 import socketService from "../services/socket.service"
 
-import ObjectLoader from "../services/mutableObjectLoader"
+import ObjectLoader, { SYMBOL_UNCHANGED } from "../services/mutableObjectLoader"
 
 import ChunkLoader, { Chunk } from "./chatChunk"
 import MessageLoader, { Message } from "./message"
@@ -110,17 +110,19 @@ export class Chat extends Observer {
 		this.update({ latestChunk, latestMessage, unreadMessageIDs })
 	}
 
+	getInfo = () => ({
+		id: this.id,
+		unreadMessageIDs: this.unreadMessageIDs,
+		latestMessageID: this.getLatestMessage(),
+		latestChunkID: this.getLatestChunk()
+	})
+
 	private store = () => {
 		if (this.draft) {
 			return
 		}
 
-		const storeInfo = {
-			id: this.id,
-			unreadMessageIDs: this.unreadMessageIDs,
-			latestMessageID: this.getLatestMessage(),
-			latestChunkID: this.getLatestChunk()
-		}
+		const storeInfo = this.getInfo()
 
 		if (h.deepEqual(this.lastStoredInfo, storeInfo)) {
 			return
@@ -669,7 +671,11 @@ type ChatCache = {
 export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 	download: (id) =>
 		socketService.definitlyEmit("chat.get", { id }).then((response) => response.chat),
-	load: (chatResponse) => {
+	load: (chatResponse, previousInstance) => {
+		if (h.deepEqual(previousInstance.getInfo(), chatResponse.chat)) {
+			return Bluebird.resolve(SYMBOL_UNCHANGED)
+		}
+
 		const loadChunks = Bluebird.all(chatResponse.chunks.map((chunkData) =>
 			ChunkLoader.load(chunkData)
 		))
