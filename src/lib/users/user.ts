@@ -24,7 +24,7 @@ import { ProfileLoader } from "../users/profile"
 import { SignedKeysLoader } from "../users/signedKeys"
 
 const friendsService = require("services/friendsService")
-const trustManager = require("crypto/trustManager").default
+import trustManager from "../crypto/trustManager"
 
 const RELOAD_DELAY_MIN = 10 * 1000
 const RELOAD_DELAY_MAX = 60 * 1000
@@ -521,7 +521,7 @@ class User implements UserInterface {
 	}
 
 	getTrustLevel = () => {
-		const trust = trustService.getKey(this.getSignKey())
+		const trust = trustManager.getKeyData(this.getSignKey())
 
 		if (trust.isOwn()) {
 			return -1

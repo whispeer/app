@@ -190,14 +190,9 @@ class TrustService {
 		return this.loadCachePromise;
 	}
 
-	getKey = (keyid: string) => trustManager.getKeyData(keyid)
-
 	verifyUser = (user: any) => {
-		return Bluebird.try(() => {
-			var keyData = trustManager.getKeyData(user.getSignKey());
-			keyData.setTrust(trustManager.trustStates.VERIFIED);
-			return this.uploadDatabase();
-		})
+		trustManager.setKeyTrustLevel(user.getSignKey(), trustManager.trustStates.VERIFIED)
+		return this.uploadDatabase()
 	};
 }
 

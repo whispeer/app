@@ -172,8 +172,6 @@ class KeyTrustData {
 	isNetworkVerified = () => this.trustSymbol === trustStates.NETWORKVERIFIED
 	isVerified = () => this.trustSymbol === trustStates.VERIFIED
 	isOwn = () => this.trustSymbol === trustStates.OWN
-
-	setTrust = (trustLevel) => trustManager.setKeyTrustLevel(this.data.key, trustLevel)
 }
 
 function userToDataSet({ key, userid, nickname }, trustLevel = trustStates.UNTRUSTED) : trustEntry {
