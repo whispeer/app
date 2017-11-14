@@ -91,7 +91,7 @@ export class SettingsPage {
 			ctx.fillText(keyData.substr(26), 10, image.height + 75);
 
 			ctx.fillText("whispeer-Passwort vergessen?", 10, image.height + 125);
-			ctx.fillText("https://whilogispeer.de/recovery", 10, image.height + 150);
+			ctx.fillText("https://whispeer.de/recovery", 10, image.height + 150);
 
 			this.photoViewer.show(c.toDataURL())
 		})
