@@ -150,6 +150,22 @@ const sortedTrustStatesNames = ["BROKEN", "UNTRUSTED", "TIMETRUSTED", "WHISPEERV
 
 export const trustStates = new Enum(sortedTrustStatesNames);
 
+export const transformLegacy = ({ nicknames, ids, me, _signature, ...rest }: legacyTrustSet) : trustSet => {
+	const keys : { [x: string]: trustEntry } = {}
+
+	Object.keys(rest).filter((key) => h.isRealID(key)).forEach((key) => {
+		keys[key] = rest[key]
+	})
+
+	return {
+		nicknames,
+		ids,
+		me,
+		keys,
+		signature: _signature
+	}
+}
+
 const sortedTrustStates = sortedTrustStatesNames.map(function(trustLevel) {
 	return trustStates.fromString("|" + trustLevel + "|");
 });
@@ -232,7 +248,7 @@ const trustManager = {
 			}
 
 			throw new errors.SecurityError("not my trust database");
-		}).then(() => trustStore.update(givenDatabase.metaGet())).nodeify(cb);
+		}).then(() => trustStore.update(transformLegacy(givenDatabase.metaGet()))).nodeify(cb);
 	},
 	hasKeyData: function(keyid) {
 		if (!loaded) {

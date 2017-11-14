@@ -5,16 +5,14 @@ import CacheService from './Cache';
 import SecuredDataApi from "../asset/securedDataWithMetaData"
 const errors = require("asset/errors");
 import sessionService from "./session.service";
-import h from "../helper/helper"
 
 const initService = require("services/initService");
 
 import trustManager, {
 	trustSet,
 	trustStates,
-	legacyTrustSet,
-	trustEntry,
 
+	transformLegacy,
 	TrustStore,
 	userToDataSet,
 	TRUST_SECURED_OPTIONS,
@@ -40,22 +38,6 @@ function time(name: string) {
 function timeEnd(name: string) {
 	if (debug.enabled(debugName)) {
 		console.timeEnd(name);
-	}
-}
-
-const transformLegacy = ({ nicknames, ids, me, _signature, ...rest }: legacyTrustSet) : trustSet => {
-	const keys : { [x: string]: trustEntry } = {}
-
-	Object.keys(rest).filter((key) => h.isRealID(key)).forEach((key) => {
-		keys[key] = rest[key]
-	})
-
-	return {
-		nicknames,
-		ids,
-		me,
-		keys,
-		signature: _signature
 	}
 }
 
