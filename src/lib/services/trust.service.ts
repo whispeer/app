@@ -5,6 +5,7 @@ import CacheService from './Cache';
 import SecuredDataApi from "../asset/securedDataWithMetaData"
 const errors = require("asset/errors");
 import sessionService from "./session.service";
+import h from "../helper/helper"
 
 const initService = require("services/initService");
 
@@ -45,7 +46,7 @@ function timeEnd(name: string) {
 const transformLegacy = ({ nicknames, ids, me, _signature, ...rest }: legacyTrustSet) : trustSet => {
 	const keys : { [x: string]: trustEntry } = {}
 
-	Object.keys(rest).filter((key) => key.indexOf("_") === -1).forEach((key) => {
+	Object.keys(rest).filter((key) => h.isRealID(key)).forEach((key) => {
 		keys[key] = rest[key]
 	})
 

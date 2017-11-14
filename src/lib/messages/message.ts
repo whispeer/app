@@ -462,7 +462,7 @@ const loadMessageSender = senderID =>
 export default class MessageLoader extends ObjectLoader<Message, MessageCache>({
 	cacheName: "message",
 	getID: ({ server }) => server.uuid,
-	download: id => socket.emit("chat.message.get", { id }),
+	download: id => socket.definitlyEmit("chat.message.get", { id }),
 	load: (messageResponse): Bluebird<MessageCache> => {
 		const { content, meta, server } = messageResponse
 
