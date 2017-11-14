@@ -668,9 +668,24 @@ type ChatCache = {
 	unreadMessageIDs: any
 }
 
+const loadChatInfo = (ids) =>
+	socketService.definitlyEmit("chat.getMultiple", { ids })
+		.then(({ chats }) =>
+			ids.map((id) => chats.find(({ chat }) => chat.id === id))
+		)
+
+const getChatInfo = h.delayMultiplePromise(Bluebird, 50, loadChatInfo, 10)
+
 export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
-	download: (id) =>
-		socketService.definitlyEmit("chat.get", { id }).then((response) => response.chat),
+	download: (id) => {
+		return getChatInfo(id).then((chatInfo) => {
+			if (chatInfo.chat.id !== id) {
+				throw new Error("fail")
+			}
+			return chatInfo
+		})
+	},
+
 	load: (chatResponse, previousInstance) => {
 		if (previousInstance && h.deepEqual(previousInstance.getInfo(), chatResponse.chat)) {
 			return Bluebird.resolve(SYMBOL_UNCHANGED)

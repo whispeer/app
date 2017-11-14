@@ -110,7 +110,6 @@ const blobCache = {
 		return Bluebird.try(async () => {
 			if (clearing) throw new Error('Cannot store blob, currently clearing cache.')
 			storing++
-			console.warn(`storing++ ${storing-1} -> ${storing}, blob: ${blob.getBlobID()}`)
 			const blobID = blob.getBlobID()
 
 			if (!blob.isDecrypted()) {
@@ -129,10 +128,7 @@ const blobCache = {
 		}).catch((e) => {
 			console.warn("Storing blob failed")
 			return Bluebird.reject(e)
-		}).finally(() => {
-			storing--
-			console.warn(`storing-- ${storing+1} -> ${storing}, blob: ${blob.getBlobID()}`)
-		})
+		}).finally(() => storing-- )
 	},
 
 	getBlobUrl: (blobID) => {
