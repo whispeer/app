@@ -1,16 +1,16 @@
 webpackJsonp([9],{
 
-/***/ 443:
+/***/ 447:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SettingsPageModule", function() { return SettingsPageModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HomePageModule", function() { return HomePageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__settings__ = __webpack_require__(494);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_components_module__ = __webpack_require__(444);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__home__ = __webpack_require__(487);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_components_module__ = __webpack_require__(455);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -22,50 +22,50 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-var SettingsPageModule = (function () {
-    function SettingsPageModule() {
+var HomePageModule = (function () {
+    function HomePageModule() {
     }
-    SettingsPageModule = __decorate([
+    HomePageModule = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
             declarations: [
-                __WEBPACK_IMPORTED_MODULE_2__settings__["a" /* SettingsPage */]
+                __WEBPACK_IMPORTED_MODULE_2__home__["a" /* HomePage */],
             ],
             imports: [
-                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__settings__["a" /* SettingsPage */]),
+                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__home__["a" /* HomePage */]),
                 __WEBPACK_IMPORTED_MODULE_3__components_components_module__["a" /* ComponentsModule */],
                 __WEBPACK_IMPORTED_MODULE_4__ngx_translate_core__["b" /* TranslateModule */].forChild(),
             ],
             entryComponents: [
-                __WEBPACK_IMPORTED_MODULE_2__settings__["a" /* SettingsPage */]
+                __WEBPACK_IMPORTED_MODULE_2__home__["a" /* HomePage */],
             ]
         })
-    ], SettingsPageModule);
-    return SettingsPageModule;
+    ], HomePageModule);
+    return HomePageModule;
 }());
 
-//# sourceMappingURL=settings.module.js.map
+//# sourceMappingURL=home.module.js.map
 
 /***/ }),
 
-/***/ 444:
+/***/ 455:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ComponentsModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_responsiveDate__ = __webpack_require__(445);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_pipes_maxValue__ = __webpack_require__(446);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_pipes_filenameLimit__ = __webpack_require__(447);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__userImage__ = __webpack_require__(448);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__navigator_navigator__ = __webpack_require__(449);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__load__ = __webpack_require__(450);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__loadingProgress__ = __webpack_require__(456);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__hexagon__ = __webpack_require__(457);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__navigator_hexagon__ = __webpack_require__(458);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__navigator_icon__ = __webpack_require__(459);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_responsiveDate__ = __webpack_require__(456);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_pipes_maxValue__ = __webpack_require__(457);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_pipes_filenameLimit__ = __webpack_require__(458);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__userImage__ = __webpack_require__(459);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__navigator_navigator__ = __webpack_require__(460);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__load__ = __webpack_require__(461);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__loadingProgress__ = __webpack_require__(467);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__hexagon__ = __webpack_require__(468);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__navigator_hexagon__ = __webpack_require__(469);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__navigator_icon__ = __webpack_require__(470);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -130,13 +130,13 @@ var ComponentsModule = (function () {
 
 /***/ }),
 
-/***/ 445:
+/***/ 456:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ResponsiveDatePipe; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(52);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -193,7 +193,7 @@ var ResponsiveDatePipe = (function () {
 
 /***/ }),
 
-/***/ 446:
+/***/ 457:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -225,7 +225,7 @@ var MaxValuePipe = (function () {
 
 /***/ }),
 
-/***/ 447:
+/***/ 458:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -258,7 +258,7 @@ var FilenameLimitPipe = (function () {
 
 /***/ }),
 
-/***/ 448:
+/***/ 459:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -333,14 +333,14 @@ var UserImageComponent = (function () {
 
 /***/ }),
 
-/***/ 449:
+/***/ 460:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Navigator; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_session_service__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_session_service__ = __webpack_require__(21);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -499,7 +499,7 @@ var Navigator = (function () {
 
 /***/ }),
 
-/***/ 450:
+/***/ 461:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -524,7 +524,7 @@ var LoadComponent = (function () {
     ;
     Object.defineProperty(LoadComponent.prototype, "name", {
         set: function (name) {
-            var icon = __webpack_require__(451)("./" + name + ".svg");
+            var icon = __webpack_require__(462)("./" + name + ".svg");
             this.html = this.sanitizer.bypassSecurityTrustHtml(icon);
         },
         enumerable: true,
@@ -549,14 +549,14 @@ var LoadComponent = (function () {
 
 /***/ }),
 
-/***/ 451:
+/***/ 462:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./add.svg": 452,
-	"./added.svg": 453,
-	"./deny.svg": 454,
-	"./write.svg": 455
+	"./add.svg": 463,
+	"./added.svg": 464,
+	"./deny.svg": 465,
+	"./write.svg": 466
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -572,39 +572,39 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 451;
+webpackContext.id = 462;
 
 /***/ }),
 
-/***/ 452:
+/***/ 463:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"add\" class=\"fill-primary\" d=\"M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25ZM496,832H484v12h-7V832H465v-7h12V813h7v12h12v7Z\" transform=\"translate(-436 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 453:
+/***/ 464:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"added\" class=\"fill-primary\" d=\"M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25Zm18.5-61.23-24.725,24.24-12.291-12.032,4.869-4.753,7.422,7.278,19.855-19.487Z\" transform=\"translate(-436 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 454:
+/***/ 465:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"deny\" class=\"fill-grey\" d=\"M953.5,880L908.985,854.25V802.759L953.5,777.013l44.515,25.746V854.25Zm8.485-38.061L953.5,833.45l-8.485,8.485-4.95-4.95,8.485-8.485-8.485-8.485,4.95-4.95,8.485,8.485,8.485-8.485,4.95,4.95L958.45,828.5l8.485,8.485Z\" transform=\"translate(-909 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 455:
+/***/ 466:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"write_corner\" data-name=\"write corner\" class=\"fill-primaryDark\" d=\"M6.577,102l6.651-24.883L31.4,95.331Z\"/>\n  <path id=\"write\" class=\"fill-primary\" d=\"M44.5,103L0,77.25V25.75L44.5,0,89,25.75v51.5ZM19,43.149V36.994H70V43.15H19ZM70,55.078H19V48.922H70v6.156ZM50,67.006H19V60.851H50v6.156Z\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 456:
+/***/ 467:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -620,9 +620,33 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+var INTERPOLATION_SCALING = 12;
 var LoadingProgress = (function () {
     function LoadingProgress(element) {
+        var _this = this;
         this.element = element;
+        this.interpolatedProgress = 0;
+        this.animationStep = function (time) {
+            if (!_this.divToStyle) {
+                window.requestAnimationFrame(_this.animationStep);
+                _this.divToStyle = _this.element.nativeElement.querySelector('div');
+            }
+            else {
+                var progress = _this.progress();
+                if (progress < _this.interpolatedProgress || progress === 1) {
+                    _this.interpolatedProgress = progress;
+                }
+                else {
+                    _this.interpolatedProgress += (progress - _this.interpolatedProgress) / INTERPOLATION_SCALING;
+                }
+                _this.divToStyle.setAttribute("style", "background-image: " + _this.progressArc());
+                if (_this.interpolatedProgress !== 1) {
+                    window.requestAnimationFrame(_this.animationStep);
+                }
+            }
+        };
+        // [ngStyle]="{'background-image': progressArc}"
+        window.requestAnimationFrame(this.animationStep);
     }
     LoadingProgress.prototype.getBackgroundElement = function () {
         var element = this.element.nativeElement.parentElement;
@@ -674,27 +698,22 @@ var LoadingProgress = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LoadingProgress.prototype, "progressArc", {
-        get: function () {
-            var progress = this.progress();
-            var _a = this, progressBackground = _a.progressBackground, progressColor = _a.progressColor;
-            if (!progressBackground || !progressColor) {
-                return "";
-            }
-            var deg, result;
-            if (progress <= 0.5) {
-                deg = 90 + 180 * progress * 2;
-                result = "linear-gradient(90deg, " + progressBackground + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(" + deg + "deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
-            }
-            else {
-                deg = -90 + 180 * (2 * (progress - .5));
-                result = "linear-gradient(" + deg + "deg, " + progressColor + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
-            }
-            return result;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    LoadingProgress.prototype.progressArc = function () {
+        var _a = this, progressBackground = _a.progressBackground, progressColor = _a.progressColor;
+        if (!progressBackground || !progressColor) {
+            return "";
+        }
+        var deg, result;
+        if (this.interpolatedProgress <= 0.5) {
+            deg = 90 + 180 * this.interpolatedProgress * 2;
+            result = "linear-gradient(90deg, " + progressBackground + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(" + deg + "deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
+        }
+        else {
+            deg = -90 + 180 * (2 * (this.interpolatedProgress - .5));
+            result = "linear-gradient(" + deg + "deg, " + progressColor + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
+        }
+        return result;
+    };
     __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
         __metadata("design:type", String)
@@ -713,7 +732,7 @@ var LoadingProgress = (function () {
     ], LoadingProgress.prototype, "foregroundClass", void 0);
     LoadingProgress = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: "loading-progress",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/'<div *ngIf="progress && progress() <= 1" [ngStyle]="{\'background-image\': progressArc}" class="progressbar">\n	<div class="dummy" [ngClass]="foregroundClass"></div>\n	<div class="hole" [ngStyle]="{\'background-color\': background}"></div>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/
+            selector: "loading-progress",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/'<div *ngIf="progress && progress() <= 1" class="progressbar">\n	<div class="dummy" [ngClass]="foregroundClass"></div>\n	<div class="hole" [ngStyle]="{\'background-color\': background}"></div>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */]])
     ], LoadingProgress);
@@ -724,7 +743,7 @@ var LoadingProgress = (function () {
 
 /***/ }),
 
-/***/ 457:
+/***/ 468:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -757,7 +776,7 @@ var HexagonComponent = (function () {
 
 /***/ }),
 
-/***/ 458:
+/***/ 469:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -790,7 +809,7 @@ var NavigatorHexagon = (function () {
 
 /***/ }),
 
-/***/ 459:
+/***/ 470:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -827,18 +846,86 @@ var NavigatorIcon = (function () {
 
 /***/ }),
 
-/***/ 494:
+/***/ 471:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SettingsPage; });
+/* unused harmony export SameArray */
+var Memoizer = (function () {
+    function Memoizer(selectors, reduce) {
+        this.selectors = selectors;
+        this.reduce = reduce;
+    }
+    Memoizer.prototype.hasChanged = function (newValues) {
+        var _this = this;
+        if (!this.values) {
+            return true;
+        }
+        var index = newValues.findIndex(function (val, index) {
+            var previousVal = _this.values[index];
+            if (previousVal === val) {
+                return false;
+            }
+            if (Array.isArray(val) && Array.isArray(previousVal) && val.length === 0 && previousVal.length === 0) {
+                return false;
+            }
+            return true;
+        });
+        if (index > -1) {
+            // console.warn(`Memoizer recalculated at ${index}`, this.values, newValues)
+        }
+        return index > -1;
+    };
+    Memoizer.prototype.getValue = function () {
+        var newValues = this.selectors.map(function (selector) { return selector(); });
+        if (!this.hasChanged(newValues)) {
+            return this.cachedValue;
+        }
+        this.values = newValues;
+        this.cachedValue = this.reduce.apply(this, this.values.concat([this.cachedValue]));
+        return this.cachedValue;
+    };
+    return Memoizer;
+}());
+/* harmony default export */ __webpack_exports__["a"] = (Memoizer);
+var SameArray = (function () {
+    function SameArray() {
+        var _this = this;
+        this.arr = [];
+        this.setValue = function (newValues) {
+            if (_this.previousInput === newValues) {
+                return;
+            }
+            _this.arr.splice(0, _this.arr.length);
+            _this.arr.push.apply(_this.arr, newValues);
+            _this.previousInput = newValues;
+        };
+        this.getValue = function () { return _this.arr; };
+    }
+    return SameArray;
+}());
+
+//# sourceMappingURL=memoizer.js.map
+
+/***/ }),
+
+/***/ 487:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HomePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_in_app_browser__ = __webpack_require__(291);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ngx_translate_core__ = __webpack_require__(280);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_tutorial__ = __webpack_require__(292);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_services_session_service__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_services_settings_service__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__ = __webpack_require__(150);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_asset_memoizer__ = __webpack_require__(471);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_messages_chatChunk__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_messages_message__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__lib_services_settings_service__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_error_service__ = __webpack_require__(30);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -854,95 +941,166 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+var contactsService = __webpack_require__(85);
 
-var SettingsPage = (function () {
-    function SettingsPage(navCtrl, navParams, alertCtrl, translate, iab) {
+
+
+
+
+var chatMemoizer = {};
+// Amount of chats after we don't load more initially
+// Considered to be at least one filled screen
+var CHATS_PER_SCREEN = 10;
+var getChatMemoizer = function (chatID) {
+    if (!chatMemoizer[chatID]) {
+        chatMemoizer[chatID] = new __WEBPACK_IMPORTED_MODULE_5__lib_asset_memoizer__["a" /* default */]([
+            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID); },
+            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID).getLatestChunk(); },
+            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID).getLatestMessage(); },
+            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID).getUnreadMessageIDs(); },
+            function () { return __WEBPACK_IMPORTED_MODULE_9__lib_services_settings_service__["default"].getBlockedUsers(); }
+        ], function (chat, latestChunkID, latestMessageID, unreadMessageIDs, blockedUsers, previousValue) {
+            var latestChunk = __WEBPACK_IMPORTED_MODULE_6__lib_messages_chatChunk__["b" /* default */].getLoaded(chat.getLatestChunk());
+            var info = previousValue || { id: chat.getID() };
+            info.id = chat.getID();
+            info.unread = chat.getUnreadMessageIDs().length > 0;
+            info.unreadCount = chat.getUnreadMessageIDs().length;
+            info.blocked = chat.isBlocked();
+            info.partners = latestChunk.getPartners();
+            info.partnersDisplay = latestChunk.getPartnerDisplay();
+            info.title = latestChunk.getTitle();
+            info.time = latestChunk.getTime();
+            info.type = latestChunk.getReceiver().length > 2 ? "groupChat" : "peerChat";
+            if (!__WEBPACK_IMPORTED_MODULE_7__lib_messages_message__["b" /* default */].isLoaded(latestMessageID)) {
+                info.latestMessageText = "";
+            }
+            else {
+                var latestMessage = __WEBPACK_IMPORTED_MODULE_7__lib_messages_message__["b" /* default */].getLoaded(latestMessageID);
+                info.time = latestMessage.getTime();
+                info.latestMessageText = latestMessage.getText();
+                info.latestMessageBlocked = latestMessage.isBlocked();
+            }
+            return info;
+        });
+    }
+    return chatMemoizer[chatID];
+};
+var HomePage = (function () {
+    function HomePage(navCtrl, translate) {
         var _this = this;
         this.navCtrl = navCtrl;
-        this.navParams = navParams;
-        this.alertCtrl = alertCtrl;
         this.translate = translate;
-        this.iab = iab;
-        this.pushEnabled = true;
-        this.tutorialPassed = true;
-        this.version = { version: {"type":"messenger","version":"0.3.6","commit":"c75ba6e\n"}.version + "-" + {"type":"messenger","version":"0.3.6","commit":"c75ba6e\n"}.commit };
-        this.hasBlocked = function () { return __WEBPACK_IMPORTED_MODULE_6__lib_services_settings_service__["default"].getBlockedUsers().length > 0; };
-        this.close = function () {
-            _this.navCtrl.setRoot("Home");
+        this.topics = [];
+        this.requests = [];
+        this.searchTerm = "";
+        this.chatsLoading = true;
+        this.moreTopicsAvailable = true;
+        this.lang = "en";
+        this.numberOfChatsToDisplay = 0;
+        this.ionViewDidEnter = function () {
+            _this.loadTopics();
+            _this.loadRequests();
+            var en = (_this.translate.currentLang.toLowerCase().indexOf("de") === -1);
+            _this.lang = en ? "en" : "de";
         };
+        this.loadTopics = function () {
+            _this.numberOfChatsToDisplay = CHATS_PER_SCREEN;
+            console.warn("load more chats?", _this.getLoadedChats().length);
+            if (_this.getLoadedChats().length >= CHATS_PER_SCREEN) {
+                return;
+            }
+            _this.numberOfChatsToDisplay = 0;
+            __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].loadMoreChats(CHATS_PER_SCREEN).then(function (chats) {
+                _this.moreTopicsAvailable = !__WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].allChatsLoaded;
+                _this.chatsLoading = false;
+                _this.numberOfChatsToDisplay = CHATS_PER_SCREEN;
+            }).catch(__WEBPACK_IMPORTED_MODULE_10__lib_services_error_service__["default"].criticalError);
+        };
+        this.getChatCount = function () { return __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs().length; };
+        this.checkNoMissingChats = function () {
+            if (_this.chatsLoading) {
+                return;
+            }
+            var missing = __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs()
+                .slice(0, _this.numberOfChatsToDisplay)
+                .filter(function (chatID) { return !__WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].isLoaded(chatID); });
+            if (missing.length === 0) {
+                return;
+            }
+            console.warn("Fetching missing chats:", missing);
+            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["all"](missing.map(function (chatID) { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].get(chatID); }));
+        };
+        this.getLoadedChats = function () {
+            return __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs()
+                .filter(function (chatID) { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].isLoaded(chatID); })
+                .filter(function (id, i) { return i < _this.numberOfChatsToDisplay; })
+                .map(function (chatID) { return getChatMemoizer(chatID).getValue(); })
+                .sort(function (a, b) { return b.time - a.time; });
+        };
+        this.showNoConversationsPlaceholder = function () { return !_this.chatsLoading && _this.getChatCount() === 0; };
+        this.loadMoreTopics = function (infiniteScroll) {
+            if (_this.chatsLoading) {
+                infiniteScroll.complete();
+                return;
+            }
+            __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].loadMoreChats(CHATS_PER_SCREEN).then(function (chats) {
+                _this.moreTopicsAvailable = !__WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].allChatsLoaded;
+                _this.numberOfChatsToDisplay += chats.length;
+                if (__WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].allChatsLoaded) {
+                    _this.numberOfChatsToDisplay = __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs().length;
+                }
+                infiniteScroll.complete();
+            });
+        };
+        this.updateRequests = function () {
+            _this.requests = contactsService.getRequests();
+        };
+        this.loadRequests = function () {
+            contactsService.awaitLoading().then(function () {
+                _this.updateRequests();
+                contactsService.listen(_this.updateRequests);
+            });
+        };
+        this.openContactRequests = function () {
+            _this.navCtrl.push("Requests");
+        };
+        this.openChat = function (chatID) {
+            _this.navCtrl.push("Messages", { chatID: chatID });
+        };
+        this.newMessage = function () {
+            _this.navCtrl.push("New Message", {}, {
+                animation: "md-transition"
+            });
+        };
+        setInterval(function () { return _this.checkNoMissingChats(); }, 10 * 1000);
     }
-    SettingsPage.prototype.tutorialVisible = function () {
-        return __WEBPACK_IMPORTED_MODULE_4__app_tutorial__["a" /* default */].tutorialVisible;
-    };
-    SettingsPage.prototype.resetTutorial = function (_a) {
-        var checked = _a.checked;
-        if (!checked)
-            return;
-        __WEBPACK_IMPORTED_MODULE_4__app_tutorial__["a" /* default */].resetVisibility();
-        try {
-            this.goBack();
-        }
-        catch (e) {
-            console.log('Something went wrong when exiting settings');
-        }
-    };
-    SettingsPage.prototype.ionViewDidLoad = function () {
-        console.log('ionViewDidLoad SettingsPage');
-    };
-    SettingsPage.prototype.pushWarning = function () {
-        this.pushEnabled = true;
-        alert(this.translate.instant("settings.pushAlert"));
-    };
-    SettingsPage.prototype.goBack = function () {
-        this.navCtrl.pop();
-    };
-    SettingsPage.prototype.logout = function () {
-        var logoutConfirm = this.alertCtrl.create({
-            title: this.translate.instant("settings.logout"),
-            message: this.translate.instant("settings.logoutWarning"),
-            buttons: [
-                { text: 'Cancel', role: 'cancel' },
-                { text: 'Logout',
-                    handler: function () { return __WEBPACK_IMPORTED_MODULE_5__lib_services_session_service__["default"].logout(); } }
-            ]
-        });
-        // there seems to be a bug in current ionic, which prevents
-        // cssClass properties in options to propagate, instead these have
-        // to be set with a subsequent call like this:
-        logoutConfirm.setCssClass('logout-confirm');
-        logoutConfirm.present();
-    };
-    SettingsPage.prototype.showBlocked = function () {
-        this.navCtrl.push("Blocked Users");
-    };
-    SettingsPage.prototype.feedback = function () {
-        this.navCtrl.push("New Message", {
-            receiverIds: "3317"
-        });
-    };
-    SettingsPage.prototype.tos = function () {
-        this.iab.create("https://whispeer.de/en/agb", "_blank");
-    };
-    SettingsPage.prototype.privacyPolicy = function () {
-        this.iab.create("https://whispeer.de/en/privacyPolicy", "_blank");
-    };
-    SettingsPage.prototype.contactUs = function () {
-        this.iab.create("https://whispeer.de/en/contact", "_blank");
-    };
-    SettingsPage = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["h" /* IonicPage */])({
-            name: "Settings",
-            segment: "settings"
+    HomePage.prototype.ngOnInit = function () { };
+    Object.defineProperty(HomePage.prototype, "requestsLabel", {
+        get: function () {
+            var count = this.requests.length > 1 ? "many" : "single";
+            return this.translate.instant("home.newContact." + count);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* Content */]),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* Content */])
+    ], HomePage.prototype, "content", void 0);
+    HomePage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* IonicPage */])({
+            name: "Home",
+            segment: "home"
         }),
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-settings',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/settings/settings.html"*/'<ion-header>\n\n	<ion-navbar [color]="\'primary\'">\n		<ion-title>{{ \'settings.title\' | translate }}</ion-title>\n	</ion-navbar>\n\n</ion-header>\n\n\n<ion-content>\n	<ion-list>\n		<ion-list-header padding-top>\n			{{ \'settings.header\' | translate}}\n		</ion-list-header>\n		<ion-item>\n			<ion-label>{{ \'settings.push\' | translate}}</ion-label>\n			<ion-toggle checked="true" disabled (ngModelChange)="pushWarning()"></ion-toggle>\n		</ion-item>\n		<ion-item>\n			<ion-label>{{ \'settings.tutorial\' | translate}}</ion-label>\n			<ion-toggle\n				[checked]="tutorialVisible()"\n				(ionChange)="resetTutorial($event)"></ion-toggle>\n		</ion-item>\n		<ion-item detail-push (click)="showBlocked()" *ngIf="hasBlocked()">\n			<ion-avatar item-start class="inline-avatar">\n				<img src="assets/img/blocked-icon.png" />\n			</ion-avatar>\n			<ion-label>{{ \'settings.blocked\' | translate}}</ion-label>\n		</ion-item>\n		<ion-item detail-push (click)="feedback()">\n			<ion-avatar item-start class="inline-avatar">\n				<img src="assets/img/feedback-icon.png" />\n			</ion-avatar>\n			<ion-label>{{ \'settings.feedback\' | translate}}</ion-label>\n		</ion-item>\n	</ion-list>\n	<ion-list>\n		<ion-list-header>\n			{{ \'settings.about\' | translate}}\n		</ion-list-header>\n		<ion-item detail-push (click)="tos()">\n			{{ \'settings.tos\' | translate}}\n		</ion-item>\n		<ion-item detail-push (click)="privacyPolicy()">\n			{{ \'settings.privacy\' | translate}}\n		</ion-item>\n		<ion-item detail-push (click)="contactUs()">\n			{{ \'settings.contact\' | translate}}\n		</ion-item>\n	</ion-list>\n\n	<button ion-button full color="danger" (click)="logout()">{{ \'settings.logout\' | translate}}</button>\n\n	<div text-center class="space-for-fab">\n		<p class="text-grey" padding-vertical>\n			{{ \'settings.companyName\' | translate:version }}<br>\n			{{ \'settings.madeInGermany\' | translate }} <ion-icon name="md-heart"></ion-icon> {{ \'settings.humanRights\' | translate }}\n		</p>\n	</div>\n\n	<navigator [icon]="\'close\'" (invoke)="close()" ion-fixed></navigator>\n</ion-content>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/settings/settings.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/home/home.html"*/'<ion-header>\n	<ion-navbar [color]="\'primary\'" no-border>\n		<ion-title>{{ \'home.title\' | translate }}</ion-title>\n	</ion-navbar>\n</ion-header>\n\n<ion-content class="list-avatar-page">\n	<div *ngIf="showNoConversationsPlaceholder()" class="home__no-content-container" ion-fixed>\n		<img class="home__no-content-image" src="assets/images/no_conversations_{{lang}}.png">\n	</div>\n	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="openContactRequests()">\n		<div class="badgeContainer">\n			<span class="hexBadge">{{requests.length}}</span>\n		</div>\n		{{requestsLabel}}\n		<ion-icon name="arrow-forward"></ion-icon>\n	</button>\n	<ion-list class="space-for-fab">\n		<ion-item *ngFor="let chat of getLoadedChats(); let i = index" class="topic" [ngClass]="{\'topic--new\': !chat.blocked && chat.unread}" tappable (click)="openChat(chat.id)">\n			<div class="user__image-wrap" item-left>\n				<ion-avatar\n					*ngFor="let partner of chat.partnersDisplay"\n					class="hexagon__image hexagon__image--active"\n					[ngClass]="{\'hexagon__image--medium\': chat.partnersDisplay.length > 1}"\n				>\n					<user-image [id]="partner.id" [image]="partner.basic.image"></user-image>\n				</ion-avatar>\n				<ion-avatar\n					*ngIf="chat.partners.length > 3"\n					class="hexagon__image hexagon__image--medium"\n				>\n					<hexagon></hexagon>\n					<span class="hexagon__image__image topic__remainingUsers">+{{chat.partners.length - 2}}</span>\n				</ion-avatar>\n			</div>\n			<div class="topic__header">\n				<h2 class="user__name">\n					<span *ngIf="!chat.title">\n						<span *ngFor="let partner of chat.partners; let l = last">\n							{{ partner.basic.shortname }}{{ l ? "":", " }}\n						</span>\n					</span>\n					<span *ngIf="chat.title">{{chat.title}}</span>\n					<div class="topic__badgeContainer" *ngIf="!chat.blocked && chat.unread">\n						<span class="topic__hexBadge">\n							<span class="topic__hexBadge__text">{{ chat.unreadCount | maxValue: 99 }}</span>\n						</span>\n					</div>\n				</h2>\n				<div>\n					<ion-note item-right>{{chat.time | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>\n				</div>\n			</div>\n			<p *ngIf="!chat.latestMessageBlocked">{{chat.latestMessageText}}</p>\n			<p *ngIf="chat.latestMessageBlocked">{{ \'blocked.messageReplacement\' | translate }}</p>\n		</ion-item>\n	</ion-list>\n\n	<ion-spinner *ngIf="chatsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>\n\n	<ion-infinite-scroll [enabled]="moreTopicsAvailable" (ionInfinite)="loadMoreTopics($event)">\n		<ion-infinite-scroll-content></ion-infinite-scroll-content>\n	</ion-infinite-scroll>\n\n	<div class="space-for-fab"></div>\n\n	<navigator (invoke)="newMessage()" ion-fixed></navigator>\n</ion-content>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["j" /* NavController */], __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["k" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["b" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__ngx_translate_core__["c" /* TranslateService */], __WEBPACK_IMPORTED_MODULE_1__ionic_native_in_app_browser__["a" /* InAppBrowser */]])
-    ], SettingsPage);
-    return SettingsPage;
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* NavController */], __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__["c" /* TranslateService */]])
+    ], HomePage);
+    return HomePage;
 }());
 
-//# sourceMappingURL=settings.js.map
+//# sourceMappingURL=home.js.map
 
 /***/ })
 

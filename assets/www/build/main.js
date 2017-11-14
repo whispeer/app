@@ -1,5 +1,197 @@
 webpackJsonp([12],{
 
+/***/ 101:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UpdateEvent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_error_service__ = __webpack_require__(30);
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+
+
+
+
+// What do we want to achieve and how:
+// - Group multiple requests together -> download can do that for itself
+// - Add cache info so server does not resend full data (esp. for trustManager) -> activeInstance
+// - merge new and active -> restore has active and response
+// - cache first then update
+var UpdateEvent;
+(function (UpdateEvent) {
+    UpdateEvent[UpdateEvent["wake"] = 0] = "wake";
+    UpdateEvent[UpdateEvent["blink"] = 1] = "blink";
+})(UpdateEvent || (UpdateEvent = {}));
+var LONG_APP_PAUSE = 2 * 60 * 1000;
+var LONG_DISCONNECT = 60 * 1000;
+function createLoader(_a) {
+    var download = _a.download, load = _a.load, restore = _a.restore, getID = _a.getID, cacheName = _a.cacheName, shouldUpdate = _a.shouldUpdate;
+    var loading = {};
+    var byId = {};
+    var cache = new __WEBPACK_IMPORTED_MODULE_2__services_Cache__["default"](cacheName);
+    var considerLoaded = function (id) {
+        loading = __assign({}, loading);
+        delete loading[id];
+    };
+    var cacheInMemory = function (id, instance, lastUpdated) {
+        byId = __assign({}, byId, (_a = {}, _a[id] = { instance: instance, lastUpdated: lastUpdated, updating: false }, _a));
+        var _a;
+    };
+    var loadFromCache = function (id) {
+        var lastUpdated = Date.now();
+        return cache.get(id)
+            .then(function (cacheResponse) {
+            lastUpdated = cacheResponse.created;
+            return cacheResponse.data;
+        })
+            .then(function (cachedData) { return restore(cachedData, null); })
+            .then(function (instance) {
+            cacheInMemory(id, instance, lastUpdated);
+            considerLoaded(id);
+            scheduleInstanceUpdate(UpdateEvent.wake, id);
+            return instance;
+        });
+    };
+    var serverResponseToInstance = function (response, id, activeInstance) {
+        return load(response, activeInstance)
+            .then(function (cacheableData) { return cache.store(id, cacheableData).thenReturn(cacheableData); })
+            .then(function (cachedData) { return restore(cachedData, activeInstance); })
+            .then(function (instance) {
+            if (activeInstance && activeInstance !== instance) {
+                console.warn("Restore should update active instance");
+            }
+            cacheInMemory(id, instance, Date.now());
+            return instance;
+        })
+            .finally(function () { return considerLoaded(id); });
+    };
+    var updateInstance = function (id, instance) {
+        return download(id, instance).then(function (response) {
+            return serverResponseToInstance(response, id, instance);
+        });
+    };
+    var scheduleInstanceUpdate = function (event, id) {
+        var _a = byId[id], instance = _a.instance, lastUpdated = _a.lastUpdated, updating = _a.updating;
+        if (updating) {
+            console.info("Not updating instance because update is already running " + cacheName + "/" + id);
+            return;
+        }
+        byId[id].updating = true;
+        shouldUpdate(event, instance, lastUpdated).then(function (shouldUpdate) {
+            if (shouldUpdate) {
+                console.info("Schedule " + cacheName + " instance " + id + " update with event " + UpdateEvent[event]);
+                return updateInstance(id, instance).then(function () {
+                    return byId[id].lastUpdated = Date.now();
+                });
+            }
+        }).catch(__WEBPACK_IMPORTED_MODULE_3__services_error_service__["default"].criticalError).finally(function () { return byId[id].updating = false; });
+        return;
+    };
+    var scheduleInstancesUpdate = function (event) {
+        console.info("Schedule " + cacheName + " instances update with event " + UpdateEvent[event]);
+        Object.keys(byId)
+            .forEach(function (id) { return scheduleInstanceUpdate(event, id); });
+    };
+    var lastHeartbeat = Date.now();
+    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].listen(function () { return lastHeartbeat = Date.now(); }, "heartbeat");
+    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].on("connect", function () {
+        console.info("connect at " + Date.now() + " after " + (Date.now() - lastHeartbeat));
+        if (Date.now() - lastHeartbeat > LONG_DISCONNECT) {
+            scheduleInstancesUpdate(UpdateEvent.wake);
+        }
+        else {
+            scheduleInstancesUpdate(UpdateEvent.blink);
+        }
+        lastHeartbeat = Date.now();
+    });
+    var pauseStarted = 0;
+    document.addEventListener("pause", function () { return pauseStarted = Date.now(); }, false);
+    document.addEventListener("resume", function () {
+        console.info("ended pause at " + Date.now() + " after " + (Date.now() - pauseStarted));
+        if (Date.now() - pauseStarted > LONG_APP_PAUSE) {
+            scheduleInstancesUpdate(UpdateEvent.wake);
+        }
+        else {
+            scheduleInstancesUpdate(UpdateEvent.blink);
+        }
+    }, false);
+    return _b = (function () {
+            function ObjectLoader() {
+            }
+            ObjectLoader.getLoaded = function (id) {
+                if (!ObjectLoader.isLoaded(id)) {
+                    throw new Error("Not yet loaded: " + id);
+                }
+                return byId[id].instance;
+            };
+            ObjectLoader.isLoaded = function (id) {
+                return byId.hasOwnProperty(id);
+            };
+            ObjectLoader.load = function (source) {
+                var id = getID(source);
+                if (byId[id]) {
+                    serverResponseToInstance(source, id, byId[id].instance);
+                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+                }
+                if (!loading[id]) {
+                    loading = __assign({}, loading, (_a = {}, _a[id] = loadFromCache(id)
+                        .catch(function () { return serverResponseToInstance(source, id, null); }), _a));
+                }
+                return loading[id];
+                var _a;
+            };
+            ObjectLoader.updateCache = function (id, cacheableData) {
+                return cache.store(id, cacheableData);
+            };
+            // Throws
+            ObjectLoader.getFromCache = function (id) {
+                if (byId[id]) {
+                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+                }
+                return loadFromCache(id);
+            };
+            ObjectLoader.get = function (id) {
+                if (typeof id === "undefined" || id === null) {
+                    throw new Error("Can't get object with id " + id + " - " + cacheName);
+                }
+                if (byId[id]) {
+                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+                }
+                if (!loading[id]) {
+                    var promise = loadFromCache(id)
+                        .catch(function () { return download(id, null).then(function (response) { return serverResponseToInstance(response, id, null); }); });
+                    loading = __assign({}, loading, (_a = {}, _a[id] = promise, _a));
+                }
+                return loading[id];
+                var _a;
+            };
+            return ObjectLoader;
+        }()),
+        _b.getAll = function () {
+            return byId;
+        },
+        _b.removeLoaded = function (id) { return delete byId[id]; },
+        _b.addLoaded = function (id, obj) {
+            byId[id] = { instance: obj, lastUpdated: Date.now(), updating: false };
+        },
+        _b;
+    var _b;
+}
+/* harmony default export */ __webpack_exports__["b"] = (createLoader);
+//# sourceMappingURL=mutableObjectLoader.js.map
+
+/***/ }),
+
 /***/ 11:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7,14 +199,14 @@ webpackJsonp([12],{
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DisconnectError", function() { return DisconnectError; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ServerError", function() { return ServerError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_socket_io_client__ = __webpack_require__(319);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_socket_io_client__ = __webpack_require__(324);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_socket_io_client___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_socket_io_client__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobUploader_service__ = __webpack_require__(341);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__location_manager__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobUploader_service__ = __webpack_require__(346);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__location_manager__ = __webpack_require__(47);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -29,7 +221,7 @@ var APIVERSION = "0.0.3";
 var debug = __webpack_require__(15);
 
 
-var config = __webpack_require__(55);
+var config = __webpack_require__(56);
 
 
 
@@ -158,7 +350,7 @@ var SocketService = (function (_super) {
         }
         var timer = log.timer("request on " + channel);
         request.version = APIVERSION;
-        request.clientInfo = {"type":"messenger","version":"0.3.6","commit":"c75ba6e\n"};
+        request.clientInfo = {"type":"messenger","version":"0.3.9","commit":"68a865d\n"};
         socketDebug("Request on " + channel, request);
         this._interceptors.forEach(function (interceptor) {
             if (interceptor.transformRequest) {
@@ -255,633 +447,22 @@ var SocketService = (function (_super) {
 
 /***/ }),
 
-/***/ 145:
+/***/ 150:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return unpath; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(84);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__ = __webpack_require__(146);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__ = __webpack_require__(361);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__asset_Queue__ = __webpack_require__(281);
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var _this = this;
-
-var debug = __webpack_require__(15);
-
-
-
-
-
-
-var initService = __webpack_require__(21);
-var keyStore = __webpack_require__(26);
-var knownBlobURLs = {};
-var downloadBlobQueue = new __WEBPACK_IMPORTED_MODULE_6__asset_Queue__["a" /* default */](5);
-downloadBlobQueue.start();
-var debugName = "whispeer:blobService";
-var blobServiceDebug = debug(debugName);
-var time = function (name) {
-    if (debug.enabled(debugName)) {
-        // eslint-disable-next-line no-console
-        console.time(name);
-    }
-};
-var timeEnd = function (name) {
-    if (debug.enabled(debugName)) {
-        // eslint-disable-next-line no-console
-        console.timeEnd(name);
-    }
-};
-var unpath = function (path) {
-    var index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1;
-    return {
-        directory: path.substr(0, index),
-        name: path.substr(index)
-    };
-};
-var MyBlob = (function () {
-    function MyBlob(blobData, blobID, options) {
-        this.blobData = blobData;
-        options = options || {};
-        if (blobID) {
-            this.blobID = blobID;
-            this.uploaded = true;
-        }
-        else {
-            this.uploaded = false;
-        }
-        this.meta = options.meta || {};
-        this.key = this.meta._key || this.meta.key;
-        this.decrypted = options.decrypted || !this.key;
-        this.uploadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
-        this.encryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
-        this.decryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
-    }
-    MyBlob.prototype.isDecrypted = function () {
-        return this.decrypted;
-    };
-    MyBlob.prototype.isUploaded = function () {
-        return this.uploaded;
-    };
-    MyBlob.prototype.getSize = function () {
-        return this.blobData.size;
-    };
-    MyBlob.prototype.getMeta = function () {
-        return this.meta;
-    };
-    MyBlob.prototype.getArrayBuffer = function () {
-        var _this = this;
-        Object(__WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["b" /* fixFileReader */])();
-        if (this.blobData.originalUrl) {
-            var _a = unpath(this.blobData.originalUrl), directory = _a.directory, name_1 = _a.name;
-            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].readFileAsArrayBuffer(directory, name_1).timeout(2 * 60 * 1000);
-        }
-        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
-            var reader = new FileReader();
-            if (reader.addEventListener) {
-                reader.addEventListener("loadend", resolve);
-            }
-            else {
-                reader.onloadend = resolve;
-            }
-            reader.readAsArrayBuffer(_this.blobData);
-        }).then(function (event) {
-            var target = event.currentTarget || event.target;
-            if (target.error) {
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](target.error);
-            }
-            return target.result;
-        }).timeout(2 * 60 * 1000);
-    };
-    MyBlob.prototype.encryptAndUpload = function (key) {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            var blobKey;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.encrypt()];
-                    case 1:
-                        blobKey = _a.sent();
-                        return [4 /*yield*/, keyStore.sym.symEncryptKey(blobKey, key)];
-                    case 2:
-                        _a.sent();
-                        return [4 /*yield*/, this.upload()];
-                    case 3:
-                        _a.sent();
-                        return [2 /*return*/, blobKey];
-                }
-            });
-        }); });
-    };
-    MyBlob.prototype.encrypt = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().then(function () {
-            if (_this.uploaded || !_this.decrypted) {
-                throw new Error("trying to encrypt an already encrypted or public blob. add a key decryptor if you want to give users access");
-            }
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
-                keyStore.sym.generateKey(null, "blob key"),
-                _this.getArrayBuffer()
-            ]);
-        }).spread(function (key, buf) {
-            _this.key = key;
-            time("blobencrypt" + (_this.blobID || _this.preReservedID));
-            return keyStore.sym.encryptArrayBuffer(buf, _this.key, function (progress) {
-                _this.encryptProgress.progress(_this.getSize() * progress);
-            });
-        }).then(function (encryptedData) {
-            _this.encryptProgress.progress(_this.getSize());
-            timeEnd("blobencrypt" + (_this.blobID || _this.preReservedID));
-            blobServiceDebug(encryptedData.byteLength);
-            _this.decrypted = false;
-            _this.blobData = new Blob([encryptedData], { type: _this.blobData.type });
-            return _this.key;
-        });
-    };
-    MyBlob.prototype.decrypt = function () {
-        var _this = this;
-        if (this.decrypted) {
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
-        }
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            return _this.getArrayBuffer();
-        }).then(function (encryptedData) {
-            time("blobdecrypt" + _this.blobID);
-            return keyStore.sym.decryptArrayBuffer(encryptedData, _this.key, function (progress) {
-                _this.decryptProgress.progress(_this.getSize() * progress);
-            });
-        }).then(function (decryptedData) {
-            _this.decryptProgress.progress(_this.getSize());
-            timeEnd("blobdecrypt" + _this.blobID);
-            _this.decrypted = true;
-            _this.blobData = new Blob([decryptedData], { type: _this.blobData.type });
-            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(_this).catch(function (e) {
-                console.log("Could not store blob");
-                return _this.toURL();
-            });
-        });
-    };
-    MyBlob.prototype.toURL = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            if (_this.blobData.localURL) {
-                return _this.blobData.localURL;
-            }
-            if (typeof window.URL !== "undefined") {
-                return window.URL.createObjectURL(_this.blobData);
-            }
-            if (typeof webkitURL !== "undefined") {
-                return window.webkitURL.createObjectURL(_this.blobData);
-            }
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["fromCallback"](function (cb) {
-                __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].blobToDataURI(_this.blobData, cb);
-            });
-        }).catch(function () {
-            return "";
-        });
-    };
-    MyBlob.prototype.upload = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            if (_this.uploaded) {
-                return _this.blobID;
-            }
-            return _this.reserveID();
-        }).then(function (blobid) {
-            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].uploadBlob(_this.blobData, blobid, _this.uploadProgress);
-        }).then(function () {
-            _this.uploaded = true;
-            return _this.blobID;
-        });
-    };
-    MyBlob.prototype.getBlobID = function () {
-        return this.blobID;
-    };
-    MyBlob.prototype.getBlobData = function () {
-        return this.blobData;
-    };
-    MyBlob.prototype.reserveID = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            var meta = _this.meta;
-            meta._key = _this.key;
-            meta.one = 1;
-            if (_this.preReservedID) {
-                return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.fullyReserveID", {
-                    blobid: _this.preReservedID,
-                    meta: meta
-                });
-            }
-            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.reserveBlobID", {
-                meta: meta
-            });
-        }).then(function (data) {
-            if (data.blobid) {
-                _this.blobID = data.blobid;
-                return _this.blobID;
-            }
-        });
-    };
-    MyBlob.prototype.preReserveID = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.preReserveID", {});
-        }).then(function (data) {
-            if (data.blobid) {
-                _this.preReservedID = data.blobid;
-                return data.blobid;
-            }
-            throw new Error("got no blobid");
-        });
-    };
-    MyBlob.prototype.getHash = function () {
-        return this.getArrayBuffer().then(function (buf) {
-            return keyStore.hash.hashArrayBuffer(buf);
-        });
-    };
-    return MyBlob;
-}());
-var loadBlob = function (blobID, progress, estimatedSize) {
-    var decryptProgressStub = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
-    var downloadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
-    progress.addDepend(downloadProgress);
-    progress.addDepend(decryptProgressStub);
-    return downloadBlobQueue.enqueue(1, function () { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-        var data, blob;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, initService.awaitLoading()];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, new __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__socket_service__["default"], blobID, downloadProgress).download()];
-                case 2:
-                    data = _a.sent();
-                    blob = new MyBlob(data.blob, blobID, { meta: data.meta });
-                    if (blob.isDecrypted()) {
-                        return [2 /*return*/, __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(blob).catch(function () { return blob.toURL(); })];
-                    }
-                    downloadProgress.progress(downloadProgress.getTotal());
-                    progress.removeDepend(decryptProgressStub);
-                    progress.addDepend(blob.decryptProgress);
-                    return [2 /*return*/, blob.decrypt()];
-            }
-        });
-    }); }); });
-};
-var getBlob = function (blobID, downloadProgress, estimatedSize) {
-    if (!knownBlobURLs[blobID]) {
-        knownBlobURLs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize);
-    }
-    return knownBlobURLs[blobID];
-};
-var blobService = {
-    createBlob: function (blob) {
-        return new MyBlob(blob);
-    },
-    isBlobLoaded: function (blobID) {
-        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].isLoaded(blobID);
-    },
-    getBlobUrl: function (blobID, progress, estimatedSize) {
-        if (progress === void 0) { progress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */](); }
-        if (estimatedSize === void 0) { estimatedSize = 0; }
-        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].getBlobUrl(blobID).catch(function () {
-            return getBlob(blobID, progress, estimatedSize);
-        });
-    },
-};
-/* harmony default export */ __webpack_exports__["a"] = (blobService);
-//# sourceMappingURL=blobService.js.map
-
-/***/ }),
-
-/***/ 146:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return fixFileReader; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_file__ = __webpack_require__(147);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(25);
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var _this = this;
-
-
-
-var BLOB_CACHE_DIR = "blobCache";
-var LOCK_TIMEOUT = 30 * 1000;
-var FILE = new __WEBPACK_IMPORTED_MODULE_1__ionic_native_file__["a" /* File */]();
-var isAndroid = function () { return window.device && window.device.platform === "Android"; };
-var fixFileReader = function () {
-    var win = window;
-    var delegateName = win.Zone.__symbol__('OriginalDelegate');
-    if (win.FileReader[delegateName]) {
-        console.warn("Fixing file reader!");
-        win.FileReader = win.FileReader[delegateName];
-    }
-};
-var cacheDirectoryPromise = null;
-var getCacheDirectory = function () {
-    if (!cacheDirectoryPromise) {
-        var basePath_1 = FILE.cacheDirectory;
-        var desiredPath_1 = "" + basePath_1 + BLOB_CACHE_DIR + "/";
-        cacheDirectoryPromise = __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](FILE.checkDir(basePath_1, BLOB_CACHE_DIR)).then(function (success) {
-            return desiredPath_1;
-        }).catch(function (error) {
-            return FILE.createDir(basePath_1, BLOB_CACHE_DIR, true).then(function (dirEntry) {
-                return desiredPath_1;
-            }).catch(function (error) {
-                throw new Error('Could not create blob cache directory.');
-            });
-        });
-    }
-    return cacheDirectoryPromise;
-};
-var readFileAsBlob = function (path, filename, type) {
-    fixFileReader();
-    return FILE.readAsArrayBuffer(path, filename).then(function (buf) { return new Blob([buf], { type: type }); });
-};
-var writeToFile = function (path, filename, data) {
-    fixFileReader();
-    return FILE.writeFile(path, filename, data);
-};
-var existsFile = function (path, filename) {
-    return FILE.checkFile(path, filename).catch(function (e) {
-        if (e.code === 1) {
-            return false;
-        }
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](e);
-    });
-};
-var idToFileName = function (blobID) { return blobID + ".blob"; };
-var clearing = false;
-var storing = 0;
-var noPendingStorageOperations = function () {
-    return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
-        var busyWait = setInterval(function () {
-            if (storing === 0) {
-                resolve();
-                clearInterval(busyWait);
-            }
-        }, 10);
-    }).timeout(LOCK_TIMEOUT).catch(__WEBPACK_IMPORTED_MODULE_0_bluebird__["TimeoutError"], function () { });
-};
-var blobCache = {
-    clear: function () {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        clearing = true;
-                        return [4 /*yield*/, noPendingStorageOperations()];
-                    case 1:
-                        _a.sent();
-                        return [4 /*yield*/, FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
-                                .catch(function (error) {
-                                // There really is little we can do here, but logouts, e.g., should not
-                                // fail because we failed to clear.
-                                console.warn('Cannot remove cache, resolving promise anyway.');
-                                return true;
-                            })];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        }); }).finally(function () { return clearing = false; });
-    },
-    moveFileToBlob: function (currentDirectory, currentFilename, blobID) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            var path, filename;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (clearing)
-                            throw new Error('Cannot get blob, currently clearing cache.');
-                        return [4 /*yield*/, getCacheDirectory()];
-                    case 1:
-                        path = _a.sent();
-                        filename = idToFileName(blobID);
-                        return [2 /*return*/, FILE.moveFile(currentDirectory, currentFilename, path, filename)];
-                }
-            });
-        }); });
-    },
-    readFileAsArrayBuffer: function (directory, name) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](FILE.readAsArrayBuffer(directory, name));
-    },
-    store: function (blob) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            var blobID, path, filename, exists;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (clearing)
-                            throw new Error('Cannot store blob, currently clearing cache.');
-                        storing++;
-                        console.warn("storing++ " + (storing - 1) + " -> " + storing + ", blob: " + blob.getBlobID());
-                        blobID = blob.getBlobID();
-                        if (!blob.isDecrypted()) {
-                            throw new Error("trying to store an undecrypted blob");
-                        }
-                        return [4 /*yield*/, getCacheDirectory()];
-                    case 1:
-                        path = _a.sent();
-                        filename = idToFileName(blobID);
-                        return [4 /*yield*/, existsFile(path, filename)];
-                    case 2:
-                        exists = _a.sent();
-                        if (!!exists) return [3 /*break*/, 4];
-                        return [4 /*yield*/, writeToFile(path, filename, blob.getBlobData())];
-                    case 3:
-                        _a.sent();
-                        _a.label = 4;
-                    case 4: return [2 /*return*/, "" + path + filename];
-                }
-            });
-        }); }).catch(function (e) {
-            console.warn("Storing blob failed");
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](e);
-        }).finally(function () {
-            storing--;
-            console.warn("storing-- " + (storing + 1) + " -> " + storing + ", blob: " + blob.getBlobID());
-        });
-    },
-    getBlobUrl: function (blobID) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            var path, filename, exists;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (clearing)
-                            throw new Error('Cannot get blob URL, currently clearing cache.');
-                        return [4 /*yield*/, getCacheDirectory()];
-                    case 1:
-                        path = _a.sent();
-                        filename = idToFileName(blobID);
-                        return [4 /*yield*/, existsFile(path, filename)];
-                    case 2:
-                        exists = _a.sent();
-                        if (!exists) {
-                            throw new Error("cannot get blob url, blob does not exist: " + filename);
-                        }
-                        return [2 /*return*/, "" + path + filename];
-                }
-            });
-        }); });
-    },
-    copyBlobToDownloads: function (blobID, filename) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            var cacheDir, blobFile, path, existsSource, existsDestination;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, getCacheDirectory()];
-                    case 1:
-                        cacheDir = _a.sent();
-                        blobFile = idToFileName(blobID);
-                        path = isAndroid() ? FILE.externalRootDirectory + "Download/" : "" + FILE.documentsDirectory;
-                        return [4 /*yield*/, existsFile(cacheDir, blobFile)];
-                    case 2:
-                        existsSource = _a.sent();
-                        return [4 /*yield*/, existsFile(path, filename)];
-                    case 3:
-                        existsDestination = _a.sent();
-                        if (!existsSource) {
-                            throw new Error("cannot copy blob, blob does not exist: " + filename);
-                        }
-                        if (!existsDestination) return [3 /*break*/, 5];
-                        return [4 /*yield*/, FILE.removeFile(path, filename)];
-                    case 4:
-                        _a.sent();
-                        _a.label = 5;
-                    case 5: return [4 /*yield*/, FILE.copyFile(cacheDir, blobFile, path, filename)];
-                    case 6:
-                        _a.sent();
-                        return [2 /*return*/, "" + path + filename];
-                }
-            });
-        }); });
-    },
-    getFileMimeType: function (url) { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](FILE.resolveLocalFilesystemUrl(url))
-        .then(function (file) { return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve, reject) { return file.file(resolve, reject); })
-        .then(function (file) { return file.type; }); }); },
-    isLoaded: function (blobID) { return blobCache.getBlobUrl(blobID).then(function () { return true; }).catch(function () { return false; }); },
-    get: function (blobID) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            var path, filename, blob;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (clearing)
-                            throw new Error('Cannot get blob, currently clearing cache.');
-                        return [4 /*yield*/, getCacheDirectory()];
-                    case 1:
-                        path = _a.sent();
-                        filename = idToFileName(blobID);
-                        return [4 /*yield*/, readFileAsBlob(path, filename, "")];
-                    case 2:
-                        blob = _a.sent();
-                        return [2 /*return*/, { blob: blob, blobID: blobID, decrypted: true, meta: {} }];
-                }
-            });
-        }); });
-    }
-};
-/* harmony default export */ __webpack_exports__["a"] = (blobCache);
-(new __WEBPACK_IMPORTED_MODULE_2__services_Cache__["default"]("blobs")).deleteAll().catch(function () { return console.warn("Could not delete legacy blobs from idb cache"); });
-//# sourceMappingURL=blobCache.js.map
-
-/***/ }),
-
-/***/ 148:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_error_service__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_socket_service__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_session_service__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__messages_chatChunk__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__messages_chat__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__messages_message__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__messages_chatList__ = __webpack_require__(399);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__messages_chatChunk__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__messages_chat__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__messages_message__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__messages_chatList__ = __webpack_require__(419);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -924,7 +505,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 
 
 
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 
 
 
@@ -1075,15 +656,15 @@ initService.awaitLoading().then(function () {
 
 /***/ }),
 
-/***/ 150:
+/***/ 152:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var sjcl = __webpack_require__(43);
-var h = __webpack_require__(6).default;
-var errors = __webpack_require__(47);
+var h = __webpack_require__(5).default;
+var errors = __webpack_require__(48);
 var helper = {
     hash: function hash(text) {
         return helper.bits2hex(sjcl.hash.sha256.hash(text));
@@ -1166,16 +747,16 @@ module.exports = helper;
 
 /***/ }),
 
-/***/ 151:
+/***/ 153:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProfileLoader", function() { return ProfileLoader; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_cachedObjectLoader__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_cachedObjectLoader__ = __webpack_require__(74);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_observer__ = __webpack_require__(17);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -1188,7 +769,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 
-var validator = __webpack_require__(183);
+var validator = __webpack_require__(188);
 var SecuredData = __webpack_require__(33);
 
 
@@ -1213,16 +794,6 @@ var Profile = (function (_super) {
                 return;
             }
             return _this.isPublicProfile ? "public-" + _this.id : "private-" + _this.id;
-        };
-        _this.getUpdatedData = function (signKey) {
-            //pad updated profile
-            //merge paddedProfile and updatedPaddedProfile
-            //sign/hash merge
-            //encrypt merge
-            if (_this.isPublicProfile) {
-                return _this.sign(signKey);
-            }
-            return _this.securedData.getUpdatedData(signKey);
         };
         _this.sign = function (signKey, cb) {
             if (!_this.isPublicProfile) {
@@ -1287,7 +858,7 @@ var ProfileLoader = (function (_super) {
         var meta = _a.meta, signKey = _a.signKey;
         return signKey + "-" + meta._signature;
     },
-    download: function (id) { throw new Error("profile get by id is not implemented"); },
+    download: function () { throw new Error("profile get by id is not implemented"); },
     load: function (_a) {
         var content = _a.content, meta = _a.meta, isPublic = _a.isPublic, signKey = _a.signKey;
         var securedData = isPublic ?
@@ -1317,7 +888,48 @@ var ProfileLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 161:
+/***/ 156:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__socket_service__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__session_service__ = __webpack_require__(21);
+
+
+var FeatureToggles = (function () {
+    function FeatureToggles() {
+        var _this = this;
+        this.config = {};
+        this.loadToggles = function () {
+            return __WEBPACK_IMPORTED_MODULE_0__socket_service__["default"].definitlyEmit("featureToggles", {})
+                .then(function (response) { return response.toggles ? _this.config = response.toggles : null; });
+        };
+        __WEBPACK_IMPORTED_MODULE_1__session_service__["default"].bootLogin()
+            .then(function () { return _this.loadToggles(); });
+        __WEBPACK_IMPORTED_MODULE_1__session_service__["default"].awaitLogin()
+            .then(function () { return _this.loadToggles(); });
+    }
+    FeatureToggles.prototype.isFeatureEnabled = function (featureName) {
+        if (!this.config.hasOwnProperty(featureName)) {
+            // console.warn(`Unknown feature: ${featureName}`)
+            return false;
+        }
+        if (this.config[featureName] === false) {
+            return false;
+        }
+        return true;
+    };
+    FeatureToggles.prototype.getFeatureConfig = function (featureName) {
+        return this.config[featureName];
+    };
+    return FeatureToggles;
+}());
+/* harmony default export */ __webpack_exports__["a"] = (new FeatureToggles());
+//# sourceMappingURL=featureToggles.js.map
+
+/***/ }),
+
+/***/ 166:
 /***/ (function(module, exports) {
 
 function webpackEmptyAsyncContext(req) {
@@ -1326,11 +938,11 @@ function webpackEmptyAsyncContext(req) {
 webpackEmptyAsyncContext.keys = function() { return []; };
 webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
 module.exports = webpackEmptyAsyncContext;
-webpackEmptyAsyncContext.id = 161;
+webpackEmptyAsyncContext.id = 166;
 
 /***/ }),
 
-/***/ 163:
+/***/ 168:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1338,7 +950,7 @@ webpackEmptyAsyncContext.id = 161;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__socket_service__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(5);
 
 
 
@@ -1443,7 +1055,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extend", function() { return extend; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
 
 
 var afterHooks = [];
@@ -1509,7 +1121,7 @@ var extend = function (obj) {
 
 /***/ }),
 
-/***/ 177:
+/***/ 182:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1563,7 +1175,7 @@ module.exports = chelper;
 
 /***/ }),
 
-/***/ 178:
+/***/ 183:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1640,7 +1252,7 @@ var Enum = (function () {
 
 /***/ }),
 
-/***/ 181:
+/***/ 186:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1650,17 +1262,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__socket_service__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Cache__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__session_service__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helper_helper__ = __webpack_require__(5);
 
 
 
 
 
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 
-var trustManager = __webpack_require__(63);
-var signatureCache = __webpack_require__(69);
+var trustManager = __webpack_require__(66);
+var signatureCache = __webpack_require__(72);
 var debug = __webpack_require__(15);
 var THROTTLE = 20, STORESIGNATURECACHEINTERVAL = 30000;
 var debugName = "whispeer:trustService";
@@ -1819,7 +1431,7 @@ var TrustService = (function () {
 
 /***/ }),
 
-/***/ 182:
+/***/ 187:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1827,7 +1439,7 @@ var TrustService = (function () {
 
 var Bluebird = __webpack_require__(3);
 
-var friendsService = __webpack_require__(82);
+var friendsService = __webpack_require__(85);
 var keyStore = __webpack_require__(32).default;
 
 function fixInvalidKey(invalidKey, friendsService) {
@@ -1870,7 +1482,7 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ 183:
+/***/ 188:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1963,7 +1575,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 
 	function doLoad(cb, exported) {
 		if (true) {
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(362), __webpack_require__(6), __webpack_require__(363), __webpack_require__(364), __webpack_require__(369), __webpack_require__(365), __webpack_require__(366), __webpack_require__(367), __webpack_require__(368)], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(367), __webpack_require__(5), __webpack_require__(368), __webpack_require__(369), __webpack_require__(374), __webpack_require__(370), __webpack_require__(371), __webpack_require__(372), __webpack_require__(373)], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				cb.apply(null, arguments);
 
 				return exported;
@@ -1989,7 +1601,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 184:
+/***/ 189:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1999,18 +1611,18 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 * MessageService
 **/
 
-var h = __webpack_require__(6).default;
+var h = __webpack_require__(5).default;
 var Observer = __webpack_require__(17);
 var SecuredData = __webpack_require__(33);
 var Bluebird = __webpack_require__(3);
 
 var socket = __webpack_require__(11).default;
 var keyStore = __webpack_require__(32).default;
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 
 var settingsService = __webpack_require__(46).default;
 
-var friendsService = __webpack_require__(82);
+var friendsService = __webpack_require__(85);
 
 var circles = {};
 var circleArray = [];
@@ -2323,7 +1935,7 @@ module.exports = circleService;
 
 /***/ }),
 
-/***/ 185:
+/***/ 190:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2334,8 +1946,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var settings = __webpack_require__(46).default;
 
 var Bluebird = __webpack_require__(3);
-var h = __webpack_require__(6).default;
-var errors = __webpack_require__(47);
+var h = __webpack_require__(5).default;
+var errors = __webpack_require__(48);
 
 function removePadding(val) {
 	var isNumber = false;
@@ -2396,7 +2008,7 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ 186:
+/***/ 191:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2414,7 +2026,7 @@ module.exports = function ($injector, cb) {
 
 /***/ }),
 
-/***/ 20:
+/***/ 21:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2422,12 +2034,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SessionService", function() { return SessionService; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_blobCache__ = __webpack_require__(146);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_blobCache__ = __webpack_require__(90);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__keyStore_service__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__location_manager__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__storage_service__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__location_manager__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__storage_service__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helper_helper__ = __webpack_require__(5);
 
 
 
@@ -2501,7 +2113,7 @@ var SessionService = (function () {
 
 /***/ }),
 
-/***/ 21:
+/***/ 22:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2515,12 +2127,12 @@ var keyStore = __webpack_require__(26);
 var socketService = __webpack_require__(11).default;
 var CacheService = __webpack_require__(25).default;
 
-var h = __webpack_require__(6).default;
+var h = __webpack_require__(5).default;
 var debug = __webpack_require__(15);
 var Observer = __webpack_require__(17);
 var Bluebird = __webpack_require__(3);
 
-var sessionService = __webpack_require__(20).default;
+var sessionService = __webpack_require__(21).default;
 
 var debugName = "whispeer:initService";
 var initServiceDebug = debug(debugName);
@@ -2677,7 +2289,7 @@ function loadData() {
 		timeEnd("runMainCallbacks");
 		keyStore.security.allowPrivateActions();
 
-		var migrationService = __webpack_require__(358);
+		var migrationService = __webpack_require__(363);
 		migrationService();
 		initService.notify("", "initDone");
 		return null;
@@ -2720,57 +2332,57 @@ module.exports = initService;
 
 /***/ }),
 
-/***/ 234:
+/***/ 239:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
 	"../pages/blocked-users/blockedUsers.module": [
-		433,
+		444,
 		6
 	],
 	"../pages/contact-requests/contact-requests.module": [
-		434,
+		445,
 		11
 	],
 	"../pages/contacts/contacts.module": [
-		435,
+		446,
 		5
 	],
 	"../pages/home/home.module": [
-		436,
-		8
+		447,
+		9
 	],
 	"../pages/login/login.module": [
-		437,
+		448,
 		3
 	],
 	"../pages/messages/add/add.module": [
-		438,
+		449,
 		4
 	],
 	"../pages/messages/details/details.module": [
-		439,
-		7
+		450,
+		8
 	],
 	"../pages/messages/messages.module": [
-		432,
+		443,
 		1
 	],
 	"../pages/new-message/new-message.module": [
-		440,
+		451,
 		0
 	],
 	"../pages/profile/profile.module": [
-		441,
+		452,
 		2
 	],
 	"../pages/sales/sales.module": [
-		442,
+		453,
 		10
 	],
 	"../pages/settings/settings.module": [
-		443,
-		9
+		454,
+		7
 	]
 };
 function webpackAsyncContext(req) {
@@ -2785,7 +2397,126 @@ webpackAsyncContext.keys = function webpackAsyncContextKeys() {
 	return Object.keys(map);
 };
 module.exports = webpackAsyncContext;
-webpackAsyncContext.id = 234;
+webpackAsyncContext.id = 239;
+
+/***/ }),
+
+/***/ 244:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__blobService__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_blobCache__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__fileTransferQueue__ = __webpack_require__(289);
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+
+
+
+
+
+
+
+var defaultUploadOptions = {
+    encrypt: true,
+    extraInfo: {}
+};
+var encryptionQueue = new __WEBPACK_IMPORTED_MODULE_5__asset_Queue__["a" /* default */](500 * 1000);
+encryptionQueue.start();
+var FileUpload = (function () {
+    function FileUpload(file, options) {
+        var _this = this;
+        this.file = file;
+        this.getProgress = function () {
+            return _this.progress.getProgress();
+        };
+        this.uploadAndEncryptPreparedBlob = function (encryptionKey, blob) {
+            _this.progress.addDepend(blob.uploadProgress);
+            _this.progress.addDepend(blob.encryptProgress);
+            return encryptionQueue.enqueue(blob.getSize(), function () {
+                return blob.encryptAndUpload(encryptionKey);
+            });
+        };
+        this.uploadPreparedBlob = function (blob) {
+            _this.progress.addDepend(blob.uploadProgress);
+            return blob.upload();
+        };
+        this.upload = function (encryptionKey) {
+            if (!_this.blob) {
+                throw new Error("usage error: prepare was not called!");
+            }
+            return __WEBPACK_IMPORTED_MODULE_6__fileTransferQueue__["a" /* queue */].enqueue(1, function () {
+                console.info("Uploading blob");
+                if (_this.options.encrypt) {
+                    return _this.uploadAndEncryptPreparedBlob(encryptionKey, _this.blob);
+                }
+                return _this.uploadPreparedBlob(_this.blob);
+            }).then(function (keys) {
+                if (_this.file.originalUrl) {
+                    var _a = Object(__WEBPACK_IMPORTED_MODULE_3__blobService__["b" /* unpath */])(_this.file.originalUrl), directory = _a.directory, name_1 = _a.name;
+                    return __WEBPACK_IMPORTED_MODULE_4__asset_blobCache__["a" /* default */].moveFileToBlob(directory, name_1, _this.blob.getBlobID()).then(function () { return keys; });
+                }
+                return keys;
+            });
+        };
+        this.prepare = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
+            return FileUpload.blobToDataSet(_this.blob).then(function (data) {
+                data.content = __assign({}, data.content, _this.getInfo());
+                return data;
+            });
+        });
+        this.getInfo = function () {
+            return __assign({ name: _this.file.name, size: _this.file.size, type: _this.file.type }, _this.options.extraInfo);
+        };
+        this.getFile = function () {
+            return _this.file;
+        };
+        this.getName = function () {
+            return _this.file.name;
+        };
+        this.progress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]();
+        this.blob = __WEBPACK_IMPORTED_MODULE_3__blobService__["a" /* default */].createBlob(file);
+        this.options = options || defaultUploadOptions;
+    }
+    FileUpload.blobToDataSet = function (blob) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([blob.preReserveID(), blob.getHash()]).spread(function (blobID, hash) {
+            return {
+                blob: blob,
+                content: {
+                    blobHash: hash
+                },
+                meta: {
+                    blobID: blobID
+                }
+            };
+        });
+    };
+    FileUpload.fileCallback = function (cb) {
+        return function (e) {
+            cb(Array.prototype.slice.call(e.target.files));
+            try {
+                e.target.value = null;
+            }
+            catch (ex) {
+                console.log(ex);
+            }
+        };
+    };
+    return FileUpload;
+}());
+/* harmony default export */ __webpack_exports__["a"] = (FileUpload);
+//# sourceMappingURL=fileUpload.service.js.map
 
 /***/ }),
 
@@ -2797,8 +2528,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_service__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_idb__ = __webpack_require__(343);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_idb__ = __webpack_require__(348);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_idb___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_idb__);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -3123,13 +2854,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 }
 */
 
-var h = __webpack_require__(6).default;
-var chelper = __webpack_require__(150);
+var h = __webpack_require__(5).default;
+var chelper = __webpack_require__(152);
 var sjcl = __webpack_require__(43);
-var waitForReady = __webpack_require__(345);
-var sjclWorkerInclude = __webpack_require__(346);
-var ObjectHasher = __webpack_require__(349);
-var errors = __webpack_require__(47);
+var waitForReady = __webpack_require__(350);
+var sjclWorkerInclude = __webpack_require__(351);
+var ObjectHasher = __webpack_require__(354);
+var errors = __webpack_require__(48);
 var Bluebird = __webpack_require__(3);
 var debug = __webpack_require__(15);
 
@@ -4296,8 +4027,8 @@ SignKey = function SignKey(keyData) {
 				throw new errors.SecurityError("Private Actions are blocked (sign)");
 			}
 
-			var trustManager = __webpack_require__(63);
-			var signatureCache = __webpack_require__(69);
+			var trustManager = __webpack_require__(66);
+			var signatureCache = __webpack_require__(72);
 
 			return Bluebird.try(function () {
 				if (!trustManager.isLoaded) {
@@ -4403,8 +4134,8 @@ SignKey = function SignKey(keyData) {
 
 	this.getFingerPrint = getFingerPrintF;
 	this.verify = function (signature, text, type, id) {
-		var trustManager = __webpack_require__(63);
-		var signatureCache = __webpack_require__(69);
+		var trustManager = __webpack_require__(66);
+		var signatureCache = __webpack_require__(72);
 		var name = chelper.bits2hex(signature).substr(0, 10);
 
 		if (debug.enabled("whispeer:keyStore")) {
@@ -5317,109 +5048,183 @@ module.exports = keyStore;
 
 /***/ }),
 
-/***/ 281:
+/***/ 289:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return queue; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_Queue__ = __webpack_require__(73);
+
+/* Queue that ensures one file transfer at a time.  */
+var queue = new __WEBPACK_IMPORTED_MODULE_0__asset_Queue__["a" /* default */](1);
+queue.start();
+//# sourceMappingURL=fileTransferQueue.js.map
+
+/***/ }),
+
+/***/ 290:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
 
-
-var Queue = (function () {
-    function Queue(maxWeight) {
-        this.maxWeight = maxWeight;
-        this.queue = [];
-        this.run = false;
-        this.runningWeight = 0;
-    }
-    Queue.prototype.enqueue = function (weight, task) {
+var playBackBlocked = false;
+var VoicemailPlayer = (function () {
+    function VoicemailPlayer(recordings) {
         var _this = this;
-        var promise = new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve, reject) {
-            _this.queue.push({
-                task: task,
-                weight: weight,
-                resolve: resolve,
-                reject: reject
+        this.playing = false;
+        this.loaded = false;
+        this.recordings = [];
+        this.recordPlayingIndex = 0;
+        this.loadingPromises = [];
+        this.positionRAFListener = [];
+        this.positionListener = function () {
+            var position = _this.getPosition();
+            _this.positionRAFListener.forEach(function (func) { return func(position); });
+            if (_this.isPlaying()) {
+                window.requestAnimationFrame(_this.positionListener);
+            }
+        };
+        this.onPositionUpdateRAF = function (listener) { return _this.positionRAFListener.push(listener); };
+        this.seekTo = function (time) {
+            var timeInTrack = time;
+            var recordPlayingIndex = _this.recordings.findIndex(function (_a) {
+                var duration = _a.duration;
+                if (timeInTrack < duration) {
+                    return true;
+                }
+                timeInTrack -= duration;
+                return false;
             });
-            _this.runTasks();
+            if (recordPlayingIndex === -1) {
+                return;
+            }
+            _this.recordPlayingIndex = recordPlayingIndex;
+            _this.recordings[_this.recordPlayingIndex].audio.currentTime = timeInTrack;
+            _this.positionListener();
+            if (_this.isPlaying()) {
+                _this.recordings.forEach(function (_a, index) {
+                    var audio = _a.audio;
+                    if (index !== recordPlayingIndex) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                });
+                _this.recordings[_this.recordPlayingIndex].audio.play();
+            }
+        };
+        this.awaitLoading = function () {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"](_this.loadingPromises);
+        };
+        this.isLoaded = function () { return _this.loaded; };
+        this.onEnded = function () {
+            if (_this.isPlaying()) {
+                _this.recordPlayingIndex += 1;
+                if (_this.recordPlayingIndex >= _this.recordings.length) {
+                    _this.reset();
+                    return;
+                }
+                _this.recordings[_this.recordPlayingIndex].audio.play();
+                // Use a Promise to trigger the angular zone. Zones are bad. Angular DI is bad.
+                __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().then(function () { });
+            }
+        };
+        recordings.map(function (_a) {
+            var url = _a.url, estimatedDuration = _a.estimatedDuration;
+            return _this.addRecording(url, estimatedDuration);
         });
-        return promise;
-    };
-    Queue.prototype.runTasks = function () {
-        if (!this.run) {
+    }
+    VoicemailPlayer.prototype.play = function () {
+        if (playBackBlocked) {
             return;
         }
-        var nextTask;
-        while (this.queue.length > 0 && this.runningWeight < this.maxWeight) {
-            nextTask = this.queue.shift();
-            this.runTask(nextTask);
+        if (VoicemailPlayer.activePlayer) {
+            VoicemailPlayer.activePlayer.pause();
+        }
+        this.recordings[this.recordPlayingIndex].audio.play();
+        VoicemailPlayer.activePlayer = this;
+        this.playing = true;
+        this.loaded = true;
+        this.positionListener();
+    };
+    VoicemailPlayer.prototype.pause = function () {
+        this.recordings[this.recordPlayingIndex].audio.pause();
+        VoicemailPlayer.activePlayer = null;
+        this.playing = false;
+    };
+    VoicemailPlayer.prototype.toggle = function () {
+        if (this.playing) {
+            this.pause();
+        }
+        else {
+            this.play();
         }
     };
-    Queue.prototype.runTask = function (task) {
-        var _this = this;
-        this.runningWeight += task.weight;
-        task.task().then(function (result) { task.resolve(result); }, function (error) { task.reject(error); }).finally(function () {
-            _this.runningWeight -= task.weight;
-            _this.runTasks();
+    VoicemailPlayer.prototype.isPlaying = function () {
+        return this.playing;
+    };
+    VoicemailPlayer.prototype.isPaused = function () {
+        return !this.playing;
+    };
+    VoicemailPlayer.prototype.getDuration = function (beforeIndex) {
+        return this.recordings.slice(0, beforeIndex).reduce(function (prev, next) { return prev + next.audio.duration || next.duration; }, 0);
+    };
+    VoicemailPlayer.prototype.getPosition = function () {
+        var currentDuration = this.getDuration(this.recordPlayingIndex);
+        return currentDuration + this.recordings[this.recordPlayingIndex].audio.currentTime;
+    };
+    VoicemailPlayer.prototype.reset = function () {
+        this.recordings.forEach(function (_a) {
+            var audio = _a.audio;
+            audio.pause();
+            audio.currentTime = 0;
+        });
+        this.recordPlayingIndex = 0;
+        if (VoicemailPlayer.activePlayer && this !== VoicemailPlayer.activePlayer) {
+            VoicemailPlayer.activePlayer.reset();
+        }
+        VoicemailPlayer.activePlayer = null;
+        this.playing = false;
+    };
+    VoicemailPlayer.prototype.addRecording = function (url, duration) {
+        var audio = new Audio(url.replace("file://", ""));
+        var audioInfo = {
+            url: url,
+            audio: audio,
+            duration: duration
+        };
+        audio.addEventListener("ended", this.onEnded);
+        var loadingPromise = new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) { return audio.addEventListener("loadedmetadata", resolve); });
+        this.loadingPromises.push(loadingPromise);
+        this.recordings.push(audioInfo);
+    };
+    VoicemailPlayer.prototype.destroy = function () {
+        this.recordings.forEach(function (_a) {
+            var audio = _a.audio, url = _a.url;
+            audio.src = "";
+            audio.load();
+            // TODO delete file created!
+            console.warn("TODO: delete file:", url);
         });
     };
-    Queue.prototype.start = function () {
-        this.run = true;
-        this.runTasks();
+    VoicemailPlayer.prototype.getRecordings = function () {
+        return this.recordings.slice();
     };
-    return Queue;
+    VoicemailPlayer.activePlayer = null;
+    VoicemailPlayer.setPlaybackBlocked = function (blocked) { return playBackBlocked = blocked; };
+    return VoicemailPlayer;
 }());
-/* harmony default export */ __webpack_exports__["a"] = (Queue);
-//# sourceMappingURL=Queue.js.map
+/* harmony default export */ __webpack_exports__["a"] = (VoicemailPlayer);
+//# sourceMappingURL=voicemailPlayer.js.map
 
 /***/ }),
 
-/***/ 285:
+/***/ 291:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__session_service__ = __webpack_require__(20);
-
-
-var FeatureToggles = (function () {
-    function FeatureToggles() {
-        var _this = this;
-        this.config = {};
-        this.loadToggles = function () {
-            return __WEBPACK_IMPORTED_MODULE_0__socket_service__["default"].definitlyEmit("featureToggles", {})
-                .then(function (response) { return response.toggles ? _this.config = response.toggles : null; });
-        };
-        __WEBPACK_IMPORTED_MODULE_1__session_service__["default"].bootLogin()
-            .then(function () { return _this.loadToggles(); });
-        __WEBPACK_IMPORTED_MODULE_1__session_service__["default"].awaitLogin()
-            .then(function () { return _this.loadToggles(); });
-    }
-    FeatureToggles.prototype.isFeatureEnabled = function (featureName) {
-        if (!this.config.hasOwnProperty(featureName)) {
-            // console.warn(`Unknown feature: ${featureName}`)
-            return false;
-        }
-        if (this.config[featureName] === false) {
-            return false;
-        }
-        return true;
-    };
-    FeatureToggles.prototype.getFeatureConfig = function (featureName) {
-        return this.config[featureName];
-    };
-    return FeatureToggles;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (new FeatureToggles());
-//# sourceMappingURL=featureToggles.js.map
-
-/***/ }),
-
-/***/ 287:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
 
 var MINUTE = 60 * 1000;
 var Burst = (function () {
@@ -5519,11 +5324,11 @@ var Burst = (function () {
 
 /***/ }),
 
-/***/ 288:
+/***/ 292:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enum__ = __webpack_require__(178);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enum__ = __webpack_require__(183);
 
 var states = new __WEBPACK_IMPORTED_MODULE_0__enum__["default"](["INIT", "PENDING", "SUCCESS", "FAILED"]);
 var State = (function () {
@@ -5603,18 +5408,36 @@ var State = (function () {
 
 /***/ }),
 
-/***/ 289:
+/***/ 293:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MessagesPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_messages_messageService__ = __webpack_require__(148);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_messages_burst__ = __webpack_require__(287);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_messages_chat__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_messages_message__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_media__ = __webpack_require__(240);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_typestate__ = __webpack_require__(403);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_typestate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_typestate__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_uuid_v4__ = __webpack_require__(404);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_uuid_v4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_uuid_v4__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_image_picker__ = __webpack_require__(154);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_file__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_camera__ = __webpack_require__(155);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ngx_translate_core__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_imageUpload_service__ = __webpack_require__(294);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__lib_services_fileUpload_service__ = __webpack_require__(244);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__lib_services_error_service__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__lib_messages_messageService__ = __webpack_require__(150);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__lib_messages_chat__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__lib_messages_message__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__ = __webpack_require__(290);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__lib_services_blobService__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__lib_messages_burst__ = __webpack_require__(291);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__lib_services_featureToggles__ = __webpack_require__(156);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__lib_services_location_manager__ = __webpack_require__(47);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -5625,14 +5448,59 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
  // tslint:disable-line:no-unused-variable
- // tslint:disable-line:no-unused-variable
 
 
 
 
 
-var inView = __webpack_require__(400);
-var initService = __webpack_require__(21);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var RecordingStates;
+(function (RecordingStates) {
+    RecordingStates[RecordingStates["NotRecording"] = 0] = "NotRecording";
+    RecordingStates[RecordingStates["Recording"] = 1] = "Recording";
+    RecordingStates[RecordingStates["Paused"] = 2] = "Paused";
+})(RecordingStates || (RecordingStates = {}));
+var RecordingStateMachine = new __WEBPACK_IMPORTED_MODULE_4_typestate__["TypeState"].FiniteStateMachine(RecordingStates.NotRecording);
+RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.Recording);
+RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording);
+RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused);
+var RECORDING_STOP_DELAY = 100;
+var ImagePickerOptions = {
+    width: 2560,
+    height: 1440,
+    maximumImagesCount: 6
+};
+var INFINITE_SCROLLING_THRESHOLD = 1000;
+var MAXIMUM_FILE_SIZE_MB = Object(__WEBPACK_IMPORTED_MODULE_21__lib_services_location_manager__["c" /* isBusinessVersion */])() ? 15 : 10;
+var isIOS = function () { return window.device && window.device.platform === 'iOS'; };
+var selectFileIOS = function () {
+    return new __WEBPACK_IMPORTED_MODULE_3_bluebird__(function (resolve, reject) { return window.FilePicker.pickFile(resolve, reject, "public.item"); })
+        .then(function (url) { return "file://" + url; });
+};
+var selectFileAndroid = function () {
+    return new __WEBPACK_IMPORTED_MODULE_3_bluebird__(function (resolve, reject) { return window.fileChooser.open(resolve, reject); })
+        .then(function (url) { return "file://" + url; });
+};
+var selectFile = function () { return isIOS() ? selectFileIOS() : selectFileAndroid(); };
+var FILE = new __WEBPACK_IMPORTED_MODULE_7__ionic_native_file__["a" /* File */]();
+var inView = __webpack_require__(420);
+var initService = __webpack_require__(22);
 var BurstHelper;
 (function (BurstHelper) {
     BurstHelper.getNewElements = function (messagesAndUpdates, bursts) {
@@ -5643,14 +5511,14 @@ var BurstHelper;
         });
     };
     BurstHelper.calculateBursts = function (messages) {
-        var bursts = [new __WEBPACK_IMPORTED_MODULE_4__lib_messages_burst__["a" /* default */]()];
+        var bursts = [new __WEBPACK_IMPORTED_MODULE_19__lib_messages_burst__["a" /* default */]()];
         var currentBurst = bursts[0];
         messages.sort(function (m1, m2) {
             return m2.getTime() - m1.getTime();
         });
         messages.forEach(function (messageOrUpdate) {
             if (!currentBurst.fitsItem(messageOrUpdate)) {
-                currentBurst = new __WEBPACK_IMPORTED_MODULE_4__lib_messages_burst__["a" /* default */]();
+                currentBurst = new __WEBPACK_IMPORTED_MODULE_19__lib_messages_burst__["a" /* default */]();
                 bursts.push(currentBurst);
             }
             currentBurst.addItem(messageOrUpdate);
@@ -5687,7 +5555,7 @@ var BurstHelper;
             return mergeBurst(possibleMatches[0], burst);
         }
         if (possibleMatches.length > 1) {
-            __WEBPACK_IMPORTED_MODULE_2__lib_services_error_service__["default"].criticalError(new Error("Burst merging possible matches > 1 wtf..."));
+            __WEBPACK_IMPORTED_MODULE_12__lib_services_error_service__["default"].criticalError(new Error("Burst merging possible matches > 1 wtf..."));
             return false;
         }
     };
@@ -5698,14 +5566,331 @@ var BurstHelper;
     };
 })(BurstHelper || (BurstHelper = {}));
 var MessagesPage = (function () {
-    function MessagesPage(navParams, navCtrl, element) {
+    function MessagesPage(navCtrl, actionSheetCtrl, platform, imagePicker, camera, translate, media, alertController, navParams, element) {
         var _this = this;
-        this.navParams = navParams;
         this.navCtrl = navCtrl;
+        this.actionSheetCtrl = actionSheetCtrl;
+        this.platform = platform;
+        this.imagePicker = imagePicker;
+        this.camera = camera;
+        this.translate = translate;
+        this.media = media;
+        this.alertController = alertController;
+        this.navParams = navParams;
         this.element = element;
         this.messagesLoading = true;
         this.burstTopic = 0;
-        this.bursts = [];
+        this.stopRecordingPromise = __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"]();
+        this.recordings = [];
+        this.firstRender = true;
+        this.newMessageText = "";
+        this.moreMessagesAvailable = true;
+        this.inViewMessages = [];
+        this.oldScrollFromBottom = 0;
+        this.inputFocus = false;
+        this.recordingInfo = {
+            UUID: "",
+            duration: 0,
+            startTime: 0,
+            updateInterval: 0
+        };
+        this.mutationListener = function (mutations) {
+            var id = _this.getFirstInViewMessageId();
+            if (!id || _this.oldScrollFromBottom < 15) {
+                return _this.stabilizeScroll();
+            }
+            var firstElement = document.querySelector("[data-messageid=\"" + id + "\"]");
+            var updateScroll = mutations.some(function (mutation) {
+                return [].slice.call(mutation.addedNodes).some(function (element) {
+                    var position = firstElement.compareDocumentPosition(element);
+                    return position & 0x02;
+                });
+            });
+            if (updateScroll) {
+                return _this.stabilizeScroll();
+            }
+            console.warn("Only elements below newest messages have changed not updating viewport");
+        };
+        this.keyboardChange = function () {
+            _this.stabilizeScroll();
+        };
+        this.sendVoicemail = function () {
+            var player = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
+            _this.resetRecordingState();
+            player.awaitLoading().then(function () { return player.getRecordings(); }).map(function (_a) {
+                var url = _a.url, audio = _a.audio, duration = _a.duration;
+                var _b = Object(__WEBPACK_IMPORTED_MODULE_18__lib_services_blobService__["b" /* unpath */])(url), directory = _b.directory, name = _b.name;
+                return FILE.moveFile(_this.platform.is("ios") ? "file://" + directory : directory, name, FILE.cacheDirectory, name).then(function () { return ({
+                    url: "" + FILE.cacheDirectory + name,
+                    duration: duration
+                }); });
+            }).map(function (voicemail) {
+                var url = voicemail.url, duration = voicemail.duration;
+                return _this.getFile(url).then(function (fileObject) {
+                    return new __WEBPACK_IMPORTED_MODULE_11__lib_services_fileUpload_service__["a" /* default */](fileObject, { encrypt: true, extraInfo: { duration: duration } });
+                });
+            }).then(function (voicemails) {
+                _this.sendMessage({
+                    text: "",
+                    voicemails: voicemails,
+                });
+            }).catch(function (e) {
+                console.error("Sending voicemail failed", e);
+                // TODO
+            });
+        };
+        this.sendMessageToChat = function () {
+            if (_this.isRecordingUIVisible()) {
+                if (_this.isRecording()) {
+                    _this.toggleRecording();
+                }
+                return _this.stopRecordingPromise.then(function () { return _this.sendVoicemail(); });
+            }
+            _this.sendMessage({
+                text: _this.newMessageText
+            });
+            _this.newMessageText = "";
+            document.querySelector("textarea").focus();
+            _this.change();
+        };
+        this.getFile = function (url, type) {
+            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](FILE.resolveLocalFilesystemUrl(url))
+                .then(function (file) { return new __WEBPACK_IMPORTED_MODULE_3_bluebird__(function (resolve, reject) { return file.file(resolve, reject); }); })
+                .then(function (file) {
+                file.originalUrl = url;
+                if (_this.platform.is("ios")) {
+                    file.localURL = url.replace("file://", "http://" + window.location.host);
+                }
+                if (file.size > MAXIMUM_FILE_SIZE_MB * 1000 * 1000) {
+                    _this.showFileTooBigWarning();
+                    throw new Error("File too big, not sending.");
+                }
+                if (type) {
+                    file.type = type;
+                }
+                return file;
+            });
+        };
+        this.takeImage = function () {
+            _this.camera.getPicture(_this.cameraOptions).then(function (url) {
+                return _this.getFile(url, "image/png");
+            }).then(function (file) {
+                return new __WEBPACK_IMPORTED_MODULE_10__lib_services_imageUpload_service__["a" /* default */](file);
+            }).then(function (image) {
+                _this.sendMessage({
+                    images: [image],
+                    text: ""
+                });
+            });
+        };
+        this.toggleInputFocus = function () {
+            return _this.inputFocus = !_this.inputFocus;
+        };
+        this.showCameraShortcut = function () {
+            return !_this.inputFocus && _this.newMessageText.length === 0;
+        };
+        this.isRecordingUIVisible = function () {
+            return !RecordingStateMachine.is(RecordingStates.NotRecording);
+        };
+        this.isPlayback = function () {
+            return RecordingStateMachine.is(RecordingStates.Paused) && _this.recordingPlayer.isPlaying();
+        };
+        this.isRecording = function () {
+            return RecordingStateMachine.is(RecordingStates.Recording);
+        };
+        this.isPaused = function () {
+            return RecordingStateMachine.is(RecordingStates.Paused);
+        };
+        this.getRecordingDir = function () {
+            if (!_this.platform.is("ios")) {
+                return FILE.externalRootDirectory;
+            }
+            return FILE.tempDirectory.replace(/^file:\/\//, '');
+        };
+        this.getRecordingFileName = function () {
+            var extension = _this.platform.is("ios") ? "m4a" : "aac";
+            var dir = _this.getRecordingDir();
+            return dir + "recording_" + _this.recordingInfo.UUID + "." + extension;
+        };
+        this.formatTime = function (seconds) {
+            var fullSeconds = __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__["default"].pad(Math.floor(seconds % 60), 2);
+            var minutes = __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__["default"].pad(Math.floor(seconds / 60), 2);
+            return minutes + ":" + fullSeconds;
+        };
+        this.getCurrentDuration = function (beforeIndex) {
+            if (beforeIndex) {
+                return 0;
+            }
+            if (!RecordingStateMachine.is(RecordingStates.Recording)) {
+                return 0;
+            }
+            return _this.recordingInfo.duration;
+        };
+        this.getDuration = function (beforeIndex) {
+            return _this.recordingPlayer.getDuration() + _this.getCurrentDuration();
+        };
+        this.toggleRecording = function () {
+            if (_this.stopRecordingPromise.isPending()) {
+                return;
+            }
+            if (RecordingStateMachine.is(RecordingStates.Recording)) {
+                _this.stopRecordingPromise = __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"]().delay(RECORDING_STOP_DELAY).then(function () {
+                    RecordingStateMachine.go(RecordingStates.Paused);
+                    _this.recordingFile.stopRecord();
+                    _this.recordingFile.release();
+                    _this.recordingFile = null;
+                    _this.recordings.push({
+                        url: _this.getRecordingFileName(),
+                        estimatedDuration: _this.recordingInfo.duration
+                    });
+                    clearInterval(_this.recordingInfo.updateInterval);
+                    _this.recordingInfo.duration = 0;
+                    _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
+                    __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(false);
+                });
+            }
+            else {
+                RecordingStateMachine.go(RecordingStates.Recording);
+                return _this.startRecording();
+            }
+        };
+        this.resetRecordingState = function () {
+            if (_this.recordingFile) {
+                _this.recordingFile.release();
+                _this.recordingFile = null;
+            }
+            __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(false);
+            clearInterval(_this.recordingInfo.updateInterval);
+            _this.recordingPlayer.reset();
+            _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */]([]);
+            _this.recordings = [];
+            RecordingStateMachine.go(RecordingStates.NotRecording);
+        };
+        this.discardRecording = function () { return _this.resetRecordingState(); };
+        this.getPosition = function () { return _this.recordingPlayer ? _this.recordingPlayer.getPosition() : 0; };
+        this.togglePlayback = function () { return _this.recordingPlayer ? _this.recordingPlayer.toggle() : null; };
+        this.presentActionSheet = function () {
+            var cameraButton = {
+                text: _this.translate.instant("topic.takePhoto"),
+                icon: !_this.platform.is("ios") ? "camera" : null,
+                handler: function () {
+                    _this.takeImage();
+                }
+            };
+            var galleryButton = {
+                text: _this.translate.instant("topic.selectGallery"),
+                icon: !_this.platform.is("ios") ? "image" : null,
+                handler: function () {
+                    __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](_this.imagePicker.getPictures(ImagePickerOptions)).map(function (result) {
+                        return _this.getFile(result, "image/png");
+                    }).map(function (file) {
+                        return new __WEBPACK_IMPORTED_MODULE_10__lib_services_imageUpload_service__["a" /* default */](file);
+                    }).then(function (images) {
+                        _this.sendMessage({
+                            images: images,
+                            text: ""
+                        });
+                    });
+                }
+            };
+            var fileButton = {
+                text: _this.translate.instant("topic.selectFile"),
+                icon: !_this.platform.is("ios") ? "document" : null,
+                handler: function () {
+                    selectFile()
+                        .then(function (file) { return _this.getFile(file); })
+                        .then(function (file) { return new __WEBPACK_IMPORTED_MODULE_11__lib_services_fileUpload_service__["a" /* default */](file, { encrypt: true, extraInfo: {} }); })
+                        .then(function (file) {
+                        _this.sendMessage({
+                            files: [file],
+                            text: ""
+                        });
+                    });
+                }
+            };
+            var cancelButton = {
+                text: _this.translate.instant("general.cancel"),
+                icon: !_this.platform.is("ios") ? "close" : null,
+                role: "cancel"
+            };
+            var buttons = __WEBPACK_IMPORTED_MODULE_20__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.fileTransfer") ?
+                [cameraButton, galleryButton, fileButton, cancelButton] :
+                [cameraButton, galleryButton, cancelButton];
+            var actionSheet = _this.actionSheetCtrl.create({
+                buttons: buttons
+            });
+            actionSheet.present();
+        };
+        this.isInView = function (element, headerHeight) {
+            var top = element.getBoundingClientRect().top - headerHeight;
+            return top > 0 && top < _this.content.nativeElement.clientHeight;
+        };
+        this.updateElementsInView = __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__["default"].debounce(function () {
+            var headerHeight = document.querySelector(".header").clientHeight;
+            var messages = Array.prototype.slice.call(_this.content.nativeElement.querySelectorAll(".messages__wrap"));
+            _this.inViewMessages = messages.filter(function (e) { return _this.isInView(e, headerHeight); });
+        }, 20);
+        this.onScroll = function () {
+            _this.oldScrollFromBottom = _this.scrollFromBottom();
+            _this.updateElementsInView();
+            _this.checkLoadMoreMessages();
+        };
+        this.scrollFromBottom = function () {
+            var element = _this.content.nativeElement;
+            return _this.realScrollHeight(element) - element.scrollTop;
+        };
+        this.stabilizeScrollIfHeightChanged = function (height, scrollFromBottom) {
+            var element = _this.content.nativeElement;
+            var newHeight = _this.realScrollHeight(element);
+            if (newHeight !== height) {
+                console.warn("Height changed from " + height + " to " + newHeight);
+                _this.oldScrollFromBottom = scrollFromBottom;
+                _this.stabilizeScroll();
+                return true;
+            }
+            return false;
+        };
+        this.checkHeightChange = function (height, scrollFromBottom, maximumTime) {
+            var delayTime = 25;
+            __WEBPACK_IMPORTED_MODULE_3_bluebird__["delay"](delayTime).then(function () {
+                if (!_this.stabilizeScrollIfHeightChanged(height, scrollFromBottom) && maximumTime > 0) {
+                    _this.checkHeightChange(height, scrollFromBottom, maximumTime - delayTime);
+                }
+            });
+        };
+        this.stabilizeScroll = function () {
+            var element = _this.content.nativeElement;
+            var height = _this.realScrollHeight(element);
+            var newScrollTop = height - _this.oldScrollFromBottom;
+            element.scrollTop = newScrollTop;
+            _this.checkHeightChange(height, _this.oldScrollFromBottom, _this.platform.is('ios') ? 300 : 50);
+        };
+        this.getFirstInViewMessageId = function () {
+            var firstInViewMessage = _this.inViewMessages[0];
+            if (firstInViewMessage) {
+                return firstInViewMessage.getAttribute("data-messageid");
+            }
+        };
+        this.messageBursts = function () {
+            var _a = _this.afterViewBurstMessages(), changed = _a.changed, bursts = _a.bursts;
+            if (changed) {
+                var scrollFromBottom = _this.scrollFromBottom();
+                if (scrollFromBottom > 15) {
+                    _this.bursts = bursts;
+                    return bursts;
+                }
+            }
+            _this.firstRender = false;
+            _this.bursts = _this.allBurstMessages();
+            return _this.bursts;
+        };
+        this.messageBurstsFunction = function (options) {
+            var burstInfo = _this.getBursts(options);
+            burstInfo.bursts.sort(function (b1, b2) {
+                return b1.firstItem().getTime() - b2.firstItem().getTime();
+            });
+            return burstInfo;
+        };
         this.ionViewDidEnter = function () { };
         this.getPartners = function () {
             if (!_this.chat) {
@@ -5720,7 +5905,7 @@ var MessagesPage = (function () {
             var messages = _this.chat.getMessages()
                 .map(function (_a) {
                 var id = _a.id;
-                return __WEBPACK_IMPORTED_MODULE_6__lib_messages_message__["b" /* default */].getLoaded(id);
+                return __WEBPACK_IMPORTED_MODULE_15__lib_messages_message__["b" /* default */].getLoaded(id);
             });
             if (_this.burstTopic !== _this.chat.getID()) {
                 _this.bursts = BurstHelper.calculateBursts(messages);
@@ -5765,17 +5950,10 @@ var MessagesPage = (function () {
                 return remaining;
             });
         };
-        this.messageBursts = function (options) {
-            var burstInfo = _this.getBursts(options);
-            burstInfo.bursts.sort(function (b1, b2) {
-                return b1.firstItem().getTime() - b2.firstItem().getTime();
-            });
-            return burstInfo;
-        };
         this.markRead = function () {
             setTimeout(function () {
                 console.log('mark topic read', _this.chat.getID());
-                _this.chat.markRead().catch(__WEBPACK_IMPORTED_MODULE_2__lib_services_error_service__["default"].criticalError);
+                _this.chat.markRead().catch(__WEBPACK_IMPORTED_MODULE_12__lib_services_error_service__["default"].criticalError);
             }, 0);
         };
         this.sendMessage = function (_a) {
@@ -5794,30 +5972,207 @@ var MessagesPage = (function () {
             _this.chat.newMessage = "";
             _this.markRead();
         };
+        this.cameraOptions = {
+            quality: 50,
+            destinationType: this.camera.DestinationType.FILE_URI,
+            sourceType: this.camera.PictureSourceType.CAMERA,
+            encodingType: this.camera.EncodingType.JPEG,
+            mediaType: this.camera.MediaType.PICTURE,
+            allowEdit: !this.platform.is('ios'),
+            correctOrientation: true
+        };
+        this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */]([]);
+        RecordingStateMachine.on(RecordingStates.NotRecording, function () {
+            if (!_this.recordingFile) {
+                return;
+            }
+            _this.recordingFile.release();
+            _this.recordingFile = null;
+        });
+        RecordingStateMachine.onExit(RecordingStates.Paused, function (to) {
+            _this.recordingPlayer.reset();
+            return true;
+        });
+        document.addEventListener("pause", function () {
+            if (RecordingStateMachine.is(RecordingStates.Recording)) {
+                _this.toggleRecording();
+            }
+        }, false);
+        document.addEventListener("resume", function () {
+            if (_this.isRecordingUIVisible()) {
+                _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
+            }
+        });
+        if (this.platform.is("ios")) {
+            this.resizeEvents = [
+                "resize",
+                "native.keyboardshow",
+                "native.keyboardhide"
+            ];
+        }
+        else {
+            this.resizeEvents = ["resize"];
+        }
     }
+    MessagesPage.prototype.ngAfterViewInit = function () {
+        var _this = this;
+        this.resizeEvents.forEach(function (resizeEvent) {
+            return window.addEventListener(resizeEvent, _this.keyboardChange);
+        });
+        this.content.nativeElement.addEventListener('scroll', this.onScroll);
+        this.mutationObserver = new MutationObserver(this.mutationListener);
+        this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true });
+    };
+    MessagesPage.prototype.ngOnDestroy = function () {
+        var _this = this;
+        this.resizeEvents.forEach(function (resizeEvent) {
+            return window.removeEventListener(resizeEvent, _this.keyboardChange);
+        });
+        this.content.nativeElement.removeEventListener('scroll', this.onScroll);
+        this.mutationObserver.disconnect();
+    };
+    MessagesPage.prototype.ionViewDidLeave = function () {
+        if (!RecordingStateMachine.is(RecordingStates.NotRecording)) {
+            this.discardRecording();
+        }
+        if (__WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].activePlayer) {
+            __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].activePlayer.reset();
+        }
+    };
+    MessagesPage.prototype.showRecordIcon = function () {
+        if (!__WEBPACK_IMPORTED_MODULE_20__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.voiceMail")) {
+            return false;
+        }
+        return this.newMessageText.length === 0;
+    };
+    MessagesPage.prototype.showFileTooBigWarning = function () {
+        var alert = this.alertController.create({
+            title: this.translate.instant("topic.fileTooBigTitle"),
+            subTitle: this.translate.instant("topic.fileTooBigDetail", { max_size: MAXIMUM_FILE_SIZE_MB }),
+            buttons: ['OK']
+        });
+        alert.present();
+    };
+    MessagesPage.prototype.startRecording = function () {
+        var _this = this;
+        if (this.recordingFile) {
+            return;
+        }
+        this.recordingInfo.UUID = __WEBPACK_IMPORTED_MODULE_5_uuid_v4___default()();
+        this.recordingFile = this.media.create(this.getRecordingFileName());
+        this.recordingInfo.startTime = Date.now();
+        this.recordingFile.startRecord();
+        clearInterval(this.recordingInfo.updateInterval);
+        this.recordingInfo.updateInterval = window.setInterval(function () {
+            _this.recordingInfo.duration = (Date.now() - _this.recordingInfo.startTime) / 1000;
+        }, 100);
+        __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].activePlayer.pause();
+        __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(true);
+    };
+    MessagesPage.prototype.realScrollHeight = function (element) {
+        return element.scrollHeight - element.clientHeight;
+    };
+    MessagesPage.prototype.checkLoadMoreMessages = function () {
+        var _this = this;
+        if (this.messagesLoading || !this.moreMessagesAvailable || !this.loadMoreMessages) {
+            return;
+        }
+        var scrollTop = this.content.nativeElement.scrollTop;
+        if (scrollTop < INFINITE_SCROLLING_THRESHOLD) {
+            this.messagesLoading = true;
+            setTimeout(function () {
+                _this.loadMoreMessages().then(function (remaining) {
+                    _this.moreMessagesAvailable = remaining !== 0;
+                    _this.messagesLoading = false;
+                });
+            }, 0);
+        }
+    };
+    MessagesPage.prototype.afterViewBurstMessages = function () {
+        var id = this.getFirstInViewMessageId();
+        if (!id) {
+            return { changed: false, bursts: [] };
+        }
+        var _a = this.messageBurstsFunction({
+            after: id
+        }), changed = _a.changed, bursts = _a.bursts;
+        return { changed: changed, bursts: bursts };
+    };
+    MessagesPage.prototype.allBurstMessages = function () {
+        var bursts = this.messageBurstsFunction().bursts;
+        return bursts;
+    };
+    MessagesPage.prototype.isPreviousMissing = function (burst) {
+        var message = burst.getItems()[0];
+        if (this.bursts[0] === burst || !message.getPreviousID()) {
+            return false;
+        }
+        return this.bursts.findIndex(function (burst) {
+            return burst.getItems().findIndex(function (m) {
+                return m.getClientID() === message.getPreviousID();
+            }) > -1;
+        }) === -1;
+    };
+    MessagesPage.prototype.ngOnChanges = function (changes) {
+        var chatChanges = changes["chat"];
+        if (!chatChanges || !chatChanges.currentValue || this.newMessageText !== "") {
+            return;
+        }
+        this.newMessageText = chatChanges.currentValue.newMessage;
+    };
+    MessagesPage.prototype.change = function () {
+        var _this = this;
+        setTimeout(function () {
+            if (_this.chat) {
+                _this.chat.newMessage = _this.newMessageText;
+            }
+            var fontSize = 16;
+            var minSize = 30;
+            var maxSize = fontSize * 7;
+            var footerElement = _this.footer.nativeElement;
+            var textarea = footerElement.getElementsByTagName("textarea")[0];
+            textarea.style.minHeight = "0";
+            textarea.style.height = "0";
+            var scroll_height = Math.max(minSize, Math.min(textarea.scrollHeight, maxSize));
+            // apply new style
+            textarea.style.minHeight = scroll_height + "px";
+            textarea.style.height = scroll_height + "px";
+            _this.stabilizeScroll();
+        }, 100);
+    };
+    MessagesPage.prototype.goToDetails = function () {
+        if (!this.chat) {
+            return;
+        }
+        this.navCtrl.push("Chat Details", {
+            chatID: this.chat.getID()
+        });
+    };
+    MessagesPage.prototype.goToProfile = function (userId) {
+        if (this.chat) {
+            return;
+        }
+        this.navCtrl.push("Profile", {
+            userId: userId
+        });
+    };
     MessagesPage.prototype.ngOnInit = function () {
         var _this = this;
         this.chatID = parseFloat(this.navParams.get("chatID"));
-        /*if (ChatLoader.isLoaded(this.chatID)) {
-            navCtrl.push("Messages", { chatID: 34 }, { animate: false })
-            this.chat = ChatLoader.getLoaded(this.chatID)
-            this.messagesLoading = false
-            return
-        }*/
         if (this.chatID < 0) {
-            if (!__WEBPACK_IMPORTED_MODULE_5__lib_messages_chat__["b" /* default */].isLoaded(this.chatID)) {
+            if (!__WEBPACK_IMPORTED_MODULE_14__lib_messages_chat__["b" /* default */].isLoaded(this.chatID)) {
                 this.navCtrl.setRoot("Home");
                 this.navCtrl.popToRoot();
                 return;
             }
         }
         initService.awaitLoading().then(function () {
-            return __WEBPACK_IMPORTED_MODULE_3__lib_messages_messageService__["a" /* default */].getChat(_this.chatID);
+            return __WEBPACK_IMPORTED_MODULE_13__lib_messages_messageService__["a" /* default */].getChat(_this.chatID);
         }).then(function (chat) {
             _this.chat = chat;
             chat.loadInitialMessages().then(function () {
                 _this.messagesLoading = false;
-                _this.chat.markRead().catch(__WEBPACK_IMPORTED_MODULE_2__lib_services_error_service__["default"].criticalError);
+                _this.chat.markRead().catch(__WEBPACK_IMPORTED_MODULE_12__lib_services_error_service__["default"].criticalError);
             });
         });
     };
@@ -5840,16 +6195,33 @@ var MessagesPage = (function () {
         }
         document.querySelector("topicwithbursts .messages__list").addEventListener("scroll", this.onElementInView);
     };
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])('content'),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */])
+    ], MessagesPage.prototype, "content", void 0);
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])('footer'),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */])
+    ], MessagesPage.prototype, "footer", void 0);
     MessagesPage = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* IonicPage */])({
+        Object(__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["h" /* IonicPage */])({
             name: "Messages",
             segment: "messages/:chatID",
             defaultHistory: ["Home"]
         }),
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-messages',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/'<topicWithBursts\n		[chat]="chat"\n		[messageBurstsFunction]="messageBursts"\n		[loadMoreMessages]="loadMoreMessages"\n		[partners]="getPartners()"\n		[messagesLoading]="messagesLoading"\n		(sendMessage)="sendMessage($event)"\n></topicWithBursts>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/
+            selector: 'page-messages',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/'<ion-header>\n	<ion-navbar [color]="\'primary\'" no-border>\n		<ion-title (click)="goToDetails()">\n\n			<!-- Actual navbar title -->\n			<span class="messages__header__username" [ngClass]="{\'messages__header__username--no-image\': getPartners().length > 1}">\n				<span *ngIf="!chat || !chat.getTitle()">\n					<span *ngIf="getPartners().length == 1" (click)="goToProfile(getPartners()[0].id)">\n						{{ getPartners()[0].name }}\n					</span>\n					<span *ngIf="getPartners().length != 1">\n						<span *ngFor="let partner of getPartners(); let l = last" (click)="goToProfile(partner.id)">\n							{{ partner.basic.shortname }}{{ l ? "":", " }}\n						</span>\n					</span>\n				</span>\n				<span *ngIf="chat && chat.getTitle()">\n					{{chat.getTitle()}}\n				</span>\n			</span>\n\n			<!-- Avatar for one user -->\n			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="getPartners().length == 1" (click)="goToProfile(getPartners()[0].id)">\n				<user-image [id]="getPartners()[0].id" [image]="getPartners()[0].basic.image"></user-image>\n			</ion-avatar>\n\n		</ion-title>\n	</ion-navbar>\n</ion-header>\n<ion-content>\n	<div class="messages__list" #content>\n		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>\n		<div class="messages_filler"></div>\n		<ion-list no-lines>\n			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">\n				<BurstDifference [chat]="chat" [burst]="bursts[0]"></BurstDifference>\n			</ion-item>\n			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{\'burst--me\': burst.isMe(), \'burst--other\': burst.isOther()}">\n				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>\n\n				<div *ngIf="isPreviousMissing(burst)" style="\n					display: flex;\n					justify-content: center;\n					align-items: center;\n				">\n					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>\n				</div>\n\n				<span>\n					<div *ngIf="burst.isOther() && getPartners().length > 1">{{burst.firstItem().data.sender.name}}</div>\n					<Message [message]="message" *ngFor="let message of burst.items"></Message>\n				</span>\n\n				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>\n			</ion-item>\n		</ion-list>\n	</div>\n\n	<div class="messages__form" *ngIf="platform.is(\'ios\')" #footer>\n		<div *ngIf="isRecordingUIVisible()" class="messages__form__button-wrap">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="ios__messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="clean-input-wrap ios__messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-stats" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"\n		*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n\n	<!-- TODO: refactor this to be one form, not two -->\n	<div class="messages__form" *ngIf="!platform.is(\'ios\')" #footer>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-stats" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button\n			ion-button icon-only clear (click)="sendMessageToChat()"\n			class="messages__send-message"\n			*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button ion-button icon-only clear class="messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n</ion-content>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* NavParams */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* NavController */], __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["j" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["a" /* ActionSheetController */],
+            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["l" /* Platform */],
+            __WEBPACK_IMPORTED_MODULE_6__ionic_native_image_picker__["a" /* ImagePicker */],
+            __WEBPACK_IMPORTED_MODULE_8__ionic_native_camera__["a" /* Camera */],
+            __WEBPACK_IMPORTED_MODULE_9__ngx_translate_core__["c" /* TranslateService */],
+            __WEBPACK_IMPORTED_MODULE_1__ionic_native_media__["a" /* Media */],
+            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["b" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["k" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */]])
     ], MessagesPage);
     return MessagesPage;
 }());
@@ -5858,7 +6230,332 @@ var MessagesPage = (function () {
 
 /***/ }),
 
-/***/ 292:
+/***/ 294:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screenSize_service__ = __webpack_require__(416);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__fileUpload_service__ = __webpack_require__(244);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobService__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(73);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+
+
+
+
+
+
+var imageLib = __webpack_require__(417);
+var canvasToBlob = __WEBPACK_IMPORTED_MODULE_0_bluebird__["promisify"](__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].canvasToBlob.bind(__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"]));
+var PREVIEWSDISABLED = false;
+var defaultOptions = {
+    minimumSizeDifference: 1024,
+    sizes: [
+        {
+            name: "lowest",
+            restrictions: {
+                maxWidth: 640,
+                maxHeight: 480
+            }
+        },
+        {
+            name: "middle",
+            restrictions: {
+                maxWidth: 1280,
+                maxHeight: 720
+            }
+        },
+        {
+            name: "highest",
+            restrictions: {
+                maxWidth: 2560,
+                maxHeight: 1440
+            }
+        }
+    ],
+    gifSizes: [
+        {
+            name: "lowest",
+            restrictions: {
+                maxWidth: 640,
+                maxHeight: 480
+            }
+        },
+        {
+            name: "highest"
+        }
+    ],
+    gif: true,
+    encrypt: true,
+    extraInfo: {}
+};
+/* TODO:
+    - maximum size for a resolution
+    - original: enable, remove meta-data (exif etc.)
+*/
+if (__WEBPACK_IMPORTED_MODULE_2__screenSize_service__["a" /* default */].mobile) {
+    defaultOptions.sizes = defaultOptions.sizes.filter(function (size) {
+        return size.name !== "highest";
+    });
+}
+var uploadQueue = new __WEBPACK_IMPORTED_MODULE_5__asset_Queue__["a" /* default */](3);
+uploadQueue.start();
+var resizeQueue = new __WEBPACK_IMPORTED_MODULE_5__asset_Queue__["a" /* default */](1);
+resizeQueue.start();
+var sizeDiff = function (a, b) {
+    return a.blob.getSize() - b.blob.getSize();
+};
+var sizeSorter = function (a, b) {
+    return sizeDiff(b, a);
+};
+var ImageUpload = (function (_super) {
+    __extends(ImageUpload, _super);
+    function ImageUpload(file, options) {
+        var _this = _super.call(this, file, options || defaultOptions) || this;
+        _this.rotation = "0";
+        _this.convertForGallery = function () {
+            return {
+                upload: _this,
+                highest: {
+                    loading: false,
+                    loaded: true,
+                    url: _this.getUrl()
+                },
+                lowest: {
+                    loading: false,
+                    loaded: true,
+                    url: _this.getUrl()
+                }
+            };
+        };
+        _this.rotate = function () {
+            return _this.generatePreviews().then(function (previews) {
+                var newDegree = "0";
+                switch (_this.rotation) {
+                    case "0":
+                        newDegree = "90";
+                        break;
+                    case "90":
+                        newDegree = "180";
+                        break;
+                    case "180":
+                        newDegree = "270";
+                        break;
+                }
+                _this.rotation = newDegree;
+                _this.previewUrl = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(previews[newDegree]);
+                return previews[newDegree];
+            });
+        };
+        _this.generatePreviews = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
+            if (PREVIEWSDISABLED) {
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](new Error("Previews are disabled"));
+            }
+            return ImageUpload.imageLibLoad(__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(_this.file), {
+                maxHeight: 200, canvas: true
+            }).then(function (img) {
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                    canvasToBlob(img, "image/jpeg"),
+                    canvasToBlob(ImageUpload.rotate90(img), "image/jpeg"),
+                    canvasToBlob(ImageUpload.rotate180(img), "image/jpeg"),
+                    canvasToBlob(ImageUpload.rotate270(img), "image/jpeg")
+                ]);
+            }).spread(function (preview0, preview90, preview180, preview270) {
+                _this.previewUrl = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(preview0);
+                return {
+                    "0": preview0,
+                    "90": preview90,
+                    "180": preview180,
+                    "270": preview270,
+                };
+            });
+        });
+        _this.getPreviewUrl = function () {
+            return _this.previewUrl || _this.getUrl();
+        };
+        _this.getUrl = function () {
+            if (!PREVIEWSDISABLED) {
+                _this.generatePreviews();
+            }
+            _this.url = _this.url || __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(_this.file);
+            _this.previewUrl = _this.previewUrl || _this.url;
+            return _this.url;
+        };
+        _this.upload = function (encryptionKey) {
+            if (!_this.blobs) {
+                throw new Error("usage error: prepare was not called!");
+            }
+            if (_this.options.encrypt && !encryptionKey) {
+                throw new Error("No encryption key given");
+            }
+            return uploadQueue.enqueue(1, function () {
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.blobs).bind(_this).map(function (blobWithMetaData) {
+                    console.info("Uploading blob");
+                    if (_this.options.encrypt) {
+                        return _this.uploadAndEncryptPreparedBlob(encryptionKey, blobWithMetaData.blob);
+                    }
+                    return _this.uploadPreparedBlob(blobWithMetaData.blob);
+                });
+            });
+        };
+        _this._createSizeData = function (size) {
+            return resizeQueue.enqueue(1, function () {
+                return _this._resizeFile(size).then(function (resizedImage) {
+                    return ImageUpload.blobToDataSet(__WEBPACK_IMPORTED_MODULE_4__blobService__["a" /* default */].createBlob(resizedImage.blob)).then(function (data) {
+                        data.content.gif = _this.isGif;
+                        data.content.width = resizedImage.width;
+                        data.content.height = resizedImage.height;
+                        return __assign({}, data, { size: size });
+                    });
+                });
+            });
+        };
+        _this.prepare = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
+            _this.isGif = !!_this.file.type.match(/image.gif/i);
+            var sizes = _this.isGif ? _this.options.gifSizes : _this.options.sizes;
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](sizes)
+                .map(_this._createSizeData)
+                .then(_this._removeUnnededBlobs);
+        });
+        _this._removeUnnededBlobs = function (blobs) {
+            var lastBlob, result = {};
+            _this.blobs = blobs.sort(sizeSorter).filter(function (blob) {
+                var keep = !lastBlob || _this.isGif || sizeDiff(lastBlob, blob) > _this.options.minimumSizeDifference;
+                if (keep) {
+                    lastBlob = blob;
+                }
+                result[blob.size.name] = lastBlob;
+                return keep;
+            });
+            return result;
+        };
+        _this._getImage = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
+            return ImageUpload.imageLibLoad(_this.getUrl());
+        });
+        _this._resizeFile = function (sizeOptions) {
+            if (_this.isGif && !sizeOptions.restrictions) {
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.file);
+            }
+            var options = __assign({}, sizeOptions.restrictions || {}, { canvas: true });
+            return _this._getImage().then(function (img) {
+                if (options.square) {
+                    img = imageLib.scale(img, {
+                        contain: true,
+                        aspectRatio: 1
+                    });
+                }
+                var canvas = ImageUpload.rotate(imageLib.scale(img, options), _this.rotation);
+                return canvasToBlob(canvas, "image/jpeg").then(function (blob) {
+                    return {
+                        blob: blob,
+                        width: canvas.width,
+                        height: canvas.height
+                    };
+                });
+            });
+        };
+        if (!ImageUpload.isImage(file)) {
+            throw new Error("not an image!");
+        }
+        if (file.type.match(/image.gif/) && !_this.options.gif) {
+            throw new Error("no gifs supported!");
+        }
+        return _this;
+    }
+    ImageUpload.isImage = function (file) {
+        return file.type.match(/image.*/);
+    };
+    ImageUpload.imageLibLoad = function (file, options) {
+        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve, reject) {
+            imageLib(file, function (canvas) {
+                if (canvas.type === "error") {
+                    reject(canvas);
+                }
+                else {
+                    resolve(canvas);
+                }
+            }, options);
+        });
+    };
+    ImageUpload.rotate = function (img, angle) {
+        switch (angle) {
+            case "0":
+                return img;
+            case "90":
+                return ImageUpload.rotate90(img);
+            case "180":
+                return ImageUpload.rotate180(img);
+            case "270":
+                return ImageUpload.rotate270(img);
+        }
+        return img;
+    };
+    ;
+    ImageUpload.rotateInternal = function (angle, img, flipRatio) {
+        var canvas = document.createElement("canvas");
+        if (flipRatio) {
+            canvas.width = img.height;
+            canvas.height = img.width;
+        }
+        else {
+            canvas.width = img.width;
+            canvas.height = img.height;
+        }
+        var diff = canvas.width - canvas.height;
+        var newCtx = canvas.getContext("2d");
+        if (newCtx === null) {
+            throw new Error("could not initialize canvas context");
+        }
+        newCtx.translate(canvas.width / 2, canvas.height / 2);
+        newCtx.rotate(angle);
+        newCtx.translate(-canvas.width / 2, -canvas.height / 2);
+        newCtx.drawImage(img, flipRatio ? diff / 2 : 0, flipRatio ? -diff / 2 : 0);
+        return canvas;
+    };
+    ;
+    ImageUpload.rotate90 = function (img) {
+        var angle = Math.PI / 2;
+        return ImageUpload.rotateInternal(angle, img, true);
+    };
+    ;
+    ImageUpload.rotate180 = function (img) {
+        var angle = Math.PI;
+        return ImageUpload.rotateInternal(angle, img, false);
+    };
+    ;
+    ImageUpload.rotate270 = function (img) {
+        var angle = 3 * Math.PI / 2;
+        return ImageUpload.rotateInternal(angle, img, true);
+    };
+    ;
+    return ImageUpload;
+}(__WEBPACK_IMPORTED_MODULE_3__fileUpload_service__["a" /* default */]));
+/* harmony default export */ __webpack_exports__["a"] = (ImageUpload);
+//# sourceMappingURL=imageUpload.service.js.map
+
+/***/ }),
+
+/***/ 297:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5888,19 +6585,19 @@ var Tutorial;
 
 /***/ }),
 
-/***/ 293:
+/***/ 298:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__ = __webpack_require__(294);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch__ = __webpack_require__(309);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__ = __webpack_require__(299);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch__ = __webpack_require__(314);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__ = __webpack_require__(96);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise__ = __webpack_require__(311);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise__ = __webpack_require__(316);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_module__ = __webpack_require__(313);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_module__ = __webpack_require__(318);
 
 
 
@@ -5917,9 +6614,9 @@ Object(__WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__["a" /* pl
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "errorServiceInstance", function() { return errorServiceInstance; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_whatwg_fetch__ = __webpack_require__(342);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_whatwg_fetch__ = __webpack_require__(347);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_whatwg_fetch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_whatwg_fetch__);
-var config = __webpack_require__(55);
+var config = __webpack_require__(56);
 
 var ErrorService = (function () {
     function ErrorService() {
@@ -5983,7 +6680,7 @@ var errorServiceInstance = new ErrorService();
 
 /***/ }),
 
-/***/ 313:
+/***/ 318:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5992,31 +6689,32 @@ var errorServiceInstance = new ErrorService();
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_moment__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_moment__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_common__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ionic_angular__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_common__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ionic_angular__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_component__ = __webpack_require__(427);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_component__ = __webpack_require__(438);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__angular_platform_browser__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_splash_screen__ = __webpack_require__(277);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_status_bar__ = __webpack_require__(149);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__ = __webpack_require__(278);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ionic_native_push__ = __webpack_require__(279);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ionic_native_photo_viewer__ = __webpack_require__(286);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__ionic_native_image_picker__ = __webpack_require__(283);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_file__ = __webpack_require__(147);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_camera__ = __webpack_require__(284);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__ionic_native_barcode_scanner__ = __webpack_require__(290);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__ionic_native_in_app_browser__ = __webpack_require__(291);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__ionic_native_media__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__ngx_translate_core__ = __webpack_require__(280);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__ngx_translate_http_loader__ = __webpack_require__(429);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__angular_http__ = __webpack_require__(431);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__lib_services_location_manager__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__lib_services_featureToggles__ = __webpack_require__(285);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__lib_services_settings_service__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24_moment_locale_de__ = __webpack_require__(98);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24_moment_locale_de___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_24_moment_locale_de__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_splash_screen__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_status_bar__ = __webpack_require__(151);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__ = __webpack_require__(285);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ionic_native_push__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ionic_native_photo_viewer__ = __webpack_require__(288);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__ionic_native_image_picker__ = __webpack_require__(154);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_file__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_camera__ = __webpack_require__(155);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__ionic_native_barcode_scanner__ = __webpack_require__(295);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__ionic_native_in_app_browser__ = __webpack_require__(296);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__ionic_native_media__ = __webpack_require__(240);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__ionic_native_keyboard__ = __webpack_require__(287);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__ngx_translate_http_loader__ = __webpack_require__(440);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__angular_http__ = __webpack_require__(442);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__lib_services_location_manager__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__lib_services_featureToggles__ = __webpack_require__(156);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__lib_services_settings_service__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_moment_locale_de__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_moment_locale_de___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25_moment_locale_de__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6026,10 +6724,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-__webpack_require__(314);
-__webpack_require__(350);
-__webpack_require__(181);
-__webpack_require__(374);
+__webpack_require__(319);
+__webpack_require__(355);
+__webpack_require__(186);
+__webpack_require__(379);
 
  // tslint:disable-line:no-unused-variable
 
@@ -6054,9 +6752,10 @@ __webpack_require__(374);
 
 
 
+
 window.startup = new Date().getTime();
 function createTranslateLoader(http) {
-    return new __WEBPACK_IMPORTED_MODULE_19__ngx_translate_http_loader__["a" /* TranslateHttpLoader */](http, './assets/i18n/', '.json');
+    return new __WEBPACK_IMPORTED_MODULE_20__ngx_translate_http_loader__["a" /* TranslateHttpLoader */](http, './assets/i18n/', '.json');
 }
 
 var DEFAULT_LANG = "de";
@@ -6115,7 +6814,7 @@ var AppModule = (function () {
                 return DEFAULT_LANG;
             }).then(function (lang) {
                 __WEBPACK_IMPORTED_MODULE_0_moment___default.a.locale(lang);
-                if (Object(__WEBPACK_IMPORTED_MODULE_21__lib_services_location_manager__["c" /* isBusinessVersion */])()) {
+                if (Object(__WEBPACK_IMPORTED_MODULE_22__lib_services_location_manager__["c" /* isBusinessVersion */])()) {
                     translate.use(lang + "_business");
                     return;
                 }
@@ -6172,15 +6871,15 @@ var AppModule = (function () {
                         { loadChildren: '../pages/settings/settings.module#SettingsPageModule', name: 'Settings', segment: 'settings', priority: 'low', defaultHistory: [] }
                     ]
                 }),
-                __WEBPACK_IMPORTED_MODULE_18__ngx_translate_core__["b" /* TranslateModule */].forRoot({
+                __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__["b" /* TranslateModule */].forRoot({
                     loader: {
-                        provide: __WEBPACK_IMPORTED_MODULE_18__ngx_translate_core__["a" /* TranslateLoader */],
+                        provide: __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__["a" /* TranslateLoader */],
                         useFactory: createTranslateLoader,
-                        deps: [__WEBPACK_IMPORTED_MODULE_20__angular_http__["a" /* Http */]]
+                        deps: [__WEBPACK_IMPORTED_MODULE_21__angular_http__["a" /* Http */]]
                     }
                 }),
                 __WEBPACK_IMPORTED_MODULE_6__angular_platform_browser__["a" /* BrowserModule */],
-                __WEBPACK_IMPORTED_MODULE_20__angular_http__["b" /* HttpModule */],
+                __WEBPACK_IMPORTED_MODULE_21__angular_http__["b" /* HttpModule */],
             ],
             bootstrap: [__WEBPACK_IMPORTED_MODULE_3_ionic_angular__["e" /* IonicApp */]],
             entryComponents: [
@@ -6200,9 +6899,10 @@ var AppModule = (function () {
                 __WEBPACK_IMPORTED_MODULE_14__ionic_native_camera__["a" /* Camera */],
                 __WEBPACK_IMPORTED_MODULE_16__ionic_native_in_app_browser__["a" /* InAppBrowser */],
                 __WEBPACK_IMPORTED_MODULE_17__ionic_native_media__["a" /* Media */],
+                __WEBPACK_IMPORTED_MODULE_18__ionic_native_keyboard__["a" /* Keyboard */],
             ]
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_core__["P" /* NgZone */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_core__["P" /* NgZone */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_18__ngx_translate_core__["c" /* TranslateService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_18__ngx_translate_core__["c" /* TranslateService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__["a" /* Globalization */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__["a" /* Globalization */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* Config */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* Config */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["l" /* Platform */] // tslint:disable-line:no-unused-variable
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_core__["P" /* NgZone */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_core__["P" /* NgZone */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__["c" /* TranslateService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__["c" /* TranslateService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__["a" /* Globalization */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__["a" /* Globalization */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* Config */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* Config */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["l" /* Platform */] // tslint:disable-line:no-unused-variable
              !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["l" /* Platform */] // tslint:disable-line:no-unused-variable
             ) === "function" && _e || Object])
     ], AppModule);
@@ -6214,7 +6914,7 @@ var AppModule = (function () {
 
 /***/ }),
 
-/***/ 314:
+/***/ 319:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6246,7 +6946,7 @@ socketService.addInterceptor(interceptor);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__requestKey_service__ = __webpack_require__(163);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__requestKey_service__ = __webpack_require__(168);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js__);
 
@@ -6265,10 +6965,10 @@ __WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js__["upload"].setKeyGet(__WEBPACK_
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var h = __webpack_require__(6).default;
+var h = __webpack_require__(5).default;
 var keyStore = __webpack_require__(26);
-var errors = __webpack_require__(47);
-var config = __webpack_require__(55);
+var errors = __webpack_require__(48);
+var config = __webpack_require__(56);
 var Bluebird = __webpack_require__(3);
 
 var attributesNeverVerified = ["_signature", "_hashObject"];
@@ -6315,8 +7015,6 @@ function SecuredDataWithMetaData(content, meta, options, isDecrypted) {
 	}
 
 	this._updated = h.deepCopyObj(this._original);
-
-	this._isKeyVerified = false;
 }
 
 SecuredDataWithMetaData.prototype._blockDisallowedAttributes = function (data) {
@@ -6397,7 +7095,7 @@ SecuredDataWithMetaData.prototype._signAndEncrypt = function (signKey, cryptKey)
 		throw new Error("can only sign and not encrypt");
 	}
 
-	if (this._original.meta._key && (this._original.meta._key !== cryptKey || !this._isKeyVerified)) {
+	if (this._original.meta._key && this._original.meta._key !== cryptKey) {
 		throw new Error("can not re-encrypt an old object with new key!");
 	}
 
@@ -6477,8 +7175,6 @@ SecuredDataWithMetaData.prototype.verifyAsync = function (signKey, id) {
 
 		return this._verifyContentHash();
 	}).then(function () {
-		this._isKeyVerified = true;
-
 		return true;
 	});
 };
@@ -6696,14 +7392,14 @@ module.exports = api;
 
 /***/ }),
 
-/***/ 335:
+/***/ 340:
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ 339:
+/***/ 344:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -6719,7 +7415,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 340:
+/***/ 345:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -6736,7 +7432,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 341:
+/***/ 346:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6851,7 +7547,7 @@ var BlobUploader = (function (_super) {
 
 /***/ }),
 
-/***/ 344:
+/***/ 349:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6895,7 +7591,7 @@ var Storage = (function () {
 
 /***/ }),
 
-/***/ 345:
+/***/ 350:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6934,16 +7630,16 @@ module.exports = waitForReady;
 
 /***/ }),
 
-/***/ 346:
+/***/ 351:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var WorkerPool = __webpack_require__(347);
+var WorkerPool = __webpack_require__(352);
 var bluebird = __webpack_require__(3);
-var chelper = __webpack_require__(177);
-var config = __webpack_require__(55);
+var chelper = __webpack_require__(182);
+var config = __webpack_require__(56);
 
 function getEntropy() {
 	try {
@@ -7118,13 +7814,13 @@ module.exports = sjclWorker;
 
 /***/ }),
 
-/***/ 347:
+/***/ 352:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Worker = __webpack_require__(348);
+var Worker = __webpack_require__(353);
 
 /** constructor for worker pool
 *   @param Promise a promise implementation
@@ -7232,7 +7928,7 @@ module.exports = WorkerPool;
 
 /***/ }),
 
-/***/ 348:
+/***/ 353:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7363,7 +8059,7 @@ module.exports = PromiseWorker;
 
 /***/ }),
 
-/***/ 349:
+/***/ 354:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7371,7 +8067,7 @@ module.exports = PromiseWorker;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var chelper = __webpack_require__(177);
+var chelper = __webpack_require__(182);
 var sjcl = __webpack_require__(43);
 
 var ObjectHasher = function ObjectHasher(data, version) {
@@ -7512,13 +8208,13 @@ module.exports = ObjectHasher;
 
 /***/ }),
 
-/***/ 350:
+/***/ 355:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var sessionService = __webpack_require__(20).default;
+var sessionService = __webpack_require__(21).default;
 var socketService = __webpack_require__(11).default;
 
 var interceptor = {
@@ -7540,14 +8236,14 @@ socketService.addInterceptor(interceptor);
 
 /***/ }),
 
-/***/ 358:
+/***/ 363:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Bluebird = __webpack_require__(3);
-var h = __webpack_require__(6).default;
+var h = __webpack_require__(5).default;
 
 var errorService = __webpack_require__(30).errorServiceInstance;
 
@@ -7555,7 +8251,7 @@ var migrations = ["regenerateFriendsKeys", "fixBrokenSettings"];
 
 function runMigration(ownUser, migrationState) {
 	return Bluebird.try(function () {
-		var migration = __webpack_require__(359)("./" + h.pad("" + (migrationState + 1), 5) + "-" + migrations[migrationState]);
+		var migration = __webpack_require__(364)("./" + h.pad("" + (migrationState + 1), 5) + "-" + migrations[migrationState]);
 		return migration();
 	}).then(function (success) {
 		if (!success) {
@@ -7585,16 +8281,16 @@ module.exports = doMigration;
 
 /***/ }),
 
-/***/ 359:
+/***/ 364:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./00001-regenerateFriendsKeys": 182,
-	"./00001-regenerateFriendsKeys.js": 182,
-	"./00002-fixBrokenSettings": 185,
-	"./00002-fixBrokenSettings.js": 185,
-	"./migrationExample": 186,
-	"./migrationExample.js": 186
+	"./00001-regenerateFriendsKeys": 187,
+	"./00001-regenerateFriendsKeys.js": 187,
+	"./00002-fixBrokenSettings": 190,
+	"./00002-fixBrokenSettings.js": 190,
+	"./migrationExample": 191,
+	"./migrationExample.js": 191
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -7610,31 +8306,31 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 359;
+webpackContext.id = 364;
 
 /***/ }),
 
-/***/ 360:
+/***/ 365:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export NotExistingUser */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_error_service__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_state__ = __webpack_require__(288);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_session_service__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_blobService__ = __webpack_require__(145);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__users_profile__ = __webpack_require__(151);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_trust_service__ = __webpack_require__(181);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_state__ = __webpack_require__(292);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_blobService__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__users_profile__ = __webpack_require__(153);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_trust_service__ = __webpack_require__(186);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_settings_service__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_filter_service__ = __webpack_require__(371);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__services_location_manager__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__services_mutableObjectLoader__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__ = __webpack_require__(163);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__users_signedKeys__ = __webpack_require__(373);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_filter_service__ = __webpack_require__(376);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__services_location_manager__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__services_mutableObjectLoader__ = __webpack_require__(101);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__ = __webpack_require__(168);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__users_signedKeys__ = __webpack_require__(378);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -7692,10 +8388,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 
 
 
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 
 var keyStoreService = __webpack_require__(26);
-var signatureCache = __webpack_require__(69);
+var signatureCache = __webpack_require__(72);
 
 
 
@@ -7707,8 +8403,8 @@ var signatureCache = __webpack_require__(69);
 
 
 
-var friendsService = __webpack_require__(82);
-var trustManager = __webpack_require__(63);
+var friendsService = __webpack_require__(85);
+var trustManager = __webpack_require__(66);
 var RELOAD_DELAY_MIN = 10 * 1000;
 var RELOAD_DELAY_MAX = 60 * 1000;
 var RELOAD_OWN_DELAY = 5 * 1000;
@@ -7982,7 +8678,7 @@ var User = (function () {
             return __WEBPACK_IMPORTED_MODULE_3_bluebird__["try"](function () {
                 return __WEBPACK_IMPORTED_MODULE_3_bluebird__["all"]([
                     _this.rebuildProfiles(),
-                    _this.profiles.me.getUpdatedData(_this.getSignKey())
+                    _this.profiles.me.signAndEncrypt(_this.getSignKey(), _this.getMainKey())
                 ]);
             }).spread(function (profileData, myProfile) {
                 profileData.me = myProfile;
@@ -8499,7 +9195,7 @@ var UserLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 361:
+/***/ 366:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8507,8 +9203,8 @@ var UserLoader = (function (_super) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_Progress__ = __webpack_require__(84);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_Progress__ = __webpack_require__(65);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -8614,7 +9310,7 @@ var BlobDownloader = (function (_super) {
 
 /***/ }),
 
-/***/ 363:
+/***/ 368:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8902,7 +9598,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 364:
+/***/ 369:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9057,7 +9753,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 365:
+/***/ 370:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9161,7 +9857,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 366:
+/***/ 371:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9226,7 +9922,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 367:
+/***/ 372:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9289,7 +9985,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 368:
+/***/ 373:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9346,7 +10042,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 369:
+/***/ 374:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9416,7 +10112,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 370:
+/***/ 375:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9450,7 +10146,7 @@ module.exports = encryptedDataObject;
 
 /***/ }),
 
-/***/ 371:
+/***/ 376:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9458,10 +10154,10 @@ module.exports = encryptedDataObject;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__keyStore_service__ = __webpack_require__(32);
 
-var errors = __webpack_require__(47);
+var errors = __webpack_require__(48);
 
-var circleService = __webpack_require__(184);
-var localize = __webpack_require__(372);
+var circleService = __webpack_require__(189);
+var localize = __webpack_require__(377);
 var FilterService = (function () {
     function FilterService() {
         var _this = this;
@@ -9603,7 +10299,7 @@ var FilterService = (function () {
 
 /***/ }),
 
-/***/ 372:
+/***/ 377:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9617,12 +10313,12 @@ module.exports = {
 
 /***/ }),
 
-/***/ 373:
+/***/ 378:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SignedKeysLoader; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_cachedObjectLoader__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_cachedObjectLoader__ = __webpack_require__(74);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -9670,26 +10366,26 @@ var SignedKeysLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 375:
+/***/ 380:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./de": 98,
-	"./de-at": 187,
-	"./de-at.js": 187,
-	"./de-ch": 188,
-	"./de-ch.js": 188,
-	"./de.js": 98,
-	"./en-au": 189,
-	"./en-au.js": 189,
-	"./en-ca": 190,
-	"./en-ca.js": 190,
-	"./en-gb": 191,
-	"./en-gb.js": 191,
-	"./en-ie": 192,
-	"./en-ie.js": 192,
-	"./en-nz": 193,
-	"./en-nz.js": 193
+	"./de": 102,
+	"./de-at": 192,
+	"./de-at.js": 192,
+	"./de-ch": 193,
+	"./de-ch.js": 193,
+	"./de.js": 102,
+	"./en-au": 194,
+	"./en-au.js": 194,
+	"./en-ca": 195,
+	"./en-ca.js": 195,
+	"./en-gb": 196,
+	"./en-gb.js": 196,
+	"./en-ie": 197,
+	"./en-ie.js": 197,
+	"./en-nz": 198,
+	"./en-nz.js": 198
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -9705,15 +10401,43 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 375;
+webpackContext.id = 380;
 
 /***/ }),
 
-/***/ 398:
+/***/ 416:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_observer__ = __webpack_require__(17);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+var ScreenSizeService = (function (_super) {
+    __extends(ScreenSizeService, _super);
+    function ScreenSizeService() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return ScreenSizeService;
+}(__WEBPACK_IMPORTED_MODULE_0__asset_observer__["default"]));
+/* harmony default export */ __webpack_exports__["a"] = (new ScreenSizeService());
+//# sourceMappingURL=screenSize.service.js.map
+
+/***/ }),
+
+/***/ 418:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -9776,17 +10500,17 @@ var TopicUpdate = (function () {
 
 /***/ }),
 
-/***/ 399:
+/***/ 419:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export ChatList */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_mutableObjectLoader__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_mutableObjectLoader__ = __webpack_require__(101);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_session_service__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__chat__ = __webpack_require__(83);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__chat__ = __webpack_require__(86);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -9844,24 +10568,25 @@ var ChatListLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 427:
+/***/ 438:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MyApp; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(277);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__ = __webpack_require__(149);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_globalization__ = __webpack_require__(278);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_push__ = __webpack_require__(279);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_services_push_service__ = __webpack_require__(428);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__lib_services_location_manager__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__tutorial__ = __webpack_require__(292);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__lib_services_session_service__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__ = __webpack_require__(151);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_globalization__ = __webpack_require__(285);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_push__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_keyboard__ = __webpack_require__(287);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_services_push_service__ = __webpack_require__(439);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__lib_services_socket_service__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_location_manager__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__tutorial__ = __webpack_require__(297);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__ = __webpack_require__(21);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9883,24 +10608,33 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 // When we think it's safe to hide the splash screen, there might actually be
 // some more drawing going on. This delay is to offset for that rendering.
 var SPLASH_SCREEN_HIDE_DELAY = 200;
 var TUTORIAL_SLIDES = 7;
+var setHeight = function (height) {
+    var ele = document.getElementsByTagName("ion-nav")[0];
+    if (ele instanceof HTMLElement) {
+        ele.style.height = height ? "calc(100% - " + height + "px)" : "";
+    }
+    return true;
+};
 var MyApp = (function () {
-    function MyApp(platform, splashScreen, statusBar, globalization, push) {
+    function MyApp(platform, splashScreen, statusBar, globalization, push, keyboard) {
         var _this = this;
         this.splashScreen = splashScreen;
         this.statusBar = statusBar;
         this.globalization = globalization;
         this.push = push;
+        this.keyboard = keyboard;
         this.rootPage = "Home";
         this.showTutorial = function () {
             var activeView = _this.nav.getActive();
             if (!activeView || !activeView.instance) {
                 return false;
             }
-            return !activeView.instance.tutorialDisabled && __WEBPACK_IMPORTED_MODULE_10__tutorial__["a" /* default */].tutorialVisible;
+            return !activeView.instance.tutorialDisabled && __WEBPACK_IMPORTED_MODULE_11__tutorial__["a" /* default */].tutorialVisible;
         };
         this.slideNumber = 1;
         this.lang = 'de';
@@ -9908,11 +10642,16 @@ var MyApp = (function () {
             // Okay, so the platform is ready and our plugins are available.
             // Here you can do any higher level native things you might need.
             _this.statusBar.styleLightContent();
-            var pushService = new __WEBPACK_IMPORTED_MODULE_7__lib_services_push_service__["a" /* PushService */](_this.nav, platform, _this.push);
+            var pushService = new __WEBPACK_IMPORTED_MODULE_8__lib_services_push_service__["a" /* PushService */](_this.nav, platform, _this.push);
             pushService.register();
-            __WEBPACK_IMPORTED_MODULE_8__lib_services_socket_service__["default"].addInterceptor({
+            if (platform.is("ios")) {
+                _this.keyboard.disableScroll(true);
+                window.addEventListener('native.keyboardshow', function (e) { return setHeight(e.keyboardHeight); });
+                window.addEventListener('native.keyboardhide', function () { return setHeight(0); });
+            }
+            __WEBPACK_IMPORTED_MODULE_9__lib_services_socket_service__["default"].addInterceptor({
                 transformResponse: function (response) {
-                    if (Object(__WEBPACK_IMPORTED_MODULE_9__lib_services_location_manager__["c" /* isBusinessVersion */])() && response.logedin && !response.error) {
+                    if (Object(__WEBPACK_IMPORTED_MODULE_10__lib_services_location_manager__["c" /* isBusinessVersion */])() && response.logedin && !response.error) {
                         var activeNav = _this.nav.getActive();
                         var onSalesPage = activeNav && activeNav.component.name === "SalesPage";
                         if (onSalesPage && response.isBusiness) {
@@ -9927,7 +10666,7 @@ var MyApp = (function () {
                     return response;
                 }
             });
-            __WEBPACK_IMPORTED_MODULE_11__lib_services_session_service__["default"].bootLogin().then(function (loggedin) {
+            __WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__["default"].bootLogin().then(function (loggedin) {
                 __WEBPACK_IMPORTED_MODULE_2_bluebird__["delay"](SPLASH_SCREEN_HIDE_DELAY).then(function () { return _this.splashScreen.hide(); });
                 if (!loggedin && _this.nav.length() > 0) {
                     _this.nav.remove(0, _this.nav.length() - 1);
@@ -9941,7 +10680,7 @@ var MyApp = (function () {
         this.slideNumber++;
         if (this.slideNumber === TUTORIAL_SLIDES + 1) {
             this.slideNumber = 1;
-            __WEBPACK_IMPORTED_MODULE_10__tutorial__["a" /* default */].skip();
+            __WEBPACK_IMPORTED_MODULE_11__tutorial__["a" /* default */].skip();
         }
     };
     MyApp.prototype.currentSlide = function () {
@@ -9958,7 +10697,7 @@ var MyApp = (function () {
         var firstSlide = this.slideNumber === 1;
         var shouldSkip = (0.73 < px) && (px < 0.98) && (0.03 < py) && (py < 0.10);
         if (shouldSkip && firstSlide) {
-            __WEBPACK_IMPORTED_MODULE_10__tutorial__["a" /* default */].skip();
+            __WEBPACK_IMPORTED_MODULE_11__tutorial__["a" /* default */].skip();
         }
         else {
             this.advance();
@@ -9973,7 +10712,7 @@ var MyApp = (function () {
         }).catch(function () {
             console.warn('Cannot get language from device, remaining with default language');
         }).then(function () {
-            __WEBPACK_IMPORTED_MODULE_10__tutorial__["a" /* default */].checkVisibility();
+            __WEBPACK_IMPORTED_MODULE_11__tutorial__["a" /* default */].checkVisibility();
         });
     };
     __decorate([
@@ -9987,7 +10726,8 @@ var MyApp = (function () {
             __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__["a" /* SplashScreen */],
             __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__["a" /* StatusBar */],
             __WEBPACK_IMPORTED_MODULE_5__ionic_native_globalization__["a" /* Globalization */],
-            __WEBPACK_IMPORTED_MODULE_6__ionic_native_push__["a" /* Push */]])
+            __WEBPACK_IMPORTED_MODULE_6__ionic_native_push__["a" /* Push */],
+            __WEBPACK_IMPORTED_MODULE_7__ionic_native_keyboard__["a" /* Keyboard */]])
     ], MyApp);
     return MyApp;
 }());
@@ -9996,24 +10736,24 @@ var MyApp = (function () {
 
 /***/ }),
 
-/***/ 428:
+/***/ 439:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PushService; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pages_messages_messages__ = __webpack_require__(289);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pages_messages_messages__ = __webpack_require__(293);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__storage_service__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__storage_service__ = __webpack_require__(89);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__messages_messageService__ = __webpack_require__(148);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__messages_messageService__ = __webpack_require__(150);
 
 
 
 
 
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 
 var sessionStorage = Object(__WEBPACK_IMPORTED_MODULE_3__storage_service__["withPrefix"])("whispeer.session");
 var sjcl = __webpack_require__(43);
@@ -10172,7 +10912,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__crypto_keyStore_js__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__crypto_keyStore_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__crypto_keyStore_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helper_helper__ = __webpack_require__(5);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -10195,9 +10935,9 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 
 
 
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 
-var EncryptedData = __webpack_require__(370);
+var EncryptedData = __webpack_require__(375);
 var SecuredData = __webpack_require__(33);
 var notVisible = {
     encrypt: true,
@@ -10464,65 +11204,6 @@ var SettingsService = (function (_super) {
 /***/ }),
 
 /***/ 47:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function extendError(ParentErrorClass, name) {
-	if (ParentErrorClass.prototype instanceof Error || ParentErrorClass === Error) {
-		var F = function F() {};
-		var CustomError = function CustomError(message, data) {
-			var _this = this;
-
-			var tmp = new ParentErrorClass(message);
-			tmp.name = this.name = name || "Error";
-
-			_this.data = data;
-			_this.stack = tmp.stack;
-			_this.message = tmp.message;
-			_this.name = name;
-
-			return _this;
-		};
-		var SubClass = function SubClass() {};
-		SubClass.prototype = ParentErrorClass.prototype;
-		F.prototype = CustomError.prototype = new SubClass();
-		CustomError.prototype.constructor = CustomError;
-
-		return CustomError;
-	} else {
-		throw new Error("our error should inherit from error!");
-	}
-}
-
-var InvalidDataError = extendError(Error, "InvalidDataError");
-var InvalidHexError = extendError(InvalidDataError, "InvalidHexError");
-var InvalidFilter = extendError(InvalidDataError, "InvalidFilter");
-
-var SecurityError = extendError(Error, "SecurityError");
-var AccessViolation = extendError(SecurityError, "AccessViolation");
-var DecryptionError = extendError(SecurityError, "DecryptionError");
-var ValidationError = extendError(SecurityError, "ValidationError");
-
-var LoginError = extendError(Error, "LoginError");
-
-module.exports = {
-	SecurityError: SecurityError,
-	AccessViolation: AccessViolation,
-	DecryptionError: DecryptionError,
-	ValidationError: ValidationError,
-
-	InvalidDataError: InvalidDataError,
-	InvalidHexError: InvalidHexError,
-	InvalidFilter: InvalidFilter,
-
-	LoginError: LoginError
-};
-
-/***/ }),
-
-/***/ 52:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10537,8 +11218,8 @@ module.exports = {
 /* unused harmony export isBlockedReturnUrl */
 /* unused harmony export setReturnUrl */
 /* unused harmony export getUrlParameter */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__storage_service__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__storage_service__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
 
 
 var loginStorage = __WEBPACK_IMPORTED_MODULE_0__storage_service__["withPrefix"]("whispeer.login");
@@ -10619,21 +11300,66 @@ var getUrlParameter = function (param) {
 
 /***/ }),
 
-/***/ 55:
+/***/ 48:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var h = __webpack_require__(6).default;
-var baseConfig = __webpack_require__(339);
-var config = __webpack_require__(340);
+function extendError(ParentErrorClass, name) {
+	if (ParentErrorClass.prototype instanceof Error || ParentErrorClass === Error) {
+		var F = function F() {};
+		var CustomError = function CustomError(message, data) {
+			var _this = this;
 
-module.exports = h.extend(h.extend({}, baseConfig), config);
+			var tmp = new ParentErrorClass(message);
+			tmp.name = this.name = name || "Error";
+
+			_this.data = data;
+			_this.stack = tmp.stack;
+			_this.message = tmp.message;
+			_this.name = name;
+
+			return _this;
+		};
+		var SubClass = function SubClass() {};
+		SubClass.prototype = ParentErrorClass.prototype;
+		F.prototype = CustomError.prototype = new SubClass();
+		CustomError.prototype.constructor = CustomError;
+
+		return CustomError;
+	} else {
+		throw new Error("our error should inherit from error!");
+	}
+}
+
+var InvalidDataError = extendError(Error, "InvalidDataError");
+var InvalidHexError = extendError(InvalidDataError, "InvalidHexError");
+var InvalidFilter = extendError(InvalidDataError, "InvalidFilter");
+
+var SecurityError = extendError(Error, "SecurityError");
+var AccessViolation = extendError(SecurityError, "AccessViolation");
+var DecryptionError = extendError(SecurityError, "DecryptionError");
+var ValidationError = extendError(SecurityError, "ValidationError");
+
+var LoginError = extendError(Error, "LoginError");
+
+module.exports = {
+	SecurityError: SecurityError,
+	AccessViolation: AccessViolation,
+	DecryptionError: DecryptionError,
+	ValidationError: ValidationError,
+
+	InvalidDataError: InvalidDataError,
+	InvalidHexError: InvalidHexError,
+	InvalidFilter: InvalidFilter,
+
+	LoginError: LoginError
+};
 
 /***/ }),
 
-/***/ 6:
+/***/ 5:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11811,11 +12537,485 @@ var helper = {
 };
 /* harmony default export */ __webpack_exports__["default"] = (helper);
 //# sourceMappingURL=helper.js.map
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(13), __webpack_require__(66)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(12), __webpack_require__(69)))
 
 /***/ }),
 
-/***/ 63:
+/***/ 53:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return unpath; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__socket_service__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__ = __webpack_require__(366);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__asset_Queue__ = __webpack_require__(73);
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var _this = this;
+
+var debug = __webpack_require__(15);
+
+
+
+
+
+
+var initService = __webpack_require__(22);
+var keyStore = __webpack_require__(26);
+var knownBlobURLs = {};
+var downloadBlobQueue = new __WEBPACK_IMPORTED_MODULE_6__asset_Queue__["a" /* default */](5);
+downloadBlobQueue.start();
+var debugName = "whispeer:blobService";
+var blobServiceDebug = debug(debugName);
+var time = function (name) {
+    if (debug.enabled(debugName)) {
+        // eslint-disable-next-line no-console
+        console.time(name);
+    }
+};
+var timeEnd = function (name) {
+    if (debug.enabled(debugName)) {
+        // eslint-disable-next-line no-console
+        console.timeEnd(name);
+    }
+};
+var unpath = function (path) {
+    var index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1;
+    return {
+        directory: path.substr(0, index),
+        name: path.substr(index)
+    };
+};
+var MyBlob = (function () {
+    function MyBlob(blobData, blobID, options) {
+        this.blobData = blobData;
+        options = options || {};
+        if (blobID) {
+            this.blobID = blobID;
+            this.uploaded = true;
+        }
+        else {
+            this.uploaded = false;
+        }
+        this.meta = options.meta || {};
+        this.key = this.meta._key || this.meta.key;
+        this.decrypted = options.decrypted || !this.key;
+        this.uploadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
+        this.encryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
+        this.decryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
+    }
+    MyBlob.prototype.isDecrypted = function () {
+        return this.decrypted;
+    };
+    MyBlob.prototype.isUploaded = function () {
+        return this.uploaded;
+    };
+    MyBlob.prototype.getSize = function () {
+        return this.blobData.size;
+    };
+    MyBlob.prototype.getMeta = function () {
+        return this.meta;
+    };
+    MyBlob.prototype.getArrayBuffer = function () {
+        var _this = this;
+        Object(__WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["b" /* fixFileReader */])();
+        if (this.blobData.originalUrl) {
+            var _a = unpath(this.blobData.originalUrl), directory = _a.directory, name_1 = _a.name;
+            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].readFileAsArrayBuffer(directory, name_1).timeout(2 * 60 * 1000);
+        }
+        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
+            var reader = new FileReader();
+            if (reader.addEventListener) {
+                reader.addEventListener("loadend", resolve);
+            }
+            else {
+                reader.onloadend = resolve;
+            }
+            reader.readAsArrayBuffer(_this.blobData);
+        }).then(function (event) {
+            var target = event.currentTarget || event.target;
+            if (target.error) {
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](target.error);
+            }
+            return target.result;
+        }).timeout(2 * 60 * 1000);
+    };
+    MyBlob.prototype.encryptAndUpload = function (key) {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            var blobKey;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.encrypt()];
+                    case 1:
+                        blobKey = _a.sent();
+                        return [4 /*yield*/, keyStore.sym.symEncryptKey(blobKey, key)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.upload()];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/, blobKey];
+                }
+            });
+        }); });
+    };
+    MyBlob.prototype.encrypt = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().then(function () {
+            if (_this.uploaded || !_this.decrypted) {
+                throw new Error("trying to encrypt an already encrypted or public blob. add a key decryptor if you want to give users access");
+            }
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                keyStore.sym.generateKey(null, "blob key"),
+                _this.getArrayBuffer()
+            ]);
+        }).spread(function (key, buf) {
+            _this.key = key;
+            time("blobencrypt" + (_this.blobID || _this.preReservedID));
+            return keyStore.sym.encryptArrayBuffer(buf, _this.key, function (progress) {
+                _this.encryptProgress.progress(_this.getSize() * progress);
+            });
+        }).then(function (encryptedData) {
+            _this.encryptProgress.progress(_this.getSize());
+            timeEnd("blobencrypt" + (_this.blobID || _this.preReservedID));
+            blobServiceDebug(encryptedData.byteLength);
+            _this.decrypted = false;
+            _this.blobData = new Blob([encryptedData], { type: _this.blobData.type });
+            return _this.key;
+        });
+    };
+    MyBlob.prototype.decrypt = function () {
+        var _this = this;
+        if (this.decrypted) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
+        }
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            return _this.getArrayBuffer();
+        }).then(function (encryptedData) {
+            time("blobdecrypt" + _this.blobID);
+            return keyStore.sym.decryptArrayBuffer(encryptedData, _this.key, function (progress) {
+                _this.decryptProgress.progress(_this.getSize() * progress);
+            });
+        }).then(function (decryptedData) {
+            _this.decryptProgress.progress(_this.getSize());
+            timeEnd("blobdecrypt" + _this.blobID);
+            _this.decrypted = true;
+            _this.blobData = new Blob([decryptedData], { type: _this.blobData.type });
+            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(_this).catch(function (e) {
+                console.log("Could not store blob");
+                return _this.toURL();
+            });
+        });
+    };
+    MyBlob.prototype.toURL = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            if (_this.blobData.localURL) {
+                return _this.blobData.localURL;
+            }
+            if (typeof window.URL !== "undefined") {
+                return window.URL.createObjectURL(_this.blobData);
+            }
+            if (typeof webkitURL !== "undefined") {
+                return window.webkitURL.createObjectURL(_this.blobData);
+            }
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["fromCallback"](function (cb) {
+                __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].blobToDataURI(_this.blobData, cb);
+            });
+        }).catch(function () {
+            return "";
+        });
+    };
+    MyBlob.prototype.upload = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            if (_this.uploaded) {
+                return _this.blobID;
+            }
+            return _this.reserveID();
+        }).then(function (blobid) {
+            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].uploadBlob(_this.blobData, blobid, _this.uploadProgress);
+        }).then(function () {
+            _this.uploaded = true;
+            return _this.blobID;
+        });
+    };
+    MyBlob.prototype.getBlobID = function () {
+        return this.blobID;
+    };
+    MyBlob.prototype.getBlobData = function () {
+        return this.blobData;
+    };
+    MyBlob.prototype.reserveID = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            var meta = _this.meta;
+            meta._key = _this.key;
+            meta.one = 1;
+            if (_this.preReservedID) {
+                return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.fullyReserveID", {
+                    blobid: _this.preReservedID,
+                    meta: meta
+                });
+            }
+            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.reserveBlobID", {
+                meta: meta
+            });
+        }).then(function (data) {
+            if (data.blobid) {
+                _this.blobID = data.blobid;
+                return _this.blobID;
+            }
+        });
+    };
+    MyBlob.prototype.preReserveID = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.preReserveID", {});
+        }).then(function (data) {
+            if (data.blobid) {
+                _this.preReservedID = data.blobid;
+                return data.blobid;
+            }
+            throw new Error("got no blobid");
+        });
+    };
+    MyBlob.prototype.getHash = function () {
+        return this.getArrayBuffer().then(function (buf) {
+            return keyStore.hash.hashArrayBuffer(buf);
+        });
+    };
+    return MyBlob;
+}());
+var loadBlob = function (blobID, progress, estimatedSize) {
+    var decryptProgressStub = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
+    var downloadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
+    progress.addDepend(downloadProgress);
+    progress.addDepend(decryptProgressStub);
+    return downloadBlobQueue.enqueue(1, function () { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+        var data, blob;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, initService.awaitLoading()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, new __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__socket_service__["default"], blobID, downloadProgress).download()];
+                case 2:
+                    data = _a.sent();
+                    blob = new MyBlob(data.blob, blobID, { meta: data.meta });
+                    if (blob.isDecrypted()) {
+                        return [2 /*return*/, __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(blob).catch(function () { return blob.toURL(); })];
+                    }
+                    downloadProgress.progress(downloadProgress.getTotal());
+                    progress.removeDepend(decryptProgressStub);
+                    progress.addDepend(blob.decryptProgress);
+                    return [2 /*return*/, blob.decrypt()];
+            }
+        });
+    }); }); });
+};
+var getBlob = function (blobID, downloadProgress, estimatedSize) {
+    if (!knownBlobURLs[blobID]) {
+        knownBlobURLs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize);
+    }
+    return knownBlobURLs[blobID];
+};
+var blobService = {
+    createBlob: function (blob) {
+        return new MyBlob(blob);
+    },
+    isBlobLoaded: function (blobID) {
+        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].isLoaded(blobID);
+    },
+    getBlobUrl: function (blobID, progress, estimatedSize) {
+        if (progress === void 0) { progress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */](); }
+        if (estimatedSize === void 0) { estimatedSize = 0; }
+        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].getBlobUrl(blobID).catch(function () {
+            return getBlob(blobID, progress, estimatedSize);
+        });
+    },
+};
+/* harmony default export */ __webpack_exports__["a"] = (blobService);
+//# sourceMappingURL=blobService.js.map
+
+/***/ }),
+
+/***/ 56:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var h = __webpack_require__(5).default;
+var baseConfig = __webpack_require__(344);
+var config = __webpack_require__(345);
+
+module.exports = h.extend(h.extend({}, baseConfig), config);
+
+/***/ }),
+
+/***/ 65:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__observer__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var Progress = (function (_super) {
+    __extends(Progress, _super);
+    function Progress(options) {
+        var _this = _super.call(this) || this;
+        _this.done = 0;
+        _this.donePercentage = 0;
+        _this.data = { progress: 0 };
+        _this._parseOptions = function () {
+            if (_this.options) {
+                _this.total = _this.options.total;
+                if (_this.options.depends) {
+                    _this._listenDepends(_this.options.depends);
+                }
+            }
+        };
+        _this._listenDepends = function (depends) {
+            _this.depends = depends;
+            depends.forEach(function (depend) {
+                depend.listen(_this.recalculate.bind(_this), "progress");
+            });
+        };
+        _this.removeDepend = function (depend) {
+            if (!_this.depends && _this.total) {
+                throw new Error("trying to mix depending progress and manual progress");
+            }
+            __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].removeArray(_this.depends, depend);
+            _this.recalculate();
+        };
+        _this.addDepend = function (depend) {
+            if (!_this.depends && _this.total) {
+                throw new Error("trying to mix depending progress and manual progress");
+            }
+            _this.depends = _this.depends || [];
+            _this.depends.push(depend);
+            depend.listen(_this.recalculate.bind(_this), "progress");
+            _this.recalculate();
+        };
+        _this.progressDelta = function (delta) {
+            if (_this.depends) {
+                throw new Error("trying to mix depending progress and manual progress");
+            }
+            _this.done += delta;
+            _this.recalculate();
+        };
+        _this.progress = function (done) {
+            if (_this.depends) {
+                throw new Error("trying to mix depending progress and manual progress");
+            }
+            _this.done = done;
+            _this.recalculate();
+        };
+        _this.setTotal = function (total) {
+            if (_this.depends) {
+                throw new Error("trying to mix depending progress and manual progress");
+            }
+            _this.total = total;
+            _this.recalculate();
+        };
+        _this.reset = function () {
+            _this.done = 0;
+            _this.recalculate();
+        };
+        _this.joinDepends = function () {
+            var done = 0, total = 0;
+            _this.depends.forEach(function (depend) {
+                done += depend.getDone();
+                total += depend.getTotal() || 0;
+            });
+            _this.done = done;
+            _this.total = total;
+        };
+        _this.getDone = function () {
+            return _this.done;
+        };
+        _this.getTotal = function () {
+            return _this.total;
+        };
+        _this.getProgress = function () {
+            return _this.donePercentage;
+        };
+        _this.recalculate = function () {
+            if (_this.depends) {
+                _this.joinDepends();
+            }
+            if (!_this.total) {
+                return;
+            }
+            _this.donePercentage = _this.done / _this.total;
+            _this.donePercentage = Math.min(_this.donePercentage, 1);
+            _this.data.progress = _this.donePercentage;
+            _this.notify(_this.donePercentage, "progress");
+        };
+        _this.options = options;
+        _this._parseOptions();
+        return _this;
+    }
+    return Progress;
+}(__WEBPACK_IMPORTED_MODULE_0__observer__["default"]));
+/* harmony default export */ __webpack_exports__["a"] = (Progress);
+//# sourceMappingURL=Progress.js.map
+
+/***/ }),
+
+/***/ 66:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11823,8 +13023,8 @@ var helper = {
 
 var Observer = __webpack_require__(17);
 var SecuredData = __webpack_require__(33);
-var Enum = __webpack_require__(178);
-var errors = __webpack_require__(47);
+var Enum = __webpack_require__(183);
+var errors = __webpack_require__(48);
 var Bluebird = __webpack_require__(3);
 var database,
     loaded = false,
@@ -12095,17 +13295,17 @@ module.exports = trustManager;
 
 /***/ }),
 
-/***/ 69:
+/***/ 72:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var h = __webpack_require__(6).default;
-var config = __webpack_require__(55);
+var h = __webpack_require__(5).default;
+var config = __webpack_require__(56);
 var Observer = __webpack_require__(17);
 var keyStore = __webpack_require__(26);
-var chelper = __webpack_require__(150);
+var chelper = __webpack_require__(152);
 var Bluebird = __webpack_require__(3);
 var loaded = false,
     changed = false,
@@ -12432,7 +13632,64 @@ module.exports = signatureCache;
 
 /***/ }),
 
-/***/ 70:
+/***/ 73:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+
+
+var Queue = (function () {
+    function Queue(maxWeight) {
+        this.maxWeight = maxWeight;
+        this.queue = [];
+        this.run = false;
+        this.runningWeight = 0;
+    }
+    Queue.prototype.enqueue = function (weight, task) {
+        var _this = this;
+        var promise = new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve, reject) {
+            _this.queue.push({
+                task: task,
+                weight: weight,
+                resolve: resolve,
+                reject: reject
+            });
+            _this.runTasks();
+        });
+        return promise;
+    };
+    Queue.prototype.runTasks = function () {
+        if (!this.run) {
+            return;
+        }
+        var nextTask;
+        while (this.queue.length > 0 && this.runningWeight < this.maxWeight) {
+            nextTask = this.queue.shift();
+            this.runTask(nextTask);
+        }
+    };
+    Queue.prototype.runTask = function (task) {
+        var _this = this;
+        this.runningWeight += task.weight;
+        task.task().then(function (result) { task.resolve(result); }, function (error) { task.reject(error); }).finally(function () {
+            _this.runningWeight -= task.weight;
+            _this.runTasks();
+        });
+    };
+    Queue.prototype.start = function () {
+        this.run = true;
+        this.runTasks();
+    };
+    return Queue;
+}());
+/* harmony default export */ __webpack_exports__["a"] = (Queue);
+//# sourceMappingURL=Queue.js.map
+
+/***/ }),
+
+/***/ 74:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12542,7 +13799,7 @@ function createLoader(_a) {
 
 /***/ }),
 
-/***/ 82:
+/***/ 85:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12552,14 +13809,14 @@ function createLoader(_a) {
 * friendsService
 **/
 
-var h = __webpack_require__(6).default;
+var h = __webpack_require__(5).default;
 var Observer = __webpack_require__(17);
 var SecuredData = __webpack_require__(33);
 var Bluebird = __webpack_require__(3);
 
 var socket = __webpack_require__(11).default;
 var keyStore = __webpack_require__(32).default;
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 
 var friends = [],
     requests = [],
@@ -12766,7 +14023,7 @@ friendsService = {
 		}
 
 		var userService = __webpack_require__(9).default,
-		    circleService = __webpack_require__(184);
+		    circleService = __webpack_require__(189);
 		var otherUser,
 		    ownUser = userService.getOwn(),
 		    userCircles = circleService.inWhichCircles(uid);
@@ -12997,7 +14254,7 @@ module.exports = friendsService;
 
 /***/ }),
 
-/***/ 83:
+/***/ 86:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13005,15 +14262,15 @@ module.exports = friendsService;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_mutableObjectLoader__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__chatChunk__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__message__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_mutableObjectLoader__ = __webpack_require__(101);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__chatChunk__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__message__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helper_helper__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_Cache__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_keyStore_service__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__asset_observer__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_settings_service__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_session_service__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_session_service__ = __webpack_require__(21);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -13078,7 +14335,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 
 
 
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 var messageSendCache = new __WEBPACK_IMPORTED_MODULE_6__services_Cache__["default"]("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });
 var unreadChatIDs = [];
 var addAfterTime = function (arr, id, time) {
@@ -13344,7 +14601,7 @@ var Chat = (function (_super) {
         };
         _this.amIAdmin = function () {
             var latestChunk = __WEBPACK_IMPORTED_MODULE_3__chatChunk__["b" /* default */].getLoaded(_this.getLatestChunk());
-            return latestChunk.amIAdmin();
+            return !_this.isDraft() && latestChunk.amIAdmin();
         };
         _this.getReceivers = function () {
             var latestChunk = __WEBPACK_IMPORTED_MODULE_3__chatChunk__["b" /* default */].getLoaded(_this.getLatestChunk());
@@ -13745,140 +15002,18 @@ initService.listen(function () {
 
 /***/ }),
 
-/***/ 84:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-var Progress = (function (_super) {
-    __extends(Progress, _super);
-    function Progress(options) {
-        var _this = _super.call(this) || this;
-        _this.done = 0;
-        _this.donePercentage = 0;
-        _this.data = { progress: 0 };
-        _this._parseOptions = function () {
-            if (_this.options) {
-                _this.total = _this.options.total;
-                if (_this.options.depends) {
-                    _this._listenDepends(_this.options.depends);
-                }
-            }
-        };
-        _this._listenDepends = function (depends) {
-            _this.depends = depends;
-            depends.forEach(function (depend) {
-                depend.listen(_this.recalculate.bind(_this), "progress");
-            });
-        };
-        _this.removeDepend = function (depend) {
-            if (!_this.depends && _this.total) {
-                throw new Error("trying to mix depending progress and manual progress");
-            }
-            __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].removeArray(_this.depends, depend);
-            _this.recalculate();
-        };
-        _this.addDepend = function (depend) {
-            if (!_this.depends && _this.total) {
-                throw new Error("trying to mix depending progress and manual progress");
-            }
-            _this.depends = _this.depends || [];
-            _this.depends.push(depend);
-            depend.listen(_this.recalculate.bind(_this), "progress");
-            _this.recalculate();
-        };
-        _this.progressDelta = function (delta) {
-            if (_this.depends) {
-                throw new Error("trying to mix depending progress and manual progress");
-            }
-            _this.done += delta;
-            _this.recalculate();
-        };
-        _this.progress = function (done) {
-            if (_this.depends) {
-                throw new Error("trying to mix depending progress and manual progress");
-            }
-            _this.done = done;
-            _this.recalculate();
-        };
-        _this.setTotal = function (total) {
-            if (_this.depends) {
-                throw new Error("trying to mix depending progress and manual progress");
-            }
-            _this.total = total;
-            _this.recalculate();
-        };
-        _this.reset = function () {
-            _this.done = 0;
-            _this.recalculate();
-        };
-        _this.joinDepends = function () {
-            var done = 0, total = 0;
-            _this.depends.forEach(function (depend) {
-                done += depend.getDone();
-                total += depend.getTotal() || 0;
-            });
-            _this.done = done;
-            _this.total = total;
-        };
-        _this.getDone = function () {
-            return _this.done;
-        };
-        _this.getTotal = function () {
-            return _this.total;
-        };
-        _this.getProgress = function () {
-            return _this.donePercentage;
-        };
-        _this.recalculate = function () {
-            if (_this.depends) {
-                _this.joinDepends();
-            }
-            if (!_this.total) {
-                return;
-            }
-            _this.donePercentage = _this.done / _this.total;
-            _this.donePercentage = Math.min(_this.donePercentage, 1);
-            _this.data.progress = _this.donePercentage;
-            _this.notify(_this.donePercentage, "progress");
-        };
-        _this.options = options;
-        _this._parseOptions();
-        return _this;
-    }
-    return Progress;
-}(__WEBPACK_IMPORTED_MODULE_0__observer__["default"]));
-/* harmony default export */ __webpack_exports__["a"] = (Progress);
-//# sourceMappingURL=Progress.js.map
-
-/***/ }),
-
-/***/ 85:
+/***/ 87:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Chunk; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_cachedObjectLoader__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__chatTitleUpdate__ = __webpack_require__(398);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_cachedObjectLoader__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__chatTitleUpdate__ = __webpack_require__(418);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -13934,7 +15069,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 
-var validator = __webpack_require__(183);
+var validator = __webpack_require__(188);
 
 var SecuredData = __webpack_require__(33);
 
@@ -13943,7 +15078,7 @@ var userService = __webpack_require__(9).default;
 
 
 var keyStore = __webpack_require__(32).default;
-var sessionService = __webpack_require__(20).default;
+var sessionService = __webpack_require__(21).default;
 
 var debugName = "whispeer:chunk";
 var chunkDebug = debug(debugName);
@@ -14032,6 +15167,9 @@ var Chunk = (function (_super) {
                 return _this.titleUpdate.state.title;
             }
             return _this.title;
+        };
+        _this.setTitle = function (title) {
+            _this.title = title;
         };
         _this.isAdmin = function (user) {
             return _this.getAdmins().indexOf(user.getID()) > -1;
@@ -14337,19 +15475,19 @@ var ChunkLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 86:
+/***/ 88:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Message; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_cachedObjectLoader__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__chatChunk__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_blobService__ = __webpack_require__(145);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__asset_Progress__ = __webpack_require__(84);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_cachedObjectLoader__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__chatChunk__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_blobService__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__asset_Progress__ = __webpack_require__(65);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_settings_service__ = __webpack_require__(46);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -14476,6 +15614,18 @@ var Message = (function () {
         this.isBlocked = function () {
             return __WEBPACK_IMPORTED_MODULE_7__services_settings_service__["default"].isBlocked(_this.data.sender.id);
         };
+        this.hasFiles = function () {
+            return _this.data.files && _this.data.files.length > 0;
+        };
+        this.hasVoicemail = function () {
+            return _this.data.voicemails && _this.data.voicemails.length > 0;
+        };
+        this.hasText = function () {
+            return _this.data.text && _this.data.text.length > 0;
+        };
+        this.hasImages = function () {
+            return _this.data.images && _this.data.images.length > 0;
+        };
         this.prepareAttachments = function () {
             return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
                 Message.prepare(_this.attachments.files),
@@ -14497,9 +15647,7 @@ var Message = (function () {
         this.getChunkID = function () {
             return _this.chunkID || _this.chat.getLatestChunk();
         };
-        this.hasBeenSent = function () {
-            return _this.wasSent;
-        };
+        this.hasBeenSent = function () { return _this.wasSent; };
         this.uploadAttachments = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function (chunkKey) {
             return _this.prepareAttachments().then(function () {
                 var attachments = _this.attachments.images.concat(_this.attachments.files, _this.attachments.voicemails);
@@ -14807,7 +15955,7 @@ var MessageLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 87:
+/***/ 89:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14817,7 +15965,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["promoteMainWindow"] = promoteMainWindow;
 /* harmony export (immutable) */ __webpack_exports__["withPrefix"] = withPrefix;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Storage__ = __webpack_require__(344);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Storage__ = __webpack_require__(349);
 
 
 function checkLocalStorage() {
@@ -14864,14 +16012,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_session_service__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__user__ = __webpack_require__(360);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__user__ = __webpack_require__(365);
 
 
 
 
 var sjcl = __webpack_require__(43);
-var initService = __webpack_require__(21);
+var initService = __webpack_require__(22);
 var userService;
 function loadUser(identifier) {
     return __WEBPACK_IMPORTED_MODULE_3__user__["a" /* default */].get(identifier);
@@ -14970,197 +16118,285 @@ initService.registerCallback(function () {
 
 /***/ }),
 
-/***/ 97:
+/***/ 90:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UpdateEvent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return fixFileReader; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_file__ = __webpack_require__(91);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_error_service__ = __webpack_require__(30);
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
-
-
-
-
-// What do we want to achieve and how:
-// - Group multiple requests together -> download can do that for itself
-// - Add cache info so server does not resend full data (esp. for trustManager) -> activeInstance
-// - merge new and active -> restore has active and response
-// - cache first then update
-var UpdateEvent;
-(function (UpdateEvent) {
-    UpdateEvent[UpdateEvent["wake"] = 0] = "wake";
-    UpdateEvent[UpdateEvent["blink"] = 1] = "blink";
-})(UpdateEvent || (UpdateEvent = {}));
-var LONG_APP_PAUSE = 2 * 60 * 1000;
-var LONG_DISCONNECT = 60 * 1000;
-function createLoader(_a) {
-    var download = _a.download, load = _a.load, restore = _a.restore, getID = _a.getID, cacheName = _a.cacheName, shouldUpdate = _a.shouldUpdate;
-    var loading = {};
-    var byId = {};
-    var cache = new __WEBPACK_IMPORTED_MODULE_2__services_Cache__["default"](cacheName);
-    var considerLoaded = function (id) {
-        loading = __assign({}, loading);
-        delete loading[id];
-    };
-    var cacheInMemory = function (id, instance, lastUpdated) {
-        byId = __assign({}, byId, (_a = {}, _a[id] = { instance: instance, lastUpdated: lastUpdated, updating: false }, _a));
-        var _a;
-    };
-    var loadFromCache = function (id) {
-        var lastUpdated = Date.now();
-        return cache.get(id)
-            .then(function (cacheResponse) {
-            lastUpdated = cacheResponse.created;
-            return cacheResponse.data;
-        })
-            .then(function (cachedData) { return restore(cachedData, null); })
-            .then(function (instance) {
-            cacheInMemory(id, instance, lastUpdated);
-            considerLoaded(id);
-            scheduleInstanceUpdate(UpdateEvent.wake, id);
-            return instance;
-        });
-    };
-    var serverResponseToInstance = function (response, id, activeInstance) {
-        return load(response, activeInstance)
-            .then(function (cacheableData) { return cache.store(id, cacheableData).thenReturn(cacheableData); })
-            .then(function (cachedData) { return restore(cachedData, activeInstance); })
-            .then(function (instance) {
-            if (activeInstance && activeInstance !== instance) {
-                console.warn("Restore should update active instance");
-            }
-            cacheInMemory(id, instance, Date.now());
-            return instance;
-        })
-            .finally(function () { return considerLoaded(id); });
-    };
-    var updateInstance = function (id, instance) {
-        return download(id, instance).then(function (response) {
-            return serverResponseToInstance(response, id, instance);
-        });
-    };
-    var scheduleInstanceUpdate = function (event, id) {
-        var _a = byId[id], instance = _a.instance, lastUpdated = _a.lastUpdated, updating = _a.updating;
-        if (updating) {
-            console.info("Not updating instance because update is already running " + cacheName + "/" + id);
-            return;
-        }
-        byId[id].updating = true;
-        shouldUpdate(event, instance, lastUpdated).then(function (shouldUpdate) {
-            if (shouldUpdate) {
-                console.info("Schedule " + cacheName + " instance " + id + " update with event " + UpdateEvent[event]);
-                return updateInstance(id, instance).then(function () {
-                    return byId[id].lastUpdated = Date.now();
-                });
-            }
-        }).catch(__WEBPACK_IMPORTED_MODULE_3__services_error_service__["default"].criticalError).finally(function () { return byId[id].updating = false; });
-        return;
-    };
-    var scheduleInstancesUpdate = function (event) {
-        console.info("Schedule " + cacheName + " instances update with event " + UpdateEvent[event]);
-        Object.keys(byId)
-            .forEach(function (id) { return scheduleInstanceUpdate(event, id); });
-    };
-    var lastHeartbeat = Date.now();
-    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].listen(function () { return lastHeartbeat = Date.now(); }, "heartbeat");
-    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].on("connect", function () {
-        console.info("connect at " + Date.now() + " after " + (Date.now() - lastHeartbeat));
-        if (Date.now() - lastHeartbeat > LONG_DISCONNECT) {
-            scheduleInstancesUpdate(UpdateEvent.wake);
-        }
-        else {
-            scheduleInstancesUpdate(UpdateEvent.blink);
-        }
-        lastHeartbeat = Date.now();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-    var pauseStarted = 0;
-    document.addEventListener("pause", function () { return pauseStarted = Date.now(); }, false);
-    document.addEventListener("resume", function () {
-        console.info("ended pause at " + Date.now() + " after " + (Date.now() - pauseStarted));
-        if (Date.now() - pauseStarted > LONG_APP_PAUSE) {
-            scheduleInstancesUpdate(UpdateEvent.wake);
-        }
-        else {
-            scheduleInstancesUpdate(UpdateEvent.blink);
-        }
-    }, false);
-    return _b = (function () {
-            function ObjectLoader() {
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
             }
-            ObjectLoader.getLoaded = function (id) {
-                if (!ObjectLoader.isLoaded(id)) {
-                    throw new Error("Not yet loaded: " + id);
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var _this = this;
+
+
+
+var BLOB_CACHE_DIR = "blobCache";
+var LOCK_TIMEOUT = 30 * 1000;
+var FILE = new __WEBPACK_IMPORTED_MODULE_1__ionic_native_file__["a" /* File */]();
+var isAndroid = function () { return window.device && window.device.platform === "Android"; };
+var fixFileReader = function () {
+    var win = window;
+    var delegateName = win.Zone.__symbol__('OriginalDelegate');
+    if (win.FileReader[delegateName]) {
+        console.warn("Fixing file reader!");
+        win.FileReader = win.FileReader[delegateName];
+    }
+};
+var cacheDirectoryPromise = null;
+var getCacheDirectory = function () {
+    if (!cacheDirectoryPromise) {
+        var basePath_1 = FILE.cacheDirectory;
+        var desiredPath_1 = "" + basePath_1 + BLOB_CACHE_DIR + "/";
+        cacheDirectoryPromise = __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](FILE.checkDir(basePath_1, BLOB_CACHE_DIR)).then(function (success) {
+            return desiredPath_1;
+        }).catch(function (error) {
+            return FILE.createDir(basePath_1, BLOB_CACHE_DIR, true).then(function (dirEntry) {
+                return desiredPath_1;
+            }).catch(function (error) {
+                throw new Error('Could not create blob cache directory.');
+            });
+        });
+    }
+    return cacheDirectoryPromise;
+};
+var removeOldFiles = function () {
+    getCacheDirectory()
+        .then(function () { return FILE.listDir(FILE.cacheDirectory, BLOB_CACHE_DIR); })
+        .filter(function (entry) { return entry.isFile && entry.name.endsWith(".blob"); })
+        .map(function (file) { return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve, reject) { return file.remove(resolve, reject); }); });
+};
+document.addEventListener("deviceready", removeOldFiles, false);
+var readFileAsBlob = function (path, filename, type) {
+    fixFileReader();
+    return FILE.readAsArrayBuffer(path, filename).then(function (buf) { return new Blob([buf], { type: type }); });
+};
+var writeToFile = function (path, filename, data) {
+    fixFileReader();
+    return FILE.writeFile(path, filename, data);
+};
+var existsFile = function (path, filename) {
+    return FILE.checkFile(path, filename).catch(function (e) {
+        if (e.code === 1) {
+            return false;
+        }
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](e);
+    });
+};
+var idToFileName = function (blobID) { return blobID + ".aac"; };
+var clearing = false;
+var storing = 0;
+var noPendingStorageOperations = function () {
+    return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
+        var busyWait = setInterval(function () {
+            if (storing === 0) {
+                resolve();
+                clearInterval(busyWait);
+            }
+        }, 10);
+    }).timeout(LOCK_TIMEOUT).catch(__WEBPACK_IMPORTED_MODULE_0_bluebird__["TimeoutError"], function () { });
+};
+var blobCache = {
+    clear: function () {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        clearing = true;
+                        return [4 /*yield*/, noPendingStorageOperations()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, FILE.removeRecursively(FILE.cacheDirectory, BLOB_CACHE_DIR)
+                                .catch(function (error) {
+                                // There really is little we can do here, but logouts, e.g., should not
+                                // fail because we failed to clear.
+                                console.warn('Cannot remove cache, resolving promise anyway.');
+                                return true;
+                            })];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
-                return byId[id].instance;
-            };
-            ObjectLoader.isLoaded = function (id) {
-                return byId.hasOwnProperty(id);
-            };
-            ObjectLoader.load = function (source) {
-                var id = getID(source);
-                if (byId[id]) {
-                    serverResponseToInstance(source, id, byId[id].instance);
-                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+            });
+        }); }).finally(function () { return clearing = false; });
+    },
+    moveFileToBlob: function (currentDirectory, currentFilename, blobID) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            var path, filename;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (clearing)
+                            throw new Error('Cannot get blob, currently clearing cache.');
+                        return [4 /*yield*/, getCacheDirectory()];
+                    case 1:
+                        path = _a.sent();
+                        filename = idToFileName(blobID);
+                        return [2 /*return*/, FILE.moveFile(currentDirectory, currentFilename, path, filename)];
                 }
-                if (!loading[id]) {
-                    loading = __assign({}, loading, (_a = {}, _a[id] = loadFromCache(id)
-                        .catch(function () { return serverResponseToInstance(source, id, null); }), _a));
+            });
+        }); });
+    },
+    readFileAsArrayBuffer: function (directory, name) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](FILE.readAsArrayBuffer(directory, name));
+    },
+    store: function (blob) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            var blobID, path, filename, exists;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (clearing)
+                            throw new Error('Cannot store blob, currently clearing cache.');
+                        storing++;
+                        console.warn("storing++ " + (storing - 1) + " -> " + storing + ", blob: " + blob.getBlobID());
+                        blobID = blob.getBlobID();
+                        if (!blob.isDecrypted()) {
+                            throw new Error("trying to store an undecrypted blob");
+                        }
+                        return [4 /*yield*/, getCacheDirectory()];
+                    case 1:
+                        path = _a.sent();
+                        filename = idToFileName(blobID);
+                        return [4 /*yield*/, existsFile(path, filename)];
+                    case 2:
+                        exists = _a.sent();
+                        if (!!exists) return [3 /*break*/, 4];
+                        return [4 /*yield*/, writeToFile(path, filename, blob.getBlobData())];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [2 /*return*/, "" + path + filename];
                 }
-                return loading[id];
-                var _a;
-            };
-            ObjectLoader.updateCache = function (id, cacheableData) {
-                return cache.store(id, cacheableData);
-            };
-            // Throws
-            ObjectLoader.getFromCache = function (id) {
-                if (byId[id]) {
-                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+            });
+        }); }).catch(function (e) {
+            console.warn("Storing blob failed");
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](e);
+        }).finally(function () {
+            storing--;
+            console.warn("storing-- " + (storing + 1) + " -> " + storing + ", blob: " + blob.getBlobID());
+        });
+    },
+    getBlobUrl: function (blobID) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            var path, filename, exists;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (clearing)
+                            throw new Error('Cannot get blob URL, currently clearing cache.');
+                        return [4 /*yield*/, getCacheDirectory()];
+                    case 1:
+                        path = _a.sent();
+                        filename = idToFileName(blobID);
+                        return [4 /*yield*/, existsFile(path, filename)];
+                    case 2:
+                        exists = _a.sent();
+                        if (!exists) {
+                            throw new Error("cannot get blob url, blob does not exist: " + filename);
+                        }
+                        return [2 /*return*/, "" + path + filename];
                 }
-                return loadFromCache(id);
-            };
-            ObjectLoader.get = function (id) {
-                if (typeof id === "undefined" || id === null) {
-                    throw new Error("Can't get object with id " + id + " - " + cacheName);
+            });
+        }); });
+    },
+    copyBlobToDownloads: function (blobID, filename) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            var cacheDir, blobFile, path, existsSource, existsDestination;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, getCacheDirectory()];
+                    case 1:
+                        cacheDir = _a.sent();
+                        blobFile = idToFileName(blobID);
+                        path = isAndroid() ? FILE.externalRootDirectory + "Download/" : "" + FILE.documentsDirectory;
+                        return [4 /*yield*/, existsFile(cacheDir, blobFile)];
+                    case 2:
+                        existsSource = _a.sent();
+                        return [4 /*yield*/, existsFile(path, filename)];
+                    case 3:
+                        existsDestination = _a.sent();
+                        if (!existsSource) {
+                            throw new Error("cannot copy blob, blob does not exist: " + filename);
+                        }
+                        if (!existsDestination) return [3 /*break*/, 5];
+                        return [4 /*yield*/, FILE.removeFile(path, filename)];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5: return [4 /*yield*/, FILE.copyFile(cacheDir, blobFile, path, filename)];
+                    case 6:
+                        _a.sent();
+                        return [2 /*return*/, "" + path + filename];
                 }
-                if (byId[id]) {
-                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+            });
+        }); });
+    },
+    getFileMimeType: function (url) { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](FILE.resolveLocalFilesystemUrl(url))
+        .then(function (file) { return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve, reject) { return file.file(resolve, reject); })
+        .then(function (file) { return file.type; }); }); },
+    isLoaded: function (blobID) { return blobCache.getBlobUrl(blobID).then(function () { return true; }).catch(function () { return false; }); },
+    get: function (blobID) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            var path, filename, blob;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (clearing)
+                            throw new Error('Cannot get blob, currently clearing cache.');
+                        return [4 /*yield*/, getCacheDirectory()];
+                    case 1:
+                        path = _a.sent();
+                        filename = idToFileName(blobID);
+                        return [4 /*yield*/, readFileAsBlob(path, filename, "")];
+                    case 2:
+                        blob = _a.sent();
+                        return [2 /*return*/, { blob: blob, blobID: blobID, decrypted: true, meta: {} }];
                 }
-                if (!loading[id]) {
-                    var promise = loadFromCache(id)
-                        .catch(function () { return download(id, null).then(function (response) { return serverResponseToInstance(response, id, null); }); });
-                    loading = __assign({}, loading, (_a = {}, _a[id] = promise, _a));
-                }
-                return loading[id];
-                var _a;
-            };
-            return ObjectLoader;
-        }()),
-        _b.getAll = function () {
-            return byId;
-        },
-        _b.removeLoaded = function (id) { return delete byId[id]; },
-        _b.addLoaded = function (id, obj) {
-            byId[id] = { instance: obj, lastUpdated: Date.now(), updating: false };
-        },
-        _b;
-    var _b;
-}
-/* harmony default export */ __webpack_exports__["b"] = (createLoader);
-//# sourceMappingURL=mutableObjectLoader.js.map
+            });
+        }); });
+    }
+};
+/* harmony default export */ __webpack_exports__["a"] = (blobCache);
+(new __WEBPACK_IMPORTED_MODULE_2__services_Cache__["default"]("blobs")).deleteAll().catch(function () { return console.warn("Could not delete legacy blobs from idb cache"); });
+//# sourceMappingURL=blobCache.js.map
 
 /***/ })
 
-},[293]);
+},[298]);
 //# sourceMappingURL=main.js.map

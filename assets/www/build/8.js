@@ -1,16 +1,16 @@
 webpackJsonp([8],{
 
-/***/ 436:
+/***/ 450:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HomePageModule", function() { return HomePageModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DetailsPageModule", function() { return DetailsPageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__home__ = __webpack_require__(483);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_components_module__ = __webpack_require__(444);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__details__ = __webpack_require__(492);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_components_module__ = __webpack_require__(455);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -22,50 +22,50 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-var HomePageModule = (function () {
-    function HomePageModule() {
+var DetailsPageModule = (function () {
+    function DetailsPageModule() {
     }
-    HomePageModule = __decorate([
+    DetailsPageModule = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
             declarations: [
-                __WEBPACK_IMPORTED_MODULE_2__home__["a" /* HomePage */],
+                __WEBPACK_IMPORTED_MODULE_2__details__["a" /* DetailPage */],
             ],
             imports: [
-                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__home__["a" /* HomePage */]),
+                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__details__["a" /* DetailPage */]),
                 __WEBPACK_IMPORTED_MODULE_3__components_components_module__["a" /* ComponentsModule */],
                 __WEBPACK_IMPORTED_MODULE_4__ngx_translate_core__["b" /* TranslateModule */].forChild(),
             ],
             entryComponents: [
-                __WEBPACK_IMPORTED_MODULE_2__home__["a" /* HomePage */],
+                __WEBPACK_IMPORTED_MODULE_2__details__["a" /* DetailPage */],
             ]
         })
-    ], HomePageModule);
-    return HomePageModule;
+    ], DetailsPageModule);
+    return DetailsPageModule;
 }());
 
-//# sourceMappingURL=home.module.js.map
+//# sourceMappingURL=details.module.js.map
 
 /***/ }),
 
-/***/ 444:
+/***/ 455:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ComponentsModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_responsiveDate__ = __webpack_require__(445);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_pipes_maxValue__ = __webpack_require__(446);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_pipes_filenameLimit__ = __webpack_require__(447);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__userImage__ = __webpack_require__(448);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__navigator_navigator__ = __webpack_require__(449);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__load__ = __webpack_require__(450);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__loadingProgress__ = __webpack_require__(456);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__hexagon__ = __webpack_require__(457);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__navigator_hexagon__ = __webpack_require__(458);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__navigator_icon__ = __webpack_require__(459);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_responsiveDate__ = __webpack_require__(456);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_pipes_maxValue__ = __webpack_require__(457);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_pipes_filenameLimit__ = __webpack_require__(458);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__userImage__ = __webpack_require__(459);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__navigator_navigator__ = __webpack_require__(460);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__load__ = __webpack_require__(461);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__loadingProgress__ = __webpack_require__(467);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__hexagon__ = __webpack_require__(468);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__navigator_hexagon__ = __webpack_require__(469);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__navigator_icon__ = __webpack_require__(470);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -130,13 +130,13 @@ var ComponentsModule = (function () {
 
 /***/ }),
 
-/***/ 445:
+/***/ 456:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ResponsiveDatePipe; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(52);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -193,7 +193,7 @@ var ResponsiveDatePipe = (function () {
 
 /***/ }),
 
-/***/ 446:
+/***/ 457:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -225,7 +225,7 @@ var MaxValuePipe = (function () {
 
 /***/ }),
 
-/***/ 447:
+/***/ 458:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -258,7 +258,7 @@ var FilenameLimitPipe = (function () {
 
 /***/ }),
 
-/***/ 448:
+/***/ 459:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -333,14 +333,14 @@ var UserImageComponent = (function () {
 
 /***/ }),
 
-/***/ 449:
+/***/ 460:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Navigator; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_session_service__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_session_service__ = __webpack_require__(21);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -499,7 +499,7 @@ var Navigator = (function () {
 
 /***/ }),
 
-/***/ 450:
+/***/ 461:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -524,7 +524,7 @@ var LoadComponent = (function () {
     ;
     Object.defineProperty(LoadComponent.prototype, "name", {
         set: function (name) {
-            var icon = __webpack_require__(451)("./" + name + ".svg");
+            var icon = __webpack_require__(462)("./" + name + ".svg");
             this.html = this.sanitizer.bypassSecurityTrustHtml(icon);
         },
         enumerable: true,
@@ -549,14 +549,14 @@ var LoadComponent = (function () {
 
 /***/ }),
 
-/***/ 451:
+/***/ 462:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./add.svg": 452,
-	"./added.svg": 453,
-	"./deny.svg": 454,
-	"./write.svg": 455
+	"./add.svg": 463,
+	"./added.svg": 464,
+	"./deny.svg": 465,
+	"./write.svg": 466
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -572,39 +572,39 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 451;
+webpackContext.id = 462;
 
 /***/ }),
 
-/***/ 452:
+/***/ 463:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"add\" class=\"fill-primary\" d=\"M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25ZM496,832H484v12h-7V832H465v-7h12V813h7v12h12v7Z\" transform=\"translate(-436 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 453:
+/***/ 464:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"added\" class=\"fill-primary\" d=\"M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25Zm18.5-61.23-24.725,24.24-12.291-12.032,4.869-4.753,7.422,7.278,19.855-19.487Z\" transform=\"translate(-436 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 454:
+/***/ 465:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"deny\" class=\"fill-grey\" d=\"M953.5,880L908.985,854.25V802.759L953.5,777.013l44.515,25.746V854.25Zm8.485-38.061L953.5,833.45l-8.485,8.485-4.95-4.95,8.485-8.485-8.485-8.485,4.95-4.95,8.485,8.485,8.485-8.485,4.95,4.95L958.45,828.5l8.485,8.485Z\" transform=\"translate(-909 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 455:
+/***/ 466:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"write_corner\" data-name=\"write corner\" class=\"fill-primaryDark\" d=\"M6.577,102l6.651-24.883L31.4,95.331Z\"/>\n  <path id=\"write\" class=\"fill-primary\" d=\"M44.5,103L0,77.25V25.75L44.5,0,89,25.75v51.5ZM19,43.149V36.994H70V43.15H19ZM70,55.078H19V48.922H70v6.156ZM50,67.006H19V60.851H50v6.156Z\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 456:
+/***/ 467:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -620,9 +620,33 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+var INTERPOLATION_SCALING = 12;
 var LoadingProgress = (function () {
     function LoadingProgress(element) {
+        var _this = this;
         this.element = element;
+        this.interpolatedProgress = 0;
+        this.animationStep = function (time) {
+            if (!_this.divToStyle) {
+                window.requestAnimationFrame(_this.animationStep);
+                _this.divToStyle = _this.element.nativeElement.querySelector('div');
+            }
+            else {
+                var progress = _this.progress();
+                if (progress < _this.interpolatedProgress || progress === 1) {
+                    _this.interpolatedProgress = progress;
+                }
+                else {
+                    _this.interpolatedProgress += (progress - _this.interpolatedProgress) / INTERPOLATION_SCALING;
+                }
+                _this.divToStyle.setAttribute("style", "background-image: " + _this.progressArc());
+                if (_this.interpolatedProgress !== 1) {
+                    window.requestAnimationFrame(_this.animationStep);
+                }
+            }
+        };
+        // [ngStyle]="{'background-image': progressArc}"
+        window.requestAnimationFrame(this.animationStep);
     }
     LoadingProgress.prototype.getBackgroundElement = function () {
         var element = this.element.nativeElement.parentElement;
@@ -674,27 +698,22 @@ var LoadingProgress = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LoadingProgress.prototype, "progressArc", {
-        get: function () {
-            var progress = this.progress();
-            var _a = this, progressBackground = _a.progressBackground, progressColor = _a.progressColor;
-            if (!progressBackground || !progressColor) {
-                return "";
-            }
-            var deg, result;
-            if (progress <= 0.5) {
-                deg = 90 + 180 * progress * 2;
-                result = "linear-gradient(90deg, " + progressBackground + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(" + deg + "deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
-            }
-            else {
-                deg = -90 + 180 * (2 * (progress - .5));
-                result = "linear-gradient(" + deg + "deg, " + progressColor + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
-            }
-            return result;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    LoadingProgress.prototype.progressArc = function () {
+        var _a = this, progressBackground = _a.progressBackground, progressColor = _a.progressColor;
+        if (!progressBackground || !progressColor) {
+            return "";
+        }
+        var deg, result;
+        if (this.interpolatedProgress <= 0.5) {
+            deg = 90 + 180 * this.interpolatedProgress * 2;
+            result = "linear-gradient(90deg, " + progressBackground + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(" + deg + "deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
+        }
+        else {
+            deg = -90 + 180 * (2 * (this.interpolatedProgress - .5));
+            result = "linear-gradient(" + deg + "deg, " + progressColor + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
+        }
+        return result;
+    };
     __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
         __metadata("design:type", String)
@@ -713,7 +732,7 @@ var LoadingProgress = (function () {
     ], LoadingProgress.prototype, "foregroundClass", void 0);
     LoadingProgress = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: "loading-progress",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/'<div *ngIf="progress && progress() <= 1" [ngStyle]="{\'background-image\': progressArc}" class="progressbar">\n	<div class="dummy" [ngClass]="foregroundClass"></div>\n	<div class="hole" [ngStyle]="{\'background-color\': background}"></div>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/
+            selector: "loading-progress",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/'<div *ngIf="progress && progress() <= 1" class="progressbar">\n	<div class="dummy" [ngClass]="foregroundClass"></div>\n	<div class="hole" [ngStyle]="{\'background-color\': background}"></div>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */]])
     ], LoadingProgress);
@@ -724,7 +743,7 @@ var LoadingProgress = (function () {
 
 /***/ }),
 
-/***/ 457:
+/***/ 468:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -757,7 +776,7 @@ var HexagonComponent = (function () {
 
 /***/ }),
 
-/***/ 458:
+/***/ 469:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -790,7 +809,7 @@ var NavigatorHexagon = (function () {
 
 /***/ }),
 
-/***/ 459:
+/***/ 470:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -827,86 +846,37 @@ var NavigatorIcon = (function () {
 
 /***/ }),
 
-/***/ 460:
+/***/ 481:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export SameArray */
-var Memoizer = (function () {
-    function Memoizer(selectors, reduce) {
-        this.selectors = selectors;
-        this.reduce = reduce;
-    }
-    Memoizer.prototype.hasChanged = function (newValues) {
-        var _this = this;
-        if (!this.values) {
-            return true;
-        }
-        var index = newValues.findIndex(function (val, index) {
-            var previousVal = _this.values[index];
-            if (previousVal === val) {
-                return false;
-            }
-            if (Array.isArray(val) && Array.isArray(previousVal) && val.length === 0 && previousVal.length === 0) {
-                return false;
-            }
-            return true;
-        });
-        if (index > -1) {
-            // console.warn(`Memoizer recalculated at ${index}`, this.values, newValues)
-        }
-        return index > -1;
-    };
-    Memoizer.prototype.getValue = function () {
-        var newValues = this.selectors.map(function (selector) { return selector(); });
-        if (!this.hasChanged(newValues)) {
-            return this.cachedValue;
-        }
-        this.values = newValues;
-        this.cachedValue = this.reduce.apply(this, this.values.concat([this.cachedValue]));
-        return this.cachedValue;
-    };
-    return Memoizer;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (Memoizer);
-var SameArray = (function () {
-    function SameArray() {
-        var _this = this;
-        this.arr = [];
-        this.setValue = function (newValues) {
-            if (_this.previousInput === newValues) {
-                return;
-            }
-            _this.arr.splice(0, _this.arr.length);
-            _this.arr.push.apply(_this.arr, newValues);
-            _this.previousInput = newValues;
-        };
-        this.getValue = function () { return _this.arr; };
-    }
-    return SameArray;
-}());
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__socket_service__ = __webpack_require__(11);
 
-//# sourceMappingURL=memoizer.js.map
+var reportService;
+(function (reportService) {
+    reportService.sendReport = function (what, id) {
+        return __WEBPACK_IMPORTED_MODULE_0__socket_service__["default"].emit("reports.add", {
+            what: what,
+            id: id
+        });
+    };
+})(reportService || (reportService = {}));
+/* harmony default export */ __webpack_exports__["a"] = (reportService);
+//# sourceMappingURL=reportService.js.map
 
 /***/ }),
 
-/***/ 483:
+/***/ 492:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HomePage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return DetailPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__ = __webpack_require__(280);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__ = __webpack_require__(148);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_asset_memoizer__ = __webpack_require__(460);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_messages_chatChunk__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_messages_message__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__lib_services_settings_service__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_error_service__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_messages_chat__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ngx_translate_core__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_services_featureToggles__ = __webpack_require__(156);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_services_reportService__ = __webpack_require__(481);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -922,166 +892,100 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var contactsService = __webpack_require__(82);
-
-
-
-
-
-var chatMemoizer = {};
-// Amount of chats after we don't load more initially
-// Considered to be at least one filled screen
-var CHATS_PER_SCREEN = 10;
-var getChatMemoizer = function (chatID) {
-    if (!chatMemoizer[chatID]) {
-        chatMemoizer[chatID] = new __WEBPACK_IMPORTED_MODULE_5__lib_asset_memoizer__["a" /* default */]([
-            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID); },
-            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID).getLatestChunk(); },
-            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID).getLatestMessage(); },
-            function () { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].getLoaded(chatID).getUnreadMessageIDs(); },
-            function () { return __WEBPACK_IMPORTED_MODULE_9__lib_services_settings_service__["default"].getBlockedUsers(); }
-        ], function (chat, latestChunkID, latestMessageID, unreadMessageIDs, blockedUsers, previousValue) {
-            var latestChunk = __WEBPACK_IMPORTED_MODULE_6__lib_messages_chatChunk__["b" /* default */].getLoaded(chat.getLatestChunk());
-            var info = previousValue || { id: chat.getID() };
-            info.id = chat.getID();
-            info.unread = chat.getUnreadMessageIDs().length > 0;
-            info.unreadCount = chat.getUnreadMessageIDs().length;
-            info.blocked = chat.isBlocked();
-            info.partners = latestChunk.getPartners();
-            info.partnersDisplay = latestChunk.getPartnerDisplay();
-            info.title = latestChunk.getTitle();
-            info.time = latestChunk.getTime();
-            info.type = latestChunk.getReceiver().length > 2 ? "groupChat" : "peerChat";
-            if (!__WEBPACK_IMPORTED_MODULE_7__lib_messages_message__["b" /* default */].isLoaded(latestMessageID)) {
-                info.latestMessageText = "";
-            }
-            else {
-                var latestMessage = __WEBPACK_IMPORTED_MODULE_7__lib_messages_message__["b" /* default */].getLoaded(latestMessageID);
-                info.time = latestMessage.getTime();
-                info.latestMessageText = latestMessage.getText();
-                info.latestMessageBlocked = latestMessage.isBlocked();
-            }
-            return info;
-        });
-    }
-    return chatMemoizer[chatID];
-};
-var HomePage = (function () {
-    function HomePage(navCtrl, translate) {
+var initService = __webpack_require__(22);
+var DetailPage = (function () {
+    function DetailPage(navCtrl, navParams, alertCtrl, translate) {
         var _this = this;
         this.navCtrl = navCtrl;
+        this.navParams = navParams;
+        this.alertCtrl = alertCtrl;
         this.translate = translate;
-        this.topics = [];
-        this.requests = [];
-        this.searchTerm = "";
-        this.chatsLoading = true;
-        this.moreTopicsAvailable = true;
-        this.lang = "en";
-        this.numberOfChatsToDisplay = 0;
-        this.ionViewDidEnter = function () {
-            _this.loadTopics();
-            _this.loadRequests();
-            var en = (_this.translate.currentLang.toLowerCase().indexOf("de") === -1);
-            _this.lang = en ? "en" : "de";
-        };
-        this.loadTopics = function () {
-            _this.numberOfChatsToDisplay = CHATS_PER_SCREEN;
-            console.warn("load more chats?", _this.getLoadedChats().length);
-            if (_this.getLoadedChats().length >= CHATS_PER_SCREEN) {
-                return;
-            }
-            _this.numberOfChatsToDisplay = 0;
-            __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].loadMoreChats(CHATS_PER_SCREEN).then(function (chats) {
-                _this.moreTopicsAvailable = !__WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].allChatsLoaded;
-                _this.chatsLoading = false;
-                _this.numberOfChatsToDisplay = CHATS_PER_SCREEN;
-            }).catch(__WEBPACK_IMPORTED_MODULE_10__lib_services_error_service__["default"].criticalError);
-        };
-        this.getChatCount = function () { return __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs().length; };
-        this.checkNoMissingChats = function () {
-            if (_this.chatsLoading) {
-                return;
-            }
-            var missing = __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs()
-                .slice(0, _this.numberOfChatsToDisplay)
-                .filter(function (chatID) { return !__WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].isLoaded(chatID); });
-            if (missing.length === 0) {
-                return;
-            }
-            console.warn("Fetching missing chats:", missing);
-            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["all"](missing.map(function (chatID) { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].get(chatID); }));
-        };
-        this.getLoadedChats = function () {
-            return __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs()
-                .filter(function (chatID) { return __WEBPACK_IMPORTED_MODULE_8__lib_messages_chat__["b" /* default */].isLoaded(chatID); })
-                .filter(function (id, i) { return i < _this.numberOfChatsToDisplay; })
-                .map(function (chatID) { return getChatMemoizer(chatID).getValue(); })
-                .sort(function (a, b) { return b.time - a.time; });
-        };
-        this.showNoConversationsPlaceholder = function () { return !_this.chatsLoading && _this.getChatCount() === 0; };
-        this.loadMoreTopics = function (infiniteScroll) {
-            if (_this.chatsLoading) {
-                infiniteScroll.complete();
-                return;
-            }
-            __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].loadMoreChats(CHATS_PER_SCREEN).then(function (chats) {
-                _this.moreTopicsAvailable = !__WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].allChatsLoaded;
-                _this.numberOfChatsToDisplay += chats.length;
-                if (__WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].allChatsLoaded) {
-                    _this.numberOfChatsToDisplay = __WEBPACK_IMPORTED_MODULE_4__lib_messages_messageService__["a" /* default */].getChatIDs().length;
-                }
-                infiniteScroll.complete();
+        this.loading = true;
+        this.title = "";
+        this.saving = false;
+        this.promote = function (user) {
+            _this.saving = true;
+            return _this.chat.addAdmin(user).then(function () {
+                _this.saving = false;
             });
         };
-        this.updateRequests = function () {
-            _this.requests = contactsService.getRequests();
-        };
-        this.loadRequests = function () {
-            contactsService.awaitLoading().then(function () {
-                _this.updateRequests();
-                contactsService.listen(_this.updateRequests);
+        this.remove = function (user) {
+            _this.saving = true;
+            return _this.chat.removeReceiver(user).then(function () {
+                _this.saving = false;
             });
         };
-        this.openContactRequests = function () {
-            _this.navCtrl.push("Requests");
+        this.addContact = function () {
+            _this.navCtrl.push("Select User", { chatID: _this.chat.getID() });
         };
-        this.openChat = function (chatID) {
-            _this.navCtrl.push("Messages", { chatID: chatID });
-        };
-        this.newMessage = function () {
-            _this.navCtrl.push("New Message", {}, {
-                animation: "md-transition"
+        this.setTitle = function (title) {
+            _this.saving = true;
+            return _this.chat.setTitle(title).then(function () {
+                _this.saving = false;
             });
         };
-        setInterval(function () { return _this.checkNoMissingChats(); }, 10 * 1000);
+        this.isAdmin = function (user) { return _this.chat.isAdmin(user); };
+        this.amIAdmin = function () { return _this.chat.amIAdmin(); };
+        this.getReceivers = function () {
+            if (!_this.chat) {
+                return [];
+            }
+            return _this.chat.getReceivers();
+        };
+        this.report = function () {
+            var reportConfirm = _this.alertCtrl.create({
+                title: _this.translate.instant("topic.detail.reportConfirm.title"),
+                message: _this.translate.instant("topic.detail.reportConfirm.message"),
+                buttons: [{
+                        text: "Cancel"
+                    }, {
+                        text: "Report",
+                        handler: function () {
+                            __WEBPACK_IMPORTED_MODULE_5__lib_services_reportService__["a" /* default */].sendReport("chat", _this.chat.getID());
+                        }
+                    }]
+            });
+            reportConfirm.setCssClass('logout-confirm');
+            reportConfirm.present();
+        };
     }
-    HomePage.prototype.ngOnInit = function () { };
-    Object.defineProperty(HomePage.prototype, "requestsLabel", {
-        get: function () {
-            var count = this.requests.length > 1 ? "many" : "single";
-            return this.translate.instant("home.newContact." + count);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* Content */]),
-        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* Content */])
-    ], HomePage.prototype, "content", void 0);
-    HomePage = __decorate([
+    DetailPage.prototype.ngOnInit = function () {
+        var _this = this;
+        var chatID = parseInt(this.navParams.get("chatID"), 10);
+        initService.awaitLoading().then(function () {
+            return __WEBPACK_IMPORTED_MODULE_2__lib_messages_chat__["b" /* default */].get(chatID);
+        }).then(function (chat) {
+            _this.chat = chat;
+            _this.loading = false;
+            _this.title = _this.chat.getTitle();
+        });
+        console.log('Init details page for topic', chatID);
+    };
+    DetailPage.prototype.featureEnabled = function (featureName) {
+        return __WEBPACK_IMPORTED_MODULE_4__lib_services_featureToggles__["a" /* default */].isFeatureEnabled(featureName);
+    };
+    DetailPage.prototype.goToUser = function (userID) {
+        this.navCtrl.push("Profile", {
+            userId: userID
+        });
+    };
+    DetailPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* IonicPage */])({
-            name: "Home",
-            segment: "home"
+            name: "Chat Details",
+            segment: "messages/:chatID/details",
         }),
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/home/home.html"*/'<ion-header>\n	<ion-navbar [color]="\'primary\'" no-border>\n		<ion-title>{{ \'home.title\' | translate }}</ion-title>\n	</ion-navbar>\n</ion-header>\n\n<ion-content class="list-avatar-page">\n	<div *ngIf="showNoConversationsPlaceholder()" class="home__no-content-container" ion-fixed>\n		<img class="home__no-content-image" src="assets/images/no_conversations_{{lang}}.png">\n	</div>\n	<button *ngIf="requests.length > 0" ion-button full icon-right class="contactRequests" (click)="openContactRequests()">\n		<div class="badgeContainer">\n			<span class="hexBadge">{{requests.length}}</span>\n		</div>\n		{{requestsLabel}}\n		<ion-icon name="arrow-forward"></ion-icon>\n	</button>\n	<ion-list class="space-for-fab">\n		<ion-item *ngFor="let chat of getLoadedChats(); let i = index" class="topic" [ngClass]="{\'topic--new\': !chat.blocked && chat.unread}" tappable (click)="openChat(chat.id)">\n			<div class="user__image-wrap" item-left>\n				<ion-avatar\n					*ngFor="let partner of chat.partnersDisplay"\n					class="hexagon__image hexagon__image--active"\n					[ngClass]="{\'hexagon__image--medium\': chat.partnersDisplay.length > 1}"\n				>\n					<user-image [id]="partner.id" [image]="partner.basic.image"></user-image>\n				</ion-avatar>\n				<ion-avatar\n					*ngIf="chat.partners.length > 3"\n					class="hexagon__image hexagon__image--medium"\n				>\n					<hexagon></hexagon>\n					<span class="hexagon__image__image topic__remainingUsers">+{{chat.partners.length - 2}}</span>\n				</ion-avatar>\n			</div>\n			<div class="topic__header">\n				<h2 class="user__name">\n					<span *ngIf="!chat.title">\n						<span *ngFor="let partner of chat.partners; let l = last">\n							{{ partner.basic.shortname }}{{ l ? "":", " }}\n						</span>\n					</span>\n					<span *ngIf="chat.title">{{chat.title}}</span>\n					<div class="topic__badgeContainer" *ngIf="!chat.blocked && chat.unread">\n						<span class="topic__hexBadge">\n							<span class="topic__hexBadge__text">{{ chat.unreadCount | maxValue: 99 }}</span>\n						</span>\n					</div>\n				</h2>\n				<div>\n					<ion-note item-right>{{chat.time | responsiveDate}} <ion-icon ios="ios-arrow-forward-outline"></ion-icon></ion-note>\n				</div>\n			</div>\n			<p *ngIf="!chat.latestMessageBlocked">{{chat.latestMessageText}}</p>\n			<p *ngIf="chat.latestMessageBlocked">{{ \'blocked.messageReplacement\' | translate }}</p>\n		</ion-item>\n	</ion-list>\n\n	<ion-spinner *ngIf="chatsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>\n\n	<ion-infinite-scroll [enabled]="moreTopicsAvailable" (ionInfinite)="loadMoreTopics($event)">\n		<ion-infinite-scroll-content></ion-infinite-scroll-content>\n	</ion-infinite-scroll>\n\n	<div class="space-for-fab"></div>\n\n	<navigator (invoke)="newMessage()" ion-fixed></navigator>\n</ion-content>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/home/home.html"*/
+            selector: 'page-details',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/messages/details/details.html"*/'<ion-header>\n\n	<ion-navbar [color]="\'primary\'" no-border>\n		<ion-title>{{ "topic.detail.title" | translate }}</ion-title>\n	</ion-navbar>\n\n</ion-header>\n\n\n<ion-content>\n	<ion-spinner *ngIf="loading" text-center margin-vertical class="spinner--full"></ion-spinner>\n\n	<ion-list *ngIf="!loading">\n\n		<ion-list-header padding-top>\n			{{ "topic.detail.chatTitle" | translate }}\n		</ion-list-header>\n\n		<ion-item class="no--padding--right">\n			<ion-input type="text" placeholder="Chat Title" *ngIf="featureEnabled(\'chat.changeTitle\') && amIAdmin()" [(ngModel)]="title"></ion-input>\n			<button ion-button item-end class="full--height" *ngIf="featureEnabled(\'chat.changeTitle\') && amIAdmin()" [disabled]="saving" (click)="setTitle(title)">Change</button>\n			<div *ngIf="!featureEnabled(\'chat.changeTitle\') || !amIAdmin()">\n				{{ title }}\n			</div>\n		</ion-item>\n\n		<ion-list-header padding-top>\n			{{ "topic.detail.allMembers" | translate }}\n		</ion-list-header>\n\n		<ion-item-sliding #item *ngFor="let receiver of getReceivers();">\n\n			<ion-item tappable (click)="goToUser(receiver.id)">\n				<ion-avatar class="hexagon--border" item-left>\n					<user-image [id]="receiver.id" [image]="receiver.basic.image"></user-image>\n				</ion-avatar>\n				<span>\n					<h2>\n						{{ receiver.name }}\n					</h2>\n					<small *ngIf="isAdmin(receiver.user)">\n						{{ "topic.detail.admin" | translate }}\n					</small>\n					<small *ngIf="!isAdmin(receiver.user)">\n						{{ "topic.detail.member" | translate }}\n					</small>\n				</span>\n			</ion-item>\n			<ion-item-options side="left" *ngIf="featureEnabled(\'chat.promoteReceiver\') && !isAdmin(receiver.user) && amIAdmin()">\n				<button ion-button color="primary" [disabled]="saving" (click)="promote(receiver.user)">Promote</button>\n			</ion-item-options>\n\n			<ion-item-options side="right" *ngIf="featureEnabled(\'chat.removeReceiver\') && !isAdmin(receiver.user) && amIAdmin()">\n				<button ion-button color="danger" [disabled]="saving" (click)="remove(receiver.user)">Remove</button>\n			</ion-item-options>\n		</ion-item-sliding>\n\n		<ion-item detail-push tappable (click)="addContact()" *ngIf="featureEnabled(\'chat.addReceiver\') && amIAdmin()">\n			{{ "topic.detail.addMore" | translate }}\n		</ion-item>\n	</ion-list>\n\n	<button *ngIf="!loading && !chat.isDraft()" ion-button full color="danger" (click)="report()">{{ \'topic.detail.reportTopic\' | translate }}</button>\n\n	<div text-center *ngIf="!loading"></div>\n\n</ion-content>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/messages/details/details.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* NavController */], __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__["c" /* TranslateService */]])
-    ], HomePage);
-    return HomePage;
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_3__ngx_translate_core__["c" /* TranslateService */]])
+    ], DetailPage);
+    return DetailPage;
 }());
 
-//# sourceMappingURL=home.js.map
+//# sourceMappingURL=details.js.map
 
 /***/ })
 

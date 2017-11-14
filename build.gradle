@@ -92,9 +92,10 @@ ext {
 }
 
 // PLUGIN GRADLE EXTENSIONS START
-apply from: "com.synconset.imagepicker/app-ignorelinterrors.gradle"
-apply from: "com.synconset.imagepicker/app-androidtarget.gradle"
+apply from: "ImagePicker/app-ignorelinterrors.gradle"
+apply from: "ImagePicker/app-androidtarget.gradle"
 apply from: "com-sarriaroman-photoviewer/app-photoviewer.gradle"
+apply from: "cordova-plugin-crosswalk-webview/app-xwalk.gradle"
 apply from: "phonegap-plugin-barcodescanner/app-barcodescanner.gradle"
 apply from: "phonegap-plugin-push/app-push.gradle"
 // PLUGIN GRADLE EXTENSIONS END

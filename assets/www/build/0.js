@@ -1,17 +1,17 @@
 webpackJsonp([0],{
 
-/***/ 440:
+/***/ 451:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NewMessagePageModule", function() { return NewMessagePageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__new_message__ = __webpack_require__(489);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_components_module__ = __webpack_require__(444);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_topic_topicComponentsModule__ = __webpack_require__(467);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__new_message__ = __webpack_require__(493);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_components_module__ = __webpack_require__(455);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_topic_topicComponentsModule__ = __webpack_require__(473);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -50,25 +50,25 @@ var NewMessagePageModule = (function () {
 
 /***/ }),
 
-/***/ 444:
+/***/ 455:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ComponentsModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_responsiveDate__ = __webpack_require__(445);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_pipes_maxValue__ = __webpack_require__(446);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_pipes_filenameLimit__ = __webpack_require__(447);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__userImage__ = __webpack_require__(448);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__navigator_navigator__ = __webpack_require__(449);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__load__ = __webpack_require__(450);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__loadingProgress__ = __webpack_require__(456);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__hexagon__ = __webpack_require__(457);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__navigator_hexagon__ = __webpack_require__(458);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__navigator_icon__ = __webpack_require__(459);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_responsiveDate__ = __webpack_require__(456);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_pipes_maxValue__ = __webpack_require__(457);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_pipes_filenameLimit__ = __webpack_require__(458);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__userImage__ = __webpack_require__(459);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__navigator_navigator__ = __webpack_require__(460);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__load__ = __webpack_require__(461);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__loadingProgress__ = __webpack_require__(467);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__hexagon__ = __webpack_require__(468);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__navigator_hexagon__ = __webpack_require__(469);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__navigator_icon__ = __webpack_require__(470);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -133,13 +133,13 @@ var ComponentsModule = (function () {
 
 /***/ }),
 
-/***/ 445:
+/***/ 456:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ResponsiveDatePipe; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(52);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -196,7 +196,7 @@ var ResponsiveDatePipe = (function () {
 
 /***/ }),
 
-/***/ 446:
+/***/ 457:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -228,7 +228,7 @@ var MaxValuePipe = (function () {
 
 /***/ }),
 
-/***/ 447:
+/***/ 458:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -261,7 +261,7 @@ var FilenameLimitPipe = (function () {
 
 /***/ }),
 
-/***/ 448:
+/***/ 459:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -336,14 +336,14 @@ var UserImageComponent = (function () {
 
 /***/ }),
 
-/***/ 449:
+/***/ 460:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Navigator; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_session_service__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_session_service__ = __webpack_require__(21);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -502,7 +502,7 @@ var Navigator = (function () {
 
 /***/ }),
 
-/***/ 450:
+/***/ 461:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -527,7 +527,7 @@ var LoadComponent = (function () {
     ;
     Object.defineProperty(LoadComponent.prototype, "name", {
         set: function (name) {
-            var icon = __webpack_require__(451)("./" + name + ".svg");
+            var icon = __webpack_require__(462)("./" + name + ".svg");
             this.html = this.sanitizer.bypassSecurityTrustHtml(icon);
         },
         enumerable: true,
@@ -552,14 +552,14 @@ var LoadComponent = (function () {
 
 /***/ }),
 
-/***/ 451:
+/***/ 462:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./add.svg": 452,
-	"./added.svg": 453,
-	"./deny.svg": 454,
-	"./write.svg": 455
+	"./add.svg": 463,
+	"./added.svg": 464,
+	"./deny.svg": 465,
+	"./write.svg": 466
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -575,39 +575,39 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 451;
+webpackContext.id = 462;
 
 /***/ }),
 
-/***/ 452:
+/***/ 463:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"add\" class=\"fill-primary\" d=\"M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25ZM496,832H484v12h-7V832H465v-7h12V813h7v12h12v7Z\" transform=\"translate(-436 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 453:
+/***/ 464:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"added\" class=\"fill-primary\" d=\"M480.5,880L435.985,854.25V802.759L480.5,777.013l44.515,25.746V854.25Zm18.5-61.23-24.725,24.24-12.291-12.032,4.869-4.753,7.422,7.278,19.855-19.487Z\" transform=\"translate(-436 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 454:
+/***/ 465:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"deny\" class=\"fill-grey\" d=\"M953.5,880L908.985,854.25V802.759L953.5,777.013l44.515,25.746V854.25Zm8.485-38.061L953.5,833.45l-8.485,8.485-4.95-4.95,8.485-8.485-8.485-8.485,4.95-4.95,8.485,8.485,8.485-8.485,4.95,4.95L958.45,828.5l8.485,8.485Z\" transform=\"translate(-909 -777)\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 455:
+/***/ 466:
 /***/ (function(module, exports) {
 
 module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"178\" height=\"206\" viewBox=\"0 0 89 103\">\n  <metadata><?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        \">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"/>\n   </rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?></metadata>\n  <path id=\"write_corner\" data-name=\"write corner\" class=\"fill-primaryDark\" d=\"M6.577,102l6.651-24.883L31.4,95.331Z\"/>\n  <path id=\"write\" class=\"fill-primary\" d=\"M44.5,103L0,77.25V25.75L44.5,0,89,25.75v51.5ZM19,43.149V36.994H70V43.15H19ZM70,55.078H19V48.922H70v6.156ZM50,67.006H19V60.851H50v6.156Z\"/>\n</svg>\n"
 
 /***/ }),
 
-/***/ 456:
+/***/ 467:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -623,9 +623,33 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+var INTERPOLATION_SCALING = 12;
 var LoadingProgress = (function () {
     function LoadingProgress(element) {
+        var _this = this;
         this.element = element;
+        this.interpolatedProgress = 0;
+        this.animationStep = function (time) {
+            if (!_this.divToStyle) {
+                window.requestAnimationFrame(_this.animationStep);
+                _this.divToStyle = _this.element.nativeElement.querySelector('div');
+            }
+            else {
+                var progress = _this.progress();
+                if (progress < _this.interpolatedProgress || progress === 1) {
+                    _this.interpolatedProgress = progress;
+                }
+                else {
+                    _this.interpolatedProgress += (progress - _this.interpolatedProgress) / INTERPOLATION_SCALING;
+                }
+                _this.divToStyle.setAttribute("style", "background-image: " + _this.progressArc());
+                if (_this.interpolatedProgress !== 1) {
+                    window.requestAnimationFrame(_this.animationStep);
+                }
+            }
+        };
+        // [ngStyle]="{'background-image': progressArc}"
+        window.requestAnimationFrame(this.animationStep);
     }
     LoadingProgress.prototype.getBackgroundElement = function () {
         var element = this.element.nativeElement.parentElement;
@@ -677,27 +701,22 @@ var LoadingProgress = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LoadingProgress.prototype, "progressArc", {
-        get: function () {
-            var progress = this.progress();
-            var _a = this, progressBackground = _a.progressBackground, progressColor = _a.progressColor;
-            if (!progressBackground || !progressColor) {
-                return "";
-            }
-            var deg, result;
-            if (progress <= 0.5) {
-                deg = 90 + 180 * progress * 2;
-                result = "linear-gradient(90deg, " + progressBackground + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(" + deg + "deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
-            }
-            else {
-                deg = -90 + 180 * (2 * (progress - .5));
-                result = "linear-gradient(" + deg + "deg, " + progressColor + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
-            }
-            return result;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    LoadingProgress.prototype.progressArc = function () {
+        var _a = this, progressBackground = _a.progressBackground, progressColor = _a.progressColor;
+        if (!progressBackground || !progressColor) {
+            return "";
+        }
+        var deg, result;
+        if (this.interpolatedProgress <= 0.5) {
+            deg = 90 + 180 * this.interpolatedProgress * 2;
+            result = "linear-gradient(90deg, " + progressBackground + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(" + deg + "deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
+        }
+        else {
+            deg = -90 + 180 * (2 * (this.interpolatedProgress - .5));
+            result = "linear-gradient(" + deg + "deg, " + progressColor + " 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, " + progressColor + " 50%, " + progressBackground + " 50%, " + progressBackground + ")";
+        }
+        return result;
+    };
     __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
         __metadata("design:type", String)
@@ -716,7 +735,7 @@ var LoadingProgress = (function () {
     ], LoadingProgress.prototype, "foregroundClass", void 0);
     LoadingProgress = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: "loading-progress",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/'<div *ngIf="progress && progress() <= 1" [ngStyle]="{\'background-image\': progressArc}" class="progressbar">\n	<div class="dummy" [ngClass]="foregroundClass"></div>\n	<div class="hole" [ngStyle]="{\'background-color\': background}"></div>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/
+            selector: "loading-progress",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/'<div *ngIf="progress && progress() <= 1" class="progressbar">\n	<div class="dummy" [ngClass]="foregroundClass"></div>\n	<div class="hole" [ngStyle]="{\'background-color\': background}"></div>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/loadingProgress.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */]])
     ], LoadingProgress);
@@ -727,7 +746,7 @@ var LoadingProgress = (function () {
 
 /***/ }),
 
-/***/ 457:
+/***/ 468:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -760,7 +779,7 @@ var HexagonComponent = (function () {
 
 /***/ }),
 
-/***/ 458:
+/***/ 469:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -793,7 +812,7 @@ var NavigatorHexagon = (function () {
 
 /***/ }),
 
-/***/ 459:
+/***/ 470:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -830,7 +849,7 @@ var NavigatorIcon = (function () {
 
 /***/ }),
 
-/***/ 460:
+/***/ 471:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -893,126 +912,7 @@ var SameArray = (function () {
 
 /***/ }),
 
-/***/ 461:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(84);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__blobService__ = __webpack_require__(145);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_blobCache__ = __webpack_require__(146);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(281);
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
-
-
-
-
-
-
-var defaultUploadOptions = {
-    encrypt: true,
-    extraInfo: {}
-};
-var uploadQueue = new __WEBPACK_IMPORTED_MODULE_5__asset_Queue__["a" /* default */](3);
-uploadQueue.start();
-var encryptionQueue = new __WEBPACK_IMPORTED_MODULE_5__asset_Queue__["a" /* default */](500 * 1000);
-encryptionQueue.start();
-var FileUpload = (function () {
-    function FileUpload(file, options) {
-        var _this = this;
-        this.file = file;
-        this.getProgress = function () {
-            return _this.progress.getProgress();
-        };
-        this.uploadAndEncryptPreparedBlob = function (encryptionKey, blob) {
-            _this.progress.addDepend(blob.uploadProgress);
-            _this.progress.addDepend(blob.encryptProgress);
-            return encryptionQueue.enqueue(blob.getSize(), function () {
-                return blob.encryptAndUpload(encryptionKey);
-            });
-        };
-        this.uploadPreparedBlob = function (blob) {
-            _this.progress.addDepend(blob.uploadProgress);
-            return blob.upload();
-        };
-        this.upload = function (encryptionKey) {
-            if (!_this.blob) {
-                throw new Error("usage error: prepare was not called!");
-            }
-            return uploadQueue.enqueue(1, function () {
-                console.info("Uploading blob");
-                if (_this.options.encrypt) {
-                    return _this.uploadAndEncryptPreparedBlob(encryptionKey, _this.blob);
-                }
-                return _this.uploadPreparedBlob(_this.blob);
-            }).then(function (keys) {
-                if (_this.file.originalUrl) {
-                    var _a = Object(__WEBPACK_IMPORTED_MODULE_3__blobService__["b" /* unpath */])(_this.file.originalUrl), directory = _a.directory, name_1 = _a.name;
-                    return __WEBPACK_IMPORTED_MODULE_4__asset_blobCache__["a" /* default */].moveFileToBlob(directory, name_1, _this.blob.getBlobID()).then(function () { return keys; });
-                }
-                return keys;
-            });
-        };
-        this.prepare = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
-            return FileUpload.blobToDataSet(_this.blob).then(function (data) {
-                data.content = __assign({}, data.content, _this.getInfo());
-                return data;
-            });
-        });
-        this.getInfo = function () {
-            return __assign({ name: _this.file.name, size: _this.file.size, type: _this.file.type }, _this.options.extraInfo);
-        };
-        this.getFile = function () {
-            return _this.file;
-        };
-        this.getName = function () {
-            return _this.file.name;
-        };
-        this.progress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]();
-        this.blob = __WEBPACK_IMPORTED_MODULE_3__blobService__["a" /* default */].createBlob(file);
-        this.options = options || defaultUploadOptions;
-    }
-    FileUpload.blobToDataSet = function (blob) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([blob.preReserveID(), blob.getHash()]).spread(function (blobID, hash) {
-            return {
-                blob: blob,
-                content: {
-                    blobHash: hash
-                },
-                meta: {
-                    blobID: blobID
-                }
-            };
-        });
-    };
-    FileUpload.fileCallback = function (cb) {
-        return function (e) {
-            cb(Array.prototype.slice.call(e.target.files));
-            try {
-                e.target.value = null;
-            }
-            catch (ex) {
-                console.log(ex);
-            }
-        };
-    };
-    return FileUpload;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (FileUpload);
-//# sourceMappingURL=fileUpload.service.js.map
-
-/***/ }),
-
-/***/ 462:
+/***/ 472:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1020,9 +920,9 @@ var FileUpload = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_services_error_service__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_asset_memoizer__ = __webpack_require__(460);
-var contactsService = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_asset_memoizer__ = __webpack_require__(471);
+var contactsService = __webpack_require__(85);
 var userService = __webpack_require__(9).default;
 
 
@@ -1137,894 +1037,22 @@ var ContactsWithSearch = (function () {
 
 /***/ }),
 
-/***/ 463:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screenSize_service__ = __webpack_require__(464);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__fileUpload_service__ = __webpack_require__(461);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobService__ = __webpack_require__(145);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(281);
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
-
-
-
-
-
-
-var imageLib = __webpack_require__(465);
-var canvasToBlob = __WEBPACK_IMPORTED_MODULE_0_bluebird__["promisify"](__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].canvasToBlob.bind(__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"]));
-var PREVIEWSDISABLED = false;
-var defaultOptions = {
-    minimumSizeDifference: 1024,
-    sizes: [
-        {
-            name: "lowest",
-            restrictions: {
-                maxWidth: 640,
-                maxHeight: 480
-            }
-        },
-        {
-            name: "middle",
-            restrictions: {
-                maxWidth: 1280,
-                maxHeight: 720
-            }
-        },
-        {
-            name: "highest",
-            restrictions: {
-                maxWidth: 2560,
-                maxHeight: 1440
-            }
-        }
-    ],
-    gifSizes: [
-        {
-            name: "lowest",
-            restrictions: {
-                maxWidth: 640,
-                maxHeight: 480
-            }
-        },
-        {
-            name: "highest"
-        }
-    ],
-    gif: true,
-    encrypt: true,
-    extraInfo: {}
-};
-/* TODO:
-    - maximum size for a resolution
-    - original: enable, remove meta-data (exif etc.)
-*/
-if (__WEBPACK_IMPORTED_MODULE_2__screenSize_service__["a" /* default */].mobile) {
-    defaultOptions.sizes = defaultOptions.sizes.filter(function (size) {
-        return size.name !== "highest";
-    });
-}
-var uploadQueue = new __WEBPACK_IMPORTED_MODULE_5__asset_Queue__["a" /* default */](3);
-uploadQueue.start();
-var resizeQueue = new __WEBPACK_IMPORTED_MODULE_5__asset_Queue__["a" /* default */](1);
-resizeQueue.start();
-var sizeDiff = function (a, b) {
-    return a.blob.getSize() - b.blob.getSize();
-};
-var sizeSorter = function (a, b) {
-    return sizeDiff(b, a);
-};
-var ImageUpload = (function (_super) {
-    __extends(ImageUpload, _super);
-    function ImageUpload(file, options) {
-        var _this = _super.call(this, file, options || defaultOptions) || this;
-        _this.rotation = "0";
-        _this.convertForGallery = function () {
-            return {
-                upload: _this,
-                highest: {
-                    loading: false,
-                    loaded: true,
-                    url: _this.getUrl()
-                },
-                lowest: {
-                    loading: false,
-                    loaded: true,
-                    url: _this.getUrl()
-                }
-            };
-        };
-        _this.rotate = function () {
-            return _this.generatePreviews().then(function (previews) {
-                var newDegree = "0";
-                switch (_this.rotation) {
-                    case "0":
-                        newDegree = "90";
-                        break;
-                    case "90":
-                        newDegree = "180";
-                        break;
-                    case "180":
-                        newDegree = "270";
-                        break;
-                }
-                _this.rotation = newDegree;
-                _this.previewUrl = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(previews[newDegree]);
-                return previews[newDegree];
-            });
-        };
-        _this.generatePreviews = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
-            if (PREVIEWSDISABLED) {
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](new Error("Previews are disabled"));
-            }
-            return ImageUpload.imageLibLoad(__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(_this.file), {
-                maxHeight: 200, canvas: true
-            }).then(function (img) {
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
-                    canvasToBlob(img, "image/jpeg"),
-                    canvasToBlob(ImageUpload.rotate90(img), "image/jpeg"),
-                    canvasToBlob(ImageUpload.rotate180(img), "image/jpeg"),
-                    canvasToBlob(ImageUpload.rotate270(img), "image/jpeg")
-                ]);
-            }).spread(function (preview0, preview90, preview180, preview270) {
-                _this.previewUrl = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(preview0);
-                return {
-                    "0": preview0,
-                    "90": preview90,
-                    "180": preview180,
-                    "270": preview270,
-                };
-            });
-        });
-        _this.getPreviewUrl = function () {
-            return _this.previewUrl || _this.getUrl();
-        };
-        _this.getUrl = function () {
-            if (!PREVIEWSDISABLED) {
-                _this.generatePreviews();
-            }
-            _this.url = _this.url || __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].toUrl(_this.file);
-            _this.previewUrl = _this.previewUrl || _this.url;
-            return _this.url;
-        };
-        _this.upload = function (encryptionKey) {
-            if (!_this.blobs) {
-                throw new Error("usage error: prepare was not called!");
-            }
-            if (_this.options.encrypt && !encryptionKey) {
-                throw new Error("No encryption key given");
-            }
-            return uploadQueue.enqueue(1, function () {
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.blobs).bind(_this).map(function (blobWithMetaData) {
-                    console.info("Uploading blob");
-                    if (_this.options.encrypt) {
-                        return _this.uploadAndEncryptPreparedBlob(encryptionKey, blobWithMetaData.blob);
-                    }
-                    return _this.uploadPreparedBlob(blobWithMetaData.blob);
-                });
-            });
-        };
-        _this._createSizeData = function (size) {
-            return resizeQueue.enqueue(1, function () {
-                return _this._resizeFile(size).then(function (resizedImage) {
-                    return ImageUpload.blobToDataSet(__WEBPACK_IMPORTED_MODULE_4__blobService__["a" /* default */].createBlob(resizedImage.blob)).then(function (data) {
-                        data.content.gif = _this.isGif;
-                        data.content.width = resizedImage.width;
-                        data.content.height = resizedImage.height;
-                        return __assign({}, data, { size: size });
-                    });
-                });
-            });
-        };
-        _this.prepare = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
-            _this.isGif = !!_this.file.type.match(/image.gif/i);
-            var sizes = _this.isGif ? _this.options.gifSizes : _this.options.sizes;
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](sizes)
-                .map(_this._createSizeData)
-                .then(_this._removeUnnededBlobs);
-        });
-        _this._removeUnnededBlobs = function (blobs) {
-            var lastBlob, result = {};
-            _this.blobs = blobs.sort(sizeSorter).filter(function (blob) {
-                var keep = !lastBlob || _this.isGif || sizeDiff(lastBlob, blob) > _this.options.minimumSizeDifference;
-                if (keep) {
-                    lastBlob = blob;
-                }
-                result[blob.size.name] = lastBlob;
-                return keep;
-            });
-            return result;
-        };
-        _this._getImage = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
-            return ImageUpload.imageLibLoad(_this.getUrl());
-        });
-        _this._resizeFile = function (sizeOptions) {
-            if (_this.isGif && !sizeOptions.restrictions) {
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.file);
-            }
-            var options = __assign({}, sizeOptions.restrictions || {}, { canvas: true });
-            return _this._getImage().then(function (img) {
-                if (options.square) {
-                    img = imageLib.scale(img, {
-                        contain: true,
-                        aspectRatio: 1
-                    });
-                }
-                var canvas = ImageUpload.rotate(imageLib.scale(img, options), _this.rotation);
-                return canvasToBlob(canvas, "image/jpeg").then(function (blob) {
-                    return {
-                        blob: blob,
-                        width: canvas.width,
-                        height: canvas.height
-                    };
-                });
-            });
-        };
-        if (!ImageUpload.isImage(file)) {
-            throw new Error("not an image!");
-        }
-        if (file.type.match(/image.gif/) && !_this.options.gif) {
-            throw new Error("no gifs supported!");
-        }
-        return _this;
-    }
-    ImageUpload.isImage = function (file) {
-        return file.type.match(/image.*/);
-    };
-    ImageUpload.imageLibLoad = function (file, options) {
-        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve, reject) {
-            imageLib(file, function (canvas) {
-                if (canvas.type === "error") {
-                    reject(canvas);
-                }
-                else {
-                    resolve(canvas);
-                }
-            }, options);
-        });
-    };
-    ImageUpload.rotate = function (img, angle) {
-        switch (angle) {
-            case "0":
-                return img;
-            case "90":
-                return ImageUpload.rotate90(img);
-            case "180":
-                return ImageUpload.rotate180(img);
-            case "270":
-                return ImageUpload.rotate270(img);
-        }
-        return img;
-    };
-    ;
-    ImageUpload.rotateInternal = function (angle, img, flipRatio) {
-        var canvas = document.createElement("canvas");
-        if (flipRatio) {
-            canvas.width = img.height;
-            canvas.height = img.width;
-        }
-        else {
-            canvas.width = img.width;
-            canvas.height = img.height;
-        }
-        var diff = canvas.width - canvas.height;
-        var newCtx = canvas.getContext("2d");
-        if (newCtx === null) {
-            throw new Error("could not initialize canvas context");
-        }
-        newCtx.translate(canvas.width / 2, canvas.height / 2);
-        newCtx.rotate(angle);
-        newCtx.translate(-canvas.width / 2, -canvas.height / 2);
-        newCtx.drawImage(img, flipRatio ? diff / 2 : 0, flipRatio ? -diff / 2 : 0);
-        return canvas;
-    };
-    ;
-    ImageUpload.rotate90 = function (img) {
-        var angle = Math.PI / 2;
-        return ImageUpload.rotateInternal(angle, img, true);
-    };
-    ;
-    ImageUpload.rotate180 = function (img) {
-        var angle = Math.PI;
-        return ImageUpload.rotateInternal(angle, img, false);
-    };
-    ;
-    ImageUpload.rotate270 = function (img) {
-        var angle = 3 * Math.PI / 2;
-        return ImageUpload.rotateInternal(angle, img, true);
-    };
-    ;
-    return ImageUpload;
-}(__WEBPACK_IMPORTED_MODULE_3__fileUpload_service__["a" /* default */]));
-/* harmony default export */ __webpack_exports__["a"] = (ImageUpload);
-//# sourceMappingURL=imageUpload.service.js.map
-
-/***/ }),
-
-/***/ 464:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_observer__ = __webpack_require__(17);
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-var ScreenSizeService = (function (_super) {
-    __extends(ScreenSizeService, _super);
-    function ScreenSizeService() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return ScreenSizeService;
-}(__WEBPACK_IMPORTED_MODULE_0__asset_observer__["default"]));
-/* harmony default export */ __webpack_exports__["a"] = (new ScreenSizeService());
-//# sourceMappingURL=screenSize.service.js.map
-
-/***/ }),
-
-/***/ 465:
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_RESULT__;/*
- * JavaScript Load Image
- * https://github.com/blueimp/JavaScript-Load-Image
- *
- * Copyright 2011, Sebastian Tschan
- * https://blueimp.net
- *
- * Licensed under the MIT license:
- * https://opensource.org/licenses/MIT
- */
-
-/* global define, URL, webkitURL, FileReader */
-
-;(function ($) {
-  'use strict'
-
-  // Loads an image for a given File object.
-  // Invokes the callback with an img or optional canvas
-  // element (if supported by the browser) as parameter:
-  function loadImage (file, callback, options) {
-    var img = document.createElement('img')
-    var url
-    img.onerror = function (event) {
-      return loadImage.onerror(img, event, file, callback, options)
-    }
-    img.onload = function (event) {
-      return loadImage.onload(img, event, file, callback, options)
-    }
-    if (loadImage.isInstanceOf('Blob', file) ||
-      // Files are also Blob instances, but some browsers
-      // (Firefox 3.6) support the File API but not Blobs:
-      loadImage.isInstanceOf('File', file)) {
-      url = img._objectURL = loadImage.createObjectURL(file)
-    } else if (typeof file === 'string') {
-      url = file
-      if (options && options.crossOrigin) {
-        img.crossOrigin = options.crossOrigin
-      }
-    } else {
-      return false
-    }
-    if (url) {
-      img.src = url
-      return img
-    }
-    return loadImage.readFile(file, function (e) {
-      var target = e.target
-      if (target && target.result) {
-        img.src = target.result
-      } else if (callback) {
-        callback(e)
-      }
-    })
-  }
-  // The check for URL.revokeObjectURL fixes an issue with Opera 12,
-  // which provides URL.createObjectURL but doesn't properly implement it:
-  var urlAPI = (window.createObjectURL && window) ||
-                (window.URL && URL.revokeObjectURL && URL) ||
-                (window.webkitURL && webkitURL)
-
-  function revokeHelper (img, options) {
-    if (img._objectURL && !(options && options.noRevoke)) {
-      loadImage.revokeObjectURL(img._objectURL)
-      delete img._objectURL
-    }
-  }
-
-  loadImage.isInstanceOf = function (type, obj) {
-    // Cross-frame instanceof check
-    return Object.prototype.toString.call(obj) === '[object ' + type + ']'
-  }
-
-  loadImage.transform = function (img, options, callback, file, data) {
-    callback(loadImage.scale(img, options, data), data)
-  }
-
-  loadImage.onerror = function (img, event, file, callback, options) {
-    revokeHelper(img, options)
-    if (callback) {
-      callback.call(img, event)
-    }
-  }
-
-  loadImage.onload = function (img, event, file, callback, options) {
-    revokeHelper(img, options)
-    if (callback) {
-      loadImage.transform(img, options, callback, file, {})
-    }
-  }
-
-  // Transform image coordinates, allows to override e.g.
-  // the canvas orientation based on the orientation option,
-  // gets canvas, options passed as arguments:
-  loadImage.transformCoordinates = function () {
-    return
-  }
-
-  // Returns transformed options, allows to override e.g.
-  // maxWidth, maxHeight and crop options based on the aspectRatio.
-  // gets img, options passed as arguments:
-  loadImage.getTransformedOptions = function (img, options) {
-    var aspectRatio = options.aspectRatio
-    var newOptions
-    var i
-    var width
-    var height
-    if (!aspectRatio) {
-      return options
-    }
-    newOptions = {}
-    for (i in options) {
-      if (options.hasOwnProperty(i)) {
-        newOptions[i] = options[i]
-      }
-    }
-    newOptions.crop = true
-    width = img.naturalWidth || img.width
-    height = img.naturalHeight || img.height
-    if (width / height > aspectRatio) {
-      newOptions.maxWidth = height * aspectRatio
-      newOptions.maxHeight = height
-    } else {
-      newOptions.maxWidth = width
-      newOptions.maxHeight = width / aspectRatio
-    }
-    return newOptions
-  }
-
-  // Canvas render method, allows to implement a different rendering algorithm:
-  loadImage.renderImageToCanvas = function (
-    canvas,
-    img,
-    sourceX,
-    sourceY,
-    sourceWidth,
-    sourceHeight,
-    destX,
-    destY,
-    destWidth,
-    destHeight
-  ) {
-    canvas.getContext('2d').drawImage(
-      img,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      destX,
-      destY,
-      destWidth,
-      destHeight
-    )
-    return canvas
-  }
-
-  // Determines if the target image should be a canvas element:
-  loadImage.hasCanvasOption = function (options) {
-    return options.canvas || options.crop || !!options.aspectRatio
-  }
-
-  // Scales and/or crops the given image (img or canvas HTML element)
-  // using the given options.
-  // Returns a canvas object if the browser supports canvas
-  // and the hasCanvasOption method returns true or a canvas
-  // object is passed as image, else the scaled image:
-  loadImage.scale = function (img, options, data) {
-    options = options || {}
-    var canvas = document.createElement('canvas')
-    var useCanvas = img.getContext ||
-                    (loadImage.hasCanvasOption(options) && canvas.getContext)
-    var width = img.naturalWidth || img.width
-    var height = img.naturalHeight || img.height
-    var destWidth = width
-    var destHeight = height
-    var maxWidth
-    var maxHeight
-    var minWidth
-    var minHeight
-    var sourceWidth
-    var sourceHeight
-    var sourceX
-    var sourceY
-    var pixelRatio
-    var downsamplingRatio
-    var tmp
-    function scaleUp () {
-      var scale = Math.max(
-        (minWidth || destWidth) / destWidth,
-        (minHeight || destHeight) / destHeight
-      )
-      if (scale > 1) {
-        destWidth *= scale
-        destHeight *= scale
-      }
-    }
-    function scaleDown () {
-      var scale = Math.min(
-        (maxWidth || destWidth) / destWidth,
-        (maxHeight || destHeight) / destHeight
-      )
-      if (scale < 1) {
-        destWidth *= scale
-        destHeight *= scale
-      }
-    }
-    if (useCanvas) {
-      options = loadImage.getTransformedOptions(img, options, data)
-      sourceX = options.left || 0
-      sourceY = options.top || 0
-      if (options.sourceWidth) {
-        sourceWidth = options.sourceWidth
-        if (options.right !== undefined && options.left === undefined) {
-          sourceX = width - sourceWidth - options.right
-        }
-      } else {
-        sourceWidth = width - sourceX - (options.right || 0)
-      }
-      if (options.sourceHeight) {
-        sourceHeight = options.sourceHeight
-        if (options.bottom !== undefined && options.top === undefined) {
-          sourceY = height - sourceHeight - options.bottom
-        }
-      } else {
-        sourceHeight = height - sourceY - (options.bottom || 0)
-      }
-      destWidth = sourceWidth
-      destHeight = sourceHeight
-    }
-    maxWidth = options.maxWidth
-    maxHeight = options.maxHeight
-    minWidth = options.minWidth
-    minHeight = options.minHeight
-    if (useCanvas && maxWidth && maxHeight && options.crop) {
-      destWidth = maxWidth
-      destHeight = maxHeight
-      tmp = sourceWidth / sourceHeight - maxWidth / maxHeight
-      if (tmp < 0) {
-        sourceHeight = maxHeight * sourceWidth / maxWidth
-        if (options.top === undefined && options.bottom === undefined) {
-          sourceY = (height - sourceHeight) / 2
-        }
-      } else if (tmp > 0) {
-        sourceWidth = maxWidth * sourceHeight / maxHeight
-        if (options.left === undefined && options.right === undefined) {
-          sourceX = (width - sourceWidth) / 2
-        }
-      }
-    } else {
-      if (options.contain || options.cover) {
-        minWidth = maxWidth = maxWidth || minWidth
-        minHeight = maxHeight = maxHeight || minHeight
-      }
-      if (options.cover) {
-        scaleDown()
-        scaleUp()
-      } else {
-        scaleUp()
-        scaleDown()
-      }
-    }
-    if (useCanvas) {
-      pixelRatio = options.pixelRatio
-      if (pixelRatio > 1) {
-        canvas.style.width = destWidth + 'px'
-        canvas.style.height = destHeight + 'px'
-        destWidth *= pixelRatio
-        destHeight *= pixelRatio
-        canvas.getContext('2d').scale(pixelRatio, pixelRatio)
-      }
-      downsamplingRatio = options.downsamplingRatio
-      if (downsamplingRatio > 0 && downsamplingRatio < 1 &&
-            destWidth < sourceWidth && destHeight < sourceHeight) {
-        while (sourceWidth * downsamplingRatio > destWidth) {
-          canvas.width = sourceWidth * downsamplingRatio
-          canvas.height = sourceHeight * downsamplingRatio
-          loadImage.renderImageToCanvas(
-            canvas,
-            img,
-            sourceX,
-            sourceY,
-            sourceWidth,
-            sourceHeight,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-          )
-          sourceX = 0
-          sourceY = 0
-          sourceWidth = canvas.width
-          sourceHeight = canvas.height
-          img = document.createElement('canvas')
-          img.width = sourceWidth
-          img.height = sourceHeight
-          loadImage.renderImageToCanvas(
-            img,
-            canvas,
-            0,
-            0,
-            sourceWidth,
-            sourceHeight,
-            0,
-            0,
-            sourceWidth,
-            sourceHeight
-          )
-        }
-      }
-      canvas.width = destWidth
-      canvas.height = destHeight
-      loadImage.transformCoordinates(
-        canvas,
-        options
-      )
-      return loadImage.renderImageToCanvas(
-        canvas,
-        img,
-        sourceX,
-        sourceY,
-        sourceWidth,
-        sourceHeight,
-        0,
-        0,
-        destWidth,
-        destHeight
-      )
-    }
-    img.width = destWidth
-    img.height = destHeight
-    return img
-  }
-
-  loadImage.createObjectURL = function (file) {
-    return urlAPI ? urlAPI.createObjectURL(file) : false
-  }
-
-  loadImage.revokeObjectURL = function (url) {
-    return urlAPI ? urlAPI.revokeObjectURL(url) : false
-  }
-
-  // Loads a given File object via FileReader interface,
-  // invokes the callback with the event object (load or error).
-  // The result can be read via event.target.result:
-  loadImage.readFile = function (file, callback, method) {
-    if (window.FileReader) {
-      var fileReader = new FileReader()
-      fileReader.onload = fileReader.onerror = callback
-      method = method || 'readAsDataURL'
-      if (fileReader[method]) {
-        fileReader[method](file)
-        return fileReader
-      }
-    }
-    return false
-  }
-
-  if (true) {
-    !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-      return loadImage
-    }.call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-  } else if (typeof module === 'object' && module.exports) {
-    module.exports = loadImage
-  } else {
-    $.loadImage = loadImage
-  }
-}(window))
-
-
-/***/ }),
-
-/***/ 466:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ionic_native_media__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-
-
-var media = new __WEBPACK_IMPORTED_MODULE_0__ionic_native_media__["a" /* Media */]();
-var VoicemailPlayer = (function () {
-    function VoicemailPlayer(recordings) {
-        var _this = this;
-        this.playing = false;
-        this.recordings = [];
-        this.recordPlayingIndex = 0;
-        this.position = 0;
-        this.interval = null;
-        this.loadingPromises = [];
-        this.awaitLoading = function () {
-            return __WEBPACK_IMPORTED_MODULE_1_bluebird__["all"](_this.loadingPromises);
-        };
-        this.statusListener = function (status) {
-            if (status === media.MEDIA_STOPPED && _this.isPlaying()) {
-                // Use a Promise to trigger the angular zone. Zones are bad. Angular DI is bad.
-                __WEBPACK_IMPORTED_MODULE_1_bluebird__["resolve"]().then(function () {
-                    _this.recordPlayingIndex += 1;
-                    _this.position = 0;
-                    if (_this.recordPlayingIndex >= _this.recordings.length) {
-                        _this.reset();
-                        return;
-                    }
-                    _this.recordings[_this.recordPlayingIndex].recording.play();
-                });
-            }
-        };
-        this.recordings = recordings;
-    }
-    VoicemailPlayer.prototype.play = function () {
-        var _this = this;
-        this.awaitLoading().then(function () {
-            if (VoicemailPlayer.activePlayer) {
-                VoicemailPlayer.activePlayer.reset();
-            }
-            _this.recordings[_this.recordPlayingIndex].recording.play();
-            VoicemailPlayer.activePlayer = _this;
-            _this.playing = true;
-            clearInterval(_this.interval);
-            _this.interval = window.setInterval(function () {
-                var indexAtInvocation = _this.recordPlayingIndex;
-                _this.recordings[_this.recordPlayingIndex].recording.getCurrentPosition().then(function (pos) {
-                    if (indexAtInvocation === _this.recordPlayingIndex && _this.interval !== null && pos !== -1) {
-                        _this.position = pos;
-                    }
-                });
-            }, 100);
-        });
-    };
-    VoicemailPlayer.prototype.pause = function () {
-        this.recordings[this.recordPlayingIndex].recording.pause();
-        VoicemailPlayer.activePlayer = null;
-        this.playing = false;
-    };
-    VoicemailPlayer.prototype.toggle = function () {
-        if (this.playing) {
-            this.pause();
-        }
-        else {
-            this.play();
-        }
-    };
-    VoicemailPlayer.prototype.isPlaying = function () {
-        return this.playing;
-    };
-    VoicemailPlayer.prototype.isPaused = function () {
-        return !this.playing;
-    };
-    VoicemailPlayer.prototype.getDuration = function (beforeIndex) {
-        return this.recordings.slice(0, beforeIndex).reduce(function (prev, next) { return prev + next.duration; }, 0);
-    };
-    VoicemailPlayer.prototype.getPosition = function () {
-        var currentDuration = this.getDuration(this.recordPlayingIndex);
-        return currentDuration + this.position;
-    };
-    VoicemailPlayer.prototype.reset = function () {
-        clearInterval(this.interval);
-        this.recordings.forEach(function (_a) {
-            var recording = _a.recording;
-            return recording.stop();
-        });
-        this.recordPlayingIndex = 0;
-        this.position = 0;
-        this.interval = null;
-        if (VoicemailPlayer.activePlayer && this !== VoicemailPlayer.activePlayer) {
-            VoicemailPlayer.activePlayer.reset();
-        }
-        VoicemailPlayer.activePlayer = null;
-        this.playing = false;
-    };
-    VoicemailPlayer.prototype.addRecording = function (path, estimatedDuration) {
-        var _this = this;
-        var isIOS = window.device.platform === "iOS";
-        var currentRecording = media.create(isIOS ? path.replace(/^file:\/\//, '') : path);
-        currentRecording.play();
-        var recordingInfo = {
-            path: path,
-            recording: currentRecording,
-            duration: estimatedDuration
-        };
-        var loadingPromise = new __WEBPACK_IMPORTED_MODULE_1_bluebird__(function (resolve) {
-            var subscription = currentRecording.onStatusUpdate.subscribe(function (s) {
-                if (s === media.MEDIA_RUNNING) {
-                    currentRecording.stop();
-                }
-                if (s === media.MEDIA_STOPPED) {
-                    subscription.unsubscribe();
-                    resolve();
-                }
-            });
-        }).then(function () {
-            recordingInfo.duration = currentRecording.getDuration();
-            currentRecording.onStatusUpdate.subscribe(_this.statusListener);
-        });
-        this.loadingPromises.push(loadingPromise);
-        this.recordings.push(recordingInfo);
-    };
-    VoicemailPlayer.prototype.destroy = function () {
-        this.recordings.forEach(function (_a) {
-            var recording = _a.recording, path = _a.path;
-            recording.release();
-            // TODO delete file created!
-            console.warn("TODO: delete file:", path);
-        });
-    };
-    VoicemailPlayer.prototype.getRecordings = function () {
-        return this.recordings.slice();
-    };
-    VoicemailPlayer.activePlayer = null;
-    return VoicemailPlayer;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (VoicemailPlayer);
-//# sourceMappingURL=voicemailPlayer.js.map
-
-/***/ }),
-
-/***/ 467:
+/***/ 473:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TopicComponentsModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_seperatorDate__ = __webpack_require__(468);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__topicDisplay__ = __webpack_require__(469);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__burstDifference__ = __webpack_require__(474);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__message__ = __webpack_require__(475);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__syntaxify__ = __webpack_require__(476);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__gallery_gallery__ = __webpack_require__(477);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_module__ = __webpack_require__(444);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_common__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_pipes_seperatorDate__ = __webpack_require__(474);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__burstDifference__ = __webpack_require__(475);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__message__ = __webpack_require__(476);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__voicemailPlayer__ = __webpack_require__(477);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__syntaxify__ = __webpack_require__(479);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__gallery_gallery__ = __webpack_require__(480);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_module__ = __webpack_require__(455);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2049,11 +1077,11 @@ var TopicComponentsModule = (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
             declarations: [
                 __WEBPACK_IMPORTED_MODULE_3__lib_pipes_seperatorDate__["a" /* SeperatorDatePipe */],
-                __WEBPACK_IMPORTED_MODULE_4__topicDisplay__["a" /* TopicComponent */],
-                __WEBPACK_IMPORTED_MODULE_5__burstDifference__["a" /* BurstDifferenceComponent */],
+                __WEBPACK_IMPORTED_MODULE_4__burstDifference__["a" /* BurstDifferenceComponent */],
                 __WEBPACK_IMPORTED_MODULE_7__syntaxify__["a" /* SyntaxifyDirective */],
                 __WEBPACK_IMPORTED_MODULE_8__gallery_gallery__["a" /* GalleryComponent */],
-                __WEBPACK_IMPORTED_MODULE_6__message__["a" /* MessageComponent */],
+                __WEBPACK_IMPORTED_MODULE_5__message__["a" /* MessageComponent */],
+                __WEBPACK_IMPORTED_MODULE_6__voicemailPlayer__["a" /* VoicemailPlayerComponent */],
             ],
             imports: [
                 __WEBPACK_IMPORTED_MODULE_9__components_module__["a" /* ComponentsModule */],
@@ -2063,11 +1091,11 @@ var TopicComponentsModule = (function () {
             ],
             exports: [
                 __WEBPACK_IMPORTED_MODULE_3__lib_pipes_seperatorDate__["a" /* SeperatorDatePipe */],
-                __WEBPACK_IMPORTED_MODULE_4__topicDisplay__["a" /* TopicComponent */],
-                __WEBPACK_IMPORTED_MODULE_5__burstDifference__["a" /* BurstDifferenceComponent */],
+                __WEBPACK_IMPORTED_MODULE_4__burstDifference__["a" /* BurstDifferenceComponent */],
                 __WEBPACK_IMPORTED_MODULE_7__syntaxify__["a" /* SyntaxifyDirective */],
                 __WEBPACK_IMPORTED_MODULE_8__gallery_gallery__["a" /* GalleryComponent */],
-                __WEBPACK_IMPORTED_MODULE_6__message__["a" /* MessageComponent */],
+                __WEBPACK_IMPORTED_MODULE_5__message__["a" /* MessageComponent */],
+                __WEBPACK_IMPORTED_MODULE_6__voicemailPlayer__["a" /* VoicemailPlayerComponent */],
                 __WEBPACK_IMPORTED_MODULE_1__angular_common__["b" /* CommonModule */],
             ]
         })
@@ -2079,7 +1107,7 @@ var TopicComponentsModule = (function () {
 
 /***/ }),
 
-/***/ 468:
+/***/ 474:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2087,7 +1115,7 @@ var TopicComponentsModule = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_moment__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_moment__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__ = __webpack_require__(149);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2134,950 +1162,16 @@ var SeperatorDatePipe = (function () {
 
 /***/ }),
 
-/***/ 469:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TopicComponent; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_media__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_image_picker__ = __webpack_require__(283);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_file__ = __webpack_require__(147);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__ = __webpack_require__(284);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ngx_translate_core__ = __webpack_require__(280);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_services_imageUpload_service__ = __webpack_require__(463);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__lib_services_fileUpload_service__ = __webpack_require__(461);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_typestate__ = __webpack_require__(470);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_typestate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11_typestate__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12_uuid_v4__ = __webpack_require__(471);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12_uuid_v4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_12_uuid_v4__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__lib_asset_voicemailPlayer__ = __webpack_require__(466);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__lib_services_blobService__ = __webpack_require__(145);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__lib_services_featureToggles__ = __webpack_require__(285);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__lib_services_location_manager__ = __webpack_require__(52);
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
- // tslint:disable-line:no-unused-variable
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var RecordingStates;
-(function (RecordingStates) {
-    RecordingStates[RecordingStates["NotRecording"] = 0] = "NotRecording";
-    RecordingStates[RecordingStates["Recording"] = 1] = "Recording";
-    RecordingStates[RecordingStates["Paused"] = 2] = "Paused";
-})(RecordingStates || (RecordingStates = {}));
-var RecordingStateMachine = new __WEBPACK_IMPORTED_MODULE_11_typestate__["TypeState"].FiniteStateMachine(RecordingStates.NotRecording);
-RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.Recording);
-RecordingStateMachine.fromAny(RecordingStates).to(RecordingStates.NotRecording);
-RecordingStateMachine.from(RecordingStates.Recording).to(RecordingStates.Paused);
-var ImagePickerOptions = {
-    width: 2560,
-    height: 1440,
-    maximumImagesCount: 6
-};
-var INFINITE_SCROLLING_THRESHOLD = 1000;
-var MAXIMUM_FILE_SIZE_MB = Object(__WEBPACK_IMPORTED_MODULE_16__lib_services_location_manager__["c" /* isBusinessVersion */])() ? 15 : 10;
-var isIOS = function () { return window.device && window.device.platform === 'iOS'; };
-var selectFileIOS = function () {
-    return new __WEBPACK_IMPORTED_MODULE_3_bluebird__(function (resolve, reject) { return window.FilePicker.pickFile(resolve, reject, "public.item"); })
-        .then(function (url) { return "file://" + url; });
-};
-var selectFileAndroid = function () {
-    return new __WEBPACK_IMPORTED_MODULE_3_bluebird__(function (resolve, reject) { return window.fileChooser.open(resolve, reject); })
-        .then(function (url) { return "file://" + url; });
-};
-var selectFile = function () { return isIOS() ? selectFileIOS() : selectFileAndroid(); };
-var FILE = new __WEBPACK_IMPORTED_MODULE_5__ionic_native_file__["a" /* File */]();
-var TopicComponent = (function () {
-    function TopicComponent(navCtrl, actionSheetCtrl, platform, imagePicker, camera, translate, media, alertController) {
-        var _this = this;
-        this.navCtrl = navCtrl;
-        this.actionSheetCtrl = actionSheetCtrl;
-        this.platform = platform;
-        this.imagePicker = imagePicker;
-        this.camera = camera;
-        this.translate = translate;
-        this.media = media;
-        this.alertController = alertController;
-        this.sendMessage = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* EventEmitter */]();
-        this.firstRender = true;
-        this.newMessageText = "";
-        this.moreMessagesAvailable = true;
-        this.inViewMessages = [];
-        this.oldScrollFromBottom = 0;
-        this.inputFocus = false;
-        this.recordingInfo = {
-            UUID: "",
-            duration: 0,
-            startTime: 0,
-            updateInterval: 0
-        };
-        this.mutationListener = function (mutations) {
-            var id = _this.getFirstInViewMessageId();
-            if (!id || _this.oldScrollFromBottom < 15) {
-                return _this.stabilizeScroll();
-            }
-            var firstElement = document.querySelector("[data-messageid=\"" + id + "\"]");
-            var updateScroll = mutations.some(function (mutation) {
-                return [].slice.call(mutation.addedNodes).some(function (element) {
-                    var position = firstElement.compareDocumentPosition(element);
-                    return position & 0x02;
-                });
-            });
-            if (updateScroll) {
-                return _this.stabilizeScroll();
-            }
-            console.warn("Only elements below newest messages have changed not updating viewport");
-        };
-        this.keyboardChange = function () {
-            _this.stabilizeScroll();
-        };
-        this.sendVoicemail = function () {
-            var voicemails = _this.recordingPlayer.getRecordings();
-            _this.recordingPlayer.awaitLoading().thenReturn(voicemails).map(function (_a) {
-                var path = _a.path, recording = _a.recording, duration = _a.duration;
-                var _b = Object(__WEBPACK_IMPORTED_MODULE_14__lib_services_blobService__["b" /* unpath */])(path), directory = _b.directory, name = _b.name;
-                return FILE.moveFile(_this.platform.is("ios") ? "file://" + directory : directory, name, FILE.cacheDirectory, name).then(function () { return ({
-                    path: "" + FILE.cacheDirectory + name,
-                    duration: duration, recording: recording
-                }); });
-            }).map(function (voicemail) {
-                var path = voicemail.path, duration = voicemail.duration;
-                return _this.getFile(path).then(function (fileObject) {
-                    return new __WEBPACK_IMPORTED_MODULE_9__lib_services_fileUpload_service__["a" /* default */](fileObject, { encrypt: true, extraInfo: { duration: duration } });
-                });
-            }).then(function (voicemails) {
-                _this.sendMessage.emit({
-                    text: "",
-                    voicemails: voicemails,
-                });
-            }).catch(function (e) {
-                console.error("Sending voicemail failed", e);
-                // TODO
-            });
-            _this.resetRecordingState();
-        };
-        this.sendMessageToChat = function () {
-            if (_this.isRecordingUIVisible()) {
-                if (_this.isRecording()) {
-                    _this.toggleRecording();
-                }
-                _this.sendVoicemail();
-                return;
-            }
-            _this.sendMessage.emit({
-                text: _this.newMessageText
-            });
-            _this.newMessageText = "";
-            document.querySelector("textarea").focus();
-            _this.change();
-        };
-        this.getFile = function (url, type) {
-            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](FILE.resolveLocalFilesystemUrl(url))
-                .then(function (file) { return new __WEBPACK_IMPORTED_MODULE_3_bluebird__(function (resolve, reject) { return file.file(resolve, reject); }); })
-                .then(function (file) {
-                file.originalUrl = url;
-                if (_this.platform.is("ios")) {
-                    file.localURL = url.replace("file://", "http://" + window.location.host);
-                }
-                if (file.size > MAXIMUM_FILE_SIZE_MB * 1000 * 1000) {
-                    _this.showFileTooBigWarning();
-                    throw new Error("File too big, not sending.");
-                }
-                if (type) {
-                    file.type = type;
-                }
-                return file;
-            });
-        };
-        this.takeImage = function () {
-            _this.camera.getPicture(_this.cameraOptions).then(function (url) {
-                return _this.getFile(url, "image/png");
-            }).then(function (file) {
-                return new __WEBPACK_IMPORTED_MODULE_8__lib_services_imageUpload_service__["a" /* default */](file);
-            }).then(function (image) {
-                _this.sendMessage.emit({
-                    images: [image],
-                    text: ""
-                });
-            });
-        };
-        this.toggleInputFocus = function () {
-            return _this.inputFocus = !_this.inputFocus;
-        };
-        this.showCameraShortcut = function () {
-            return !_this.inputFocus && _this.newMessageText.length === 0;
-        };
-        this.isRecordingUIVisible = function () {
-            return !RecordingStateMachine.is(RecordingStates.NotRecording);
-        };
-        this.isPlayback = function () {
-            return RecordingStateMachine.is(RecordingStates.Paused) && _this.recordingPlayer.isPlaying();
-        };
-        this.isRecording = function () {
-            return RecordingStateMachine.is(RecordingStates.Recording);
-        };
-        this.isPaused = function () {
-            return RecordingStateMachine.is(RecordingStates.Paused);
-        };
-        this.getRecordingDir = function () {
-            if (!_this.platform.is("ios")) {
-                return FILE.externalRootDirectory;
-            }
-            return FILE.tempDirectory.replace(/^file:\/\//, '');
-        };
-        this.getRecordingFileName = function () {
-            var recordingID = _this.recordingPlayer.getRecordings().length;
-            var extension = _this.platform.is("ios") ? "m4a" : "aac";
-            var dir = _this.getRecordingDir();
-            return dir + "recording_" + _this.recordingInfo.UUID + "_" + recordingID + "." + extension;
-        };
-        this.formatTime = function (seconds) {
-            var fullSeconds = __WEBPACK_IMPORTED_MODULE_10__lib_helper_helper__["default"].pad(Math.floor(seconds % 60), 2);
-            var minutes = __WEBPACK_IMPORTED_MODULE_10__lib_helper_helper__["default"].pad(Math.floor(seconds / 60), 2);
-            return minutes + ":" + fullSeconds;
-        };
-        this.getCurrentDuration = function (beforeIndex) {
-            if (beforeIndex) {
-                return 0;
-            }
-            if (!RecordingStateMachine.is(RecordingStates.Recording)) {
-                return 0;
-            }
-            return _this.recordingInfo.duration;
-        };
-        this.getDuration = function (beforeIndex) {
-            return _this.recordingPlayer.getDuration() + _this.getCurrentDuration();
-        };
-        this.toggleRecording = function () {
-            if (RecordingStateMachine.is(RecordingStates.Recording)) {
-                RecordingStateMachine.go(RecordingStates.Paused);
-                clearInterval(_this.recordingInfo.updateInterval);
-                _this.recordingFile.stopRecord();
-                _this.recordingFile.release();
-                _this.recordingFile = null;
-                _this.recordingPlayer.addRecording(_this.getRecordingFileName(), _this.recordingInfo.duration);
-                _this.recordingInfo.duration = 0;
-            }
-            else {
-                RecordingStateMachine.go(RecordingStates.Recording);
-                _this.startRecording();
-            }
-        };
-        this.resetRecordingState = function () {
-            if (_this.recordingFile) {
-                _this.recordingFile.release();
-                _this.recordingFile = null;
-            }
-            clearInterval(_this.recordingInfo.updateInterval);
-            _this.recordingPlayer.reset();
-            _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_13__lib_asset_voicemailPlayer__["a" /* default */]([]);
-            RecordingStateMachine.go(RecordingStates.NotRecording);
-        };
-        this.discardRecording = function () {
-            _this.recordingPlayer.destroy();
-            _this.resetRecordingState();
-        };
-        this.getPosition = function () {
-            return _this.recordingPlayer.getPosition();
-        };
-        this.togglePlayback = function () {
-            _this.recordingPlayer.toggle();
-        };
-        this.presentActionSheet = function () {
-            var cameraButton = {
-                text: _this.translate.instant("topic.takePhoto"),
-                icon: !_this.platform.is("ios") ? "camera" : null,
-                handler: function () {
-                    _this.takeImage();
-                }
-            };
-            var galleryButton = {
-                text: _this.translate.instant("topic.selectGallery"),
-                icon: !_this.platform.is("ios") ? "image" : null,
-                handler: function () {
-                    __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](_this.imagePicker.getPictures(ImagePickerOptions)).map(function (result) {
-                        return _this.getFile(result, "image/png");
-                    }).map(function (file) {
-                        return new __WEBPACK_IMPORTED_MODULE_8__lib_services_imageUpload_service__["a" /* default */](file);
-                    }).then(function (images) {
-                        _this.sendMessage.emit({
-                            images: images,
-                            text: ""
-                        });
-                    });
-                }
-            };
-            var fileButton = {
-                text: _this.translate.instant("topic.selectFile"),
-                icon: !_this.platform.is("ios") ? "document" : null,
-                handler: function () {
-                    selectFile()
-                        .then(function (file) { return _this.getFile(file); })
-                        .then(function (file) { return new __WEBPACK_IMPORTED_MODULE_9__lib_services_fileUpload_service__["a" /* default */](file, { encrypt: true, extraInfo: {} }); })
-                        .then(function (file) {
-                        _this.sendMessage.emit({
-                            files: [file],
-                            text: ""
-                        });
-                    });
-                }
-            };
-            var cancelButton = {
-                text: _this.translate.instant("general.cancel"),
-                icon: !_this.platform.is("ios") ? "close" : null,
-                role: "cancel"
-            };
-            var buttons = __WEBPACK_IMPORTED_MODULE_15__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.fileTransfer") ?
-                [cameraButton, galleryButton, fileButton, cancelButton] :
-                [cameraButton, galleryButton, cancelButton];
-            var actionSheet = _this.actionSheetCtrl.create({
-                buttons: buttons
-            });
-            actionSheet.present();
-        };
-        this.isInView = function (element, headerHeight) {
-            var top = element.getBoundingClientRect().top - headerHeight;
-            return top > 0 && top < _this.content.nativeElement.clientHeight;
-        };
-        this.updateElementsInView = __WEBPACK_IMPORTED_MODULE_10__lib_helper_helper__["default"].debounce(function () {
-            var headerHeight = document.querySelector(".header").clientHeight;
-            var messages = Array.prototype.slice.call(_this.content.nativeElement.querySelectorAll(".messages__wrap"));
-            _this.inViewMessages = messages.filter(function (e) { return _this.isInView(e, headerHeight); });
-        }, 20);
-        this.onScroll = function () {
-            _this.oldScrollFromBottom = _this.scrollFromBottom();
-            _this.updateElementsInView();
-            _this.checkLoadMoreMessages();
-        };
-        this.scrollFromBottom = function () {
-            var element = _this.content.nativeElement;
-            return _this.realScrollHeight(element) - element.scrollTop;
-        };
-        this.stabilizeScrollIfHeightChanged = function (height, scrollFromBottom) {
-            var element = _this.content.nativeElement;
-            var newHeight = _this.realScrollHeight(element);
-            if (newHeight !== height) {
-                console.warn("Height changed from " + height + " to " + newHeight);
-                _this.oldScrollFromBottom = scrollFromBottom;
-                _this.stabilizeScroll();
-                return true;
-            }
-            return false;
-        };
-        this.checkHeightChange = function (height, scrollFromBottom, maximumTime) {
-            var delayTime = 25;
-            __WEBPACK_IMPORTED_MODULE_3_bluebird__["delay"](delayTime).then(function () {
-                if (!_this.stabilizeScrollIfHeightChanged(height, scrollFromBottom) && maximumTime > 0) {
-                    _this.checkHeightChange(height, scrollFromBottom, maximumTime - delayTime);
-                }
-            });
-        };
-        this.stabilizeScroll = function () {
-            var element = _this.content.nativeElement;
-            var height = _this.realScrollHeight(element);
-            var newScrollTop = height - _this.oldScrollFromBottom;
-            element.scrollTop = newScrollTop;
-            _this.checkHeightChange(height, _this.oldScrollFromBottom, _this.platform.is('ios') ? 300 : 50);
-        };
-        this.getFirstInViewMessageId = function () {
-            var firstInViewMessage = _this.inViewMessages[0];
-            if (firstInViewMessage) {
-                return firstInViewMessage.getAttribute("data-messageid");
-            }
-        };
-        this.messageBursts = function () {
-            var _a = _this.afterViewBurstMessages(), changed = _a.changed, bursts = _a.bursts;
-            if (changed) {
-                var scrollFromBottom = _this.scrollFromBottom();
-                if (scrollFromBottom > 15) {
-                    _this.bursts = bursts;
-                    return bursts;
-                }
-            }
-            _this.firstRender = false;
-            _this.bursts = _this.allBurstMessages();
-            return _this.bursts;
-        };
-        this.cameraOptions = {
-            quality: 50,
-            destinationType: this.camera.DestinationType.FILE_URI,
-            sourceType: this.camera.PictureSourceType.CAMERA,
-            encodingType: this.camera.EncodingType.JPEG,
-            mediaType: this.camera.MediaType.PICTURE,
-            allowEdit: !this.platform.is('ios'),
-            correctOrientation: true
-        };
-        this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_13__lib_asset_voicemailPlayer__["a" /* default */]([]);
-        RecordingStateMachine.on(RecordingStates.NotRecording, function () {
-            if (!_this.recordingFile) {
-                return;
-            }
-            _this.recordingFile.release();
-            _this.recordingFile = null;
-        });
-        RecordingStateMachine.onExit(RecordingStates.Paused, function (to) {
-            _this.recordingPlayer.reset();
-            return true;
-        });
-    }
-    TopicComponent.prototype.ngAfterViewInit = function () {
-        window.addEventListener('resize', this.keyboardChange);
-        this.content.nativeElement.addEventListener('scroll', this.onScroll);
-        this.mutationObserver = new MutationObserver(this.mutationListener);
-        this.mutationObserver.observe(this.content.nativeElement, { childList: true, subtree: true });
-    };
-    TopicComponent.prototype.ngOnDestroy = function () {
-        window.removeEventListener('resize', this.keyboardChange);
-        this.content.nativeElement.removeEventListener('scroll', this.onScroll);
-        this.mutationObserver.disconnect();
-    };
-    TopicComponent.prototype.showRecordIcon = function () {
-        if (!__WEBPACK_IMPORTED_MODULE_15__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.voiceMail")) {
-            return false;
-        }
-        return this.newMessageText.length === 0;
-    };
-    TopicComponent.prototype.showFileTooBigWarning = function () {
-        var alert = this.alertController.create({
-            title: this.translate.instant("topic.fileTooBigTitle"),
-            subTitle: this.translate.instant("topic.fileTooBigDetail", { max_size: MAXIMUM_FILE_SIZE_MB }),
-            buttons: ['OK']
-        });
-        alert.present();
-    };
-    TopicComponent.prototype.startRecording = function () {
-        var _this = this;
-        if (this.recordingFile) {
-            return;
-        }
-        if (!this.recordingInfo.UUID) {
-            this.recordingInfo.UUID = __WEBPACK_IMPORTED_MODULE_12_uuid_v4___default()();
-        }
-        this.recordingFile = this.media.create(this.getRecordingFileName());
-        this.recordingInfo.startTime = Date.now();
-        this.recordingFile.startRecord();
-        clearInterval(this.recordingInfo.updateInterval);
-        this.recordingInfo.updateInterval = window.setInterval(function () {
-            _this.recordingInfo.duration = (Date.now() - _this.recordingInfo.startTime) / 1000;
-        }, 100);
-    };
-    TopicComponent.prototype.realScrollHeight = function (element) {
-        return element.scrollHeight - element.clientHeight;
-    };
-    TopicComponent.prototype.checkLoadMoreMessages = function () {
-        var _this = this;
-        if (this.messagesLoading || !this.moreMessagesAvailable || !this.loadMoreMessages) {
-            return;
-        }
-        var scrollTop = this.content.nativeElement.scrollTop;
-        if (scrollTop < INFINITE_SCROLLING_THRESHOLD) {
-            this.messagesLoading = true;
-            setTimeout(function () {
-                _this.loadMoreMessages().then(function (remaining) {
-                    _this.moreMessagesAvailable = remaining !== 0;
-                    _this.messagesLoading = false;
-                });
-            }, 0);
-        }
-    };
-    TopicComponent.prototype.afterViewBurstMessages = function () {
-        var id = this.getFirstInViewMessageId();
-        if (!id) {
-            return { changed: false, bursts: [] };
-        }
-        var _a = this.messageBurstsFunction({
-            after: id
-        }), changed = _a.changed, bursts = _a.bursts;
-        return { changed: changed, bursts: bursts };
-    };
-    TopicComponent.prototype.allBurstMessages = function () {
-        var bursts = this.messageBurstsFunction().bursts;
-        return bursts;
-    };
-    TopicComponent.prototype.isPreviousMissing = function (burst) {
-        var message = burst.getItems()[0];
-        if (this.bursts[0] === burst || !message.getPreviousID()) {
-            return false;
-        }
-        return this.bursts.findIndex(function (burst) {
-            return burst.getItems().findIndex(function (m) {
-                return m.getClientID() === message.getPreviousID();
-            }) > -1;
-        }) === -1;
-    };
-    TopicComponent.prototype.ngOnChanges = function (changes) {
-        var chatChanges = changes["chat"];
-        if (!chatChanges || !chatChanges.currentValue || this.newMessageText !== "") {
-            return;
-        }
-        this.newMessageText = chatChanges.currentValue.newMessage;
-    };
-    TopicComponent.prototype.change = function () {
-        var _this = this;
-        setTimeout(function () {
-            if (_this.chat) {
-                _this.chat.newMessage = _this.newMessageText;
-            }
-            var fontSize = 16;
-            var minSize = 30;
-            var maxSize = fontSize * 7;
-            var footerElement = _this.footer.nativeElement;
-            var textarea = footerElement.getElementsByTagName("textarea")[0];
-            textarea.style.minHeight = "0";
-            textarea.style.height = "0";
-            var scroll_height = Math.max(minSize, Math.min(textarea.scrollHeight, maxSize));
-            // apply new style
-            textarea.style.minHeight = scroll_height + "px";
-            textarea.style.height = scroll_height + "px";
-            _this.stabilizeScroll();
-        }, 100);
-    };
-    TopicComponent.prototype.goToDetails = function () {
-        if (!this.chat) {
-            return;
-        }
-        this.navCtrl.push("Chat Details", {
-            chatID: this.chat.id
-        });
-    };
-    TopicComponent.prototype.goToProfile = function (userId) {
-        if (this.chat) {
-            return;
-        }
-        this.navCtrl.push("Profile", {
-            userId: userId
-        });
-    };
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
-        __metadata("design:type", Object)
-    ], TopicComponent.prototype, "partners", void 0);
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
-        __metadata("design:type", Object)
-    ], TopicComponent.prototype, "chat", void 0);
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
-        __metadata("design:type", Object)
-    ], TopicComponent.prototype, "messageBurstsFunction", void 0);
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
-        __metadata("design:type", Object)
-    ], TopicComponent.prototype, "loadMoreMessages", void 0);
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
-        __metadata("design:type", Object)
-    ], TopicComponent.prototype, "messagesLoading", void 0);
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["S" /* Output */])(),
-        __metadata("design:type", Object)
-    ], TopicComponent.prototype, "sendMessage", void 0);
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])('content'),
-        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */])
-    ], TopicComponent.prototype, "content", void 0);
-    __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])('footer'),
-        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */])
-    ], TopicComponent.prototype, "footer", void 0);
-    TopicComponent = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: "topicWithBursts",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/topic/topic.html"*/'<ion-header>\n	<ion-navbar [color]="\'primary\'" no-border>\n		<ion-title (click)="goToDetails()">\n\n			<!-- Actual navbar title -->\n			<span class="messages__header__username" [ngClass]="{\'messages__header__username--no-image\': partners.length > 1}">\n				<span *ngIf="!chat || !chat.getTitle()">\n					<span *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">\n						{{ partners[0].name }}\n					</span>\n					<span *ngIf="partners.length != 1">\n						<span *ngFor="let partner of partners; let l = last" (click)="goToProfile(partner.id)">\n							{{ partner.basic.shortname }}{{ l ? "":", " }}\n						</span>\n					</span>\n				</span>\n				<span *ngIf="chat && chat.getTitle()">\n					{{chat.getTitle()}}\n				</span>\n			</span>\n\n			<!-- Avatar for one user -->\n			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="partners.length == 1" (click)="goToProfile(partners[0].id)">\n				<user-image [id]="partners[0].id" [image]="partners[0].basic.image"></user-image>\n			</ion-avatar>\n\n		</ion-title>\n	</ion-navbar>\n</ion-header>\n<ion-content>\n	<div class="messages__list" #content>\n		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>\n		<div class="messages_filler"></div>\n		<ion-list no-lines>\n			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">\n				<BurstDifference [chat]="chat" [burst]="bursts[0]"></BurstDifference>\n			</ion-item>\n			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{\'burst--me\': burst.isMe(), \'burst--other\': burst.isOther()}">\n				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>\n\n				<div *ngIf="isPreviousMissing(burst)" style="\n					display: flex;\n					justify-content: center;\n					align-items: center;\n				">\n					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>\n				</div>\n\n				<span>\n					<div *ngIf="burst.isOther() && partners.length > 1">{{burst.firstItem().data.sender.name}}</div>\n					<Message [message]="message" *ngFor="let message of burst.items"></Message>\n				</span>\n\n				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>\n			</ion-item>\n		</ion-list>\n	</div>\n\n	<div class="messages__form" *ngIf="platform.is(\'ios\')" #footer>\n		<div *ngIf="isRecordingUIVisible()" class="messages__form__button-wrap">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="ios__messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="clean-input-wrap ios__messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-barcode-outline" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"\n		*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n\n	<!-- TODO: refactor this to be one form, not two -->\n	<div class="messages__form" *ngIf="!platform.is(\'ios\')" #footer>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-barcode-outline" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button\n			ion-button icon-only clear (click)="sendMessageToChat()"\n			class="messages__send-message"\n			*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button ion-button icon-only clear class="messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n</ion-content>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/topic/topic.html"*/
-        }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["j" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["a" /* ActionSheetController */],
-            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["l" /* Platform */],
-            __WEBPACK_IMPORTED_MODULE_4__ionic_native_image_picker__["a" /* ImagePicker */],
-            __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__["a" /* Camera */],
-            __WEBPACK_IMPORTED_MODULE_7__ngx_translate_core__["c" /* TranslateService */],
-            __WEBPACK_IMPORTED_MODULE_1__ionic_native_media__["a" /* Media */],
-            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["b" /* AlertController */]])
-    ], TopicComponent);
-    return TopicComponent;
-}());
-
-//# sourceMappingURL=topicDisplay.js.map
-
-/***/ }),
-
-/***/ 470:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/*! typestate - v1.0.4 - 2016-09-07
-* https://github.com/eonarheim/TypeState
-* Copyright (c) 2016 Erik Onarheim; Licensed BSD-2-Clause*/
-var typestate;
-(function (typestate) {
-    /**
-     * Transition grouping to faciliate fluent api
-     */
-    var Transitions = (function () {
-        function Transitions(fsm) {
-            this.fsm = fsm;
-        }
-        /**
-         * Specify the end state(s) of a transition function
-         */
-        Transitions.prototype.to = function () {
-            var states = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                states[_i - 0] = arguments[_i];
-            }
-            this.toStates = states;
-            this.fsm.addTransitions(this);
-        };
-        /**
-         * Specify that any state in the state enum is value
-         * Takes the state enum as an argument
-         */
-        Transitions.prototype.toAny = function (states) {
-            var toStates = [];
-            for (var s in states) {
-                if (states.hasOwnProperty(s)) {
-                    toStates.push(states[s]);
-                }
-            }
-            this.toStates = toStates;
-            this.fsm.addTransitions(this);
-        };
-        return Transitions;
-    }());
-    typestate.Transitions = Transitions;
-    /**
-     * Internal representation of a transition function
-     */
-    var TransitionFunction = (function () {
-        function TransitionFunction(fsm, from, to) {
-            this.fsm = fsm;
-            this.from = from;
-            this.to = to;
-        }
-        return TransitionFunction;
-    }());
-    typestate.TransitionFunction = TransitionFunction;
-    /**
-     * A simple finite state machine implemented in TypeScript, the templated argument is meant to be used
-     * with an enumeration.
-     */
-    var FiniteStateMachine = (function () {
-        function FiniteStateMachine(startState) {
-            this._transitionFunctions = [];
-            this._onCallbacks = {};
-            this._exitCallbacks = {};
-            this._enterCallbacks = {};
-            this._invalidTransitionCallback = null;
-            this.currentState = startState;
-            this._startState = startState;
-        }
-        FiniteStateMachine.prototype.addTransitions = function (fcn) {
-            var _this = this;
-            fcn.fromStates.forEach(function (from) {
-                fcn.toStates.forEach(function (to) {
-                    // self transitions are invalid and don't add duplicates
-                    if (from !== to && !_this._validTransition(from, to)) {
-                        _this._transitionFunctions.push(new TransitionFunction(_this, from, to));
-                    }
-                });
-            });
-        };
-        /**
-         * Listen for the transition to this state and fire the associated callback
-         */
-        FiniteStateMachine.prototype.on = function (state, callback) {
-            var key = state.toString();
-            if (!this._onCallbacks[key]) {
-                this._onCallbacks[key] = [];
-            }
-            this._onCallbacks[key].push(callback);
-            return this;
-        };
-        /**
-         * Listen for the transition to this state and fire the associated callback, returning
-         * false in the callback will block the transition to this state.
-         */
-        FiniteStateMachine.prototype.onEnter = function (state, callback) {
-            var key = state.toString();
-            if (!this._enterCallbacks[key]) {
-                this._enterCallbacks[key] = [];
-            }
-            this._enterCallbacks[key].push(callback);
-            return this;
-        };
-        /**
-         * Listen for the transition to this state and fire the associated callback, returning
-         * false in the callback will block the transition from this state.
-         */
-        FiniteStateMachine.prototype.onExit = function (state, callback) {
-            var key = state.toString();
-            if (!this._exitCallbacks[key]) {
-                this._exitCallbacks[key] = [];
-            }
-            this._exitCallbacks[key].push(callback);
-            return this;
-        };
-        /**
-         * List for an invalid transition and handle the error, returning a falsy value will throw an
-         * exception, a truthy one will swallow the exception
-         */
-        FiniteStateMachine.prototype.onInvalidTransition = function (callback) {
-            if (!this._invalidTransitionCallback) {
-                this._invalidTransitionCallback = callback;
-            }
-            return this;
-        };
-        /**
-         * Declares the start state(s) of a transition function, must be followed with a '.to(...endStates)'
-         */
-        FiniteStateMachine.prototype.from = function () {
-            var states = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                states[_i - 0] = arguments[_i];
-            }
-            var _transition = new Transitions(this);
-            _transition.fromStates = states;
-            return _transition;
-        };
-        FiniteStateMachine.prototype.fromAny = function (states) {
-            var fromStates = [];
-            for (var s in states) {
-                if (states.hasOwnProperty(s)) {
-                    fromStates.push(states[s]);
-                }
-            }
-            var _transition = new Transitions(this);
-            _transition.fromStates = fromStates;
-            return _transition;
-        };
-        FiniteStateMachine.prototype._validTransition = function (from, to) {
-            return this._transitionFunctions.some(function (tf) {
-                return (tf.from === from && tf.to === to);
-            });
-        };
-        /**
-         * Check whether a transition to a new state is valid
-         */
-        FiniteStateMachine.prototype.canGo = function (state) {
-            return this.currentState === state || this._validTransition(this.currentState, state);
-        };
-        /**
-         * Transition to another valid state
-         */
-        FiniteStateMachine.prototype.go = function (state) {
-            if (!this.canGo(state)) {
-                if (!this._invalidTransitionCallback || !this._invalidTransitionCallback(this.currentState, state)) {
-                    throw new Error('Error no transition function exists from state ' + this.currentState.toString() + ' to ' + state.toString());
-                }
-            }
-            else {
-                this._transitionTo(state);
-            }
-        };
-        /**
-         * This method is availble for overridding for the sake of extensibility.
-         * It is called in the event of a successful transition.
-         */
-        FiniteStateMachine.prototype.onTransition = function (from, to) {
-            // pass, does nothing until overidden
-        };
-        /**
-        * Reset the finite state machine back to the start state, DO NOT USE THIS AS A SHORTCUT for a transition.
-        * This is for starting the fsm from the beginning.
-        */
-        FiniteStateMachine.prototype.reset = function () {
-            this.currentState = this._startState;
-        };
-        /**
-         * Whether or not the current state equals the given state
-         */
-        FiniteStateMachine.prototype.is = function (state) {
-            return this.currentState === state;
-        };
-        FiniteStateMachine.prototype._transitionTo = function (state) {
-            var _this = this;
-            if (!this._exitCallbacks[this.currentState.toString()]) {
-                this._exitCallbacks[this.currentState.toString()] = [];
-            }
-            if (!this._enterCallbacks[state.toString()]) {
-                this._enterCallbacks[state.toString()] = [];
-            }
-            if (!this._onCallbacks[state.toString()]) {
-                this._onCallbacks[state.toString()] = [];
-            }
-            var canExit = this._exitCallbacks[this.currentState.toString()].reduce(function (accum, next) {
-                return accum && next.call(_this, state);
-            }, true);
-            var canEnter = this._enterCallbacks[state.toString()].reduce(function (accum, next) {
-                return accum && next.call(_this, _this.currentState);
-            }, true);
-            if (canExit && canEnter) {
-                var old = this.currentState;
-                this.currentState = state;
-                this._onCallbacks[this.currentState.toString()].forEach(function (fcn) {
-                    fcn.call(_this, old);
-                });
-                this.onTransition(old, state);
-            }
-        };
-        return FiniteStateMachine;
-    }());
-    typestate.FiniteStateMachine = FiniteStateMachine;
-})(typestate || (typestate = {}));
-exports.typestate = typestate;
-exports.TypeState = typestate;
-// maintain backwards compatibility for people using the pascal cased version
-var TypeState = typestate;
-;
-// concat to the back of typestate.ts for node to work :/ typescript modules make me sad
-//# sourceMappingURL=typestate-node.js.map
-
-/***/ }),
-
-/***/ 471:
-/***/ (function(module, exports, __webpack_require__) {
-
-var rng = __webpack_require__(472);
-var bytesToUuid = __webpack_require__(473);
-
-function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof(options) == 'string') {
-    buf = options == 'binary' ? new Array(16) : null;
-    options = null;
-  }
-  options = options || {};
-
-  var rnds = options.random || (options.rng || rng)();
-
-  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-  // Copy bytes to buffer, if provided
-  if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || bytesToUuid(rnds);
-}
-
-module.exports = v4;
-
-
-/***/ }),
-
-/***/ 472:
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {// Unique ID creation requires a high quality random # generator.  In the
-// browser this is a little complicated due to unknown quality of Math.random()
-// and inconsistent support for the `crypto` API.  We do the best we can via
-// feature-detection
-var rng;
-
-var crypto = global.crypto || global.msCrypto; // for IE 11
-if (crypto && crypto.getRandomValues) {
-  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
-  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
-  rng = function whatwgRNG() {
-    crypto.getRandomValues(rnds8);
-    return rnds8;
-  };
-}
-
-if (!rng) {
-  // Math.random()-based (RNG)
-  //
-  // If all else fails, use Math.random().  It's fast, but is of unspecified
-  // quality.
-  var rnds = new Array(16);
-  rng = function() {
-    for (var i = 0, r; i < 16; i++) {
-      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-    }
-
-    return rnds;
-  };
-}
-
-module.exports = rng;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
-
-/***/ }),
-
-/***/ 473:
-/***/ (function(module, exports) {
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex;
-  return bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]];
-}
-
-module.exports = bytesToUuid;
-
-
-/***/ }),
-
-/***/ 474:
+/***/ 475:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BurstDifferenceComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_messages_chatChunk__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_messages_chat__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_messages_burst__ = __webpack_require__(287);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_messages_chatChunk__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_messages_chat__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_messages_burst__ = __webpack_require__(291);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3209,7 +1303,7 @@ var BurstDifferenceComponent = (function () {
 
 /***/ }),
 
-/***/ 475:
+/***/ 476:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3217,12 +1311,11 @@ var BurstDifferenceComponent = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_messages_message__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_asset_voicemailPlayer__ = __webpack_require__(466);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_helper_helper__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_asset_Progress__ = __webpack_require__(84);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_services_blobService__ = __webpack_require__(145);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_asset_blobCache__ = __webpack_require__(146);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_messages_message__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_asset_Progress__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_services_blobService__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_asset_blobCache__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_services_fileTransferQueue__ = __webpack_require__(289);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3239,7 +1332,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-
 var EMOJIS = ["💩", "👻", "🤖", "🐋", "🌍"];
 var FILE_DOWNLOAD_DELAY = 500;
 var MessageComponent = (function () {
@@ -3247,18 +1339,6 @@ var MessageComponent = (function () {
         var _this = this;
         this.add = function (arr, attr) {
             return arr.reduce(function (prev, next) { return prev + next[attr]; }, 0);
-        };
-        this.voicemailDuration = function () {
-            if (_this.voicemailPlayer.getDuration() > 0) {
-                return _this.voicemailPlayer.getDuration();
-            }
-            return _this.message.data.voicemails.reduce(function (prev, next) { return prev + next.duration; }, 0);
-        };
-        this.voicemailPosition = function () {
-            if (!_this.voicemailPlayer) {
-                return 0;
-            }
-            return _this.voicemailPlayer.getPosition();
         };
         this.voicemailProgress = function () {
             var message = _this.message;
@@ -3277,52 +1357,30 @@ var MessageComponent = (function () {
         this.voicemailSize = function () {
             return _this.message.data.voicemails.reduce(function (prev, next) { return prev + next.size; }, 0);
         };
-        this.voicemailLoaded = function () {
-            return _this.message.data.voicemails.reduce(function (prev, next) { return prev && next.loaded; }, true);
-        };
         this.downloadFile = function (file) {
-            var loadProgress = new __WEBPACK_IMPORTED_MODULE_5__lib_asset_Progress__["a" /* default */]();
+            var loadProgress = new __WEBPACK_IMPORTED_MODULE_3__lib_asset_Progress__["a" /* default */]();
             file.getProgress = function () { return loadProgress.getProgress(); };
-            __WEBPACK_IMPORTED_MODULE_6__lib_services_blobService__["a" /* default */]
-                .getBlobUrl(file.blobID, loadProgress, file.size)
-                .then(function (url) { return __WEBPACK_IMPORTED_MODULE_7__lib_asset_blobCache__["a" /* default */].copyBlobToDownloads(file.blobID, file.name); })
-                .delay(FILE_DOWNLOAD_DELAY)
-                .then(function (url) {
-                file.loaded = true;
-                file.url = url;
-                return __WEBPACK_IMPORTED_MODULE_7__lib_asset_blobCache__["a" /* default */].getFileMimeType(url).then(function (mimeType) {
-                    return new __WEBPACK_IMPORTED_MODULE_1_bluebird__(function (success, error) {
-                        return window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success: success, error: error });
+            __WEBPACK_IMPORTED_MODULE_6__lib_services_fileTransferQueue__["a" /* queue */].enqueue(1, function () {
+                return __WEBPACK_IMPORTED_MODULE_4__lib_services_blobService__["a" /* default */]
+                    .getBlobUrl(file.blobID, loadProgress, file.size)
+                    .then(function (url) { return __WEBPACK_IMPORTED_MODULE_5__lib_asset_blobCache__["a" /* default */].copyBlobToDownloads(file.blobID, file.name); })
+                    .delay(FILE_DOWNLOAD_DELAY)
+                    .then(function (url) {
+                    file.loaded = true;
+                    file.url = url;
+                    return __WEBPACK_IMPORTED_MODULE_5__lib_asset_blobCache__["a" /* default */].getFileMimeType(url).then(function (mimeType) {
+                        return new __WEBPACK_IMPORTED_MODULE_1_bluebird__(function (success, error) {
+                            return window.cordova.plugins.fileOpener2.showOpenWithDialog(url, mimeType || "", { success: success, error: error });
+                        });
                     });
-                });
-            })
-                .catch(function (e) {
-                return alert(parseInt(e.status, 10) === 9
-                    ? "Could not open file. No app found to open file type for " + file.name
-                    : "Something went wrong trying to load file " + file.name);
-            });
-        };
-        this.downloadVoicemail = __WEBPACK_IMPORTED_MODULE_4__lib_helper_helper__["default"].cacheResult(function () {
-            _this.voicemailDownloadProgress = new __WEBPACK_IMPORTED_MODULE_5__lib_asset_Progress__["a" /* default */]();
-            return _this.message.downloadVoicemail(_this.voicemailDownloadProgress).then(function (files) {
-                return files.forEach(function (file) {
-                    _this.voicemailPlayer.addRecording(file.url, file.duration);
+                })
+                    .catch(function (e) {
+                    delete file.getProgress;
+                    alert(parseInt(e.status, 10) === 9
+                        ? "Could not open file. No app found to open file type for " + file.name
+                        : "Download of file " + file.name + " failed");
                 });
             });
-        });
-        this.voicemailPaused = function () {
-            return _this.voicemailPlayer.isPaused();
-        };
-        this.voicemailPlaying = function () {
-            return _this.voicemailPlayer.isPlaying();
-        };
-        this.playVoicemail = function () {
-            return _this.downloadVoicemail().then(function () {
-                return _this.voicemailPlayer.play();
-            });
-        };
-        this.pauseVoicemail = function () {
-            return _this.voicemailPlayer.pause();
         };
     }
     Object.defineProperty(MessageComponent.prototype, "message", {
@@ -3330,10 +1388,6 @@ var MessageComponent = (function () {
             return this._message;
         },
         set: function (_message) {
-            var voicemails = _message.data.voicemails;
-            if (voicemails && voicemails.length > 0) {
-                this.voicemailPlayer = new __WEBPACK_IMPORTED_MODULE_3__lib_asset_voicemailPlayer__["a" /* default */]([]);
-            }
             this._message = _message;
         },
         enumerable: true,
@@ -3367,7 +1421,7 @@ var MessageComponent = (function () {
     ], MessageComponent.prototype, "message", null);
     MessageComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: "Message",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/topic/message.html"*/'<div *ngIf="message.isBlockedSince()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">\n	<div class="messages__message messages__message-blocked">\n		<span>{{ \'blocked.messageReplacement\' | translate }}</span>\n	</div>\n	<span class="messages__time"></span>\n</div>\n\n<div *ngIf="!message.isBlockedSince()">\n\n	<div *ngIf="message.data.text.length > 0 || message.data.images.length > 0" attr.data-messageid="{{message.data.id}}" class="messages__wrap">\n		<div class="messages__message" [ngClass]="{\'messages__message--emoji-only\': message.data.emojiOnly, \'sending\': !message.hasBeenSent()}">\n			<span whispeerSyntaxify content="{{message.data.text}}" *ngIf="message.data.text"></span>\n			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>\n		</div>\n		<ng-container *ngTemplateOutlet="message_time"></ng-container>\n	</div>\n\n	<div *ngFor="let file of message.data.files" class="messages__wrap">\n		<div class="messages__message message__file" [ngClass]="{\'sending\': !message.hasBeenSent()}">\n			<div class="message__voicemail__actions">\n				<ion-icon *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)" class="message__voicemail__action" name="md-download"></ion-icon>\n				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>\n				<loading-progress\n					*ngIf="(!file.loaded && file.getProgress) || file.sending"\n					backgroundClass="messages__message"\n					foregroundClass="progressIndicator"\n					[progress]="file.getProgress">\n				</loading-progress>\n			</div>\n			<span class="message__file__info">\n				<span class="message__file__name">{{ file.name | filenameLimit: 25 }}</span>\n				<span class="message__file__size" *ngIf="!file.loaded">[{{ formatSize(file.size) }}]</span>\n			</span>\n		</div>\n		<ng-container *ngTemplateOutlet="message_time"></ng-container>\n	</div>\n\n	<div *ngIf="message.data.voicemails && message.data.voicemails.length > 0" class="messages__wrap messages__wrap--file">\n		<div class="messages__message message__voicemail" [ngClass]="{\'sending\': !message.hasBeenSent()}">\n			<div class="message__file__info message__voicemail__info">\n				<div class="message__voicemail__actions">\n					<ion-icon name="md-download" class="message__voicemail__action" *ngIf="!voicemailLoaded() && !voicemailDownloadProgress && message.hasBeenSent()" (click)="downloadVoicemail()"></ion-icon>\n					<ion-icon name="md-play" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPaused() && message.hasBeenSent()" (click)="playVoicemail()"></ion-icon>\n					<loading-progress *ngIf="!voicemailLoaded() && voicemailDownloadProgress"\n						backgroundClass="messages__message"\n						foregroundClass="progressIndicator"\n						[progress]="voicemailProgress"\n					>\n					</loading-progress>\n					<ion-spinner *ngIf="!message.hasBeenSent()" class="message__voicemail__uploadSpinner"></ion-spinner>\n					<ion-icon name="md-pause" class="message__voicemail__action" *ngIf="voicemailLoaded() && voicemailPlaying()" (click)="pauseVoicemail()"></ion-icon>\n				</div>\n				<div class="message__voicemail__player">\n					<ion-icon icon name="stats" class="message__file__memo-play-icon" [ngClass]="{\'message__file__memo-play-icon--active\': voicemailPlaying()}"></ion-icon>&nbsp;\n					<span><span *ngIf="voicemailLoaded()">{{ voicemailPosition() * 1000 | date: \'mm:ss\' }} /&nbsp;</span>{{ voicemailDuration() * 1000 | date: \'mm:ss\' }}&nbsp;</span>\n					<span *ngIf="!voicemailLoaded()" class="message__file__info__size">[{{formatSize(voicemailSize())}}]</span>\n					<div class="message__file__progress" *ngIf="voicemailLoaded() && voicemailPosition() > 0">\n						<div class="message__file__progress__bar" [ngStyle]="{\'width.%\': voicemailPosition() * 100 / voicemailDuration()}"></div>\n						<div class="message__file__progress__icon" [ngStyle]="{\'margin-left.%\': voicemailPosition() * 100 / voicemailDuration()}">\n							<hexagon class="message__file__progress__icon__hex"></hexagon>\n						</div>\n					</div>\n				</div>\n			</div>\n		</div>\n		<ng-container *ngTemplateOutlet="message_time"></ng-container>\n	</div>\n</div>\n\n<ng-template #message_time>\n		<span *ngIf="message.hasBeenSent()" class="messages__time">\n			{{ message.sendTime | date: "shortTime" }}\n		</span>\n		<span *ngIf="!message.hasBeenSent()" class="messages__time messageSpinner">\n			<ion-spinner text-center name="ios-small"></ion-spinner>\n		</span>\n</ng-template>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/topic/message.html"*/
+            selector: "Message",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/topic/message.html"*/'<div *ngIf="message.isBlockedSince()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">\n	<div class="messages__message messages__message-blocked">\n		<span>{{ \'blocked.messageReplacement\' | translate }}</span>\n	</div>\n	<span class="messages__time"></span>\n</div>\n\n<ng-container *ngIf="!message.isBlockedSince()">\n\n	<div *ngIf="message.hasText() || message.hasImages()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">\n		<div class="messages__message last" [ngClass]="{\'messages__message--emoji-only\': message.data.emojiOnly, \'sending\': !message.hasBeenSent()}">\n			<span whispeerSyntaxify content="{{message.data.text}}" *ngIf="message.data.text"></span>\n			<gallery *ngIf="message.data.images && message.data.images.length > 0" [images]="message.data.images"></gallery>\n		</div>\n		<ng-container *ngTemplateOutlet="message_time"></ng-container>\n	</div>\n\n	<div *ngFor="let file of message.data.files; let last = last;" class="messages__wrap">\n		<div class="messages__message message__file" [ngClass]="{\'sending\': !message.hasBeenSent(), \'last\': last}">\n			<div class="message__voicemail__actions">\n				<ion-icon *ngIf="!file.loaded && !file.getProgress" (click)="downloadFile(file)" class="message__voicemail__action" name="md-download"></ion-icon>\n				<ion-icon *ngIf="file.loaded && !file.sending" (click)="downloadFile(file)" class="message__voicemail__action" name="md-document"></ion-icon>\n				<loading-progress\n					*ngIf="(!file.loaded && file.getProgress) || file.sending"\n					backgroundClass="messages__message"\n					foregroundClass="progressIndicator"\n					[progress]="file.getProgress">\n				</loading-progress>\n			</div>\n			<span class="message__file__info">\n				<span class="message__file__name">{{ file.name | filenameLimit: 25 }}</span>\n				<span class="message__file__size" *ngIf="!file.loaded">[{{ formatSize(file.size) }}]</span>\n			</span>\n		</div>\n		<ng-container *ngTemplateOutlet="message_time"></ng-container>\n	</div>\n\n	<div *ngIf="message.hasVoicemail()" class="messages__wrap messages__wrap--file">\n		<div class="messages__message message__voicemail last" [ngClass]="{\'sending\': !message.hasBeenSent()}">\n			<voicemailplayer [voicemails]="message.data.voicemails" [hasBeenSent]="message.hasBeenSent()"></voicemailplayer>\n		</div>\n		<ng-container *ngTemplateOutlet="message_time"></ng-container>\n	</div>\n</ng-container>\n\n<ng-template #message_time>\n		<span *ngIf="message.hasBeenSent()" class="messages__time">\n			{{ message.sendTime | date: "shortTime" }}\n		</span>\n		<ng-container *ngIf="!message.hasBeenSent()">\n			<span *ngIf="message.hasVoicemail() || message.hasFiles()" class="messages__time"> </span>\n			<span *ngIf="!message.hasVoicemail() && !message.hasFiles()" class="messages__time messageSpinner">\n				<ion-spinner text-center name="ios-small"></ion-spinner>\n			</span>\n		</ng-container>\n</ng-template>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/topic/message.html"*/
         }),
         __metadata("design:paramtypes", [])
     ], MessageComponent);
@@ -3378,7 +1432,177 @@ var MessageComponent = (function () {
 
 /***/ }),
 
-/***/ 476:
+/***/ 477:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return VoicemailPlayerComponent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_asset_sizeFormatter__ = __webpack_require__(478);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_asset_voicemailPlayer__ = __webpack_require__(290);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_services_blobService__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_asset_Progress__ = __webpack_require__(65);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+var loadVoicemail = function (voicemail) {
+    var loadProgress = new __WEBPACK_IMPORTED_MODULE_5__lib_asset_Progress__["a" /* default */]();
+    voicemail.loading = true;
+    voicemail.getProgress = function () { return loadProgress.getProgress(); };
+    return __WEBPACK_IMPORTED_MODULE_4__lib_services_blobService__["a" /* default */].getBlobUrl(voicemail.blobID, loadProgress, voicemail.size).then(function (url) {
+        voicemail.url = url;
+        voicemail.loading = false;
+        voicemail.loaded = true;
+        return voicemail;
+    });
+};
+var playBackBlocked = false;
+var VoicemailPlayerComponent = (function () {
+    function VoicemailPlayerComponent(element) {
+        var _this = this;
+        this.element = element;
+        this.hasBeenSent = true;
+        this.startTime = 0;
+        this.seekVal = 0;
+        this.toggle = function () { return _this.isPlaying() ? _this.pause() : _this.play(); };
+        this.downloadable = function () { return !_this.isLoaded() && _this.hasBeenSent; };
+        this.isPlaying = function () { return _this.player ? _this.player.isPlaying() : false; };
+        this.isLoading = function () { return !!_this.voicemails.find(function (_a) {
+            var loading = _a.loading;
+            return loading;
+        }); };
+        this.getProgress = function () { return _this.voicemails.reduce(function (prev, _a) {
+            var getProgress = _a.getProgress;
+            return getProgress ? prev + getProgress() : 0;
+        }, 0) / _this.voicemails.length; };
+        this.getSize = function () { return _this.voicemails.reduce(function (prev, _a) {
+            var size = _a.size;
+            return prev + size;
+        }, 0); };
+        this.isLoaded = function () { return _this.voicemails.reduce(function (prev, _a) {
+            var loaded = _a.loaded;
+            return prev && loaded;
+        }, true); };
+        this.timeUpdate = function (position) {
+            var time = Math.floor(position);
+            var progress = position * 100 / _this.getDuration();
+            var ele = _this.element.nativeElement;
+            var progressBar = ele.querySelector(".vom--progress--bar");
+            if (progressBar instanceof HTMLElement) {
+                progressBar.style.width = Math.round(progress * 10) / 10 + "%";
+            }
+            if (_this.previousTime === time) {
+                return;
+            }
+            _this.previousTime = time;
+            ele.querySelector(".vom--position").innerHTML = _this.formatPosition(time);
+        };
+        this.formatPosition = function (position) {
+            var minutes = Math.floor(position / 60);
+            var seconds = Math.floor(position % 60);
+            var secondsString = ("0" + seconds).substr(-2);
+            return minutes + ":" + secondsString;
+        };
+        this.formatSize = __WEBPACK_IMPORTED_MODULE_2__lib_asset_sizeFormatter__["a" /* formatSize */];
+        this.seekTo = function (position) {
+            if (_this.player) {
+                return _this.player.seekTo(position);
+            }
+            _this.startTime = position;
+            _this.timeUpdate(position);
+        };
+        this.loadAndPlay = function () {
+            var voicemails = _this.voicemails;
+            return __WEBPACK_IMPORTED_MODULE_1_bluebird__["resolve"](voicemails)
+                .map(function (voicemail) { return loadVoicemail(voicemail); })
+                .map(function (_a) {
+                var url = _a.url, duration = _a.duration;
+                return ({ url: url, estimatedDuration: duration });
+            })
+                .then(function (voicemails) { return new __WEBPACK_IMPORTED_MODULE_3__lib_asset_voicemailPlayer__["a" /* default */](voicemails); })
+                .then(function (player) {
+                _this.player = player;
+                _this.player.onPositionUpdateRAF(_this.timeUpdate);
+                _this.player.awaitLoading().then(function () {
+                    _this.player.seekTo(_this.startTime);
+                    _this.player.play();
+                });
+            });
+        };
+        this.play = function () { return _this.player ? _this.player.play() : _this.loadAndPlay(); };
+        this.pause = function () { return _this.player.pause(); };
+        this.getDuration = function () { return _this.player ? _this.player.getDuration() : _this.voicemails.reduce(function (prev, _a) {
+            var duration = _a.duration;
+            return prev + duration;
+        }, 0); };
+    }
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
+        __metadata("design:type", Array)
+    ], VoicemailPlayerComponent.prototype, "voicemails", void 0);
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["E" /* Input */])(),
+        __metadata("design:type", Boolean)
+    ], VoicemailPlayerComponent.prototype, "hasBeenSent", void 0);
+    VoicemailPlayerComponent = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
+            selector: "voicemailplayer",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/topic/voicemailPlayer.html"*/'<ng-container>\n	<div class="vom--icon">\n		<ion-icon name="md-play" *ngIf="!isLoading() && !isPlaying() && hasBeenSent" (click)="play()"></ion-icon>\n		<ion-icon name="md-pause" *ngIf="isPlaying()" (click)="pause()"></ion-icon>\n		<loading-progress *ngIf="isLoading() || !hasBeenSent"\n			backgroundClass="messages__message"\n			foregroundClass="progressIndicator"\n			[progress]="getProgress"\n		>\n		</loading-progress>\n	</div>\n	<div class="vom--info" [ngClass]="{\'vom--playing\': isPlaying()}">\n		<ion-icon icon name="stats"></ion-icon>\n		<span class="vom--position" *ngIf="!downloadable()">0:00</span>\n		<span class="vom--dividor" *ngIf="!downloadable()"> / </span>\n		<span class="vom--duration">{{ formatPosition(getDuration()) }}</span>\n		<span class="vom--size" *ngIf="downloadable()">[{{formatSize(getSize())}}]</span>\n\n		<div class="vom--progress" *ngIf="isLoaded()">\n			<div class="vom--progress--bar"></div>\n		</div>\n	</div>\n</ng-container>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/topic/voicemailPlayer.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */]])
+    ], VoicemailPlayerComponent);
+    return VoicemailPlayerComponent;
+}());
+
+//# sourceMappingURL=voicemailPlayer.js.map
+
+/***/ }),
+
+/***/ 478:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return formatSize; });
+var EMOJIS = ["💩", "👻", "🤖", "🐋", "🌍"];
+var formatSize = function (size) {
+    var emoji = EMOJIS[size % EMOJIS.length];
+    if (size < 1000) {
+        return size + " B";
+    }
+    else if (size < 1000 * 1000) {
+        return Math.round(size / 100) / 10 + " kB";
+    }
+    else if (size < 1000 * 1000 * 1000) {
+        return Math.round(size / (100 * 1000)) / 10 + " MB";
+    }
+    else if (size < 1000 * 1000 * 1000 * 1000) {
+        return Math.round(size / (100 * 1000 * 1000)) / 10 + " GB";
+    }
+    else if (size < 1000 * 1000 * 1000 * 1000 * 1000) {
+        return emoji + " TB";
+    }
+    else {
+        return emoji + " PB";
+    }
+};
+//# sourceMappingURL=sizeFormatter.js.map
+
+/***/ }),
+
+/***/ 479:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3500,7 +1724,7 @@ var SyntaxifyDirective = (function () {
 
 /***/ }),
 
-/***/ 477:
+/***/ 480:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3508,10 +1732,10 @@ var SyntaxifyDirective = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_services_error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_services_blobService__ = __webpack_require__(145);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_services_blobService__ = __webpack_require__(53);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_photo_viewer__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_photo_viewer__ = __webpack_require__(288);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3534,15 +1758,12 @@ var GalleryComponent = (function () {
         this.photoViewer = photoViewer;
         this.previewChunk = 2;
         this.preview = this.previewChunk;
-        this.isLoading = function () {
-            return _this._images.reduce(function (prev, image) { return prev
-                || image.highest && image.highest.loading
+        this.isLoading = function (image) {
+            return image.highest && image.highest.loading
                 || image.middle && image.middle.loading
-                || image.lowest && image.lowest.loading; }, false);
+                || image.lowest && image.lowest.loading;
         };
-        this.getProgress = function () {
-            return 0;
-        };
+        this.getProgress = function () { return 0; };
         this.displayImage = function (image) {
             if (image.upload) {
                 _this.photoViewer.show(image.upload._file.originalUrl);
@@ -3618,7 +1839,7 @@ var GalleryComponent = (function () {
     ], GalleryComponent.prototype, "images", null);
     GalleryComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: "gallery",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/gallery/gallery.html"*/'<div *ngFor="let image of images" [ngClass]="{\'loading\': isLoading() }">\n	<ng-container *ngIf="image.lowest.url">\n		<img class="post-image" *ngIf="!runGif($index)" [src]="image.lowest.url" (click)="displayImage(image)" />\n		<span class="post-image--play fa fa-play fa-2x" *ngIf="image.lowest.gif && !runGif($index)"></span>\n		<div *ngIf="runGif($index)">\n			<img class="post-image" [src]="image.highest.url" *ngIf="!image.highest.loading" />\n			<img class="post-image" [src]="image.lowest.url" *ngIf="image.highest.loading" />\n		</div>\n	</ng-container>\n	<div *ngIf="isLoading()" class="overlay">\n		<ion-spinner text-center name="ios-small"></ion-spinner>\n	</div>\n</div>\n\n<div *ngIf="images.length > preview">\n	<button (click)="loadMoreImages()" ion-button block>Load more images</button>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/gallery/gallery.html"*/
+            selector: "gallery",template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/components/gallery/gallery.html"*/'<div>\n	<ng-container *ngFor="let image of images">\n		<div class="imageContainer" [ngClass]="{\'loading\': isLoading(image) }" *ngIf="image.lowest.url">\n			<img class="post-image" *ngIf="!runGif($index)" [src]="image.lowest.url" (click)="displayImage(image)" />\n			<span class="post-image--play fa fa-play fa-2x" *ngIf="image.lowest.gif && !runGif($index)"></span>\n			<div *ngIf="runGif($index)">\n				<img class="post-image" [src]="image.highest.url" *ngIf="!image.highest.loading" />\n				<img class="post-image" [src]="image.lowest.url" *ngIf="image.highest.loading" />\n			</div>\n			<div *ngIf="isLoading(image)" class="overlay">\n				<ion-spinner text-center name="ios-small"></ion-spinner>\n			</div>\n		</div>\n	</ng-container>\n</div>\n\n<div *ngIf="images.length > preview">\n	<button (click)="loadMoreImages()" ion-button block>Load more images</button>\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/components/gallery/gallery.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["c" /* DomSanitizer */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_photo_viewer__["a" /* PhotoViewer */]])
     ], GalleryComponent);
@@ -3629,19 +1850,19 @@ var GalleryComponent = (function () {
 
 /***/ }),
 
-/***/ 489:
+/***/ 493:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return NewMessagePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__ = __webpack_require__(280);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_messages_messageService__ = __webpack_require__(148);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_messages_chat__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_messages_chatChunk__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_contacts_contactsWithSearch__ = __webpack_require__(462);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ngx_translate_core__ = __webpack_require__(149);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_messages_messageService__ = __webpack_require__(150);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lib_messages_chat__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__lib_messages_chatChunk__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__lib_contacts_contactsWithSearch__ = __webpack_require__(472);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__lib_helper_helper__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_users_userService__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_bluebird__);
@@ -3673,7 +1894,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var friendsService = __webpack_require__(82);
+var friendsService = __webpack_require__(85);
 
 var NewMessagePage = (function (_super) {
     __extends(NewMessagePage, _super);
@@ -3749,6 +1970,9 @@ var NewMessagePage = (function (_super) {
             _this.navCtrl.push("Messages", { chatID: chatID }).then(function () {
                 _this.navCtrl.remove(_this.navCtrl.length() - 2, 1);
             });
+        };
+        _this.closeSearchBar = function ($event) {
+            $event.srcElement.blur();
         };
         _this.ios = platform.is("ios");
         return _this;
