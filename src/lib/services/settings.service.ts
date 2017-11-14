@@ -240,20 +240,21 @@ const loadSettings = (givenSettings: any) => {
 	})
 }
 
+let settings: Settings
+
 class SettingsService extends Observer {
 	api: any;
-	settings: Settings
 
 	constructor() { super() }
 
 	setDefaultLanguage = (language: string) => defaultSettings.uiLanguage = language
 
-	getContent = () => this.settings.getContent()
+	getContent = () => settings.getContent()
 
-	getBranchContent = (branchName: string) => this.settings.getBranch(branchName)
+	getBranchContent = (branchName: string) => settings.getBranch(branchName)
 
 	getBranch = (branchName: string) => {
-		if (!this.settings) {
+		if (!settings) {
 			return defaultSettings[branchName];
 		}
 
@@ -267,7 +268,7 @@ class SettingsService extends Observer {
 	};
 
 	updateBranch = (branchName: string, value: any) => {
-		this.settings.setBranch(branchName, value)
+		settings.setBranch(branchName, value)
 		this.notify("", "updated");
 	}
 
@@ -297,14 +298,14 @@ class SettingsService extends Observer {
 	}
 
 	uploadChangedData = () => {
-		if (!this.settings.isChanged()) {
+		if (!settings.isChanged()) {
 			return Bluebird.resolve(true)
 		}
 
 		const userService = require("users/userService").default;
 		const ownUser = userService.getOwn()
 
-		return this.settings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
+		return settings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
 			.then((settings: any) => socketService.emit("settings.setSettings", { settings }))
 			.then((result: any) => result.success)
 	};
@@ -410,5 +411,5 @@ class SettingsLoader extends MutableObjectLoader<Settings, CachedSettings>({
 
 initService.registerCallback(() =>
 	SettingsLoader.get(sessionService.getUserID())
-		.then((settings) => this.settings = settings)
+		.then((loadedSettings) => settings = loadedSettings)
 )
