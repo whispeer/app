@@ -478,7 +478,9 @@ export class MessagesPage {
 			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
 		}, 100)
 
-		VoicemailPlayer.activePlayer.pause()
+		if (VoicemailPlayer.activePlayer) {
+			VoicemailPlayer.activePlayer.pause()
+		}
 		VoicemailPlayer.setPlaybackBlocked(true)
 	}
 
