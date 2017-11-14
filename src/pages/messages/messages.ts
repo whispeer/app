@@ -945,7 +945,7 @@ export class MessagesPage {
 			return
 		}
 
-		document.querySelector("topicwithbursts .messages__list").addEventListener("scroll", this.onElementInView)
+		document.querySelector(".messages__list").addEventListener("scroll", this.onElementInView)
 	}
 
 	loadMoreMessages = () => {
