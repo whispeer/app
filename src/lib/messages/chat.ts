@@ -672,7 +672,7 @@ export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 	download: (id) =>
 		socketService.definitlyEmit("chat.get", { id }).then((response) => response.chat),
 	load: (chatResponse, previousInstance) => {
-		if (h.deepEqual(previousInstance.getInfo(), chatResponse.chat)) {
+		if (previousInstance && h.deepEqual(previousInstance.getInfo(), chatResponse.chat)) {
 			return Bluebird.resolve(SYMBOL_UNCHANGED)
 		}
 
