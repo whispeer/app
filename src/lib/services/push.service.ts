@@ -6,6 +6,7 @@ import { MessagesPage } from "../../pages/messages/messages";
 
 import * as Bluebird from "bluebird";
 import socketService from "./socket.service";
+import sessionService from "./session.service";
 import { withPrefix } from "./storage.service";
 import errorService from "./error.service";
 
@@ -164,8 +165,12 @@ export class PushService {
 		}
 	};
 
-	unregister = () =>
-		this.pushInstance.unregister()
+	unregister = () => {
+		if (this.pushInstance) {
+			this.pushInstance.unregister()
+			this.pushInstance = null
+		}
+	}
 
 	register = () => {
 		try {

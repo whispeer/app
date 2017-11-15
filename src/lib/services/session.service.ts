@@ -2,13 +2,14 @@ import * as Bluebird from "bluebird"
 
 import Storage from "./Storage";
 import blobCache from "../asset/blobCache"
+import Observer from "../asset/observer"
 import Cache from "../services/Cache"
 import keyStore from "./keyStore.service";
 import { landingPage } from "./location.manager";
 import { withPrefix } from "./storage.service";
 import h from "../helper/helper"
 
-export class SessionService {
+export class SessionService extends Observer {
 	sid: string = "";
 	loggedin: boolean = false;
 	userid: any;
@@ -53,6 +54,8 @@ export class SessionService {
 				return this.clear().thenReturn(false);
 			}
 
+			this.notify(null, "login")
+
 			this.setPassword(this.sessionStorage.get("password"));
 			this.setLoginData(this.sessionStorage.get("sid"), this.sessionStorage.get("userid"));
 
@@ -69,6 +72,7 @@ export class SessionService {
 	isOwnUserID = (id) => parseInt(id, 10) === this.userid
 
 	clear = () => {
+		this.notify(null, "logout")
 		return Bluebird.all([
 			blobCache.clear(),
 			this.sessionStorage.clear(),

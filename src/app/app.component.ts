@@ -109,7 +109,6 @@ export class MyApp {
 			this.statusBar.styleLightContent();
 
 			const pushService = new PushService(this.nav, platform, this.push);
-			pushService.register();
 
 			if(platform.is("ios")) {
 				this.keyboard.disableScroll(true)
@@ -139,8 +138,10 @@ export class MyApp {
 				}
 			})
 
-			sessionService.bootLogin().then((loggedin) => {
+			sessionService.listen(() => pushService.register(), "login")
+			sessionService.listen(() => pushService.unregister(), "logout")
 
+			sessionService.bootLogin().then((loggedin) => {
 				Bluebird.delay(SPLASH_SCREEN_HIDE_DELAY).then(() => this.splashScreen.hide())
 				if (!loggedin && this.nav.length() > 0) {
 					this.nav.remove(0, this.nav.length() - 1)
