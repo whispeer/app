@@ -252,18 +252,19 @@ export class Message {
 			}
 
 			const signAndEncryptPromise = this.securedData.signAndEncrypt(userService.getOwn().getSignKey(), chunkKey)
-			const keys = await this.uploadAttachments(chunkKey)
+			const keys = (await this.uploadAttachments(chunkKey)).map(keyStore.upload.getKey)
 			const request = await signAndEncryptPromise
 
 			if (this.chat.isDraft()) {
 				const {
-					receiverKeys, keys, chunk: initialChunk
+					receiverKeys, keys: chunkKeys, chunk: initialChunk
 				} = chunk.chunkData
+
 				const response = await socket.emit("chat.create", {
 					initialChunk,
 					firstMessage: request,
 					receiverKeys,
-					keys
+					keys: [...chunkKeys, ...keys]
 				});
 
 				const chatInfo = response.chat.chat
@@ -282,7 +283,7 @@ export class Message {
 			const response = await socket.emit("chat.message.create", {
 				chunkID: chunk.getID(),
 				message: request,
-				keys: keys.map(keyStore.upload.getKey)
+				keys
 			})
 
 			if (response.success) {
