@@ -470,6 +470,7 @@ export class MessagesPage {
 		this.recordingInfo.UUID = uuidv4()
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
+
 		this.recordingInfo.startTime = Date.now()
 		this.recordingFile.startRecord()
 
@@ -478,7 +479,9 @@ export class MessagesPage {
 			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
 		}, 100)
 
-		VoicemailPlayer.activePlayer.pause()
+		if (VoicemailPlayer.activePlayer) {
+			VoicemailPlayer.activePlayer.pause()
+		}
 		VoicemailPlayer.setPlaybackBlocked(true)
 	}
 

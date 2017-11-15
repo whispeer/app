@@ -38,8 +38,6 @@ cordova plugin add cordova-plugin-crosswalk-webview
 ionic cordova build --release android
 cp ./platforms/android/build/outputs/apk/android-release-unsigned.apk ./release/whispeer-android4-unsigned.apk
 
-rm -rf platforms plugins www/*
-
 extra=android
 signAndCopy
 

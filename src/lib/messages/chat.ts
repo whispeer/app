@@ -113,7 +113,7 @@ export class Chat extends Observer {
 	getInfo = () => ({
 		id: this.id,
 		unreadMessageIDs: this.unreadMessageIDs,
-		latestMessageID: this.getLatestMessage(),
+		latestMessageID: this.getLatestSentMessage(),
 		latestChunkID: this.getLatestChunk()
 	})
 
@@ -380,6 +380,14 @@ export class Chat extends Observer {
 	getLatestMessage() {
 		if (this.messages.length > 0) {
 			return h.array.last(this.messages).id
+		}
+	}
+
+	getLatestSentMessage() {
+		const messages = this.messages.map(({ id }) => MessageLoader.getLoaded(id)).filter((m) => m.hasBeenSent())
+
+		if (messages.length > 0) {
+			return h.array.last(messages).getClientID()
 		}
 	}
 
