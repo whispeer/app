@@ -470,6 +470,7 @@ export class MessagesPage {
 		this.recordingInfo.UUID = uuidv4()
 
 		this.recordingFile = this.media.create(this.getRecordingFileName())
+
 		this.recordingInfo.startTime = Date.now()
 		this.recordingFile.startRecord()
 
