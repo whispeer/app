@@ -143,8 +143,9 @@ class TrustStoreLoader extends MutableObjectLoader<TrustStore, trustSet>({
 	cacheName: "trustStore"
 }) {}
 
-initService.registerCallback(() => {
-	TrustStoreLoader.get(sessionService.getUserID()).then((trustStore) => trustManager.setTrustStore(trustStore))
-})
+initService.registerCallback(() =>
+	TrustStoreLoader.get(sessionService.getUserID())
+		.then((trustStore) => trustManager.setTrustStore(trustStore))
+)
 
 new TrustService()
