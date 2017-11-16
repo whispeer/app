@@ -138,6 +138,10 @@ export class MyApp {
 				}
 			})
 
+			if (sessionService.isLoggedin()) {
+				pushService.register()
+			}
+
 			sessionService.listen(() => pushService.register(), "login")
 			sessionService.listen(() => pushService.unregister(), "logout")
 

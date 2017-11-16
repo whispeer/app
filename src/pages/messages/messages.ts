@@ -17,6 +17,7 @@ import { TranslateService } from '@ngx-translate/core'
 import ImageUpload from "../../lib/services/imageUpload.service"
 import FileUpload from "../../lib/services/fileUpload.service"
 import errorService from "../../lib/services/error.service";
+import { replaceView } from "../../lib/angularUtils"
 
 import messageService from "../../lib/messages/messageService";
 import ChatLoader, { Chat } from "../../lib/messages/chat"
@@ -977,11 +978,8 @@ export class MessagesPage {
 		const sendPromise = this.chat.sendMessage(text, { images, files, voicemails })
 
 		if (this.chat.isDraft()) {
-			sendPromise.then(() => {
-				this.navCtrl.push("Messages", { chatID: this.chat.getID() }, { animate: false }).then(() => {
-					this.navCtrl.remove(this.navCtrl.length() - 2, 1)
-				})
-			})
+			sendPromise
+				.then(() => replaceView(this.navCtrl, "Messages", { chatID: this.chat.getID() }, 1, { animate: false }))
 		}
 
 		this.chat.newMessage = ""

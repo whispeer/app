@@ -7,6 +7,7 @@ import ChatLoader, { Chat } from "../../lib/messages/chat"
 import ChunkLoader, { Chunk } from "../../lib/messages/chatChunk"
 import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
 import h from "../../lib/helper/helper";
+import { replaceView } from "../../lib/angularUtils"
 
 import userService from "../../lib/users/userService"
 const friendsService = require("../../lib/services/friendsService");
@@ -154,9 +155,7 @@ export class NewMessagePage extends ContactsWithSearch {
 	}
 
 	goToChat = (chatID) => {
-		this.navCtrl.push("Messages", { chatID }).then(() => {
-			this.navCtrl.remove(this.navCtrl.length() - 2, 1)
-		})
+		replaceView(this.navCtrl, "Messages", { chatID })
 	}
 
 	closeSearchBar = ($event) => {
