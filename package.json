@@ -43,7 +43,7 @@
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
       },
       "phonegap-plugin-push": {
-        "SENDER_ID": "809266780938"
+        "FCM_VERSION": "11.0.1"
       }
     }
   },
@@ -111,7 +111,7 @@
     "jquery": "~3.1.0",
     "moment": "^2.18.1",
     "phonegap-plugin-barcodescanner": "~6.0.6",
-    "phonegap-plugin-push": "1.9.1",
+    "phonegap-plugin-push": "^2.1.0",
     "qrious": "^4.0.2",
     "rxjs": "~5.4.0",
     "sjcl": "git+https://github.com/whispeer/sjcl.git#custom-build",

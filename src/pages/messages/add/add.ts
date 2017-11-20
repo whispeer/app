@@ -5,6 +5,7 @@ import { Platform, NavController, NavParams, IonicPage, Searchbar } from "ionic-
 const contactsService = require("../../../lib/services/friendsService");
 const initService = require("../../../lib/services/initService")
 
+import { replaceView } from "../../../lib/angularUtils"
 import ChatLoader, { Chat } from "../../../lib/messages/chat"
 
 import { ContactsWithSearch } from "../../../lib/contacts/contactsWithSearch"
@@ -121,9 +122,7 @@ export class AddPage extends ContactsWithSearch {
 		}).then((data) => {
 			return this.chat.addReceivers(data)
 		}).then(() => {
-			this.navCtrl.push("Chat Details", { chatID: this.chat.getID() }).then(() => {
-				this.navCtrl.remove(this.navCtrl.length() - 3, 2)
-			})
+			replaceView(this.navCtrl, "Chat Details", { chatID: this.chat.getID() }, 2)
 		});
 	}
 
