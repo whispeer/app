@@ -2,7 +2,7 @@ const APIVERSION = "0.0.3";
 
 const debug = require("debug");
 import h from "../helper/helper";
-import { connect } from "socket.io-client";
+import SocketIOClient, { connect } from "socket.io-client"; // tslint:disable-line:no-unused-variable
 
 const config = require('../config.js');
 import * as Bluebird from "bluebird";
@@ -12,6 +12,7 @@ import BlobUploader from "./blobUploader.service"
 import { goToBusinessVersion, isBusinessVersion } from "./location.manager";
 
 const socketDebug = debug("whispeer:socket");
+const blobSocketDebug = debug("whispeerBlob:any");
 const socketError = debug("whispeer:socket:error");
 
 export const DisconnectError = h.createErrorType("disconnectedError");
@@ -167,12 +168,17 @@ class SocketService extends Observer {
 			throw new DisconnectError("no connection");
 		}
 
-		var timer = log.timer("request on " + channel);
+		const timer = log.timer("request on " + channel);
+		const isBlobRequest = channel.indexOf("blob") === 0
 
 		request.version = APIVERSION;
 		request.clientInfo = CLIENT_INFO;
 
-		socketDebug("Request on " + channel, request);
+		if (isBlobRequest) {
+			blobSocketDebug("Request on " + channel, request);
+		} else {
+			socketDebug("Request on " + channel, request);
+		}
 
 		this._interceptors.forEach(function (interceptor) {
 			if (interceptor.transformRequest) {
@@ -184,7 +190,12 @@ class SocketService extends Observer {
 		this.notify(null, "request");
 
 		return this._emit(channel, request).timeout(SOCKET_TIMEOUT).then((response) => {
-			socketDebug("Answer on " + channel, response);
+			if (isBlobRequest) {
+				blobSocketDebug("Answer on " + channel, response);
+			} else {
+				socketDebug("Answer on " + channel, response);
+			}
+
 			log.timerEnd(timer);
 
 			if (response.alert) {

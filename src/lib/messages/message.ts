@@ -2,7 +2,7 @@ import * as Bluebird from "bluebird"
 
 const userService = require("users/userService").default
 const keyStore = require("services/keyStore.service").default
-const SecuredData = require("asset/securedDataWithMetaData")
+import SecuredDataApi, { SecuredData } from "../asset/securedDataWithMetaData"
 
 import h from "../helper/helper"
 import socket from "../services/socket.service"
@@ -30,7 +30,7 @@ export class Message {
 	private serverID: number
 	private clientID: any
 	private previousID: any
-	private securedData: any
+	private securedData: SecuredData
 	private attachments: attachments
 
 	private sendTime: number
@@ -62,7 +62,7 @@ export class Message {
 
 		this.sendTime = h.parseDecimal(server.sendTime)
 
-		this.securedData = SecuredData.createRaw(content, meta, { type: "message" })
+		this.securedData = new SecuredData(content, meta, { type: "message" }, true)
 
 		this.setDefaultData()
 
@@ -152,7 +152,7 @@ export class Message {
 		])
 	}
 
-	static setAttachmentsInfo = (securedData, attachments: attachments) => {
+	static setAttachmentsInfo = (securedData: SecuredData, attachments: attachments) => {
 		return Bluebird.try(async function () {
 			const imagesInfo = await Message.prepare(attachments.images)
 			const voicemailsInfo = await Message.prepare(attachments.voicemails)
@@ -251,7 +251,7 @@ export class Message {
 				this.securedData.setAfterRelationShip(newest.getSecuredData())
 			}
 
-			const signAndEncryptPromise = this.securedData._signAndEncrypt(userService.getOwn().getSignKey(), chunkKey)
+			const signAndEncryptPromise = this.securedData.signAndEncrypt(userService.getOwn().getSignKey(), chunkKey)
 			const keys = (await this.uploadAttachments(chunkKey)).map(keyStore.upload.getKey)
 			const request = await signAndEncryptPromise
 
@@ -428,9 +428,7 @@ export class Message {
 	}
 
 	static createRawSecuredData(message, meta, chunk?: Chunk) {
-		const secured = SecuredData.createRaw({ message }, meta, {
-			type: "message",
-		})
+		const secured = new SecuredData({ message }, meta, { type: "message" }, true)
 
 		if (chunk) {
 			secured.setParent(chunk.getSecuredData())
@@ -465,11 +463,11 @@ const loadMessageSender = senderID =>
 export default class MessageLoader extends ObjectLoader<Message, MessageCache>({
 	cacheName: "message",
 	getID: ({ server }) => server.uuid,
-	download: id => socket.emit("chat.message.get", { id }),
+	download: id => socket.definitlyEmit("chat.message.get", { id }),
 	load: (messageResponse): Bluebird<MessageCache> => {
 		const { content, meta, server } = messageResponse
 
-		const securedData = SecuredData.load(content, meta, { type: "message" })
+		const securedData = SecuredDataApi.load(content, meta, { type: "message" })
 		const senderID = server.sender
 
 		// !! Typescript is broken for async arrow functions without a this context !!

@@ -115,6 +115,8 @@ export class HomePage {
 			this.moreTopicsAvailable = !messageService.allChatsLoaded
 			this.chatsLoading = false
 
+			console.timeEnd("Spinner on Home")
+
 			this.numberOfChatsToDisplay = CHATS_PER_SCREEN
 		}).catch(errorService.criticalError);
 	}
