@@ -59,7 +59,6 @@ export default class Enum {
 	};
 
 	symbols(): InternalSymbol[] {
-		debugger
 		return Object.keys(this).map((key) => this[key])
 	};
 
