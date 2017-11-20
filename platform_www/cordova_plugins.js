@@ -365,7 +365,7 @@ module.exports.metadata =
   "cordova-plugin-whitelist": "1.3.3",
   "ionic-plugin-keyboard": "2.2.1",
   "phonegap-plugin-barcodescanner": "6.0.8",
-  "phonegap-plugin-push": "1.9.1"
+  "phonegap-plugin-push": "2.1.0"
 };
 // BOTTOM OF METADATA
 });

@@ -2,6 +2,5 @@
 platform :ios, '8.0'
 target 'whispeer Messenger' do
 	project 'whispeer Messenger.xcodeproj'
-	pod 'GoogleCloudMessaging', '~> 1.2.0'
-	pod 'GGLInstanceID', '~> 1.2.1'
+	pod 'FirebaseMessaging', '~> 2.0.0'
 end

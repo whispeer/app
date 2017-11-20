@@ -1,14 +1,8 @@
 {
-    "GoogleCloudMessaging": {
-        "name": "GoogleCloudMessaging",
+    "FirebaseMessaging": {
+        "name": "FirebaseMessaging",
         "type": "podspec",
-        "spec": "~> 1.2.0",
-        "count": 1
-    },
-    "GGLInstanceID": {
-        "name": "GGLInstanceID",
-        "type": "podspec",
-        "spec": "~> 1.2.1",
+        "spec": "~> 2.0.0",
         "count": 1
     }
 }
