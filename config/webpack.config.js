@@ -13,7 +13,7 @@ const commit = require("child_process")
 	.execSync("git rev-parse --short HEAD")
 	.toString();
 
-module.exports = {
+const config = {
 	entry: process.env.IONIC_APP_ENTRY_POINT,
 	output: {
 		path: "{{BUILD}}",
@@ -92,3 +92,8 @@ module.exports = {
 		tls: "empty"
 	}
 };
+
+module.exports = {
+  dev: config,
+  prod: config
+}
