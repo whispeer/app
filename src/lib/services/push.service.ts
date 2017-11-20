@@ -3,6 +3,7 @@ import { Push, PushObject } from '@ionic-native/push';
 import { NavController, Platform } from "ionic-angular";
 
 import { MessagesPage } from "../../pages/messages/messages";
+import { replaceView } from "../angularUtils"
 
 import * as Bluebird from "bluebird";
 import socketService from "./socket.service";
@@ -97,8 +98,7 @@ export class PushService {
 				return;
 			}
 
-			const index = this.navCtrl.getActive().index;
-			this.navCtrl.remove(index);
+			return replaceView(this.navCtrl, "Messages", { chatID })
 		}
 
 		return this.navCtrl.push("Messages", { chatID });
@@ -164,8 +164,12 @@ export class PushService {
 		}
 	};
 
-	unregister = () =>
-		this.pushInstance.unregister()
+	unregister = () => {
+		if (this.pushInstance) {
+			this.pushInstance.unregister()
+			this.pushInstance = null
+		}
+	}
 
 	register = () => {
 		try {

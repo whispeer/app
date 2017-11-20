@@ -16,11 +16,11 @@ import ChatListLoader from "../messages/chatList"
 
 new Cache("messageSend").deleteAll()
 
-var messageService;
-
 let activeChat = 0
 
-messageService = {
+const messageService = {
+	notify: <any> null,
+	allChatsLoaded: false,
 	prependChatID: function (chatID) {
 		if (!ChatListLoader.isLoaded(sessionService.getUserID())) {
 			return
@@ -121,12 +121,12 @@ messageService = {
 			});
 		});
 	},
-	getChat: function (chatID, cb) {
+	getChat: function (chatID, cb?) {
 		return Bluebird.try(function () {
 			return ChatLoader.get(chatID);
 		}).nodeify(cb);
 	},
-	getUserChat: function (uid, cb) {
+	getUserChat: function (uid, cb?) {
 		return initService.awaitLoading().then(function () {
 			return socket.definitlyEmit("chat.getChatWithUser", {
 				userID: uid

@@ -36,6 +36,7 @@
         <splash density="port-xhdpi" src="resources/android/splash/drawable-port-xhdpi-screen.png" />
         <splash density="port-xxhdpi" src="resources/android/splash/drawable-port-xxhdpi-screen.png" />
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
+        <resource-file src="google-services.json" target="google-services.json" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
@@ -128,7 +129,7 @@
         <variable name="CAMERA_USAGE_DESCRIPTION" value="whispeer needs access to your Camera to allow you to take Photos directly from the app." />
         <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value="whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts." />
     </plugin>
-    <plugin name="phonegap-plugin-push" spec="1.9.1">
-        <variable name="SENDER_ID" value="809266780938" />
+    <plugin name="phonegap-plugin-push" spec="^2.1.0">
+        <variable name="FCM_VERSION" value="11.0.1" />
     </plugin>
 </widget>
