@@ -54,6 +54,13 @@ const prodLoaders = [
 				loader: process.env.IONIC_WEBPACK_LOADER
 			}
 		]
+	}, {
+		test: /\.js$/,
+		exclude: /(node_modules|bower_components)/,
+		loader: "babel-loader"
+	}, {
+		test: /\.svg$/,
+		use: "raw-loader"
 	}
 ];
 
