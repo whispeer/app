@@ -1,212 +1,20 @@
 webpackJsonp([12],{
 
-/***/ 101:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UpdateEvent; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_error_service__ = __webpack_require__(30);
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
-
-
-
-
-// What do we want to achieve and how:
-// - Group multiple requests together -> download can do that for itself
-// - Add cache info so server does not resend full data (esp. for trustManager) -> activeInstance
-// - merge new and active -> restore has active and response
-// - cache first then update
-var UpdateEvent;
-(function (UpdateEvent) {
-    UpdateEvent[UpdateEvent["wake"] = 0] = "wake";
-    UpdateEvent[UpdateEvent["blink"] = 1] = "blink";
-})(UpdateEvent || (UpdateEvent = {}));
-var LONG_APP_PAUSE = 2 * 60 * 1000;
-var LONG_DISCONNECT = 60 * 1000;
-function createLoader(_a) {
-    var download = _a.download, load = _a.load, restore = _a.restore, getID = _a.getID, cacheName = _a.cacheName, shouldUpdate = _a.shouldUpdate;
-    var loading = {};
-    var byId = {};
-    var cache = new __WEBPACK_IMPORTED_MODULE_2__services_Cache__["default"](cacheName);
-    var considerLoaded = function (id) {
-        loading = __assign({}, loading);
-        delete loading[id];
-    };
-    var cacheInMemory = function (id, instance, lastUpdated) {
-        byId = __assign({}, byId, (_a = {}, _a[id] = { instance: instance, lastUpdated: lastUpdated, updating: false }, _a));
-        var _a;
-    };
-    var loadFromCache = function (id) {
-        var lastUpdated = Date.now();
-        return cache.get(id)
-            .then(function (cacheResponse) {
-            lastUpdated = cacheResponse.created;
-            return cacheResponse.data;
-        })
-            .then(function (cachedData) { return restore(cachedData, null); })
-            .then(function (instance) {
-            cacheInMemory(id, instance, lastUpdated);
-            considerLoaded(id);
-            scheduleInstanceUpdate(UpdateEvent.wake, id);
-            return instance;
-        });
-    };
-    var serverResponseToInstance = function (response, id, activeInstance) {
-        return load(response, activeInstance)
-            .then(function (cacheableData) { return cache.store(id, cacheableData).thenReturn(cacheableData); })
-            .then(function (cachedData) { return restore(cachedData, activeInstance); })
-            .then(function (instance) {
-            if (activeInstance && activeInstance !== instance) {
-                console.warn("Restore should update active instance");
-            }
-            cacheInMemory(id, instance, Date.now());
-            return instance;
-        })
-            .finally(function () { return considerLoaded(id); });
-    };
-    var updateInstance = function (id, instance) {
-        return download(id, instance).then(function (response) {
-            return serverResponseToInstance(response, id, instance);
-        });
-    };
-    var scheduleInstanceUpdate = function (event, id) {
-        var _a = byId[id], instance = _a.instance, lastUpdated = _a.lastUpdated, updating = _a.updating;
-        if (updating) {
-            console.info("Not updating instance because update is already running " + cacheName + "/" + id);
-            return;
-        }
-        byId[id].updating = true;
-        shouldUpdate(event, instance, lastUpdated).then(function (shouldUpdate) {
-            if (shouldUpdate) {
-                console.info("Schedule " + cacheName + " instance " + id + " update with event " + UpdateEvent[event]);
-                return updateInstance(id, instance).then(function () {
-                    return byId[id].lastUpdated = Date.now();
-                });
-            }
-        }).catch(__WEBPACK_IMPORTED_MODULE_3__services_error_service__["default"].criticalError).finally(function () { return byId[id].updating = false; });
-        return;
-    };
-    var scheduleInstancesUpdate = function (event) {
-        console.info("Schedule " + cacheName + " instances update with event " + UpdateEvent[event]);
-        Object.keys(byId)
-            .forEach(function (id) { return scheduleInstanceUpdate(event, id); });
-    };
-    var lastHeartbeat = Date.now();
-    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].listen(function () { return lastHeartbeat = Date.now(); }, "heartbeat");
-    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].on("connect", function () {
-        console.info("connect at " + Date.now() + " after " + (Date.now() - lastHeartbeat));
-        if (Date.now() - lastHeartbeat > LONG_DISCONNECT) {
-            scheduleInstancesUpdate(UpdateEvent.wake);
-        }
-        else {
-            scheduleInstancesUpdate(UpdateEvent.blink);
-        }
-        lastHeartbeat = Date.now();
-    });
-    var pauseStarted = 0;
-    document.addEventListener("pause", function () { return pauseStarted = Date.now(); }, false);
-    document.addEventListener("resume", function () {
-        console.info("ended pause at " + Date.now() + " after " + (Date.now() - pauseStarted));
-        if (Date.now() - pauseStarted > LONG_APP_PAUSE) {
-            scheduleInstancesUpdate(UpdateEvent.wake);
-        }
-        else {
-            scheduleInstancesUpdate(UpdateEvent.blink);
-        }
-    }, false);
-    return _b = (function () {
-            function ObjectLoader() {
-            }
-            ObjectLoader.getLoaded = function (id) {
-                if (!ObjectLoader.isLoaded(id)) {
-                    throw new Error("Not yet loaded: " + id);
-                }
-                return byId[id].instance;
-            };
-            ObjectLoader.isLoaded = function (id) {
-                return byId.hasOwnProperty(id);
-            };
-            ObjectLoader.load = function (source) {
-                var id = getID(source);
-                if (byId[id]) {
-                    serverResponseToInstance(source, id, byId[id].instance);
-                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
-                }
-                if (!loading[id]) {
-                    loading = __assign({}, loading, (_a = {}, _a[id] = loadFromCache(id)
-                        .catch(function () { return serverResponseToInstance(source, id, null); }), _a));
-                }
-                return loading[id];
-                var _a;
-            };
-            ObjectLoader.updateCache = function (id, cacheableData) {
-                return cache.store(id, cacheableData);
-            };
-            // Throws
-            ObjectLoader.getFromCache = function (id) {
-                if (byId[id]) {
-                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
-                }
-                return loadFromCache(id);
-            };
-            ObjectLoader.get = function (id) {
-                if (typeof id === "undefined" || id === null) {
-                    throw new Error("Can't get object with id " + id + " - " + cacheName);
-                }
-                if (byId[id]) {
-                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
-                }
-                if (!loading[id]) {
-                    var promise = loadFromCache(id)
-                        .catch(function () { return download(id, null).then(function (response) { return serverResponseToInstance(response, id, null); }); });
-                    loading = __assign({}, loading, (_a = {}, _a[id] = promise, _a));
-                }
-                return loading[id];
-                var _a;
-            };
-            return ObjectLoader;
-        }()),
-        _b.getAll = function () {
-            return byId;
-        },
-        _b.removeLoaded = function (id) { return delete byId[id]; },
-        _b.addLoaded = function (id, obj) {
-            byId[id] = { instance: obj, lastUpdated: Date.now(), updating: false };
-        },
-        _b;
-    var _b;
-}
-/* harmony default export */ __webpack_exports__["b"] = (createLoader);
-//# sourceMappingURL=mutableObjectLoader.js.map
-
-/***/ }),
-
-/***/ 11:
+/***/ 10:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DisconnectError", function() { return DisconnectError; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ServerError", function() { return ServerError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_socket_io_client__ = __webpack_require__(324);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_socket_io_client__ = __webpack_require__(337);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_socket_io_client___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_socket_io_client__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobUploader_service__ = __webpack_require__(346);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__location_manager__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobUploader_service__ = __webpack_require__(359);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__location_manager__ = __webpack_require__(49);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -220,13 +28,14 @@ var __extends = (this && this.__extends) || (function () {
 var APIVERSION = "0.0.3";
 var debug = __webpack_require__(15);
 
-
-var config = __webpack_require__(56);
+ // tslint:disable-line:no-unused-variable
+var config = __webpack_require__(61);
 
 
 
 
 var socketDebug = debug("whispeer:socket");
+var blobSocketDebug = debug("whispeerBlob:any");
 var socketError = debug("whispeer:socket:error");
 var DisconnectError = __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].createErrorType("disconnectedError");
 var ServerError = __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].createErrorType("serverError");
@@ -349,9 +158,15 @@ var SocketService = (function (_super) {
             throw new DisconnectError("no connection");
         }
         var timer = log.timer("request on " + channel);
+        var isBlobRequest = channel.indexOf("blob") === 0;
         request.version = APIVERSION;
-        request.clientInfo = {"type":"messenger","version":"0.3.9","commit":"68a865d\n"};
-        socketDebug("Request on " + channel, request);
+        request.clientInfo = {"type":"messenger","version":"0.3.10","commit":"b82f06c\n"};
+        if (isBlobRequest) {
+            blobSocketDebug("Request on " + channel, request);
+        }
+        else {
+            socketDebug("Request on " + channel, request);
+        }
         this._interceptors.forEach(function (interceptor) {
             if (interceptor.transformRequest) {
                 request = interceptor.transformRequest(request);
@@ -360,7 +175,12 @@ var SocketService = (function (_super) {
         this._loading++;
         this.notify(null, "request");
         return this._emit(channel, request).timeout(SOCKET_TIMEOUT).then(function (response) {
-            socketDebug("Answer on " + channel, response);
+            if (isBlobRequest) {
+                blobSocketDebug("Answer on " + channel, response);
+            }
+            else {
+                socketDebug("Answer on " + channel, response);
+            }
             log.timerEnd(timer);
             if (response.alert) {
                 alert(response.alert);
@@ -447,22 +267,355 @@ var SocketService = (function (_super) {
 
 /***/ }),
 
-/***/ 150:
+/***/ 107:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var h = __webpack_require__(6).default;
+var config = __webpack_require__(61);
+var Observer = __webpack_require__(16);
+var keyStore = __webpack_require__(28);
+var chelper = __webpack_require__(160);
+var Bluebird = __webpack_require__(3);
+var loaded = false,
+    changed = false,
+    isLoaded = {};
+
+isLoaded.promise = new Bluebird(function (resolve) {
+	isLoaded.promiseResolve = resolve;
+});
+
+function dataSetToHash(signature, hash, key) {
+	var data = {
+		signature: chelper.bits2hex(signature),
+		signatureHash: chelper.bits2hex(hash),
+		key: key
+	};
+
+	return keyStore.hash.hashObjectOrValueHex(data, config.hashVersion);
+}
+
+/*
+	user:  signedKeys, signedFriendList, profile
+	me: circle, trustManager, settings
+	message: topic, message
+	post: post, comment
+
+	noCache: friendShip, removeFriend
+*/
+
+var types = {
+	me: {
+		maxCount: -1,
+		saveID: true
+	},
+	user: {
+		maxCount: 500,
+		saveID: true
+	},
+	post: {
+		maxCount: 100,
+		saveID: false
+	}
+};
+
+var cacheTypes = {
+	signatureCache: "noCache",
+
+	signedFriendList: "user",
+
+	circle: "me",
+	trustManager: "noCache",
+	settings: "noCache",
+
+	topicUpdate: "noCache",
+
+	post: "post",
+	postPrivate: "post",
+
+	topic: "noCache",
+	message: "noCache",
+
+	profile: "noCache",
+	signedKeys: "noCache",
+
+	comment: "noCache",
+	friendShip: "noCache",
+	removeFriend: "noCache"
+};
+
+var Database = function Database(type, options) {
+	this._type = type;
+
+	this._maxCount = options.maxCount;
+	this._saveID = options.saveID;
+
+	this._signatures = {};
+};
+
+Database.prototype.getType = function () {
+	return this._type;
+};
+
+Database.prototype.getCacheEntry = function (id) {
+	var entry = {};
+	if (this._maxCount > -1) {
+		entry.date = new Date().getTime();
+	}
+
+	if (this._saveID && id) {
+		entry.id = id;
+	}
+
+	return entry;
+};
+
+Database.prototype.allEntries = function () {
+	return this.allSignatures().map(function (signatureHash) {
+		var entry = h.deepCopyObj(this.getEntry(signatureHash));
+		entry.signatureHash = signatureHash;
+		return entry;
+	}, this);
+};
+
+Database.prototype.getEntry = function (signatureHash) {
+	return this._signatures[signatureHash];
+};
+
+Database.prototype.joinEntries = function (entries) {
+	entries.forEach(function (entry) {
+		var signatureHash = entry.signatureHash;
+
+		delete entry.signatureHash;
+
+		if (!this._signatures[signatureHash]) {
+			this._signatures[signatureHash] = entry;
+		}
+	}, this);
+};
+
+Database.prototype.deleteByID = function (id) {
+	if (!this._saveID || !id) {
+		return;
+	}
+
+	this.allEntries().filter(function (entry) {
+		return entry.id === id;
+	}).forEach(function (entry) {
+		this.deleteEntry(entry.signatureHash);
+	}, this);
+};
+
+Database.prototype.deleteEntry = function (signatureHash) {
+	delete this._signatures[signatureHash];
+};
+
+Database.prototype.addSignature = function (signature, hash, key, id) {
+	if (!h.isRealID(key) || !h.isSignature(chelper.bits2hex(signature))) {
+		throw new Error("invalid input");
+	}
+
+	var sHash = dataSetToHash(signature, hash, key);
+
+	changed = true;
+
+	this.deleteByID(id);
+	this._signatures[sHash] = this.getCacheEntry(id);
+
+	this.cleanUp();
+};
+
+Database.prototype.hasEntry = function (signatureHash) {
+	if (this._signatures[signatureHash]) {
+		return true;
+	}
+
+	return false;
+};
+
+Database.prototype.hasSignature = function (signature, hash, key) {
+	var sHash = dataSetToHash(signature, hash, key);
+	return this.hasEntry(sHash);
+};
+
+Database.prototype.cleanUp = function () {
+	if (this._maxCount === -1) {
+		return;
+	}
+
+	var entries = this.allEntries();
+	if (entries.length <= this._maxCount) {
+		return;
+	}
+
+	console.log("Cleaning up database of type " + this._type + " (" + entries.length + ")");
+
+	entries.sort(function (a, b) {
+		return a.date - b.date;
+	});
+
+	entries.slice(0, entries.length - this._maxCount).forEach(function (entry) {
+		this.deleteEntry(entry.signatureHash);
+	}, this);
+};
+
+Database.prototype.allSignatures = function () {
+	return Object.keys(this._signatures);
+};
+
+var allDatabases = [];
+h.objectEach(types, function (name, val) {
+	types[name] = new Database(name, val);
+	allDatabases.push(types[name]);
+});
+
+var signatureCache = {
+	awaitLoading: function awaitLoading() {
+		return isLoaded.promise;
+	},
+	/**
+  * Has the signature cache changed? (was a signature added/removed?)
+  */
+	isChanged: function isChanged() {
+		return changed;
+	},
+	resetChanged: function resetChanged() {
+		changed = false;
+	},
+	isLoaded: function isLoaded() {
+		return loaded;
+	},
+	/**
+  * Load a given signature cache
+  * @param signatureCacheData signature cache data to load.
+  * @param ownKey own signing key
+  */
+	load: function load(signatureCacheData, ownKey) {
+		if (signatureCacheData.internalHashVersion !== config.hashVersion) {
+			console.warn("resetting signature cache to upgrade to new hash version");
+			signatureCache.initialize(ownKey);
+
+			return;
+		}
+
+		if (signatureCacheData.me !== ownKey) {
+			console.warn("not my signature cache");
+			signatureCache.initialize(ownKey);
+
+			return;
+		}
+
+		signatureCacheData.databases.forEach(function (db) {
+			if (!types[db.type]) {
+				return;
+			}
+
+			types[db.type].joinEntries(db.entries);
+		});
+
+		signatureCache.initialize(ownKey);
+	},
+	/**
+  * Initialize cache
+  * @param ownKey id of the own sign key
+  */
+	initialize: function initialize() {
+		loaded = true;
+
+		isLoaded.promiseResolve();
+	},
+	/**
+  * Get the signed updated version of this signature cache
+  */
+	getUpdatedVersion: function getUpdatedVersion() {
+		if (!loaded) {
+			return Bluebird.reject("Signature Cache not yet loaded!");
+		}
+
+		var databases = allDatabases.map(function (db) {
+			return {
+				type: db.getType(),
+				entries: db.allEntries()
+			};
+		});
+
+		var data = {
+			internalHashVersion: config.hashVersion,
+			databases: databases
+		};
+
+		return Bluebird.resolve(data);
+	},
+	/**
+  * Check if a signature is in the cache
+  * @param signature the signature to check for
+  * @param hash hash that was signed
+  * @param key key that was used to sign the signature
+  */
+	isValidSignatureInCache: function isValidSignatureInCache(signature, hash, key) {
+		var sHash = dataSetToHash(signature, hash, key);
+
+		return allDatabases.filter(function (database) {
+			return database.hasEntry(sHash);
+		}).length > 0;
+	},
+	/**
+  * Add a valid signature to the cache.
+  * @param signature the signature to add
+  * @param hash the hash that was signed by the signature
+  * @param key the key used to verify the signature
+  * @param type type of the signed object
+  * @param (id) id of the signed object
+  */
+	addValidSignature: function addValidSignature(signature, hash, key, type, id) {
+		if (!h.isRealID(key) || !h.isSignature(chelper.bits2hex(signature))) {
+			throw new Error("invalid input");
+		}
+
+		var reducedType = cacheTypes[type];
+
+		if (!reducedType) {
+			console.warn("unknown type: " + type);
+			return;
+		}
+
+		if (reducedType === "noCache") {
+			return;
+		}
+
+		if (id) {
+			id = type + "-" + id;
+		}
+
+		var db = types[reducedType];
+		db.addSignature(signature, hash, key, id);
+	}
+};
+
+Observer.extend(signatureCache);
+
+module.exports = signatureCache;
+
+/***/ }),
+
+/***/ 157:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_session_service__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__messages_chatChunk__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__messages_chat__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__messages_message__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__messages_chatList__ = __webpack_require__(419);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_error_service__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_Cache__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_session_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__messages_chatChunk__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__messages_chat__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__messages_message__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__messages_chatList__ = __webpack_require__(445);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -505,15 +658,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 
 
 
-var initService = __webpack_require__(22);
+var initService = __webpack_require__(20);
 
 
 
 
 new __WEBPACK_IMPORTED_MODULE_5__services_Cache__["default"]("messageSend").deleteAll();
-var messageService;
 var activeChat = 0;
-messageService = {
+var messageService = {
+    notify: null,
+    allChatsLoaded: false,
     prependChatID: function (chatID) {
         if (!__WEBPACK_IMPORTED_MODULE_10__messages_chatList__["a" /* default */].isLoaded(__WEBPACK_IMPORTED_MODULE_6__services_session_service__["default"].getUserID())) {
             return;
@@ -656,15 +810,104 @@ initService.awaitLoading().then(function () {
 
 /***/ }),
 
-/***/ 152:
+/***/ 159:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return replaceView; });
+var replaceView = function (navCtrl, view, params, count, options) {
+    if (count === void 0) { count = 1; }
+    navCtrl.push(view, params, options).then(function () {
+        navCtrl.remove(navCtrl.length() - count - 1, count);
+    });
+};
+//# sourceMappingURL=angularUtils.js.map
+
+/***/ }),
+
+/***/ 16:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extend", function() { return extend; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+
+
+var afterHooks = [];
+var Observer = (function () {
+    function Observer() {
+        this._listeners = {};
+        this._listenersOnce = {};
+    }
+    Observer.addAfterHook = function (listener) {
+        afterHooks.push(listener);
+    };
+    ;
+    Observer.prototype.listenOnce = function (fn, type) {
+        type = type || "any";
+        if (typeof this._listenersOnce[type] === "undefined") {
+            this._listenersOnce[type] = [];
+        }
+        this._listenersOnce[type].push(fn);
+    };
+    Observer.prototype.listenPromise = function (type) {
+        var that = this;
+        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
+            that.listenOnce(resolve, type);
+        });
+    };
+    Observer.prototype.listen = function (fn, type) {
+        type = type || "any";
+        if (typeof this._listeners[type] === "undefined") {
+            this._listeners[type] = [];
+        }
+        this._listeners[type].push(fn);
+    };
+    Observer.prototype.notify = function (data, type, returnF) {
+        type = type || "any";
+        if (!returnF) {
+            returnF = function () { };
+        }
+        var listeners = this._listeners[type] || [];
+        var listenersOnce = this._listenersOnce[type] || [];
+        var subscribers = (listeners).concat(listenersOnce);
+        this._listenersOnce[type] = [];
+        var result = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].callEach(subscribers, [data], returnF);
+        if (type !== "any") {
+            result = returnF(this.notify(data), result);
+        }
+        __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].callEach(afterHooks);
+        return result;
+    };
+    Observer.extend = function (obj) {
+        var internalObserver = new Observer();
+        obj.notify = internalObserver.notify.bind(internalObserver);
+        obj.listenOnce = internalObserver.listenOnce.bind(internalObserver);
+        obj.listenPromise = internalObserver.listenPromise.bind(internalObserver);
+        obj.listen = internalObserver.listen.bind(internalObserver);
+    };
+    return Observer;
+}());
+/* harmony default export */ __webpack_exports__["default"] = (Observer);
+var extend = function (obj) {
+    Observer.extend(obj);
+};
+//# sourceMappingURL=observer.js.map
+
+/***/ }),
+
+/***/ 160:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var sjcl = __webpack_require__(43);
-var h = __webpack_require__(5).default;
-var errors = __webpack_require__(48);
+var sjcl = __webpack_require__(45);
+var h = __webpack_require__(6).default;
+var errors = __webpack_require__(42);
 var helper = {
     hash: function hash(text) {
         return helper.bits2hex(sjcl.hash.sha256.hash(text));
@@ -747,17 +990,18 @@ module.exports = helper;
 
 /***/ }),
 
-/***/ 153:
+/***/ 161:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProfileLoader", function() { return ProfileLoader; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_cachedObjectLoader__ = __webpack_require__(74);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_observer__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_cachedObjectLoader__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_observer__ = __webpack_require__(16);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -769,8 +1013,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 
-var validator = __webpack_require__(188);
-var SecuredData = __webpack_require__(33);
+var validator = __webpack_require__(198);
+
 
 
 
@@ -810,7 +1054,7 @@ var Profile = (function (_super) {
             if (_this.isPublicProfile) {
                 throw new Error("no encrypt for public profiles!");
             }
-            return _this.securedData._signAndEncrypt(signKey, cryptKey);
+            return _this.securedData.signAndEncrypt(signKey, cryptKey);
         };
         _this.updated = function () {
             return _this.securedData.updated();
@@ -823,7 +1067,7 @@ var Profile = (function (_super) {
         };
         _this.setAttribute = function (attr, value) {
             _this.securedData.contentSetAttr(attr, value);
-            return __WEBPACK_IMPORTED_MODULE_1_bluebird__["resolve"]();
+            return __WEBPACK_IMPORTED_MODULE_2_bluebird__["resolve"]();
         };
         _this.removeAttribute = function (attr) {
             _this.securedData.contentRemoveAttr(attr);
@@ -836,7 +1080,7 @@ var Profile = (function (_super) {
         };
         options = options || {};
         _this.isPublicProfile = options.isPublicProfile === true;
-        _this.securedData = SecuredData.createRaw(data.content, data.meta, PROFILE_SECUREDDATA_OPTIONS);
+        _this.securedData = new __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["SecuredData"](data.content, data.meta, PROFILE_SECUREDDATA_OPTIONS, true);
         _this.checkProfile();
         if (data.profileid) {
             _this.id = data.profileid;
@@ -844,7 +1088,7 @@ var Profile = (function (_super) {
         return _this;
     }
     return Profile;
-}(__WEBPACK_IMPORTED_MODULE_3__asset_observer__["default"]));
+}(__WEBPACK_IMPORTED_MODULE_4__asset_observer__["default"]));
 /* harmony default export */ __webpack_exports__["default"] = (Profile);
 var ProfileLoader = (function (_super) {
     __extends(ProfileLoader, _super);
@@ -852,7 +1096,7 @@ var ProfileLoader = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     return ProfileLoader;
-}(Object(__WEBPACK_IMPORTED_MODULE_2__services_cachedObjectLoader__["a" /* default */])({
+}(Object(__WEBPACK_IMPORTED_MODULE_3__services_cachedObjectLoader__["a" /* default */])({
     cacheName: "profile",
     getID: function (_a) {
         var meta = _a.meta, signKey = _a.signKey;
@@ -862,9 +1106,9 @@ var ProfileLoader = (function (_super) {
     load: function (_a) {
         var content = _a.content, meta = _a.meta, isPublic = _a.isPublic, signKey = _a.signKey;
         var securedData = isPublic ?
-            SecuredData.createRaw(content, meta, PROFILE_SECUREDDATA_OPTIONS) :
-            SecuredData.load(content, meta, PROFILE_SECUREDDATA_OPTIONS);
-        return __WEBPACK_IMPORTED_MODULE_1_bluebird__["all"]([
+            new __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["SecuredData"](content, meta, PROFILE_SECUREDDATA_OPTIONS, true) :
+            __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["default"].load(content, meta, PROFILE_SECUREDDATA_OPTIONS);
+        return __WEBPACK_IMPORTED_MODULE_2_bluebird__["all"]([
             securedData.verifyAsync(signKey),
             isPublic ? null : securedData.decrypt()
         ]).then(function () { return ({
@@ -888,12 +1132,12 @@ var ProfileLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 156:
+/***/ 162:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__session_service__ = __webpack_require__(19);
 
 
 var FeatureToggles = (function () {
@@ -929,34 +1173,38 @@ var FeatureToggles = (function () {
 
 /***/ }),
 
-/***/ 166:
+/***/ 177:
 /***/ (function(module, exports) {
 
 function webpackEmptyAsyncContext(req) {
-	return new Promise(function(resolve, reject) { reject(new Error("Cannot find module '" + req + "'.")); });
+	// Here Promise.resolve().then() is used instead of new Promise() to prevent
+	// uncatched exception popping up in devtools
+	return Promise.resolve().then(function() {
+		throw new Error("Cannot find module '" + req + "'.");
+	});
 }
 webpackEmptyAsyncContext.keys = function() { return []; };
 webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
 module.exports = webpackEmptyAsyncContext;
-webpackEmptyAsyncContext.id = 166;
+webpackEmptyAsyncContext.id = 177;
 
 /***/ }),
 
-/***/ 168:
+/***/ 179:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Cache__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(6);
 
 
 
 
 var debug = __webpack_require__(15);
-var keyStore = __webpack_require__(26);
+var keyStore = __webpack_require__(28);
 var MAXCACHETIME = 7 * 24 * 60 * 60 * 1000;
 var keyStoreDebug = debug("whispeer:keyStore");
 var THROTTLE = 20;
@@ -1047,87 +1295,116 @@ var RequestKeyService = (function () {
 
 /***/ }),
 
-/***/ 17:
+/***/ 19:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extend", function() { return extend; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SessionService", function() { return SessionService; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_blobCache__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_Cache__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__keyStore_service__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__location_manager__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__storage_service__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__helper_helper__ = __webpack_require__(6);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 
 
-var afterHooks = [];
-var Observer = (function () {
-    function Observer() {
-        this._listeners = {};
-        this._listenersOnce = {};
-    }
-    Observer.addAfterHook = function (listener) {
-        afterHooks.push(listener);
-    };
-    ;
-    Observer.prototype.listenOnce = function (fn, type) {
-        type = type || "any";
-        if (typeof this._listenersOnce[type] === "undefined") {
-            this._listenersOnce[type] = [];
-        }
-        this._listenersOnce[type].push(fn);
-    };
-    Observer.prototype.listenPromise = function (type) {
-        var that = this;
-        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
-            that.listenOnce(resolve, type);
+
+
+
+
+
+
+var SessionService = (function (_super) {
+    __extends(SessionService, _super);
+    function SessionService() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.sid = "";
+        _this.loggedin = false;
+        _this.sessionStorage = Object(__WEBPACK_IMPORTED_MODULE_6__storage_service__["withPrefix"])("whispeer.session");
+        _this.loginPromise = new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (loginResolve) {
+            _this.loginResolve = loginResolve;
         });
-    };
-    Observer.prototype.listen = function (fn, type) {
-        type = type || "any";
-        if (typeof this._listeners[type] === "undefined") {
-            this._listeners[type] = [];
-        }
-        this._listeners[type].push(fn);
-    };
-    Observer.prototype.notify = function (data, type, returnF) {
-        type = type || "any";
-        if (!returnF) {
-            returnF = function () { };
-        }
-        var listeners = this._listeners[type] || [];
-        var listenersOnce = this._listenersOnce[type] || [];
-        var subscribers = (listeners).concat(listenersOnce);
-        this._listenersOnce[type] = [];
-        var result = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].callEach(subscribers, [data], returnF);
-        if (type !== "any") {
-            result = returnF(this.notify(data), result);
-        }
-        __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].callEach(afterHooks);
-        return result;
-    };
-    Observer.extend = function (obj) {
-        var internalObserver = new Observer();
-        obj.notify = internalObserver.notify.bind(internalObserver);
-        obj.listenOnce = internalObserver.listenOnce.bind(internalObserver);
-        obj.listenPromise = internalObserver.listenPromise.bind(internalObserver);
-        obj.listen = internalObserver.listen.bind(internalObserver);
-    };
-    return Observer;
-}());
-/* harmony default export */ __webpack_exports__["default"] = (Observer);
-var extend = function (obj) {
-    Observer.extend(obj);
-};
-//# sourceMappingURL=observer.js.map
+        _this.saveSession = function () {
+            _this.sessionStorage.set("sid", _this.sid);
+            _this.sessionStorage.set("userid", _this.userid);
+            _this.sessionStorage.set("loggedin", true);
+        };
+        _this.setLoginData = function (_sid, _userid) {
+            _this.sid = _sid;
+            _this.userid = parseInt(_userid, 10);
+            _this.loggedin = true;
+            _this.loginResolve();
+        };
+        _this.awaitLogin = function () {
+            return _this.loginPromise;
+        };
+        _this.setPassword = function (password) {
+            __WEBPACK_IMPORTED_MODULE_4__keyStore_service__["default"].security.setPassword(password);
+            _this.sessionStorage.set("password", password);
+        };
+        _this.bootLogin = __WEBPACK_IMPORTED_MODULE_7__helper_helper__["default"].cacheResult(function () { return _this.loadLogin(); });
+        _this.loadLogin = function () {
+            return _this.sessionStorage.awaitLoading().then(function () {
+                var loggedin = _this.sessionStorage.get("loggedin") === "true" && _this.sessionStorage.get("password");
+                if (!loggedin) {
+                    return _this.clear().thenReturn(false);
+                }
+                _this.notify(null, "login");
+                _this.setPassword(_this.sessionStorage.get("password"));
+                _this.setLoginData(_this.sessionStorage.get("sid"), _this.sessionStorage.get("userid"));
+                return true;
+            });
+        };
+        _this.getSID = function () {
+            return _this.sid;
+        };
+        _this.getUserID = function () { return _this.userid; };
+        _this.isOwnUserID = function (id) { return parseInt(id, 10) === _this.userid; };
+        _this.clear = function () {
+            _this.notify(null, "logout");
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                __WEBPACK_IMPORTED_MODULE_1__asset_blobCache__["a" /* default */].clear(),
+                _this.sessionStorage.clear(),
+                __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](__WEBPACK_IMPORTED_MODULE_3__services_Cache__["default"].deleteDatabase()),
+            ].map(function (p) { return p.reflect(); }));
+        };
+        _this.logout = function () {
+            _this.clear().finally(__WEBPACK_IMPORTED_MODULE_5__location_manager__["f" /* landingPage */]);
+        };
+        _this.isLoggedin = function () {
+            return _this.loggedin;
+        };
+        return _this;
+    }
+    return SessionService;
+}(__WEBPACK_IMPORTED_MODULE_2__asset_observer__["default"]));
+
+/* harmony default export */ __webpack_exports__["default"] = (new SessionService());
+//# sourceMappingURL=session.service.js.map
 
 /***/ }),
 
-/***/ 182:
+/***/ 193:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var sjcl = __webpack_require__(43);
+var sjcl = __webpack_require__(45);
 var chelper = {
 	getCurveName: function getCurveName(curve) {
 		var curcurve;
@@ -1175,12 +1452,11 @@ module.exports = chelper;
 
 /***/ }),
 
-/***/ 183:
+/***/ 194:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InternalSymbol", function() { return InternalSymbol; });
+/* unused harmony export InternalSymbol */
 function copyOwnFrom(target, source) {
     Object.getOwnPropertyNames(source).forEach(function (propName) {
         Object.defineProperty(target, propName, Object.getOwnPropertyDescriptor(source, propName));
@@ -1205,17 +1481,14 @@ var InternalSymbol = (function () {
 
 var Enum = (function () {
     function Enum(obj) {
-        this._symbols = [];
         if (Array.isArray(obj)) {
             obj.forEach(function (name) {
                 this[name] = new InternalSymbol(name);
-                this._symbols.push(this[name]);
             }, this);
         }
         else {
             Object.keys(obj).forEach(function (name) {
                 this[name] = new InternalSymbol(name, obj[name]);
-                this._symbols.push(this[name]);
             }, this);
         }
     }
@@ -1228,17 +1501,21 @@ var Enum = (function () {
     ;
     Enum.prototype.fromString = function (name) {
         if (name.substr(0, 1) === "|" && name.substr(-1, 1) === "|") {
-            return this[name.substring(1, name.length - 1)];
+            var sym = this[name.substring(1, name.length - 1)];
+            if (sym instanceof InternalSymbol) {
+                return sym;
+            }
         }
         return null;
     };
     ;
     Enum.prototype.symbols = function () {
-        return this._symbols;
+        var _this = this;
+        return Object.keys(this).map(function (key) { return _this[key]; });
     };
     ;
     Enum.prototype.symbolPosition = function (symbol) {
-        return this._symbols.indexOf(symbol);
+        return this.symbols().indexOf(symbol);
     };
     ;
     Enum.prototype.contains = function (sym) {
@@ -1247,191 +1524,12 @@ var Enum = (function () {
     ;
     return Enum;
 }());
-/* harmony default export */ __webpack_exports__["default"] = (Enum);
+/* harmony default export */ __webpack_exports__["a"] = (Enum);
 //# sourceMappingURL=enum.js.map
 
 /***/ }),
 
-/***/ 186:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__session_service__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helper_helper__ = __webpack_require__(5);
-
-
-
-
-
-var initService = __webpack_require__(22);
-
-var trustManager = __webpack_require__(66);
-var signatureCache = __webpack_require__(72);
-var debug = __webpack_require__(15);
-var THROTTLE = 20, STORESIGNATURECACHEINTERVAL = 30000;
-var debugName = "whispeer:trustService";
-var trustServiceDebug = debug(debugName);
-function time(name) {
-    if (debug.enabled(debugName)) {
-        console.time(name);
-    }
-}
-function timeEnd(name) {
-    if (debug.enabled(debugName)) {
-        console.timeEnd(name);
-    }
-}
-var resolveOwnKeys, resolveOwnUser;
-var ownKeysPromise = new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) { return resolveOwnKeys = resolve; });
-var ownUserPromise = new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) { return resolveOwnUser = resolve; });
-var TrustService = (function () {
-    function TrustService() {
-        var _this = this;
-        this.loadCachePromise = __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
-        this.onInit = function (data) {
-            trustServiceDebug("trustManager.get finished unchanged: " + data.unChanged);
-            return _this.loadCachePromise.catch(function (e) {
-                trustServiceDebug("Could not load trust service from cache!");
-                console.error(e);
-            }).then(function () { return ownKeysPromise; }).then(function () {
-                if (data.unChanged) {
-                    if (!trustManager.isLoaded()) {
-                        throw new Error("cache loading seems to have failed but server is unchanged!");
-                    }
-                    trustServiceDebug("trustManager unChanged");
-                    return;
-                }
-                trustServiceDebug("trustManager get loading");
-                if (trustManager.isLoaded()) {
-                    trustServiceDebug("trustManager cache exists updating");
-                    return trustManager.updateDatabase(data.content).then(function () {
-                        return false;
-                    });
-                }
-                if (data.content) {
-                    trustServiceDebug("load content");
-                    return _this.loadDatabase(data.content);
-                }
-                trustServiceDebug("create new trust database!");
-                return _this.createTrustDatabase();
-            });
-        };
-        this.uploadDatabase = function (cb) {
-            return initService.awaitLoading().then(function () {
-                return trustManager.getUpdatedVersion();
-            }).then(function (newTrustContent) {
-                _this.trustManagerCache.store(__WEBPACK_IMPORTED_MODULE_4__session_service__["default"].getUserID().toString(), newTrustContent);
-                return __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].emit("trustManager.set", {
-                    content: newTrustContent
-                });
-            }).then(function (response) {
-                if (!response.success) {
-                    __WEBPACK_IMPORTED_MODULE_3__error_service__["errorServiceInstance"].criticalError(response.error);
-                }
-            }).nodeify(cb);
-        };
-        this.storeSignatureCache = function () {
-            if (signatureCache.isChanged()) {
-                trustServiceDebug("Storing signature cache!");
-                time("storedSignatureCache");
-                signatureCache.resetChanged();
-                signatureCache.getUpdatedVersion().then(function (updatedVersion) {
-                    return _this.signatureCacheObject.store(__WEBPACK_IMPORTED_MODULE_4__session_service__["default"].getUserID().toString(), updatedVersion);
-                }).then(function () {
-                    timeEnd("storedSignatureCache");
-                });
-            }
-        };
-        this.addNewUsers = function (userInfo) {
-            if (trustManager.isLoaded() && !trustManager.hasKeyData(userInfo.key)) {
-                trustManager.addUser(userInfo);
-                _this.delay();
-            }
-        };
-        this.loadDatabase = function (database, cb) {
-            return trustManager.loadDatabase(database).thenReturn(database).nodeify(cb);
-        };
-        this.createTrustDatabase = function () {
-            ownUserPromise.then(function (ownUser) {
-                var key = ownUser.getSignKey();
-                var userid = ownUser.getID();
-                var nickname = ownUser.getNickname();
-                trustManager.createDatabase({ key: key, userid: userid, nickname: nickname });
-                _this.uploadDatabase().catch(__WEBPACK_IMPORTED_MODULE_3__error_service__["errorServiceInstance"].criticalError);
-                return null;
-            });
-        };
-        this.loadFromCache = function (cacheEntry) {
-            trustServiceDebug("trustManager cache get done");
-            _this.loadCachePromise = ownKeysPromise.then(function () {
-                trustServiceDebug("trustManager cache loading");
-                return _this.loadDatabase(cacheEntry.data);
-            });
-            return _this.loadCachePromise;
-        };
-        this.hasKey = function (keyid) {
-            return trustManager.hasKeyData(keyid);
-        };
-        this.getKey = function (keyid) {
-            return trustManager.getKeyData(keyid);
-        };
-        this.verifyUser = function (user, cb) {
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-                var keyData = trustManager.getKeyData(user.getSignKey());
-                keyData.setTrust(trustManager.trustStates.VERIFIED);
-                return _this.uploadDatabase();
-            }).nodeify(cb);
-        };
-        this.signatureCacheObject = new __WEBPACK_IMPORTED_MODULE_2__Cache__["default"]("signatureCache");
-        this.trustManagerCache = new __WEBPACK_IMPORTED_MODULE_2__Cache__["default"]("trustManager.get");
-        this.delay = __WEBPACK_IMPORTED_MODULE_5__helper_helper__["default"].aggregateOnce(THROTTLE, this.uploadDatabase);
-        window.setInterval(this.storeSignatureCache, STORESIGNATURECACHEINTERVAL);
-        initService.get("trustManager.get", this.onInit, {
-            cacheCallback: this.loadFromCache,
-            cache: true
-        });
-        __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].channel("notify.trustManager", function (_e, data) {
-            trustManager.updateDatabase(data, __WEBPACK_IMPORTED_MODULE_3__error_service__["errorServiceInstance"].criticalError);
-        });
-        this.waitForLogin();
-    }
-    TrustService.prototype.ownKeysLoaded = function () {
-        resolveOwnKeys();
-    };
-    TrustService.prototype.ownUserLoaded = function (user) {
-        resolveOwnUser(user);
-    };
-    TrustService.prototype.waitForLogin = function () {
-        var _this = this;
-        __WEBPACK_IMPORTED_MODULE_4__session_service__["default"].awaitLogin().then(function () {
-            time("getSignatureCache");
-            return _this.signatureCacheObject.get(__WEBPACK_IMPORTED_MODULE_4__session_service__["default"].getUserID().toString()).catch(function () {
-                return;
-            });
-        }).then(function (signatureCacheData) {
-            timeEnd("getSignatureCache");
-            if (signatureCacheData) {
-                signatureCache.load(signatureCacheData.data);
-            }
-            else {
-                signatureCache.initialize();
-            }
-        });
-    };
-    return TrustService;
-}());
-/* harmony default export */ __webpack_exports__["default"] = (new TrustService());
-//# sourceMappingURL=trust.service.js.map
-
-/***/ }),
-
-/***/ 187:
+/***/ 197:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1439,8 +1537,8 @@ var TrustService = (function () {
 
 var Bluebird = __webpack_require__(3);
 
-var friendsService = __webpack_require__(85);
-var keyStore = __webpack_require__(32).default;
+var friendsService = __webpack_require__(87);
+var keyStore = __webpack_require__(34).default;
 
 function fixInvalidKey(invalidKey, friendsService) {
 	var userid;
@@ -1482,25 +1580,25 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ 188:
+/***/ 198:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
+
 
 (function () {
 	"use strict";
 
-	var amanda, h, jsonSchemaValidator;
+	var h;
 
 	var validations = {};
 
 	function doValidate(ref, data) {
 		if (ref) {
 			var theError;
-			amanda.validate(data, ref, function (err) {
-				theError = err;
-			});
+			/*amanda.validate(data, ref, function (err) {
+   	theError = err;
+   });*/
 
 			return theError;
 		} else {
@@ -1510,7 +1608,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 
 	var validator = {
 		addAttribute: function addAttribute(name, cb) {
-			jsonSchemaValidator.addAttribute(name, cb);
+			// jsonSchemaValidator.addAttribute(name, cb);
 		},
 		register: function register(name, obj) {
 			if (validations[name]) {
@@ -1520,8 +1618,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 			validations[name] = obj;
 		},
 		validate: function validate(name, data) {
-			return false;
-
 			if (validations[name]) {
 				var result = doValidate(validations[name], data);
 				if (result) {
@@ -1535,7 +1631,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 	};
 
 	function amandaLoaded(am, helper, profileV, profileEncryptedV, postV, messageV, topicV, topicCreateV, circleV) {
-		amanda = am;
 		h = helper;
 
 		validator.register("profile", profileV);
@@ -1567,41 +1662,28 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 			// Continue...
 			return callback();
 		};
-
-		// Add a new validator
-		jsonSchemaValidator = amanda("json");
-		jsonSchemaValidator.addAttribute("hex", hexAttribute);
 	}
 
-	function doLoad(cb, exported) {
-		if (true) {
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(367), __webpack_require__(5), __webpack_require__(368), __webpack_require__(369), __webpack_require__(374), __webpack_require__(370), __webpack_require__(371), __webpack_require__(372), __webpack_require__(373)], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				cb.apply(null, arguments);
+	var modules = [];
 
-				return exported;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else if (typeof module !== "undefined" && module.exports && typeof require !== "undefined") {
-			var load = ["amanda", "whispeerHelper", "./validations/profileV", "./validations/profileEncryptedV", "./validations/postV", "./validations/messageV", "./validations/topicV", "./validations/topicCreateV", "./validations/circleV"];
+	modules.push(__webpack_require__(379));
+	modules.push(__webpack_require__(6));
+	modules.push(__webpack_require__(380));
+	modules.push(__webpack_require__(381));
+	modules.push(__webpack_require__(382));
+	modules.push(__webpack_require__(383));
+	modules.push(__webpack_require__(384));
+	modules.push(__webpack_require__(385));
+	modules.push(__webpack_require__(386));
 
-			var modules = [],
-			    i;
-			for (i = 0; i < load.length; i += 1) {
-				modules.push(require(load[i]));
-			}
+	amandaLoaded.apply(null, modules);
 
-			cb.apply(null, modules);
-
-			module.exports = exported;
-		}
-	}
-
-	doLoad(amandaLoaded, validator);
+	module.exports = validator;
 })();
 
 /***/ }),
 
-/***/ 189:
+/***/ 199:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1611,18 +1693,18 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 * MessageService
 **/
 
-var h = __webpack_require__(5).default;
-var Observer = __webpack_require__(17);
-var SecuredData = __webpack_require__(33);
+var h = __webpack_require__(6).default;
+var Observer = __webpack_require__(16);
+var SecuredData = __webpack_require__(26).default;
 var Bluebird = __webpack_require__(3);
 
-var socket = __webpack_require__(11).default;
-var keyStore = __webpack_require__(32).default;
-var initService = __webpack_require__(22);
+var socket = __webpack_require__(10).default;
+var keyStore = __webpack_require__(34).default;
+var initService = __webpack_require__(20);
 
-var settingsService = __webpack_require__(46).default;
+var settingsService = __webpack_require__(48).default;
 
-var friendsService = __webpack_require__(85);
+var friendsService = __webpack_require__(87);
 
 var circles = {};
 var circleArray = [];
@@ -1935,7 +2017,97 @@ module.exports = circleService;
 
 /***/ }),
 
-/***/ 190:
+/***/ 20:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+console.warn("Whispeer startup at " + Date.now());
+console.time("Spinner on Home");
+
+var errorService = __webpack_require__(32).errorServiceInstance;
+var keyStore = __webpack_require__(28);
+var socketService = __webpack_require__(10).default;
+var CacheService = __webpack_require__(27).default;
+
+var debug = __webpack_require__(15);
+var Observer = __webpack_require__(16);
+var Bluebird = __webpack_require__(3);
+
+var sessionService = __webpack_require__(19).default;
+
+var debugName = "whispeer:initService";
+var initServiceDebug = debug(debugName);
+
+function time(name) {
+	if (debug.enabled(debugName)) {
+		console.time("init: " + name);
+	}
+}
+
+function timeEnd(name) {
+	if (debug.enabled(debugName)) {
+		console.timeEnd("init: " + name);
+	}
+}
+
+var initCallbacks = [],
+    initService;
+
+function loadData() {
+	keyStore.security.blockPrivateActions();
+
+	var promise = Bluebird.resolve().then(function () {
+		time("runInitCallbacks");
+		return Bluebird.all(initCallbacks.map(function (func) {
+			return func();
+		}));
+	}).then(function () {
+		timeEnd("runInitCallbacks");
+		keyStore.security.allowPrivateActions();
+
+		var migrationService = __webpack_require__(375);
+		migrationService();
+		initService.notify("", "initDone");
+		return null;
+	});
+
+	promise.catch(errorService.criticalError);
+
+	return promise;
+}
+
+var loadingPromise = sessionService.awaitLogin().then(function () {
+	return loadData();
+});
+
+initService = {
+	/** get via api, also check cache in before!
+ * @param domain: domain to get from
+ */
+	awaitLoading: function awaitLoading() {
+		return loadingPromise;
+	},
+	get: function get(domain, cb, options) {
+		initRequestsList.push({
+			domain: domain,
+			callback: cb,
+			options: options || {}
+		});
+	},
+	registerCallback: function registerCallback(cb) {
+		initCallbacks.push(cb);
+	}
+};
+
+Observer.extend(initService);
+
+module.exports = initService;
+
+/***/ }),
+
+/***/ 200:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1943,11 +2115,11 @@ module.exports = circleService;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var settings = __webpack_require__(46).default;
+var settings = __webpack_require__(48).default;
 
 var Bluebird = __webpack_require__(3);
-var h = __webpack_require__(5).default;
-var errors = __webpack_require__(48);
+var h = __webpack_require__(6).default;
+var errors = __webpack_require__(42);
 
 function removePadding(val) {
 	var isNumber = false;
@@ -2008,7 +2180,7 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ 191:
+/***/ 201:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2026,362 +2198,56 @@ module.exports = function ($injector, cb) {
 
 /***/ }),
 
-/***/ 21:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SessionService", function() { return SessionService; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_blobCache__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__keyStore_service__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__location_manager__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__storage_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helper_helper__ = __webpack_require__(5);
-
-
-
-
-
-
-
-var SessionService = (function () {
-    function SessionService() {
-        var _this = this;
-        this.sid = "";
-        this.loggedin = false;
-        this.sessionStorage = Object(__WEBPACK_IMPORTED_MODULE_5__storage_service__["withPrefix"])("whispeer.session");
-        this.loginPromise = new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (loginResolve) {
-            _this.loginResolve = loginResolve;
-        });
-        this.saveSession = function () {
-            _this.sessionStorage.set("sid", _this.sid);
-            _this.sessionStorage.set("userid", _this.userid);
-            _this.sessionStorage.set("loggedin", true);
-        };
-        this.setLoginData = function (_sid, _userid) {
-            _this.sid = _sid;
-            _this.userid = parseInt(_userid, 10);
-            _this.loggedin = true;
-            _this.loginResolve();
-        };
-        this.awaitLogin = function () {
-            return _this.loginPromise;
-        };
-        this.setPassword = function (password) {
-            __WEBPACK_IMPORTED_MODULE_3__keyStore_service__["default"].security.setPassword(password);
-            _this.sessionStorage.set("password", password);
-        };
-        this.bootLogin = __WEBPACK_IMPORTED_MODULE_6__helper_helper__["default"].cacheResult(function () { return _this.loadLogin(); });
-        this.loadLogin = function () {
-            return _this.sessionStorage.awaitLoading().then(function () {
-                var loggedin = _this.sessionStorage.get("loggedin") === "true" && _this.sessionStorage.get("password");
-                if (!loggedin) {
-                    return _this.clear().thenReturn(false);
-                }
-                _this.setPassword(_this.sessionStorage.get("password"));
-                _this.setLoginData(_this.sessionStorage.get("sid"), _this.sessionStorage.get("userid"));
-                return true;
-            });
-        };
-        this.getSID = function () {
-            return _this.sid;
-        };
-        this.getUserID = function () { return _this.userid; };
-        this.isOwnUserID = function (id) { return parseInt(id, 10) === _this.userid; };
-        this.clear = function () {
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
-                __WEBPACK_IMPORTED_MODULE_1__asset_blobCache__["a" /* default */].clear(),
-                _this.sessionStorage.clear(),
-                __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](__WEBPACK_IMPORTED_MODULE_2__services_Cache__["default"].deleteDatabase()),
-            ].map(function (p) { return p.reflect(); }));
-        };
-        this.logout = function () {
-            _this.clear().finally(__WEBPACK_IMPORTED_MODULE_4__location_manager__["f" /* landingPage */]);
-        };
-        this.isLoggedin = function () {
-            return _this.loggedin;
-        };
-    }
-    return SessionService;
-}());
-
-/* harmony default export */ __webpack_exports__["default"] = (new SessionService());
-//# sourceMappingURL=session.service.js.map
-
-/***/ }),
-
-/***/ 22:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-console.warn("Whispeer startup at " + Date.now());
-console.time("Spinner on Home");
-
-var errorService = __webpack_require__(30).errorServiceInstance;
-var keyStore = __webpack_require__(26);
-var socketService = __webpack_require__(11).default;
-var CacheService = __webpack_require__(25).default;
-
-var h = __webpack_require__(5).default;
-var debug = __webpack_require__(15);
-var Observer = __webpack_require__(17);
-var Bluebird = __webpack_require__(3);
-
-var sessionService = __webpack_require__(21).default;
-
-var debugName = "whispeer:initService";
-var initServiceDebug = debug(debugName);
-
-function time(name) {
-	if (debug.enabled(debugName)) {
-		console.time("init: " + name);
-	}
-}
-
-function timeEnd(name) {
-	if (debug.enabled(debugName)) {
-		console.timeEnd("init: " + name);
-	}
-}
-
-var initRequestsList = [],
-    initCallbacks = [],
-    initCacheCallbacks = [],
-    initService;
-
-function getCache(initRequest) {
-	return new CacheService(initRequest.domain).get(initRequest.id || sessionService.getUserID()).then(function (cache) {
-		initRequest.cache = cache;
-
-		return initRequest;
-	}).catch(function () {
-		return initRequest;
-	});
-}
-
-function setCache(initResponse, transformedData) {
-	if (!transformedData) {
-		return Bluebird.resolve(initResponse);
-	}
-
-	return new CacheService(initResponse.domain).store(initResponse.id || sessionService.getUserID(), transformedData).then(function () {
-		return initResponse;
-	}).catch(function () {
-		return initResponse;
-	});
-}
-
-function getServerData(initRequests) {
-	return Bluebird.resolve(initRequests).map(function (request) {
-		var requestObject = {
-			responseKey: "content"
-		};
-
-		var id = request.id;
-
-		if (typeof id === "function") {
-			id = id();
-		}
-
-		if (typeof id !== "undefined") {
-			requestObject.id = id;
-		}
-
-		if (request.cache && request.cache.data) {
-			if (request.cache.data._signature) {
-				requestObject.cacheSignature = request.cache.data._signature;
-			} else if (request.cache.data.meta && request.cache.data.meta._signature) {
-				requestObject.cacheSignature = request.cache.data.meta._signature;
-			}
-		}
-
-		return socketService.definitlyEmit(request.domain, requestObject).then(function (response) {
-			request.data = response;
-
-			return request;
-		});
-	});
-}
-
-function runCacheCallbacks(initRequests) {
-	return Bluebird.all(initRequests).map(function (request) {
-		if (!request.cache || !request.options.cacheCallback) {
-			return !request.options.cache;
-		}
-
-		return request.options.cacheCallback(request.cache).thenReturn(true);
-	});
-}
-
-function runCallbacks(initResponses) {
-	return Bluebird.all(initResponses).map(function (response) {
-		var callback = response.callback;
-
-		if (response.options.cache) {
-			return callback(response.data.content).then(function (transformedData) {
-				initServiceDebug("Callback done:" + response.domain);
-				if (!transformedData) {
-					return;
-				}
-
-				return setCache(response, transformedData);
-			});
-		}
-
-		return callback(response.data.content);
-	});
-}
-
-function runFunction(func) {
-	return func();
-}
-
-function runInitCacheCallbacks() {
-	return Bluebird.all(initCacheCallbacks.map(runFunction));
-}
-
-function loadData() {
-	keyStore.security.blockPrivateActions();
-
-	var runningInitCallbacks;
-	var promise = Bluebird.resolve().then(function () {
-
-		time("getCache");
-		return initRequestsList;
-	}).map(function (initRequest) {
-		if (initRequest.options.cache) {
-			return getCache(initRequest);
-		} else {
-			return initRequest;
-		}
-	}).then(function (initRequests) {
-		timeEnd("getCache");
-		time("runCacheCallbacks");
-
-		return Bluebird.all([runInitCacheCallbacks(), runCacheCallbacks(initRequests)]).spread(function (customCacheResults, simpleCacheResults) {
-			if (simpleCacheResults.reduce(h.and, true)) {
-				initService.notify("", "initCacheDone");
-			} else {
-				initServiceDebug("Could not load cache!");
-			}
-
-			return null;
-		}).catch(errorService.criticalError).thenReturn(initRequests);
-	}).then(function (initRequests) {
-		timeEnd("runCacheCallbacks");
-		runningInitCallbacks = initCallbacks.map(runFunction);
-
-		time("getServer");
-		return getServerData(initRequests);
-	}).then(function (initResponses) {
-		timeEnd("getServer");
-		time("runMainCallbacks");
-		return runCallbacks(initResponses);
-	}).then(function () {
-		initServiceDebug("Callbacks done!");
-		return Bluebird.all(runningInitCallbacks);
-	}).then(function () {
-		timeEnd("runMainCallbacks");
-		keyStore.security.allowPrivateActions();
-
-		var migrationService = __webpack_require__(363);
-		migrationService();
-		initService.notify("", "initDone");
-		return null;
-	});
-
-	promise.catch(errorService.criticalError);
-
-	return promise;
-}
-
-var loadingPromise = sessionService.awaitLogin().then(function () {
-	return loadData();
-});
-
-initService = {
-	/** get via api, also check cache in before!
- * @param domain: domain to get from
- */
-	awaitLoading: function awaitLoading() {
-		return loadingPromise;
-	},
-	get: function get(domain, cb, options) {
-		initRequestsList.push({
-			domain: domain,
-			callback: cb,
-			options: options || {}
-		});
-	},
-	registerCacheCallback: function registerCacheCallback(cb) {
-		initCacheCallbacks.push(cb);
-	},
-	registerCallback: function registerCallback(cb) {
-		initCallbacks.push(cb);
-	}
-};
-
-Observer.extend(initService);
-
-module.exports = initService;
-
-/***/ }),
-
-/***/ 239:
+/***/ 250:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
 	"../pages/blocked-users/blockedUsers.module": [
-		444,
+		475,
 		6
 	],
 	"../pages/contact-requests/contact-requests.module": [
-		445,
+		476,
 		11
 	],
 	"../pages/contacts/contacts.module": [
-		446,
+		477,
 		5
 	],
 	"../pages/home/home.module": [
-		447,
+		478,
 		9
 	],
 	"../pages/login/login.module": [
-		448,
+		479,
 		3
 	],
 	"../pages/messages/add/add.module": [
-		449,
+		480,
 		4
 	],
 	"../pages/messages/details/details.module": [
-		450,
+		481,
 		8
 	],
 	"../pages/messages/messages.module": [
-		443,
+		483,
 		1
 	],
 	"../pages/new-message/new-message.module": [
-		451,
+		482,
 		0
 	],
 	"../pages/profile/profile.module": [
-		452,
+		485,
 		2
 	],
 	"../pages/sales/sales.module": [
-		453,
+		484,
 		10
 	],
 	"../pages/settings/settings.module": [
-		454,
+		486,
 		7
 	]
 };
@@ -2396,23 +2262,23 @@ function webpackAsyncContext(req) {
 webpackAsyncContext.keys = function webpackAsyncContextKeys() {
 	return Object.keys(map);
 };
+webpackAsyncContext.id = 250;
 module.exports = webpackAsyncContext;
-webpackAsyncContext.id = 239;
 
 /***/ }),
 
-/***/ 244:
+/***/ 257:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__blobService__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_blobCache__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(73);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__fileTransferQueue__ = __webpack_require__(289);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__blobService__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_blobCache__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__fileTransferQueue__ = __webpack_require__(303);
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -2520,16 +2386,362 @@ var FileUpload = (function () {
 
 /***/ }),
 
-/***/ 25:
+/***/ 26:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_service__ = __webpack_require__(30);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SecuredData", function() { return SecuredData; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+
+
+var keyStore = __webpack_require__(28);
+var errors = __webpack_require__(42);
+var config = __webpack_require__(61);
+
+var attributesNeverVerified = ["_signature", "_hashObject"];
+/** crypted content with metadata
+        @param content the content to handle either encrypted or decrypted
+        @param meta metadata for the content
+        @param isDecrypted whether the content is decrypted
+*/
+var SecuredData = (function () {
+    function SecuredData(content, meta, options, isDecrypted) {
+        var _this = this;
+        this.blockDisallowedAttributes = function (data) {
+            if (data._contentHash || data._key || data._signature || data._version) {
+                throw new Error("content hash/key should not be provided by outside world");
+            }
+        };
+        this.hasContent = function () {
+            return _this._hasContent;
+        };
+        this.getHash = function () {
+            return _this._updated.meta._ownHash;
+        };
+        this.getKey = function () {
+            return _this.original.meta._key;
+        };
+        this.sign = function (signKey, cb) {
+            var toSign = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepCopyObj(_this._updated.meta);
+            var hashVersion = config.hashVersion;
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+                toSign._version = 1;
+                toSign._type = _this.type;
+                toSign._hashVersion = hashVersion;
+                //do not sign attributes which should not be verified
+                _this.attributesNotVerified.forEach(function (attr) {
+                    delete toSign[attr];
+                });
+                if (_this._updated.paddedContent || _this._updated.content) {
+                    var hashContent = _this._updated.paddedContent || _this._updated.content;
+                    return keyStore.hash.hashObjectOrValueHexAsync(hashContent).then(function (contentHash) {
+                        toSign._contentHash = contentHash;
+                        //create new ownHash
+                        delete toSign._ownHash;
+                        return keyStore.hash.hashObjectOrValueHexAsync(toSign);
+                    }).then(function (ownHash) {
+                        toSign._ownHash = ownHash;
+                    });
+                }
+            }).then(function () {
+                return keyStore.sign.signObject(toSign, signKey, hashVersion);
+            }).then(function (signature) {
+                toSign._signature = signature;
+                return toSign;
+            }).nodeify(cb);
+        };
+        this.getUpdatedData = function (signKey, cb) {
+            return _this.verify(signKey).then(function () {
+                if (_this._hasContent) {
+                    keyStore.security.addEncryptionIdentifier(_this.original.meta._key);
+                    return _this.signAndEncrypt(signKey, _this.original.meta._key);
+                }
+                return _this.sign(signKey);
+            }).nodeify(cb);
+        };
+        /** sign and encrypt this object.
+                pads and then encrypts our content.
+                adds contentHash, key id and version to metaData and signs meta data.
+                @param signKey key to use for signing
+                @param cb callback(cryptedData, metaData),
+        */
+        this.signAndEncrypt = function (signKey, cryptKey) {
+            if (!_this._hasContent) {
+                throw new Error("can only sign and not encrypt");
+            }
+            if (_this.original.meta._key && _this.original.meta._key !== cryptKey) {
+                throw new Error("can not re-encrypt an old object with new key!");
+            }
+            return keyStore.hash.addPaddingToObject(_this._updated.content, 128).then(function (paddedContent) {
+                _this._updated.paddedContent = paddedContent;
+                _this._updated.meta._key = keyStore.correctKeyIdentifier(cryptKey);
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                    keyStore.sym.encryptObject(paddedContent, cryptKey, _this.encryptDepth),
+                    _this.sign(signKey)
+                ]);
+            }).spread(function (cryptedData, meta) {
+                _this._updated.meta = meta;
+                return {
+                    content: cryptedData,
+                    meta: meta
+                };
+            });
+        };
+        this.hasType = function (type) {
+            if (type === _this.type) {
+                return true;
+            }
+            if (_this.alternativeType && _this.alternativeType === type) {
+                return true;
+            }
+            return false;
+        };
+        /** verify the decrypted data
+                decrypts data if necessary
+                @param signKey key to check signature against
+                @param id id for signature caching
+                @throw SecurityError: contenthash or signature wrong
+        */
+        this.verifyAsync = function (signKey, id) {
+            //check contentHash is correct
+            //check signature is correct
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().then(function () {
+                var metaCopy = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepCopyObj(_this.original.meta);
+                _this.attributesNotVerified.forEach(function (attr) {
+                    delete metaCopy[attr];
+                });
+                if (!_this.hasType(metaCopy._type)) {
+                    // eslint-disable-next-line no-debugger
+                    debugger;
+                    throw new errors.SecurityError("invalid object type. is: " + metaCopy._type + " should be: " + _this.type);
+                }
+                if (typeof metaCopy._hashVersion === "number") {
+                    metaCopy._hashVersion = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(metaCopy._hashVersion);
+                }
+                var hashVersion = 1;
+                if (metaCopy._hashVersion) {
+                    hashVersion = metaCopy._hashVersion;
+                }
+                else if (metaCopy._v2 && metaCopy._v2 !== "false") {
+                    hashVersion = 2;
+                }
+                return keyStore.sign.verifyObject(_this.original.meta._signature, metaCopy, signKey, hashVersion, id);
+            }).then(function (correctSignature) {
+                if (!correctSignature) {
+                    alert("Bug: signature did not match (" + _this.original.meta._type + ") Please report this bug!");
+                    throw new errors.SecurityError("signature did not match " + _this.original.meta._type);
+                }
+                return _this.verifyContentHash();
+            }).then(function () {
+                return true;
+            });
+        };
+        this.verify = function (signKey, cb, id) {
+            return _this.verifyAsync(signKey, id).nodeify(cb);
+        };
+        this.updated = function () {
+            _this.changed = false;
+        };
+        this._decrypt = function () {
+            if (!_this.decryptionPromise) {
+                _this.decryptionPromise = keyStore.sym.decryptObject(_this.original.encryptedContent, _this.encryptDepth, undefined, _this.original.meta._key).then(function (decryptedData) {
+                    _this.decrypted = true;
+                    _this.original.paddedContent = decryptedData;
+                    _this.original.content = keyStore.hash.removePaddingFromObject(decryptedData, 128);
+                    _this._updated.content = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepCopyObj(_this.original.content);
+                    return _this.verifyContentHash();
+                });
+            }
+            return _this.decryptionPromise;
+        };
+        this.decrypt = function (cb) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().then(function () {
+                if (_this._hasContent && !_this.decrypted) {
+                    return _this._decrypt();
+                }
+            }).then(function () {
+                if (!_this._hasContent) {
+                    return;
+                }
+                return _this.original.content;
+            }).nodeify(cb);
+        };
+        this.verifyContentHash = function () {
+            if (!_this._hasContent || !_this.decrypted) {
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
+            }
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+                return keyStore.hash.hashObjectOrValueHexAsync(_this.original.paddedContent || _this.original.content);
+            }).then(function (hash) {
+                if (hash !== _this.original.meta._contentHash) {
+                    throw new errors.SecurityError("content hash did not match");
+                }
+            });
+        };
+        this.isChanged = function () { return _this.changed; };
+        this.isEncrypted = function () { return !_this.decrypted; };
+        this.isDecrypted = function () { return _this.decrypted; };
+        this.contentGet = function () { return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepCopyObj(_this._updated.content); };
+        this.metaGet = function () { return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepCopyObj(_this._updated.meta); };
+        this.metaHasAttr = function (attr) { return _this._updated.meta.hasOwnProperty(attr); };
+        this.metaKeys = function () { return Object.keys(_this._updated.meta).filter(function (key) { return key[0] !== "_"; }); };
+        this.metaAttr = function (attr) { return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepCopyObj(_this._updated.meta[attr]); };
+        /** sets the whole content to the given data
+                @param newContent new value for this objects content
+        */
+        this.contentSet = function (newContent) {
+            _this._hasContent = _this.changed = true;
+            _this._updated.content = newContent;
+        };
+        /** set a certain attribute in the content object
+                @param attr attribute to set
+                @param value value to set attribute to
+        */
+        this.contentSetAttr = function (attr, value) {
+            if (typeof _this._updated.content !== "object") {
+                throw new Error("our content is not an object");
+            }
+            _this._updated.content[attr] = value;
+            _this.changed = true;
+        };
+        this.contentRemoveAttr = function (attr) {
+            if (typeof _this._updated.content !== "object") {
+                throw new Error("our content is not an object");
+            }
+            delete _this._updated.content[attr];
+            _this.changed = true;
+        };
+        /** sets the whole metaData to the given data
+                @param newMetaData new value for this objects metaData
+        */
+        this.metaSet = function (newMetaData) {
+            _this.blockDisallowedAttributes(newMetaData);
+            _this.changed = true;
+            _this._updated.meta = newMetaData;
+        };
+        this.metaRemoveAttr = function (attr) {
+            if (attr[0] === "_") {
+                throw new Error("private attributes should not be provided by outside world");
+            }
+            _this.changed = true;
+            delete _this._updated.meta[attr];
+        };
+        this.metaSetAttr = function (attr, value) {
+            if (attr[0] === "_") {
+                throw new Error("private attributes should not be provided by outside world");
+            }
+            _this.changed = true;
+            _this._updated.meta[attr] = value;
+        };
+        /** set a certain attribute in the meta object
+                @param attrs [] list of which attribute to set
+                @param value value to set attribute to
+        */
+        this.metaAdd = function (attrs, value) {
+            _this.changed = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepSetCreate(_this._updated.meta, attrs, value);
+        };
+        this.setParent = function (parentSecuredData) {
+            _this._updated.meta._parent = parentSecuredData.getHash();
+        };
+        this.checkParent = function (expectedParent) {
+            if (_this._updated.meta._parent !== expectedParent.getHash()) {
+                throw new errors.SecurityError("wrong parent. is: " + _this._updated.meta._parent + " should be: " + expectedParent.getHash());
+            }
+        };
+        this.getRelationshipCounter = function () {
+            return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(_this._updated.meta._sortCounter || 0);
+        };
+        this.setAfterRelationShip = function (afterSecuredData) {
+            _this._updated.meta._sortCounter = afterSecuredData.getRelationshipCounter() + 1;
+        };
+        this.checkAfter = function (securedData) {
+            if (_this.getRelationshipCounter() < securedData.getRelationshipCounter()) {
+                throw new errors.SecurityError("wrong ordering. " + _this.getRelationshipCounter() + " should be after " + securedData.getRelationshipCounter());
+            }
+        };
+        this.checkBefore = function (securedData) {
+            if (_this.getRelationshipCounter() > securedData.getRelationshipCounter()) {
+                throw new errors.SecurityError("wrong ordering. " + _this.getRelationshipCounter() + " should be before " + securedData.getRelationshipCounter());
+            }
+        };
+        //we need to somehow ensure that we have the correct object type.
+        if (!options || typeof options.type !== "string") {
+            throw new Error("need a type for security!");
+        }
+        this.type = options.type;
+        this.alternativeType = options.alternativeType;
+        this.removeEmpty = options.removeEmpty;
+        this.encryptDepth = options.encryptDepth || 0;
+        this.attributesNotVerified = options.attributesNotVerified || [];
+        this.attributesNotVerified.filter(function (val) { return val.match(/^A-z0-9$/); });
+        this.attributesNotVerified = attributesNeverVerified.concat(this.attributesNotVerified);
+        this.decrypted = isDecrypted;
+        this._hasContent = true;
+        this.original = {
+            meta: meta || {}
+        };
+        if (typeof content === "undefined") {
+            this._hasContent = false;
+        }
+        else if (isDecrypted) {
+            this.original.content = content;
+        }
+        else {
+            this.original.encryptedContent = content;
+        }
+        this._updated = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].deepCopyObj(this.original);
+    }
+    return SecuredData;
+}());
+
+var api = {
+    createPromisified: function (content, meta, options, signKey, cryptKey) {
+        var securedData, securedDataPromise;
+        securedDataPromise = __WEBPACK_IMPORTED_MODULE_0_bluebird__["fromCallback"](function (cb) {
+            securedData = api.create(content, meta, options, signKey, cryptKey, cb);
+        });
+        return {
+            promise: securedDataPromise,
+            data: securedData
+        };
+    },
+    createAsync: function (content, meta, options, signKey, cryptKey) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["fromCallback"](function (cb) {
+            api.create(content, meta, options, signKey, cryptKey, cb);
+        });
+    },
+    create: function (content, meta, options, signKey, cryptKey, cb) {
+        var secured = api.createRaw(content, meta, options);
+        __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().delay(1).then(function () {
+            return secured.signAndEncrypt(signKey, cryptKey);
+        }).nodeify(cb);
+        return secured;
+    },
+    load: function (content, meta, options) {
+        return new SecuredData(content, meta, options, false);
+    },
+    createRaw: function (content, meta, options) {
+        return new SecuredData(content, meta, options, true);
+    }
+};
+/* harmony default export */ __webpack_exports__["default"] = (api);
+//# sourceMappingURL=securedDataWithMetaData.js.map
+
+/***/ }),
+
+/***/ 27:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_service__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_idb__ = __webpack_require__(348);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_idb__ = __webpack_require__(361);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_idb___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_idb__);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2572,22 +2784,21 @@ var _this = this;
 
  // tslint:disable-line:no-unused-variable
 var REINIT_CACHE_TIMEOUT = 2000;
-var dbPromise, cachesDisabled;
-var initCache = function () {
-    cachesDisabled = false;
-    dbPromise = __WEBPACK_IMPORTED_MODULE_3_idb___default.a.open("whispeerCache", 10, function (upgradeDB) {
+var cachesDisabled = false;
+var openDatabase = function () {
+    return __WEBPACK_IMPORTED_MODULE_3_idb___default.a.open("whispeerCache", 10, function (upgradeDB) {
         var objectStore = upgradeDB.createObjectStore('cache', { keyPath: "id" });
         objectStore.createIndex("created", "created", { unique: false });
         objectStore.createIndex("used", "used", { unique: false });
         objectStore.createIndex("type", "type", { unique: false });
         objectStore.createIndex("size", "size", { unique: false });
-    });
-    dbPromise.catch(function (e) {
+    }).catch(function (e) {
         console.warn("Disabling indexedDB caching due to error", e);
         cachesDisabled = true;
+        return Promise.reject(e);
     });
 };
-initCache();
+var initCache = function () { return cachesDisabled = false; };
 try {
     indexedDB.deleteDatabase("whispeer");
 }
@@ -2623,11 +2834,7 @@ var Cache = (function () {
     }
     Cache.deleteDatabase = function () {
         cachesDisabled = true;
-        return dbPromise.then(function (db) {
-            return db.close();
-        }).then(function () {
-            return __WEBPACK_IMPORTED_MODULE_3_idb___default.a.delete("whispeerCache");
-        }).then(function () {
+        return __WEBPACK_IMPORTED_MODULE_3_idb___default.a.delete("whispeerCache").then(function () {
             setTimeout(function () {
                 initCache();
             }, REINIT_CACHE_TIMEOUT);
@@ -2666,7 +2873,7 @@ var Cache = (function () {
             var db, tx;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, dbPromise];
+                    case 0: return [4 /*yield*/, openDatabase()];
                     case 1:
                         db = _a.sent();
                         console.info("Storing in indexeddb " + this.getID(id));
@@ -2675,6 +2882,7 @@ var Cache = (function () {
                         return [4 /*yield*/, tx.complete];
                     case 2:
                         _a.sent();
+                        db.close();
                         return [2 /*return*/];
                 }
             });
@@ -2689,13 +2897,14 @@ var Cache = (function () {
             var db, tx, count;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, dbPromise];
+                    case 0: return [4 /*yield*/, openDatabase()];
                     case 1:
                         db = _a.sent();
                         tx = db.transaction("cache", "readonly");
                         return [4 /*yield*/, tx.objectStore("cache").count(this.name + "/" + id)];
                     case 2:
                         count = _a.sent();
+                        db.close();
                         return [2 /*return*/, count > 0];
                 }
             });
@@ -2715,7 +2924,7 @@ var Cache = (function () {
             var db, tx, data;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, dbPromise];
+                    case 0: return [4 /*yield*/, openDatabase()];
                     case 1:
                         db = _a.sent();
                         tx = db.transaction("cache", "readonly");
@@ -2736,6 +2945,7 @@ var Cache = (function () {
                         if (data.blobs.length === 1) {
                             data.blob = data.blobs[0];
                         }
+                        db.close();
                         return [2 /*return*/, data];
                 }
             });
@@ -2769,13 +2979,14 @@ var Cache = (function () {
             var db, tx;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, dbPromise];
+                    case 0: return [4 /*yield*/, openDatabase()];
                     case 1:
                         db = _a.sent();
                         tx = db.transaction("cache", "readwrite");
                         return [4 /*yield*/, tx.objectStore("cache").delete(this.getID(id))];
                     case 2:
                         _a.sent();
+                        db.close();
                         return [2 /*return*/];
                 }
             });
@@ -2794,7 +3005,7 @@ var Cache = (function () {
             var db, tx, cursorPromise;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, dbPromise];
+                    case 0: return [4 /*yield*/, openDatabase()];
                     case 1:
                         db = _a.sent();
                         tx = db.transaction("cache", transactionType);
@@ -2802,6 +3013,7 @@ var Cache = (function () {
                         return [4 /*yield*/, followCursorUntilDone(cursorPromise, action)];
                     case 2:
                         _a.sent();
+                        db.close();
                         return [2 /*return*/];
                 }
             });
@@ -2820,7 +3032,7 @@ var Cache = (function () {
 
 /***/ }),
 
-/***/ 26:
+/***/ 28:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2854,13 +3066,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 }
 */
 
-var h = __webpack_require__(5).default;
-var chelper = __webpack_require__(152);
-var sjcl = __webpack_require__(43);
-var waitForReady = __webpack_require__(350);
-var sjclWorkerInclude = __webpack_require__(351);
-var ObjectHasher = __webpack_require__(354);
-var errors = __webpack_require__(48);
+var h = __webpack_require__(6).default;
+var chelper = __webpack_require__(160);
+var sjcl = __webpack_require__(45);
+var waitForReady = __webpack_require__(363);
+var sjclWorkerInclude = __webpack_require__(364);
+var ObjectHasher = __webpack_require__(367);
+var errors = __webpack_require__(42);
 var Bluebird = __webpack_require__(3);
 var debug = __webpack_require__(15);
 
@@ -4027,8 +4239,8 @@ SignKey = function SignKey(keyData) {
 				throw new errors.SecurityError("Private Actions are blocked (sign)");
 			}
 
-			var trustManager = __webpack_require__(66);
-			var signatureCache = __webpack_require__(72);
+			var trustManager = __webpack_require__(71).default;
+			var signatureCache = __webpack_require__(107);
 
 			return Bluebird.try(function () {
 				if (!trustManager.isLoaded) {
@@ -4134,8 +4346,8 @@ SignKey = function SignKey(keyData) {
 
 	this.getFingerPrint = getFingerPrintF;
 	this.verify = function (signature, text, type, id) {
-		var trustManager = __webpack_require__(66);
-		var signatureCache = __webpack_require__(72);
+		var trustManager = __webpack_require__(71).default;
+		var signatureCache = __webpack_require__(107);
 		var name = chelper.bits2hex(signature).substr(0, 10);
 
 		if (debug.enabled("whispeer:keyStore")) {
@@ -5048,12 +5260,116 @@ module.exports = keyStore;
 
 /***/ }),
 
-/***/ 289:
+/***/ 302:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+
+var MINUTE = 60 * 1000;
+var Burst = (function () {
+    function Burst() {
+        var _this = this;
+        this.getItems = function () {
+            return _this.items;
+        };
+        this.hasItem = function (item) {
+            return _this.items.indexOf(item) > -1;
+        };
+        this.addItem = function (item) {
+            if (!_this.hasItems()) {
+                _this.chunkID = item.getChunkID();
+            }
+            _this.items.push(item);
+            _this.items.sort(function (m1, m2) {
+                return m1.getTime() - m2.getTime();
+            });
+        };
+        this.removeAllExceptLast = function () {
+            _this.items.splice(0, _this.items.length - 1);
+        };
+        this.firstItem = function () {
+            return _this.items[0];
+        };
+        this.lastItem = function () {
+            return _this.items[_this.items.length - 1];
+        };
+        this.hasItems = function () {
+            return _this.items.length > 0;
+        };
+        this.fitsItem = function (item) {
+            if (!_this.hasItems()) {
+                return true;
+            }
+            return _this.sameChunk(item) &&
+                _this.sameSender(item) &&
+                _this.continousMessage(item) &&
+                _this.sameDay(item) &&
+                _this.timeDifference(item) < MINUTE * 10;
+        };
+        this.getChunkID = function () { return _this.chunkID; };
+        this.sameChunk = function (item) {
+            if (!item) {
+                return false;
+            }
+            return _this.getChunkID() === item.getChunkID();
+        };
+        this.sameSender = function (message) {
+            return _this.firstItem().data.sender.id === message.data.sender.id;
+        };
+        this.sameDay = function (message) {
+            if (!message) {
+                return false;
+            }
+            if (message instanceof Burst) {
+                message = message.firstItem();
+            }
+            var date1 = new Date(__WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(_this.firstItem().getTime()));
+            var date2 = new Date(__WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(message.getTime()));
+            if (date1.getDate() !== date2.getDate()) {
+                return false;
+            }
+            if (date1.getMonth() !== date2.getMonth()) {
+                return false;
+            }
+            if (date1.getFullYear() !== date2.getFullYear()) {
+                return false;
+            }
+            return true;
+        };
+        this.timeDifference = function (item) {
+            return Math.abs(__WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(item.getTime()) - __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(_this.firstItem().getTime()));
+        };
+        this.isMe = function () {
+            return _this.firstItem().data.sender.me;
+        };
+        this.isOther = function () {
+            return !_this.firstItem().data.sender.me;
+        };
+        this.sender = function () {
+            return _this.firstItem().data.sender;
+        };
+        this.items = [];
+    }
+    Burst.prototype.continousMessage = function (item) {
+        if (this.items.findIndex(function (m) { return m.getClientID() === item.getPreviousID(); }) !== -1) {
+            return true;
+        }
+        return this.items.findIndex(function (m) { return m.getPreviousID() === item.getClientID(); }) !== -1;
+    };
+    return Burst;
+}());
+/* harmony default export */ __webpack_exports__["a"] = (Burst);
+//# sourceMappingURL=burst.js.map
+
+/***/ }),
+
+/***/ 303:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return queue; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_Queue__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_Queue__ = __webpack_require__(75);
 
 /* Queue that ensures one file transfer at a time.  */
 var queue = new __WEBPACK_IMPORTED_MODULE_0__asset_Queue__["a" /* default */](1);
@@ -5062,7 +5378,7 @@ queue.start();
 
 /***/ }),
 
-/***/ 290:
+/***/ 304:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5220,117 +5536,13 @@ var VoicemailPlayer = (function () {
 
 /***/ }),
 
-/***/ 291:
+/***/ 305:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enum__ = __webpack_require__(194);
 
-var MINUTE = 60 * 1000;
-var Burst = (function () {
-    function Burst() {
-        var _this = this;
-        this.getItems = function () {
-            return _this.items;
-        };
-        this.hasItem = function (item) {
-            return _this.items.indexOf(item) > -1;
-        };
-        this.addItem = function (item) {
-            if (!_this.hasItems()) {
-                _this.chunkID = item.getChunkID();
-            }
-            _this.items.push(item);
-            _this.items.sort(function (m1, m2) {
-                return m1.getTime() - m2.getTime();
-            });
-        };
-        this.removeAllExceptLast = function () {
-            _this.items.splice(0, _this.items.length - 1);
-        };
-        this.firstItem = function () {
-            return _this.items[0];
-        };
-        this.lastItem = function () {
-            return _this.items[_this.items.length - 1];
-        };
-        this.hasItems = function () {
-            return _this.items.length > 0;
-        };
-        this.fitsItem = function (item) {
-            if (!_this.hasItems()) {
-                return true;
-            }
-            return _this.sameChunk(item) &&
-                _this.sameSender(item) &&
-                _this.continousMessage(item) &&
-                _this.sameDay(item) &&
-                _this.timeDifference(item) < MINUTE * 10;
-        };
-        this.getChunkID = function () { return _this.chunkID; };
-        this.sameChunk = function (item) {
-            if (!item) {
-                return false;
-            }
-            return _this.getChunkID() === item.getChunkID();
-        };
-        this.sameSender = function (message) {
-            return _this.firstItem().data.sender.id === message.data.sender.id;
-        };
-        this.sameDay = function (message) {
-            if (!message) {
-                return false;
-            }
-            if (message instanceof Burst) {
-                message = message.firstItem();
-            }
-            var date1 = new Date(__WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(_this.firstItem().getTime()));
-            var date2 = new Date(__WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(message.getTime()));
-            if (date1.getDate() !== date2.getDate()) {
-                return false;
-            }
-            if (date1.getMonth() !== date2.getMonth()) {
-                return false;
-            }
-            if (date1.getFullYear() !== date2.getFullYear()) {
-                return false;
-            }
-            return true;
-        };
-        this.timeDifference = function (item) {
-            return Math.abs(__WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(item.getTime()) - __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(_this.firstItem().getTime()));
-        };
-        this.isMe = function () {
-            return _this.firstItem().data.sender.me;
-        };
-        this.isOther = function () {
-            return !_this.firstItem().data.sender.me;
-        };
-        this.sender = function () {
-            return _this.firstItem().data.sender;
-        };
-        this.items = [];
-    }
-    Burst.prototype.continousMessage = function (item) {
-        if (this.items.findIndex(function (m) { return m.getClientID() === item.getPreviousID(); }) !== -1) {
-            return true;
-        }
-        return this.items.findIndex(function (m) { return m.getPreviousID() === item.getClientID(); }) !== -1;
-    };
-    return Burst;
-}());
-/* harmony default export */ __webpack_exports__["a"] = (Burst);
-//# sourceMappingURL=burst.js.map
-
-/***/ }),
-
-/***/ 292:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enum__ = __webpack_require__(183);
-
-var states = new __WEBPACK_IMPORTED_MODULE_0__enum__["default"](["INIT", "PENDING", "SUCCESS", "FAILED"]);
+var states = new __WEBPACK_IMPORTED_MODULE_0__enum__["a" /* default */](["INIT", "PENDING", "SUCCESS", "FAILED"]);
 var State = (function () {
     function State() {
         this._state = states.INIT;
@@ -5408,36 +5620,37 @@ var State = (function () {
 
 /***/ }),
 
-/***/ 293:
+/***/ 306:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MessagesPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_media__ = __webpack_require__(240);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_media__ = __webpack_require__(256);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(69);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_typestate__ = __webpack_require__(403);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_typestate__ = __webpack_require__(446);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_typestate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_typestate__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_uuid_v4__ = __webpack_require__(404);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_uuid_v4__ = __webpack_require__(447);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_uuid_v4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_uuid_v4__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_image_picker__ = __webpack_require__(154);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_file__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_camera__ = __webpack_require__(155);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ngx_translate_core__ = __webpack_require__(149);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_imageUpload_service__ = __webpack_require__(294);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__lib_services_fileUpload_service__ = __webpack_require__(244);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__lib_services_error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__lib_messages_messageService__ = __webpack_require__(150);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__lib_messages_chat__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__lib_messages_message__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__ = __webpack_require__(290);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__lib_services_blobService__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__lib_messages_burst__ = __webpack_require__(291);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__lib_services_featureToggles__ = __webpack_require__(156);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__lib_services_location_manager__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_image_picker__ = __webpack_require__(163);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_file__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_camera__ = __webpack_require__(164);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ngx_translate_core__ = __webpack_require__(156);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_imageUpload_service__ = __webpack_require__(307);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__lib_services_fileUpload_service__ = __webpack_require__(257);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__lib_services_error_service__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__lib_angularUtils__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__lib_messages_messageService__ = __webpack_require__(157);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__lib_messages_chat__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__lib_messages_message__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__lib_helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__ = __webpack_require__(304);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__lib_services_blobService__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__lib_messages_burst__ = __webpack_require__(302);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__lib_services_featureToggles__ = __webpack_require__(162);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__lib_services_location_manager__ = __webpack_require__(49);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -5448,6 +5661,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
  // tslint:disable-line:no-unused-variable
+
 
 
 
@@ -5487,7 +5701,7 @@ var ImagePickerOptions = {
     maximumImagesCount: 6
 };
 var INFINITE_SCROLLING_THRESHOLD = 1000;
-var MAXIMUM_FILE_SIZE_MB = Object(__WEBPACK_IMPORTED_MODULE_21__lib_services_location_manager__["c" /* isBusinessVersion */])() ? 15 : 10;
+var MAXIMUM_FILE_SIZE_MB = Object(__WEBPACK_IMPORTED_MODULE_22__lib_services_location_manager__["c" /* isBusinessVersion */])() ? 15 : 10;
 var isIOS = function () { return window.device && window.device.platform === 'iOS'; };
 var selectFileIOS = function () {
     return new __WEBPACK_IMPORTED_MODULE_3_bluebird__(function (resolve, reject) { return window.FilePicker.pickFile(resolve, reject, "public.item"); })
@@ -5499,8 +5713,8 @@ var selectFileAndroid = function () {
 };
 var selectFile = function () { return isIOS() ? selectFileIOS() : selectFileAndroid(); };
 var FILE = new __WEBPACK_IMPORTED_MODULE_7__ionic_native_file__["a" /* File */]();
-var inView = __webpack_require__(420);
-var initService = __webpack_require__(22);
+var inView = __webpack_require__(452);
+var initService = __webpack_require__(20);
 var BurstHelper;
 (function (BurstHelper) {
     BurstHelper.getNewElements = function (messagesAndUpdates, bursts) {
@@ -5511,14 +5725,14 @@ var BurstHelper;
         });
     };
     BurstHelper.calculateBursts = function (messages) {
-        var bursts = [new __WEBPACK_IMPORTED_MODULE_19__lib_messages_burst__["a" /* default */]()];
+        var bursts = [new __WEBPACK_IMPORTED_MODULE_20__lib_messages_burst__["a" /* default */]()];
         var currentBurst = bursts[0];
         messages.sort(function (m1, m2) {
             return m2.getTime() - m1.getTime();
         });
         messages.forEach(function (messageOrUpdate) {
             if (!currentBurst.fitsItem(messageOrUpdate)) {
-                currentBurst = new __WEBPACK_IMPORTED_MODULE_19__lib_messages_burst__["a" /* default */]();
+                currentBurst = new __WEBPACK_IMPORTED_MODULE_20__lib_messages_burst__["a" /* default */]();
                 bursts.push(currentBurst);
             }
             currentBurst.addItem(messageOrUpdate);
@@ -5615,11 +5829,11 @@ var MessagesPage = (function () {
             _this.stabilizeScroll();
         };
         this.sendVoicemail = function () {
-            var player = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
+            var player = new __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
             _this.resetRecordingState();
             player.awaitLoading().then(function () { return player.getRecordings(); }).map(function (_a) {
                 var url = _a.url, audio = _a.audio, duration = _a.duration;
-                var _b = Object(__WEBPACK_IMPORTED_MODULE_18__lib_services_blobService__["b" /* unpath */])(url), directory = _b.directory, name = _b.name;
+                var _b = Object(__WEBPACK_IMPORTED_MODULE_19__lib_services_blobService__["b" /* unpath */])(url), directory = _b.directory, name = _b.name;
                 return FILE.moveFile(_this.platform.is("ios") ? "file://" + directory : directory, name, FILE.cacheDirectory, name).then(function () { return ({
                     url: "" + FILE.cacheDirectory + name,
                     duration: duration
@@ -5713,8 +5927,8 @@ var MessagesPage = (function () {
             return dir + "recording_" + _this.recordingInfo.UUID + "." + extension;
         };
         this.formatTime = function (seconds) {
-            var fullSeconds = __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__["default"].pad(Math.floor(seconds % 60), 2);
-            var minutes = __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__["default"].pad(Math.floor(seconds / 60), 2);
+            var fullSeconds = __WEBPACK_IMPORTED_MODULE_17__lib_helper_helper__["default"].pad(Math.floor(seconds % 60), 2);
+            var minutes = __WEBPACK_IMPORTED_MODULE_17__lib_helper_helper__["default"].pad(Math.floor(seconds / 60), 2);
             return minutes + ":" + fullSeconds;
         };
         this.getCurrentDuration = function (beforeIndex) {
@@ -5745,8 +5959,8 @@ var MessagesPage = (function () {
                     });
                     clearInterval(_this.recordingInfo.updateInterval);
                     _this.recordingInfo.duration = 0;
-                    _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
-                    __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(false);
+                    _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
+                    __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(false);
                 });
             }
             else {
@@ -5759,10 +5973,10 @@ var MessagesPage = (function () {
                 _this.recordingFile.release();
                 _this.recordingFile = null;
             }
-            __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(false);
+            __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(false);
             clearInterval(_this.recordingInfo.updateInterval);
             _this.recordingPlayer.reset();
-            _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */]([]);
+            _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */]([]);
             _this.recordings = [];
             RecordingStateMachine.go(RecordingStates.NotRecording);
         };
@@ -5813,7 +6027,7 @@ var MessagesPage = (function () {
                 icon: !_this.platform.is("ios") ? "close" : null,
                 role: "cancel"
             };
-            var buttons = __WEBPACK_IMPORTED_MODULE_20__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.fileTransfer") ?
+            var buttons = __WEBPACK_IMPORTED_MODULE_21__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.fileTransfer") ?
                 [cameraButton, galleryButton, fileButton, cancelButton] :
                 [cameraButton, galleryButton, cancelButton];
             var actionSheet = _this.actionSheetCtrl.create({
@@ -5825,7 +6039,7 @@ var MessagesPage = (function () {
             var top = element.getBoundingClientRect().top - headerHeight;
             return top > 0 && top < _this.content.nativeElement.clientHeight;
         };
-        this.updateElementsInView = __WEBPACK_IMPORTED_MODULE_16__lib_helper_helper__["default"].debounce(function () {
+        this.updateElementsInView = __WEBPACK_IMPORTED_MODULE_17__lib_helper_helper__["default"].debounce(function () {
             var headerHeight = document.querySelector(".header").clientHeight;
             var messages = Array.prototype.slice.call(_this.content.nativeElement.querySelectorAll(".messages__wrap"));
             _this.inViewMessages = messages.filter(function (e) { return _this.isInView(e, headerHeight); });
@@ -5905,7 +6119,7 @@ var MessagesPage = (function () {
             var messages = _this.chat.getMessages()
                 .map(function (_a) {
                 var id = _a.id;
-                return __WEBPACK_IMPORTED_MODULE_15__lib_messages_message__["b" /* default */].getLoaded(id);
+                return __WEBPACK_IMPORTED_MODULE_16__lib_messages_message__["b" /* default */].getLoaded(id);
             });
             if (_this.burstTopic !== _this.chat.getID()) {
                 _this.bursts = BurstHelper.calculateBursts(messages);
@@ -5963,11 +6177,8 @@ var MessagesPage = (function () {
             }
             var sendPromise = _this.chat.sendMessage(text, { images: images, files: files, voicemails: voicemails });
             if (_this.chat.isDraft()) {
-                sendPromise.then(function () {
-                    _this.navCtrl.push("Messages", { chatID: _this.chat.getID() }, { animate: false }).then(function () {
-                        _this.navCtrl.remove(_this.navCtrl.length() - 2, 1);
-                    });
-                });
+                sendPromise
+                    .then(function () { return Object(__WEBPACK_IMPORTED_MODULE_13__lib_angularUtils__["a" /* replaceView */])(_this.navCtrl, "Messages", { chatID: _this.chat.getID() }, 1, { animate: false }); });
             }
             _this.chat.newMessage = "";
             _this.markRead();
@@ -5981,7 +6192,7 @@ var MessagesPage = (function () {
             allowEdit: !this.platform.is('ios'),
             correctOrientation: true
         };
-        this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */]([]);
+        this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */]([]);
         RecordingStateMachine.on(RecordingStates.NotRecording, function () {
             if (!_this.recordingFile) {
                 return;
@@ -6000,7 +6211,7 @@ var MessagesPage = (function () {
         }, false);
         document.addEventListener("resume", function () {
             if (_this.isRecordingUIVisible()) {
-                _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
+                _this.recordingPlayer = new __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */](_this.recordings);
             }
         });
         if (this.platform.is("ios")) {
@@ -6035,12 +6246,12 @@ var MessagesPage = (function () {
         if (!RecordingStateMachine.is(RecordingStates.NotRecording)) {
             this.discardRecording();
         }
-        if (__WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].activePlayer) {
-            __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].activePlayer.reset();
+        if (__WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */].activePlayer) {
+            __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */].activePlayer.reset();
         }
     };
     MessagesPage.prototype.showRecordIcon = function () {
-        if (!__WEBPACK_IMPORTED_MODULE_20__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.voiceMail")) {
+        if (!__WEBPACK_IMPORTED_MODULE_21__lib_services_featureToggles__["a" /* default */].isFeatureEnabled("chat.voiceMail")) {
             return false;
         }
         return this.newMessageText.length === 0;
@@ -6066,8 +6277,10 @@ var MessagesPage = (function () {
         this.recordingInfo.updateInterval = window.setInterval(function () {
             _this.recordingInfo.duration = (Date.now() - _this.recordingInfo.startTime) / 1000;
         }, 100);
-        __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].activePlayer.pause();
-        __WEBPACK_IMPORTED_MODULE_17__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(true);
+        if (__WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */].activePlayer) {
+            __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */].activePlayer.pause();
+        }
+        __WEBPACK_IMPORTED_MODULE_18__lib_asset_voicemailPlayer__["a" /* default */].setPlaybackBlocked(true);
     };
     MessagesPage.prototype.realScrollHeight = function (element) {
         return element.scrollHeight - element.clientHeight;
@@ -6160,14 +6373,14 @@ var MessagesPage = (function () {
         var _this = this;
         this.chatID = parseFloat(this.navParams.get("chatID"));
         if (this.chatID < 0) {
-            if (!__WEBPACK_IMPORTED_MODULE_14__lib_messages_chat__["b" /* default */].isLoaded(this.chatID)) {
+            if (!__WEBPACK_IMPORTED_MODULE_15__lib_messages_chat__["b" /* default */].isLoaded(this.chatID)) {
                 this.navCtrl.setRoot("Home");
                 this.navCtrl.popToRoot();
                 return;
             }
         }
         initService.awaitLoading().then(function () {
-            return __WEBPACK_IMPORTED_MODULE_13__lib_messages_messageService__["a" /* default */].getChat(_this.chatID);
+            return __WEBPACK_IMPORTED_MODULE_14__lib_messages_messageService__["a" /* default */].getChat(_this.chatID);
         }).then(function (chat) {
             _this.chat = chat;
             chat.loadInitialMessages().then(function () {
@@ -6193,35 +6406,30 @@ var MessagesPage = (function () {
             this.markRead();
             return;
         }
-        document.querySelector("topicwithbursts .messages__list").addEventListener("scroll", this.onElementInView);
+        document.querySelector(".messages__list").addEventListener("scroll", this.onElementInView);
     };
     __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])('content'),
-        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */])
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])('content'),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* ElementRef */])
     ], MessagesPage.prototype, "content", void 0);
     __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])('footer'),
-        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */])
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])('footer'),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* ElementRef */])
     ], MessagesPage.prototype, "footer", void 0);
     MessagesPage = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["h" /* IonicPage */])({
-            name: "Messages",
-            segment: "messages/:chatID",
-            defaultHistory: ["Home"]
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-messages',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/`<ion-header>\n	<ion-navbar [color]="\'primary\'" no-border>\n		<ion-title (click)="goToDetails()">\n\n			<!-- Actual navbar title -->\n			<span class="messages__header__username" [ngClass]="{\'messages__header__username--no-image\': getPartners().length > 1}">\n				<span *ngIf="!chat || !chat.getTitle()">\n					<span *ngIf="getPartners().length == 1" (click)="goToProfile(getPartners()[0].id)">\n						{{ getPartners()[0].name }}\n					</span>\n					<span *ngIf="getPartners().length != 1">\n						<span *ngFor="let partner of getPartners(); let l = last" (click)="goToProfile(partner.id)">\n							{{ partner.basic.shortname }}{{ l ? "":", " }}\n						</span>\n					</span>\n				</span>\n				<span *ngIf="chat && chat.getTitle()">\n					{{chat.getTitle()}}\n				</span>\n			</span>\n\n			<!-- Avatar for one user -->\n			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="getPartners().length == 1" (click)="goToProfile(getPartners()[0].id)">\n				<user-image [id]="getPartners()[0].id" [image]="getPartners()[0].basic.image"></user-image>\n			</ion-avatar>\n\n		</ion-title>\n	</ion-navbar>\n</ion-header>\n<ion-content>\n	<div class="messages__list" #content>\n		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>\n		<div class="messages_filler"></div>\n		<ion-list no-lines>\n			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">\n				<BurstDifference [chat]="chat" [burst]="bursts[0]"></BurstDifference>\n			</ion-item>\n			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{\'burst--me\': burst.isMe(), \'burst--other\': burst.isOther()}">\n				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>\n\n				<div *ngIf="isPreviousMissing(burst)" style="\n					display: flex;\n					justify-content: center;\n					align-items: center;\n				">\n					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>\n				</div>\n\n				<span>\n					<div *ngIf="burst.isOther() && getPartners().length > 1">{{burst.firstItem().data.sender.name}}</div>\n					<Message [message]="message" *ngFor="let message of burst.items"></Message>\n				</span>\n\n				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>\n			</ion-item>\n		</ion-list>\n	</div>\n\n	<div class="messages__form" *ngIf="platform.is(\'ios\')" #footer>\n		<div *ngIf="isRecordingUIVisible()" class="messages__form__button-wrap">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="ios__messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="clean-input-wrap ios__messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-stats" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"\n		*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n\n	<!-- TODO: refactor this to be one form, not two -->\n	<div class="messages__form" *ngIf="!platform.is(\'ios\')" #footer>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-stats" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button\n			ion-button icon-only clear (click)="sendMessageToChat()"\n			class="messages__send-message"\n			*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button ion-button icon-only clear class="messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n</ion-content>\n`/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/
         }),
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-messages',template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/'<ion-header>\n	<ion-navbar [color]="\'primary\'" no-border>\n		<ion-title (click)="goToDetails()">\n\n			<!-- Actual navbar title -->\n			<span class="messages__header__username" [ngClass]="{\'messages__header__username--no-image\': getPartners().length > 1}">\n				<span *ngIf="!chat || !chat.getTitle()">\n					<span *ngIf="getPartners().length == 1" (click)="goToProfile(getPartners()[0].id)">\n						{{ getPartners()[0].name }}\n					</span>\n					<span *ngIf="getPartners().length != 1">\n						<span *ngFor="let partner of getPartners(); let l = last" (click)="goToProfile(partner.id)">\n							{{ partner.basic.shortname }}{{ l ? "":", " }}\n						</span>\n					</span>\n				</span>\n				<span *ngIf="chat && chat.getTitle()">\n					{{chat.getTitle()}}\n				</span>\n			</span>\n\n			<!-- Avatar for one user -->\n			<ion-avatar item-left class="messages__header-image hexagon__image hexagon__image--small" *ngIf="getPartners().length == 1" (click)="goToProfile(getPartners()[0].id)">\n				<user-image [id]="getPartners()[0].id" [image]="getPartners()[0].basic.image"></user-image>\n			</ion-avatar>\n\n		</ion-title>\n	</ion-navbar>\n</ion-header>\n<ion-content>\n	<div class="messages__list" #content>\n		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>\n		<div class="messages_filler"></div>\n		<ion-list no-lines>\n			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">\n				<BurstDifference [chat]="chat" [burst]="bursts[0]"></BurstDifference>\n			</ion-item>\n			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{\'burst--me\': burst.isMe(), \'burst--other\': burst.isOther()}">\n				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>\n\n				<div *ngIf="isPreviousMissing(burst)" style="\n					display: flex;\n					justify-content: center;\n					align-items: center;\n				">\n					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>\n				</div>\n\n				<span>\n					<div *ngIf="burst.isOther() && getPartners().length > 1">{{burst.firstItem().data.sender.name}}</div>\n					<Message [message]="message" *ngFor="let message of burst.items"></Message>\n				</span>\n\n				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>\n			</ion-item>\n		</ion-list>\n	</div>\n\n	<div class="messages__form" *ngIf="platform.is(\'ios\')" #footer>\n		<div *ngIf="isRecordingUIVisible()" class="messages__form__button-wrap">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="ios__messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="ios__messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="clean-input-wrap ios__messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="ios__messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-stats" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="sendMessageToChat()"\n		*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button color="green" ion-button icon-only class="ios__messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n\n	<!-- TODO: refactor this to be one form, not two -->\n	<div class="messages__form" *ngIf="!platform.is(\'ios\')" #footer>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="discardRecording()">\n				<ion-icon name="trash"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="danger" class="messages__add-assets" (click)="toggleRecording()">\n				<ion-icon name="mic" *ngIf="isPaused()"></ion-icon>\n				<ion-icon name="pause" *ngIf="!isPaused()"></ion-icon>\n			</button>\n			<button *ngIf="isPaused()" ion-button icon-only clear color="grey" class="messages__add-assets" (click)="togglePlayback()">\n				<ion-icon name="{{(isPlayback() ? \'pause\' : \'play\')}}"></ion-icon>\n			</button>\n		</div>\n		<div\n			class="messages__form__button-wrap"\n			*ngIf="!isRecordingUIVisible()">\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="presentActionSheet()">\n				<ion-icon name="add-circle"></ion-icon>\n			</button>\n			<button ion-button icon-only clear color="grey" class="messages__add-assets" (click)="takeImage()" *ngIf="showCameraShortcut()">\n				<ion-icon name="camera"></ion-icon>\n			</button>\n		</div>\n		<ion-item class="messages__input-wrap">\n			<ion-textarea rows="1" type="text" class="messages__message-input" autocomplete="on" autocorrect="on" id="sendMessageBox" (ngModelChange)="change()" [(ngModel)]="newMessageText" [disabled]="isRecordingUIVisible()" (ionBlur)="toggleInputFocus()" (ionFocus)="toggleInputFocus()"></ion-textarea>\n		</ion-item>\n		<div class="ios__messages__recording-overlay" [ngClass]="{\'ios__messages__recording-overlay--distance\': isPaused()}">\n			<span *ngIf="isRecording()">\n				<ion-icon name="mic" color="danger"></ion-icon>\n				<span>&nbsp;Recording - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n			<span *ngIf="isPaused()">\n				<span *ngIf="isPlayback()">\n					<ion-icon icon name="ios-stats" color="primary"></ion-icon>\n					<span>&nbsp;{{ formatTime(getPosition()) }} / {{ formatTime(getDuration()) }}</span>\n				</span>\n				<span *ngIf="!isPlayback()">Paused - <time class="ios__messages__recording__time">{{ formatTime(getDuration()) }}</time></span>\n			</span>\n		</div>\n		<button\n			ion-button icon-only clear (click)="sendMessageToChat()"\n			class="messages__send-message"\n			*ngIf="!showRecordIcon() || isRecordingUIVisible()">\n			<ion-icon name="send"></ion-icon>\n		</button>\n		<button ion-button icon-only clear class="messages__send-message" (click)="toggleRecording()"\n		*ngIf="showRecordIcon() && !isRecordingUIVisible()">\n			<ion-icon name="mic"></ion-icon>\n		</button>\n	</div>\n</ion-content>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/pages/messages/messages.html"*/
-        }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["j" /* NavController */],
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* NavController */],
             __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["a" /* ActionSheetController */],
-            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["l" /* Platform */],
+            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["k" /* Platform */],
             __WEBPACK_IMPORTED_MODULE_6__ionic_native_image_picker__["a" /* ImagePicker */],
             __WEBPACK_IMPORTED_MODULE_8__ionic_native_camera__["a" /* Camera */],
             __WEBPACK_IMPORTED_MODULE_9__ngx_translate_core__["c" /* TranslateService */],
             __WEBPACK_IMPORTED_MODULE_1__ionic_native_media__["a" /* Media */],
             __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["b" /* AlertController */],
-            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["k" /* NavParams */],
-            __WEBPACK_IMPORTED_MODULE_0__angular_core__["u" /* ElementRef */]])
+            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["j" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* ElementRef */]])
     ], MessagesPage);
     return MessagesPage;
 }());
@@ -6230,17 +6438,17 @@ var MessagesPage = (function () {
 
 /***/ }),
 
-/***/ 294:
+/***/ 307:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screenSize_service__ = __webpack_require__(416);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__fileUpload_service__ = __webpack_require__(244);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobService__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screenSize_service__ = __webpack_require__(450);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__fileUpload_service__ = __webpack_require__(257);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__blobService__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_Queue__ = __webpack_require__(75);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -6265,7 +6473,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 
 
 
-var imageLib = __webpack_require__(417);
+var imageLib = __webpack_require__(451);
 var canvasToBlob = __WEBPACK_IMPORTED_MODULE_0_bluebird__["promisify"](__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].canvasToBlob.bind(__WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"]));
 var PREVIEWSDISABLED = false;
 var defaultOptions = {
@@ -6555,7 +6763,7 @@ var ImageUpload = (function (_super) {
 
 /***/ }),
 
-/***/ 297:
+/***/ 310:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6585,19 +6793,19 @@ var Tutorial;
 
 /***/ }),
 
-/***/ 298:
+/***/ 311:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__ = __webpack_require__(299);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch__ = __webpack_require__(314);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__ = __webpack_require__(312);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch__ = __webpack_require__(326);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rxjs_add_operator_catch__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__ = __webpack_require__(102);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise__ = __webpack_require__(316);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise__ = __webpack_require__(330);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_toPromise__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_module__ = __webpack_require__(318);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_module__ = __webpack_require__(331);
 
 
 
@@ -6608,15 +6816,15 @@ Object(__WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__["a" /* pl
 
 /***/ }),
 
-/***/ 30:
+/***/ 32:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "errorServiceInstance", function() { return errorServiceInstance; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_whatwg_fetch__ = __webpack_require__(347);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_whatwg_fetch__ = __webpack_require__(360);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_whatwg_fetch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_whatwg_fetch__);
-var config = __webpack_require__(56);
+var config = __webpack_require__(61);
 
 var ErrorService = (function () {
     function ErrorService() {
@@ -6680,40 +6888,40 @@ var errorServiceInstance = new ErrorService();
 
 /***/ }),
 
-/***/ 318:
+/***/ 331:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export createTranslateLoader */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_moment__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_moment__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_moment__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_common__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_common__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ionic_angular__ = __webpack_require__(69);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_component__ = __webpack_require__(438);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_component__ = __webpack_require__(470);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__angular_platform_browser__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_splash_screen__ = __webpack_require__(284);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_status_bar__ = __webpack_require__(151);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__ = __webpack_require__(285);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ionic_native_push__ = __webpack_require__(286);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ionic_native_photo_viewer__ = __webpack_require__(288);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__ionic_native_image_picker__ = __webpack_require__(154);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_file__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_camera__ = __webpack_require__(155);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__ionic_native_barcode_scanner__ = __webpack_require__(295);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__ionic_native_in_app_browser__ = __webpack_require__(296);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__ionic_native_media__ = __webpack_require__(240);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__ionic_native_keyboard__ = __webpack_require__(287);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__ = __webpack_require__(149);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__ngx_translate_http_loader__ = __webpack_require__(440);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__angular_http__ = __webpack_require__(442);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__lib_services_location_manager__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__lib_services_featureToggles__ = __webpack_require__(156);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__lib_services_settings_service__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_moment_locale_de__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_splash_screen__ = __webpack_require__(297);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_status_bar__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__ = __webpack_require__(298);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ionic_native_push__ = __webpack_require__(299);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ionic_native_photo_viewer__ = __webpack_require__(301);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__ionic_native_image_picker__ = __webpack_require__(163);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_file__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_camera__ = __webpack_require__(164);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__ionic_native_barcode_scanner__ = __webpack_require__(308);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__ionic_native_in_app_browser__ = __webpack_require__(309);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__ionic_native_media__ = __webpack_require__(256);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__ionic_native_keyboard__ = __webpack_require__(300);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__ = __webpack_require__(156);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__ngx_translate_http_loader__ = __webpack_require__(472);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__angular_http__ = __webpack_require__(474);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__lib_services_location_manager__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__lib_services_featureToggles__ = __webpack_require__(162);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__lib_services_settings_service__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_moment_locale_de__ = __webpack_require__(108);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_25_moment_locale_de___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_25_moment_locale_de__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -6724,10 +6932,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-__webpack_require__(319);
-__webpack_require__(355);
-__webpack_require__(186);
-__webpack_require__(379);
+__webpack_require__(332);
+__webpack_require__(391);
+__webpack_require__(392);
+__webpack_require__(393);
 
  // tslint:disable-line:no-unused-variable
 
@@ -6846,7 +7054,7 @@ var AppModule = (function () {
         fn();
     };
     AppModule = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["L" /* NgModule */])({
+        Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["I" /* NgModule */])({
             declarations: [
                 __WEBPACK_IMPORTED_MODULE_5__app_component__["a" /* MyApp */]
             ],
@@ -6857,7 +7065,6 @@ var AppModule = (function () {
                     autoFocusAssist: false
                 }, {
                     links: [
-                        { loadChildren: '../pages/messages/messages.module#MessagesPageModule', name: 'Messages', segment: 'messages/:chatID', priority: 'low', defaultHistory: ['Home'] },
                         { loadChildren: '../pages/blocked-users/blockedUsers.module#ContactsPageModule', name: 'Blocked Users', segment: 'blockedusers', priority: 'low', defaultHistory: [] },
                         { loadChildren: '../pages/contact-requests/contact-requests.module#ContactRequestPageModule', name: 'Requests', segment: 'requests', priority: 'low', defaultHistory: [] },
                         { loadChildren: '../pages/contacts/contacts.module#ContactsPageModule', name: 'Contacts', segment: 'contacts', priority: 'low', defaultHistory: [] },
@@ -6866,8 +7073,9 @@ var AppModule = (function () {
                         { loadChildren: '../pages/messages/add/add.module#AddPageModule', name: 'Select User', segment: 'messages/:chatID/add', priority: 'low', defaultHistory: [] },
                         { loadChildren: '../pages/messages/details/details.module#DetailsPageModule', name: 'Chat Details', segment: 'messages/:chatID/details', priority: 'low', defaultHistory: [] },
                         { loadChildren: '../pages/new-message/new-message.module#NewMessagePageModule', name: 'New Message', segment: 'newMessage/:receiverIds', priority: 'low', defaultHistory: [] },
-                        { loadChildren: '../pages/profile/profile.module#ProfilePageModule', name: 'Profile', segment: 'profile/:userId', priority: 'low', defaultHistory: [] },
+                        { loadChildren: '../pages/messages/messages.module#MessagesPageModule', name: 'Messages', segment: 'messages/:chatID', priority: 'low', defaultHistory: ['Home'] },
                         { loadChildren: '../pages/sales/sales.module#SalesPageModule', name: 'Sales', segment: 'sales', priority: 'low', defaultHistory: [] },
+                        { loadChildren: '../pages/profile/profile.module#ProfilePageModule', name: 'Profile', segment: 'profile/:userId', priority: 'low', defaultHistory: [] },
                         { loadChildren: '../pages/settings/settings.module#SettingsPageModule', name: 'Settings', segment: 'settings', priority: 'low', defaultHistory: [] }
                     ]
                 }),
@@ -6886,8 +7094,8 @@ var AppModule = (function () {
                 __WEBPACK_IMPORTED_MODULE_5__app_component__["a" /* MyApp */],
             ],
             providers: [
-                { provide: __WEBPACK_IMPORTED_MODULE_1__angular_core__["v" /* ErrorHandler */], useClass: __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["f" /* IonicErrorHandler */] },
-                __WEBPACK_IMPORTED_MODULE_2__angular_common__["c" /* DatePipe */],
+                { provide: __WEBPACK_IMPORTED_MODULE_1__angular_core__["u" /* ErrorHandler */], useClass: __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["f" /* IonicErrorHandler */] },
+                __WEBPACK_IMPORTED_MODULE_2__angular_common__["d" /* DatePipe */],
                 __WEBPACK_IMPORTED_MODULE_15__ionic_native_barcode_scanner__["a" /* BarcodeScanner */],
                 __WEBPACK_IMPORTED_MODULE_7__ionic_native_splash_screen__["a" /* SplashScreen */],
                 __WEBPACK_IMPORTED_MODULE_8__ionic_native_status_bar__["a" /* StatusBar */],
@@ -6902,26 +7110,28 @@ var AppModule = (function () {
                 __WEBPACK_IMPORTED_MODULE_18__ionic_native_keyboard__["a" /* Keyboard */],
             ]
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_core__["P" /* NgZone */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_core__["P" /* NgZone */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__["c" /* TranslateService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__["c" /* TranslateService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__["a" /* Globalization */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__["a" /* Globalization */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* Config */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* Config */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["l" /* Platform */] // tslint:disable-line:no-unused-variable
-             !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["l" /* Platform */] // tslint:disable-line:no-unused-variable
-            ) === "function" && _e || Object])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_core__["M" /* NgZone */],
+            __WEBPACK_IMPORTED_MODULE_19__ngx_translate_core__["c" /* TranslateService */],
+            __WEBPACK_IMPORTED_MODULE_9__ionic_native_globalization__["a" /* Globalization */],
+            __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* Config */],
+            __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["k" /* Platform */] // tslint:disable-line:no-unused-variable
+        ])
     ], AppModule);
     return AppModule;
-    var _a, _b, _c, _d, _e;
 }());
 
 //# sourceMappingURL=app.module.js.map
 
 /***/ }),
 
-/***/ 319:
+/***/ 332:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var keyStore = __webpack_require__(32).default;
-var socketService = __webpack_require__(11).default;
+var keyStore = __webpack_require__(34).default;
+var socketService = __webpack_require__(10).default;
 
 var interceptor = {
 	transformResponse: function transformResponse(response) {
@@ -6941,465 +7151,28 @@ socketService.addInterceptor(interceptor);
 
 /***/ }),
 
-/***/ 32:
+/***/ 34:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__requestKey_service__ = __webpack_require__(168);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__requestKey_service__ = __webpack_require__(179);
 
-
-__WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js__["upload"].setKeyGet(__WEBPACK_IMPORTED_MODULE_0__requestKey_service__["a" /* default */].getKey);
-/* harmony default export */ __webpack_exports__["default"] = (__WEBPACK_IMPORTED_MODULE_1__crypto_keyStore_js__);
+var keyStore = __webpack_require__(28);
+keyStore.upload.setKeyGet(__WEBPACK_IMPORTED_MODULE_0__requestKey_service__["a" /* default */].getKey);
+/* harmony default export */ __webpack_exports__["default"] = (keyStore);
 //# sourceMappingURL=keyStore.service.js.map
 
 /***/ }),
 
-/***/ 33:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var h = __webpack_require__(5).default;
-var keyStore = __webpack_require__(26);
-var errors = __webpack_require__(48);
-var config = __webpack_require__(56);
-var Bluebird = __webpack_require__(3);
-
-var attributesNeverVerified = ["_signature", "_hashObject"];
-
-/** crypted content with metadata
-		@param content the content to handle either encrypted or decrypted
-		@param meta metadata for the content
-		@param isDecrypted whether the content is decrypted
-*/
-function SecuredDataWithMetaData(content, meta, options, isDecrypted) {
-	options = options || {};
-
-	//we need to somehow ensure that we have the correct object type.
-	if (typeof options.type !== "string") {
-		throw new Error("need a type for security!");
-	}
-
-	this._type = options.type;
-	this._alternativeType = options.alternativeType;
-
-	this._removeEmpty = options.removeEmpty;
-	this._encryptDepth = options.encryptDepth || 0;
-
-	this._attributesNotVerified = options.attributesNotVerified || [];
-	this._attributesNotVerified.filter(function (val) {
-		return val.match(/^A-z0-9$/);
-	});
-	this._attributesNotVerified = attributesNeverVerified.concat(this._attributesNotVerified);
-
-	this._decrypted = isDecrypted;
-
-	this._hasContent = true;
-
-	this._original = {
-		meta: meta || {}
-	};
-
-	if (typeof content === "undefined") {
-		this._hasContent = false;
-	} else if (isDecrypted) {
-		this._original.content = content;
-	} else {
-		this._original.encryptedContent = content;
-	}
-
-	this._updated = h.deepCopyObj(this._original);
-}
-
-SecuredDataWithMetaData.prototype._blockDisallowedAttributes = function (data) {
-	if (data._contentHash || data._key || data._signature || data._version) {
-		throw new Error("content hash/key should not be provided by outside world");
-	}
-};
-
-SecuredDataWithMetaData.prototype.hasContent = function () {
-	return this._hasContent;
-};
-
-SecuredDataWithMetaData.prototype.getHash = function () {
-	return this._updated.meta._ownHash;
-};
-
-SecuredDataWithMetaData.prototype.getKey = function () {
-	return this._original.meta._key;
-};
-
-SecuredDataWithMetaData.prototype.sign = function (signKey, cb) {
-	var that = this;
-	var toSign = h.deepCopyObj(that._updated.meta);
-	var hashVersion = config.hashVersion;
-
-	return Bluebird.try(function () {
-		toSign._version = 1;
-		toSign._type = that._type;
-
-		toSign._hashVersion = hashVersion;
-
-		//do not sign attributes which should not be verified
-		that._attributesNotVerified.forEach(function (attr) {
-			delete toSign[attr];
-		});
-
-		if (that._updated.paddedContent || that._updated.content) {
-			var hashContent = that._updated.paddedContent || that._updated.content;
-
-			return keyStore.hash.hashObjectOrValueHexAsync(hashContent).then(function (contentHash) {
-				toSign._contentHash = contentHash;
-
-				//create new ownHash
-				delete toSign._ownHash;
-				return keyStore.hash.hashObjectOrValueHexAsync(toSign);
-			}).then(function (ownHash) {
-				toSign._ownHash = ownHash;
-			});
-		}
-	}).then(function () {
-		return keyStore.sign.signObject(toSign, signKey, hashVersion);
-	}).then(function (signature) {
-		toSign._signature = signature;
-
-		return toSign;
-	}).nodeify(cb);
-};
-
-SecuredDataWithMetaData.prototype.getUpdatedData = function (signKey, cb) {
-	return this.verify(signKey).bind(this).then(function () {
-		if (this._hasContent) {
-			keyStore.security.addEncryptionIdentifier(this._original.meta._key);
-			return this._signAndEncrypt(signKey, this._original.meta._key);
-		}
-
-		return this.sign(signKey);
-	}).nodeify(cb);
-};
-
-/** sign and encrypt this object.
-		pads and then encrypts our content.
-		adds contentHash, key id and version to metaData and signs meta data.
-		@param signKey key to use for signing
-		@param cb callback(cryptedData, metaData),
-*/
-SecuredDataWithMetaData.prototype._signAndEncrypt = function (signKey, cryptKey) {
-	if (!this._hasContent) {
-		throw new Error("can only sign and not encrypt");
-	}
-
-	if (this._original.meta._key && this._original.meta._key !== cryptKey) {
-		throw new Error("can not re-encrypt an old object with new key!");
-	}
-
-	return keyStore.hash.addPaddingToObject(this._updated.content, 128).bind(this).then(function (paddedContent) {
-		this._updated.paddedContent = paddedContent;
-
-		this._updated.meta._key = keyStore.correctKeyIdentifier(cryptKey);
-
-		return Bluebird.all([keyStore.sym.encryptObject(paddedContent, cryptKey, this._encryptDepth), this.sign(signKey)]);
-	}).spread(function (cryptedData, meta) {
-		this._updated.meta = meta;
-
-		return {
-			content: cryptedData,
-			meta: meta
-		};
-	});
-};
-
-SecuredDataWithMetaData.prototype.signAndEncrypt = function (signKey, cryptKey) {
-	return this._signAndEncrypt(signKey, cryptKey);
-};
-
-SecuredDataWithMetaData.prototype.hasType = function (type) {
-	if (type === this._type) {
-		return true;
-	}
-
-	if (this._alternativeType && this._alternativeType === type) {
-		return true;
-	}
-
-	return false;
-};
-
-/** verify the decrypted data
-		decrypts data if necessary
-		@param signKey key to check signature against
-		@param id id for signature caching
-		@throw SecurityError: contenthash or signature wrong
-*/
-SecuredDataWithMetaData.prototype.verifyAsync = function (signKey, id) {
-	//check contentHash is correct
-	//check signature is correct
-
-	return Bluebird.resolve().bind(this).then(function () {
-		var metaCopy = h.deepCopyObj(this._original.meta);
-
-		this._attributesNotVerified.forEach(function (attr) {
-			delete metaCopy[attr];
-		});
-
-		if (!this.hasType(metaCopy._type)) {
-			// eslint-disable-next-line no-debugger
-			debugger;
-			throw new errors.SecurityError("invalid object type. is: " + metaCopy._type + " should be: " + this._type);
-		}
-
-		if (typeof metaCopy._hashVersion === "number") {
-			metaCopy._hashVersion = h.parseDecimal(metaCopy._hashVersion);
-		}
-
-		var hashVersion = 1;
-
-		if (metaCopy._hashVersion) {
-			hashVersion = metaCopy._hashVersion;
-		} else if (metaCopy._v2 && metaCopy._v2 !== "false") {
-			hashVersion = 2;
-		}
-
-		return keyStore.sign.verifyObject(this._original.meta._signature, metaCopy, signKey, hashVersion, id);
-	}).then(function (correctSignature) {
-		if (!correctSignature) {
-			alert("Bug: signature did not match (" + this._original.meta._type + ") Please report this bug!");
-			throw new errors.SecurityError("signature did not match " + this._original.meta._type);
-		}
-
-		return this._verifyContentHash();
-	}).then(function () {
-		return true;
-	});
-};
-
-SecuredDataWithMetaData.prototype.verify = function (signKey, cb, id) {
-	return this.verifyAsync(signKey, id).nodeify(cb);
-};
-
-SecuredDataWithMetaData.prototype.updated = function () {
-	this._changed = false;
-};
-
-SecuredDataWithMetaData.prototype._decrypt = function () {
-	if (!this._decryptionPromise) {
-		this._decryptionPromise = keyStore.sym.decryptObject(this._original.encryptedContent, this._encryptDepth, undefined, this._original.meta._key).bind(this).then(function (decryptedData) {
-			this._decrypted = true;
-			this._original.paddedContent = decryptedData;
-			this._original.content = keyStore.hash.removePaddingFromObject(decryptedData, 128);
-			this._updated.content = h.deepCopyObj(this._original.content);
-
-			return this._verifyContentHash();
-		});
-	}
-
-	return this._decryptionPromise;
-};
-
-SecuredDataWithMetaData.prototype.decrypt = function (cb) {
-	return Bluebird.resolve().bind(this).then(function () {
-		if (this._hasContent && !this._decrypted) {
-			return this._decrypt();
-		}
-	}).then(function () {
-		if (!this._hasContent) {
-			return;
-		}
-
-		return this._original.content;
-	}).nodeify(cb);
-};
-
-SecuredDataWithMetaData.prototype._verifyContentHash = function (cb) {
-	if (!this._hasContent || !this._decrypted) {
-		return Bluebird.resolve().nodeify(cb);
-	}
-
-	return Bluebird.bind(this).then(function () {
-		return keyStore.hash.hashObjectOrValueHexAsync(this._original.paddedContent || this._original.content);
-	}).then(function (hash) {
-		if (hash !== this._original.meta._contentHash) {
-			throw new errors.SecurityError("content hash did not match");
-		}
-	}).nodeify(cb);
-};
-
-SecuredDataWithMetaData.prototype.isChanged = function () {
-	return this._changed;
-};
-SecuredDataWithMetaData.prototype.isEncrypted = function () {
-	return !this._decrypted;
-};
-SecuredDataWithMetaData.prototype.isDecrypted = function () {
-	return this._decrypted;
-};
-
-SecuredDataWithMetaData.prototype.contentGet = function () {
-	return h.deepCopyObj(this._updated.content);
-};
-SecuredDataWithMetaData.prototype.metaGet = function () {
-	return h.deepCopyObj(this._updated.meta);
-};
-SecuredDataWithMetaData.prototype.metaHasAttr = function (attr) {
-	return this._updated.meta.hasOwnProperty(attr);
-};
-SecuredDataWithMetaData.prototype.metaKeys = function () {
-	return Object.keys(this._updated.meta).filter(function (key) {
-		return key[0] !== "_";
-	});
-};
-SecuredDataWithMetaData.prototype.metaAttr = function (attr) {
-	return h.deepCopyObj(this._updated.meta[attr]);
-};
-
-/** sets the whole content to the given data
-		@param newContent new value for this objects content
-*/
-SecuredDataWithMetaData.prototype.contentSet = function (newContent) {
-	this._hasContent = this._changed = true;
-	this._updated.content = newContent;
-};
-
-/** set a certain attribute in the content object
-		@param attr attribute to set
-		@param value value to set attribute to
-*/
-SecuredDataWithMetaData.prototype.contentSetAttr = function (attr, value) {
-	if (_typeof(this._updated.content) !== "object") {
-		throw new Error("our content is not an object");
-	}
-
-	this._updated.content[attr] = value;
-	this._changed = true;
-};
-
-SecuredDataWithMetaData.prototype.contentRemoveAttr = function (attr) {
-	if (_typeof(this._updated.content) !== "object") {
-		throw new Error("our content is not an object");
-	}
-
-	delete this._updated.content[attr];
-	this._changed = true;
-};
-
-/** sets the whole metaData to the given data
-		@param newMetaData new value for this objects metaData
-*/
-SecuredDataWithMetaData.prototype.metaSet = function (newMetaData) {
-	this._blockDisallowedAttributes(newMetaData);
-
-	this._changed = true;
-	this._updated.meta = newMetaData;
-};
-
-SecuredDataWithMetaData.prototype.metaRemoveAttr = function (attr) {
-	if (attr[0] === "_") {
-		throw new Error("private attributes should not be provided by outside world");
-	}
-
-	this._changed = true;
-	delete this._updated.meta[attr];
-};
-
-SecuredDataWithMetaData.prototype.metaSetAttr = function (attr, value) {
-	if (attr[0] === "_") {
-		throw new Error("private attributes should not be provided by outside world");
-	}
-
-	this._changed = true;
-	this._updated.meta[attr] = value;
-};
-
-/** set a certain attribute in the meta object
-		@param attrs [] list of which attribute to set
-		@param value value to set attribute to
-*/
-SecuredDataWithMetaData.prototype.metaAdd = function (attrs, value) {
-	this._changed = h.deepSetCreate(this._updated.meta, attrs, value);
-};
-
-SecuredDataWithMetaData.prototype.setParent = function (parentSecuredData) {
-	this._updated.meta._parent = parentSecuredData.getHash();
-};
-
-SecuredDataWithMetaData.prototype.checkParent = function (expectedParent) {
-	if (this._updated.meta._parent !== expectedParent.getHash()) {
-		throw new errors.SecurityError("wrong parent. is: " + this._updated.meta._parent + " should be: " + expectedParent.getHash());
-	}
-};
-
-SecuredDataWithMetaData.prototype.getRelationshipCounter = function () {
-	return h.parseDecimal(this._updated.meta._sortCounter || 0);
-};
-
-SecuredDataWithMetaData.prototype.setAfterRelationShip = function (afterSecuredData) {
-	this._updated.meta._sortCounter = afterSecuredData.getRelationshipCounter() + 1;
-};
-
-SecuredDataWithMetaData.prototype.checkAfter = function (securedData) {
-	if (this.getRelationshipCounter() < securedData.getRelationshipCounter()) {
-		throw new errors.SecurityError("wrong ordering. " + this.getRelationshipCounter() + " should be after " + securedData.getRelationshipCounter());
-	}
-};
-
-SecuredDataWithMetaData.prototype.checkBefore = function (securedData) {
-	if (this.getRelationshipCounter() > securedData.getRelationshipCounter()) {
-		throw new errors.SecurityError("wrong ordering. " + this.getRelationshipCounter() + " should be before " + securedData.getRelationshipCounter());
-	}
-};
-
-var api = {
-	createPromisified: function createPromisified(content, meta, options, signKey, cryptKey) {
-		var securedData, securedDataPromise;
-		securedDataPromise = Bluebird.fromCallback(function (cb) {
-			securedData = api.create(content, meta, options, signKey, cryptKey, cb);
-		});
-
-		return {
-			promise: securedDataPromise,
-			data: securedData
-		};
-	},
-	createAsync: function createAsync(content, meta, options, signKey, cryptKey) {
-		return Bluebird.fromCallback(function (cb) {
-			api.create(content, meta, options, signKey, cryptKey, cb);
-		});
-	},
-	create: function create(content, meta, options, signKey, cryptKey, cb) {
-		var secured = api.createRaw(content, meta, options);
-
-		Bluebird.resolve().delay(1).then(function () {
-			return secured._signAndEncrypt(signKey, cryptKey);
-		}).nodeify(cb);
-
-		return secured;
-	},
-	load: function load(content, meta, options) {
-		return new SecuredDataWithMetaData(content, meta, options);
-	},
-	createRaw: function createRaw(content, meta, options) {
-		return new SecuredDataWithMetaData(content, meta, options, true);
-	}
-};
-
-module.exports = api;
-
-/***/ }),
-
-/***/ 340:
+/***/ 353:
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ 344:
+/***/ 357:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -7415,7 +7188,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 345:
+/***/ 358:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -7432,13 +7205,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ 346:
+/***/ 359:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(16);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -7547,7 +7320,7 @@ var BlobUploader = (function (_super) {
 
 /***/ }),
 
-/***/ 349:
+/***/ 362:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7591,13 +7364,13 @@ var Storage = (function () {
 
 /***/ }),
 
-/***/ 350:
+/***/ 363:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var sjcl = __webpack_require__(43);
+var sjcl = __webpack_require__(45);
 var Bluebird = __webpack_require__(3);
 
 /**
@@ -7630,16 +7403,16 @@ module.exports = waitForReady;
 
 /***/ }),
 
-/***/ 351:
+/***/ 364:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var WorkerPool = __webpack_require__(352);
+var WorkerPool = __webpack_require__(365);
 var bluebird = __webpack_require__(3);
-var chelper = __webpack_require__(182);
-var config = __webpack_require__(56);
+var chelper = __webpack_require__(193);
+var config = __webpack_require__(61);
 
 function getEntropy() {
 	try {
@@ -7814,13 +7587,13 @@ module.exports = sjclWorker;
 
 /***/ }),
 
-/***/ 352:
+/***/ 365:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Worker = __webpack_require__(353);
+var Worker = __webpack_require__(366);
 
 /** constructor for worker pool
 *   @param Promise a promise implementation
@@ -7928,7 +7701,7 @@ module.exports = WorkerPool;
 
 /***/ }),
 
-/***/ 353:
+/***/ 366:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8059,7 +7832,7 @@ module.exports = PromiseWorker;
 
 /***/ }),
 
-/***/ 354:
+/***/ 367:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8067,8 +7840,8 @@ module.exports = PromiseWorker;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var chelper = __webpack_require__(182);
-var sjcl = __webpack_require__(43);
+var chelper = __webpack_require__(193);
+var sjcl = __webpack_require__(45);
 
 var ObjectHasher = function ObjectHasher(data, version) {
 	this._data = data;
@@ -8208,50 +7981,22 @@ module.exports = ObjectHasher;
 
 /***/ }),
 
-/***/ 355:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var sessionService = __webpack_require__(21).default;
-var socketService = __webpack_require__(11).default;
-
-var interceptor = {
-
-	transformResponse: function transformResponse(response, request) {
-		if (request.sid && !response.logedin) {
-			sessionService.logout();
-		}
-		return response;
-	},
-
-	transformRequest: function transformRequest(request) {
-		request.sid = sessionService.getSID();
-		return request;
-	}
-};
-
-socketService.addInterceptor(interceptor);
-
-/***/ }),
-
-/***/ 363:
+/***/ 375:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Bluebird = __webpack_require__(3);
-var h = __webpack_require__(5).default;
+var h = __webpack_require__(6).default;
 
-var errorService = __webpack_require__(30).errorServiceInstance;
+var errorService = __webpack_require__(32).errorServiceInstance;
 
 var migrations = ["regenerateFriendsKeys", "fixBrokenSettings"];
 
 function runMigration(ownUser, migrationState) {
 	return Bluebird.try(function () {
-		var migration = __webpack_require__(364)("./" + h.pad("" + (migrationState + 1), 5) + "-" + migrations[migrationState]);
+		var migration = __webpack_require__(376)("./" + h.pad("" + (migrationState + 1), 5) + "-" + migrations[migrationState]);
 		return migration();
 	}).then(function (success) {
 		if (!success) {
@@ -8281,16 +8026,16 @@ module.exports = doMigration;
 
 /***/ }),
 
-/***/ 364:
+/***/ 376:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./00001-regenerateFriendsKeys": 187,
-	"./00001-regenerateFriendsKeys.js": 187,
-	"./00002-fixBrokenSettings": 190,
-	"./00002-fixBrokenSettings.js": 190,
-	"./migrationExample": 191,
-	"./migrationExample.js": 191
+	"./00001-regenerateFriendsKeys": 197,
+	"./00001-regenerateFriendsKeys.js": 197,
+	"./00002-fixBrokenSettings": 200,
+	"./00002-fixBrokenSettings.js": 200,
+	"./migrationExample": 201,
+	"./migrationExample.js": 201
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -8306,31 +8051,31 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 364;
+webpackContext.id = 376;
 
 /***/ }),
 
-/***/ 365:
+/***/ 377:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export NotExistingUser */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_error_service__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_state__ = __webpack_require__(292);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_session_service__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_blobService__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__users_profile__ = __webpack_require__(153);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_trust_service__ = __webpack_require__(186);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_settings_service__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_filter_service__ = __webpack_require__(376);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__services_location_manager__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__services_mutableObjectLoader__ = __webpack_require__(101);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__ = __webpack_require__(168);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__users_signedKeys__ = __webpack_require__(378);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_state__ = __webpack_require__(305);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_session_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_blobService__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__users_profile__ = __webpack_require__(161);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_settings_service__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_filter_service__ = __webpack_require__(388);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_location_manager__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__services_mutableObjectLoader__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__services_requestKey_service__ = __webpack_require__(179);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__users_signedKeys__ = __webpack_require__(390);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__crypto_trustManager__ = __webpack_require__(71);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -8384,15 +8129,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
+            t[p[i]] = s[p[i]];
+    return t;
+};
 
 
 
 
-var initService = __webpack_require__(22);
+var initService = __webpack_require__(20);
 
-var keyStoreService = __webpack_require__(26);
-var signatureCache = __webpack_require__(72);
-
+var keyStoreService = __webpack_require__(28);
 
 
 
@@ -8403,10 +8155,9 @@ var signatureCache = __webpack_require__(72);
 
 
 
-var friendsService = __webpack_require__(85);
-var trustManager = __webpack_require__(66);
-var RELOAD_DELAY_MIN = 10 * 1000;
-var RELOAD_DELAY_MAX = 60 * 1000;
+var friendsService = __webpack_require__(87);
+
+var RELOAD_DELAY = 10 * 1000;
 var RELOAD_OWN_DELAY = 5 * 1000;
 var advancedBranches = ["location", "birthday", "relationship", "education", "work", "gender", "languages"];
 var advancedDefaults = {
@@ -8510,7 +8261,7 @@ var User = (function () {
             _this.data.basic.shortname = names.shortname;
         };
         this.isBlocked = function () {
-            return __WEBPACK_IMPORTED_MODULE_9__services_settings_service__["default"].isBlocked(_this.id);
+            return __WEBPACK_IMPORTED_MODULE_8__services_settings_service__["default"].isBlocked(_this.id);
         };
         this.setData = function () {
             _this.data = {
@@ -8560,7 +8311,7 @@ var User = (function () {
                     _this.data.isMyFriend = friendsService.areFriends(_this.getID());
                 });
             });
-            __WEBPACK_IMPORTED_MODULE_9__services_settings_service__["default"].listen(function () { return _this.setNames(); }, "updated");
+            __WEBPACK_IMPORTED_MODULE_8__services_settings_service__["default"].listen(function () { return _this.setNames(); }, "updated");
         };
         this.generateNewFriendsKey = function () {
             var newFriendsKey;
@@ -8637,9 +8388,9 @@ var User = (function () {
                 if (!_this.isOwn()) {
                     throw new Error("update on another user failed");
                 }
-                privacySettings = __WEBPACK_IMPORTED_MODULE_9__services_settings_service__["default"].getBranch("privacy");
+                privacySettings = __WEBPACK_IMPORTED_MODULE_8__services_settings_service__["default"].getBranch("privacy");
                 scopes = getAllProfileTypes(privacySettings);
-                return __WEBPACK_IMPORTED_MODULE_10__services_filter_service__["a" /* default */].filterToKeys(scopes);
+                return __WEBPACK_IMPORTED_MODULE_9__services_filter_service__["a" /* default */].filterToKeys(scopes);
             }).then(function (keys) {
                 var profile = _this.profiles.me.getFull();
                 var scopeData = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].joinArraysToObject({
@@ -8714,7 +8465,7 @@ var User = (function () {
                 if (fingerPrint !== keyStoreService.format.fingerPrint(_this.getSignKey())) {
                     throw new Error("wrong code");
                 }
-                return __WEBPACK_IMPORTED_MODULE_8__services_trust_service__["default"].verifyUser(_this);
+                return __WEBPACK_IMPORTED_MODULE_14__crypto_trustManager__["default"].verifyUser(_this);
             }).then(function () {
                 _this.data.trustLevel = 2;
             });
@@ -8741,7 +8492,7 @@ var User = (function () {
             });
         };
         this.getTrustLevel = function () {
-            var trust = __WEBPACK_IMPORTED_MODULE_8__services_trust_service__["default"].getKey(_this.getSignKey());
+            var trust = __WEBPACK_IMPORTED_MODULE_14__crypto_trustManager__["default"].getKeyData(_this.getSignKey());
             if (trust.isOwn()) {
                 return -1;
             }
@@ -8791,7 +8542,7 @@ var User = (function () {
                 return;
             }
             return __WEBPACK_IMPORTED_MODULE_6__services_blobService__["a" /* default */].getBlobUrl(blob.blobid).then(function (url) {
-                return Object(__WEBPACK_IMPORTED_MODULE_11__services_location_manager__["d" /* isIOS */])() ?
+                return Object(__WEBPACK_IMPORTED_MODULE_10__services_location_manager__["d" /* isIOS */])() ?
                     url.replace("file://", "") : url;
             }).then(function (imageUrl) {
                 _this.data.basic.image = imageUrl;
@@ -9083,29 +8834,70 @@ function enhanceOwnUser(userData) {
     });
     keyStoreService.security.addEncryptionIdentifier(mainKey);
     keyStoreService.security.addEncryptionIdentifier(signKey);
-    trustManager.setOwnSignKey(signKey);
-    __WEBPACK_IMPORTED_MODULE_8__services_trust_service__["default"].ownKeysLoaded();
+    __WEBPACK_IMPORTED_MODULE_14__crypto_trustManager__["default"].setOwnSignKey(signKey);
     __WEBPACK_IMPORTED_MODULE_3_bluebird__["all"]([
-        __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__["a" /* default */].getKey(signKey),
-        __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__["a" /* default */].getKey(mainKey)
+        __WEBPACK_IMPORTED_MODULE_12__services_requestKey_service__["a" /* default */].getKey(signKey),
+        __WEBPACK_IMPORTED_MODULE_12__services_requestKey_service__["a" /* default */].getKey(mainKey)
     ]).then(function () {
-        __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__["a" /* default */].cacheKey(signKey, "user-sign-" + nickname, __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__["a" /* default */].MAXCACHETIME);
-        __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__["a" /* default */].cacheKey(mainKey, "user-main-" + nickname, __WEBPACK_IMPORTED_MODULE_13__services_requestKey_service__["a" /* default */].MAXCACHETIME);
+        __WEBPACK_IMPORTED_MODULE_12__services_requestKey_service__["a" /* default */].cacheKey(signKey, "user-sign-" + nickname, __WEBPACK_IMPORTED_MODULE_12__services_requestKey_service__["a" /* default */].MAXCACHETIME);
+        __WEBPACK_IMPORTED_MODULE_12__services_requestKey_service__["a" /* default */].cacheKey(mainKey, "user-main-" + nickname, __WEBPACK_IMPORTED_MODULE_12__services_requestKey_service__["a" /* default */].MAXCACHETIME);
     });
 }
+var loadUserInfo = function (identifiers) {
+    return __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].definitlyEmit("user.getMultiple", { identifiers: identifiers })
+        .then(function (_a) {
+        var users = _a.users;
+        return users;
+    });
+};
+var getUserInfoDelayed = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].delayMultiplePromise(__WEBPACK_IMPORTED_MODULE_3_bluebird__, 1000, loadUserInfo, 20);
+var getUserInfoNow = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].delayMultiplePromise(__WEBPACK_IMPORTED_MODULE_3_bluebird__, 50, loadUserInfo, 10);
+var profilesLoaded = function (signKey, profiles) {
+    var pub = profiles.pub;
+    var priv = profiles.priv || [];
+    return __WEBPACK_IMPORTED_MODULE_7__users_profile__["ProfileLoader"].isLoaded(signKey + "-" + pub.meta._signature) && priv.reduce(function (prev, privProfile) {
+        return prev && __WEBPACK_IMPORTED_MODULE_7__users_profile__["ProfileLoader"].isLoaded(signKey + "-" + privProfile.meta._signature);
+    }, true);
+};
+var isSameInfo = function (userData, previousInstance) {
+    if (previousInstance instanceof NotExistingUser || userData.userNotExisting) {
+        return false;
+    }
+    var userID = previousInstance.getID();
+    var isMe = __WEBPACK_IMPORTED_MODULE_5__services_session_service__["default"].isOwnUserID(userID);
+    if (isMe) {
+        return false;
+    }
+    var signKey = previousInstance.getSignKey();
+    var signedKeys = userData.signedKeys, profile = userData.profile, rest = __rest(userData, ["signedKeys", "profile"]);
+    if (!__WEBPACK_IMPORTED_MODULE_13__users_signedKeys__["a" /* SignedKeysLoader */].isLoaded(signKey + "-" + signedKeys._signature)) {
+        return false;
+    }
+    if (!profilesLoaded(signKey, profile)) {
+        return false;
+    }
+    if (Object.keys(rest).length !== 3) {
+        return false;
+    }
+    return rest.id === previousInstance.id &&
+        rest.nickname === previousInstance.nickname &&
+        __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].deepEqual(rest.mutualFriends, previousInstance.mutualFriends);
+};
 var UserLoader = (function (_super) {
     __extends(UserLoader, _super);
     function UserLoader() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     return UserLoader;
-}(Object(__WEBPACK_IMPORTED_MODULE_12__services_mutableObjectLoader__["b" /* default */])({
-    download: function (id) {
+}(Object(__WEBPACK_IMPORTED_MODULE_11__services_mutableObjectLoader__["c" /* default */])({
+    download: function (id, previousInstance) {
         return __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].awaitConnection()
-            .then(function () { return __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].definitlyEmit("user.getMultiple", { identifiers: [id] }); })
-            .then(function (response) { return response.users[0]; });
+            .then(function () { return previousInstance ? getUserInfoDelayed(id) : getUserInfoNow(id); });
     },
-    load: function (userData) {
+    load: function (userData, previousInstance) {
+        if (previousInstance && isSameInfo(userData, previousInstance)) {
+            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](__WEBPACK_IMPORTED_MODULE_11__services_mutableObjectLoader__["a" /* SYMBOL_UNCHANGED */]);
+        }
         return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](userData);
     },
     restore: function (userData, previousInstance) {
@@ -9135,12 +8927,12 @@ var UserLoader = (function (_super) {
                 });
             }
             console.warn("previous instance is not a user but current data is. Reloading");
-            Object(__WEBPACK_IMPORTED_MODULE_11__services_location_manager__["h" /* reloadApp */])();
+            Object(__WEBPACK_IMPORTED_MODULE_10__services_location_manager__["h" /* reloadApp */])();
             return previousInstance;
         }
         return __WEBPACK_IMPORTED_MODULE_3_bluebird__["try"](function () {
             return __awaiter(this, void 0, void 0, function () {
-                var userID, isMe, signKey, nickname, signedKeys, profiles, user;
+                var userID, isMe, signKey, nickname, signedKeys, profiles;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -9152,27 +8944,21 @@ var UserLoader = (function (_super) {
                             }
                             userID = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].parseDecimal(userData.id);
                             isMe = __WEBPACK_IMPORTED_MODULE_5__services_session_service__["default"].isOwnUserID(userID);
-                            if (!isMe) return [3 /*break*/, 2];
-                            enhanceOwnUser(userData);
-                            return [4 /*yield*/, signatureCache.awaitLoading()];
-                        case 1:
-                            _a.sent();
-                            _a.label = 2;
-                        case 2:
+                            if (isMe) {
+                                enhanceOwnUser(userData);
+                            }
                             signKey = userData.signedKeys.sign;
                             nickname = userData.nickname;
-                            __WEBPACK_IMPORTED_MODULE_8__services_trust_service__["default"].addNewUsers({ key: signKey, userid: userID, nickname: nickname });
-                            return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_14__users_signedKeys__["a" /* SignedKeysLoader */].load({ signedKeys: userData.signedKeys, signKey: signKey })];
-                        case 3:
+                            if (!isMe) {
+                                __WEBPACK_IMPORTED_MODULE_14__crypto_trustManager__["default"].addNewUsers({ key: signKey, userid: userID, nickname: nickname });
+                            }
+                            return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_13__users_signedKeys__["a" /* SignedKeysLoader */].load({ signedKeys: userData.signedKeys, signKey: signKey })];
+                        case 1:
                             signedKeys = _a.sent();
                             return [4 /*yield*/, getProfiles(userData, signKey, isMe)];
-                        case 4:
+                        case 2:
                             profiles = _a.sent();
-                            user = new User(userData, signedKeys, profiles);
-                            if (isMe) {
-                                __WEBPACK_IMPORTED_MODULE_8__services_trust_service__["default"].ownUserLoaded(user);
-                            }
-                            return [2 /*return*/, user];
+                            return [2 /*return*/, new User(userData, signedKeys, profiles)];
                     }
                 });
             });
@@ -9182,8 +8968,8 @@ var UserLoader = (function (_super) {
         if (__WEBPACK_IMPORTED_MODULE_5__services_session_service__["default"].isOwnUserID(instance.getID())) {
             return __WEBPACK_IMPORTED_MODULE_3_bluebird__["delay"](RELOAD_OWN_DELAY).thenReturn(true);
         }
-        if (event === __WEBPACK_IMPORTED_MODULE_12__services_mutableObjectLoader__["a" /* UpdateEvent */].wake) {
-            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["delay"](__WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].randomIntFromInterval(RELOAD_DELAY_MIN, RELOAD_DELAY_MAX)).thenReturn(true);
+        if (event === __WEBPACK_IMPORTED_MODULE_11__services_mutableObjectLoader__["b" /* UpdateEvent */].wake) {
+            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["delay"](RELOAD_DELAY).thenReturn(true);
         }
         return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](false);
     },
@@ -9195,16 +8981,16 @@ var UserLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 366:
+/***/ 378:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_Progress__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_Progress__ = __webpack_require__(70);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -9310,7 +9096,7 @@ var BlobDownloader = (function (_super) {
 
 /***/ }),
 
-/***/ 368:
+/***/ 380:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9598,7 +9384,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 369:
+/***/ 381:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9753,7 +9539,77 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 370:
+/***/ 382:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+var __WEBPACK_AMD_DEFINE_RESULT__;
+
+(function () {
+	"use strict";
+
+	/*
+ 	post: {
+ 		meta: {
+ 			contentHash,
+ 			time,
+ 			signature,
+ 			(key),
+ 			(receiver), //for a wallpost
+ 		}
+ 		content //padded!
+ 	}
+ */
+
+	var postJSON = {
+		"name": "Post",
+		"type": "object",
+		"properties": {
+			"meta": {
+				"required": true,
+				"type": "object",
+				"extends": "securedDataContent",
+				"properties": {
+					"sender": {
+						"required": true,
+						"type": "integer"
+					},
+					"time": {
+						"required": true,
+						"type": "integer",
+						"min": 1388714536420
+					},
+					"key": {
+						"type": "object"
+					},
+					"walluser": {
+						"type": "integer",
+						"min": 1
+					}
+				}
+			},
+			"content": {
+				"type": "object",
+				"required": true,
+				"extends": "encryptedData",
+				"properties": {}
+			}
+		}
+	};
+
+	if (typeof module !== "undefined" && module.exports) {
+		module.exports = postJSON;
+	} else if (true) {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+			return postJSON;
+		}.call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}
+})();
+
+/***/ }),
+
+/***/ 383:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9857,7 +9713,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 371:
+/***/ 384:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9922,7 +9778,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 372:
+/***/ 385:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9985,7 +9841,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 373:
+/***/ 386:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10042,84 +9898,14 @@ var __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 
-/***/ 374:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-var __WEBPACK_AMD_DEFINE_RESULT__;
-
-(function () {
-	"use strict";
-
-	/*
- 	post: {
- 		meta: {
- 			contentHash,
- 			time,
- 			signature,
- 			(key),
- 			(receiver), //for a wallpost
- 		}
- 		content //padded!
- 	}
- */
-
-	var postJSON = {
-		"name": "Post",
-		"type": "object",
-		"properties": {
-			"meta": {
-				"required": true,
-				"type": "object",
-				"extends": "securedDataContent",
-				"properties": {
-					"sender": {
-						"required": true,
-						"type": "integer"
-					},
-					"time": {
-						"required": true,
-						"type": "integer",
-						"min": 1388714536420
-					},
-					"key": {
-						"type": "object"
-					},
-					"walluser": {
-						"type": "integer",
-						"min": 1
-					}
-				}
-			},
-			"content": {
-				"type": "object",
-				"required": true,
-				"extends": "encryptedData",
-				"properties": {}
-			}
-		}
-	};
-
-	if (typeof module !== "undefined" && module.exports) {
-		module.exports = postJSON;
-	} else if (true) {
-		!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-			return postJSON;
-		}.call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}
-})();
-
-/***/ }),
-
-/***/ 375:
+/***/ 387:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Bluebird = __webpack_require__(3);
-var keyStore = __webpack_require__(26);
+var keyStore = __webpack_require__(28);
 
 var encryptedDataObject = function encryptedDataObject(data) {
 	var encryptedData = data,
@@ -10146,18 +9932,18 @@ module.exports = encryptedDataObject;
 
 /***/ }),
 
-/***/ 376:
+/***/ 388:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__keyStore_service__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__keyStore_service__ = __webpack_require__(34);
 
-var errors = __webpack_require__(48);
+var errors = __webpack_require__(42);
 
-var circleService = __webpack_require__(189);
-var localize = __webpack_require__(377);
+var circleService = __webpack_require__(199);
+var localize = __webpack_require__(389);
 var FilterService = (function () {
     function FilterService() {
         var _this = this;
@@ -10299,7 +10085,7 @@ var FilterService = (function () {
 
 /***/ }),
 
-/***/ 377:
+/***/ 389:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10313,12 +10099,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ 378:
+/***/ 390:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SignedKeysLoader; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_cachedObjectLoader__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_cachedObjectLoader__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__ = __webpack_require__(26);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -10330,8 +10117,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 
-var SecuredData = __webpack_require__(33);
-var keyStoreService = __webpack_require__(26);
+
+var keyStoreService = __webpack_require__(28);
 var SignedKeysLoader = (function (_super) {
     __extends(SignedKeysLoader, _super);
     function SignedKeysLoader() {
@@ -10347,13 +10134,13 @@ var SignedKeysLoader = (function (_super) {
     download: function () { throw new Error("profile get by id is not implemented"); },
     load: function (_a) {
         var signedKeys = _a.signedKeys, signKey = _a.signKey;
-        var securedData = SecuredData.load(undefined, signedKeys, { type: "signedKeys" });
+        var securedData = __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["default"].load(undefined, signedKeys, { type: "signedKeys" });
         return securedData.verifyAsync(signKey).then(function () {
             return securedData.metaGet();
         });
     },
     restore: function (signedKeysCache) {
-        var signedKeys = SecuredData.createRaw(undefined, signedKeysCache, { type: "signedKeys" });
+        var signedKeys = new __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["SecuredData"](undefined, signedKeysCache, { type: "signedKeys" }, true);
         var friends = signedKeys.metaAttr("friends");
         var crypt = signedKeys.metaAttr("crypt");
         keyStoreService.security.addEncryptionIdentifier(friends);
@@ -10366,26 +10153,209 @@ var SignedKeysLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 380:
+/***/ 391:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var sessionService = __webpack_require__(19).default;
+var socketService = __webpack_require__(10).default;
+
+var interceptor = {
+
+	transformResponse: function transformResponse(response, request) {
+		if (request.sid && !response.logedin) {
+			sessionService.logout();
+		}
+		return response;
+	},
+
+	transformRequest: function transformRequest(request) {
+		request.sid = sessionService.getSID();
+		return request;
+	}
+};
+
+socketService.addInterceptor(interceptor);
+
+/***/ }),
+
+/***/ 392:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Cache__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_securedDataWithMetaData__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__session_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__crypto_trustManager__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_mutableObjectLoader__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__users_userService__ = __webpack_require__(9);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+var errors = __webpack_require__(42);
+
+var initService = __webpack_require__(20);
+
+
+
+
+var signatureCache = __webpack_require__(107);
+var debug = __webpack_require__(15);
+var STORESIGNATURECACHEINTERVAL = 30000;
+var debugName = "whispeer:trustService";
+var trustServiceDebug = debug(debugName);
+function time(name) {
+    if (debug.enabled(debugName)) {
+        console.time(name);
+    }
+}
+function timeEnd(name) {
+    if (debug.enabled(debugName)) {
+        console.timeEnd(name);
+    }
+}
+var loadTrustInfo = function (data) {
+    return __WEBPACK_IMPORTED_MODULE_7__users_userService__["default"].getOwnAsync().then(function (ownUser) {
+        var ownKey = ownUser.getSignKey();
+        if (!data) {
+            var userid = ownUser.getID();
+            var nickname = ownUser.getNickname();
+            return {
+                nicknames: (_a = {},
+                    _a[nickname] = ownKey,
+                    _a),
+                ids: (_b = {},
+                    _b[userid] = ownKey,
+                    _b),
+                me: ownKey,
+                keys: (_c = {},
+                    _c[ownKey] = Object(__WEBPACK_IMPORTED_MODULE_4__crypto_trustManager__["userToDataSet"])({ key: ownKey, userid: userid, nickname: nickname }, __WEBPACK_IMPORTED_MODULE_4__crypto_trustManager__["trustStates"].OWN),
+                    _c),
+                signature: ""
+            };
+        }
+        if (data.me !== ownKey) {
+            throw new errors.SecurityError("not my trust database");
+        }
+        var givenDatabase = __WEBPACK_IMPORTED_MODULE_2__asset_securedDataWithMetaData__["default"].load(undefined, data, __WEBPACK_IMPORTED_MODULE_4__crypto_trustManager__["TRUST_SECURED_OPTIONS"]);
+        return givenDatabase.verifyAsync(ownKey, "user")
+            .then(function () { return Object(__WEBPACK_IMPORTED_MODULE_4__crypto_trustManager__["transformLegacy"])(givenDatabase.metaGet()); });
+        var _a, _b, _c;
+    });
+};
+var signatureCacheObject = new __WEBPACK_IMPORTED_MODULE_1__Cache__["default"]("signatureCache");
+var TrustService = (function () {
+    function TrustService() {
+        this.storeSignatureCache = function () {
+            if (signatureCache.isChanged()) {
+                trustServiceDebug("Storing signature cache!");
+                time("storedSignatureCache");
+                signatureCache.resetChanged();
+                signatureCache.getUpdatedVersion().then(function (updatedVersion) {
+                    return signatureCacheObject.store(__WEBPACK_IMPORTED_MODULE_3__session_service__["default"].getUserID().toString(), updatedVersion);
+                }).then(function () {
+                    timeEnd("storedSignatureCache");
+                });
+            }
+        };
+        window.setInterval(this.storeSignatureCache, STORESIGNATURECACHEINTERVAL);
+        this.waitForLogin();
+    }
+    TrustService.prototype.waitForLogin = function () {
+        __WEBPACK_IMPORTED_MODULE_3__session_service__["default"].awaitLogin().then(function () {
+            time("getSignatureCache");
+            return signatureCacheObject.get(__WEBPACK_IMPORTED_MODULE_3__session_service__["default"].getUserID().toString()).catch(function () {
+                return;
+            });
+        }).then(function (signatureCacheData) {
+            timeEnd("getSignatureCache");
+            if (signatureCacheData) {
+                signatureCache.load(signatureCacheData.data);
+            }
+            else {
+                signatureCache.initialize();
+            }
+        });
+    };
+    return TrustService;
+}());
+var TrustStoreLoader = (function (_super) {
+    __extends(TrustStoreLoader, _super);
+    function TrustStoreLoader() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return TrustStoreLoader;
+}(Object(__WEBPACK_IMPORTED_MODULE_5__services_mutableObjectLoader__["c" /* default */])({
+    download: function (id, previousInstance) {
+        return __WEBPACK_IMPORTED_MODULE_6__services_socket_service__["default"].awaitConnection()
+            .then(function () { return __WEBPACK_IMPORTED_MODULE_6__services_socket_service__["default"].definitlyEmit("trustManager.get", {
+            responseKey: "content",
+            cacheSignature: previousInstance && previousInstance.getSignature()
+        }); })
+            .then(function (response) { return response.content; });
+    },
+    load: function (response, previousInstance) {
+        if (previousInstance && response.unChanged) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](__WEBPACK_IMPORTED_MODULE_5__services_mutableObjectLoader__["a" /* SYMBOL_UNCHANGED */]);
+        }
+        return loadTrustInfo(response.content);
+    },
+    restore: function (content, previousInstance) {
+        if (previousInstance) {
+            previousInstance.update(content);
+            return previousInstance;
+        }
+        return new __WEBPACK_IMPORTED_MODULE_4__crypto_trustManager__["TrustStore"](content);
+    },
+    shouldUpdate: function (event, instance) { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](true); },
+    getID: function (settingsData) { return __WEBPACK_IMPORTED_MODULE_3__session_service__["default"].getUserID(); },
+    cacheName: "trustStore"
+})));
+initService.registerCallback(function () {
+    return TrustStoreLoader.get(__WEBPACK_IMPORTED_MODULE_3__session_service__["default"].getUserID())
+        .then(function (trustStore) { return __WEBPACK_IMPORTED_MODULE_4__crypto_trustManager__["default"].setTrustStore(trustStore); });
+});
+new TrustService();
+//# sourceMappingURL=trust.service.js.map
+
+/***/ }),
+
+/***/ 394:
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./de": 102,
-	"./de-at": 192,
-	"./de-at.js": 192,
-	"./de-ch": 193,
-	"./de-ch.js": 193,
-	"./de.js": 102,
-	"./en-au": 194,
-	"./en-au.js": 194,
-	"./en-ca": 195,
-	"./en-ca.js": 195,
-	"./en-gb": 196,
-	"./en-gb.js": 196,
-	"./en-ie": 197,
-	"./en-ie.js": 197,
-	"./en-nz": 198,
-	"./en-nz.js": 198
+	"./de": 108,
+	"./de-at": 202,
+	"./de-at.js": 202,
+	"./de-ch": 203,
+	"./de-ch.js": 203,
+	"./de.js": 108,
+	"./en-au": 204,
+	"./en-au.js": 204,
+	"./en-ca": 205,
+	"./en-ca.js": 205,
+	"./en-gb": 206,
+	"./en-gb.js": 206,
+	"./en-ie": 207,
+	"./en-ie.js": 207,
+	"./en-nz": 208,
+	"./en-nz.js": 208
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -10401,43 +10371,75 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 380;
+webpackContext.id = 394;
 
 /***/ }),
 
-/***/ 416:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ 42:
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_observer__ = __webpack_require__(17);
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 
-var ScreenSizeService = (function (_super) {
-    __extends(ScreenSizeService, _super);
-    function ScreenSizeService() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return ScreenSizeService;
-}(__WEBPACK_IMPORTED_MODULE_0__asset_observer__["default"]));
-/* harmony default export */ __webpack_exports__["a"] = (new ScreenSizeService());
-//# sourceMappingURL=screenSize.service.js.map
+
+function extendError(ParentErrorClass, name) {
+	if (ParentErrorClass.prototype instanceof Error || ParentErrorClass === Error) {
+		var F = function F() {};
+		var CustomError = function CustomError(message, data) {
+			var _this = this;
+
+			var tmp = new ParentErrorClass(message);
+			tmp.name = this.name = name || "Error";
+
+			_this.data = data;
+			_this.stack = tmp.stack;
+			_this.message = tmp.message;
+			_this.name = name;
+
+			return _this;
+		};
+		var SubClass = function SubClass() {};
+		SubClass.prototype = ParentErrorClass.prototype;
+		F.prototype = CustomError.prototype = new SubClass();
+		CustomError.prototype.constructor = CustomError;
+
+		return CustomError;
+	} else {
+		throw new Error("our error should inherit from error!");
+	}
+}
+
+var InvalidDataError = extendError(Error, "InvalidDataError");
+var InvalidHexError = extendError(InvalidDataError, "InvalidHexError");
+var InvalidFilter = extendError(InvalidDataError, "InvalidFilter");
+
+var SecurityError = extendError(Error, "SecurityError");
+var AccessViolation = extendError(SecurityError, "AccessViolation");
+var DecryptionError = extendError(SecurityError, "DecryptionError");
+var ValidationError = extendError(SecurityError, "ValidationError");
+
+var LoginError = extendError(Error, "LoginError");
+
+module.exports = {
+	SecurityError: SecurityError,
+	AccessViolation: AccessViolation,
+	DecryptionError: DecryptionError,
+	ValidationError: ValidationError,
+
+	InvalidDataError: InvalidDataError,
+	InvalidHexError: InvalidHexError,
+	InvalidFilter: InvalidFilter,
+
+	LoginError: LoginError
+};
 
 /***/ }),
 
-/***/ 418:
+/***/ 444:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_securedDataWithMetaData__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -10446,7 +10448,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-var SecuredData = __webpack_require__(33);
+
 
 var TopicUpdate = (function () {
     function TopicUpdate(_a) {
@@ -10459,7 +10461,7 @@ var TopicUpdate = (function () {
             return _this._id;
         };
         this.getTime = function () {
-            return __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(_this.securedData.metaAttr("time"));
+            return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(_this.securedData.metaAttr("time"));
         };
         this.isAfter = function (topicUpdate) {
             if (!topicUpdate) {
@@ -10484,11 +10486,11 @@ var TopicUpdate = (function () {
         };
         var content = content, meta = meta;
         this._id = server.id;
-        this.securedData = SecuredData.createRaw(content, meta, { type: "topicUpdate" });
+        this.securedData = new __WEBPACK_IMPORTED_MODULE_0__asset_securedDataWithMetaData__["SecuredData"](content, meta, { type: "topicUpdate" }, true);
         this.userID = meta.userID;
         this.state = {
             loading: false,
-            timestamp: __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].parseDecimal(meta.time),
+            timestamp: __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(meta.time),
             title: content.title,
             sender: sender
         };
@@ -10500,17 +10502,17 @@ var TopicUpdate = (function () {
 
 /***/ }),
 
-/***/ 419:
+/***/ 445:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export ChatList */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_mutableObjectLoader__ = __webpack_require__(101);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_session_service__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__chat__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_mutableObjectLoader__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_session_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__chat__ = __webpack_require__(88);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -10545,7 +10547,7 @@ var ChatListLoader = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     return ChatListLoader;
-}(Object(__WEBPACK_IMPORTED_MODULE_1__services_mutableObjectLoader__["b" /* default */])({
+}(Object(__WEBPACK_IMPORTED_MODULE_1__services_mutableObjectLoader__["c" /* default */])({
     download: function () { return __WEBPACK_IMPORTED_MODULE_2__services_socket_service__["default"].definitlyEmit("chat.getAllIDs", {}).then(function (response) { return response.chatIDs; }); },
     load: function (chatResponse) { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](chatResponse); },
     getID: function () { return __WEBPACK_IMPORTED_MODULE_3__services_session_service__["default"].getUserID(); },
@@ -10568,25 +10570,53 @@ var ChatListLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 438:
+/***/ 450:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__asset_observer__ = __webpack_require__(16);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+var ScreenSizeService = (function (_super) {
+    __extends(ScreenSizeService, _super);
+    function ScreenSizeService() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return ScreenSizeService;
+}(__WEBPACK_IMPORTED_MODULE_0__asset_observer__["default"]));
+/* harmony default export */ __webpack_exports__["a"] = (new ScreenSizeService());
+//# sourceMappingURL=screenSize.service.js.map
+
+/***/ }),
+
+/***/ 470:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MyApp; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(69);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(284);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__ = __webpack_require__(151);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_globalization__ = __webpack_require__(285);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_push__ = __webpack_require__(286);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_keyboard__ = __webpack_require__(287);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_services_push_service__ = __webpack_require__(439);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__lib_services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_location_manager__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__tutorial__ = __webpack_require__(297);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(297);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_globalization__ = __webpack_require__(298);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_push__ = __webpack_require__(299);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ionic_native_keyboard__ = __webpack_require__(300);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__lib_services_push_service__ = __webpack_require__(471);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__lib_services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__lib_services_location_manager__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__tutorial__ = __webpack_require__(310);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__ = __webpack_require__(19);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -10643,7 +10673,6 @@ var MyApp = (function () {
             // Here you can do any higher level native things you might need.
             _this.statusBar.styleLightContent();
             var pushService = new __WEBPACK_IMPORTED_MODULE_8__lib_services_push_service__["a" /* PushService */](_this.nav, platform, _this.push);
-            pushService.register();
             if (platform.is("ios")) {
                 _this.keyboard.disableScroll(true);
                 window.addEventListener('native.keyboardshow', function (e) { return setHeight(e.keyboardHeight); });
@@ -10666,6 +10695,11 @@ var MyApp = (function () {
                     return response;
                 }
             });
+            if (__WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__["default"].isLoggedin()) {
+                pushService.register();
+            }
+            __WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__["default"].listen(function () { return pushService.register(); }, "login");
+            __WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__["default"].listen(function () { return pushService.unregister(); }, "logout");
             __WEBPACK_IMPORTED_MODULE_12__lib_services_session_service__["default"].bootLogin().then(function (loggedin) {
                 __WEBPACK_IMPORTED_MODULE_2_bluebird__["delay"](SPLASH_SCREEN_HIDE_DELAY).then(function () { return _this.splashScreen.hide(); });
                 if (!loggedin && _this.nav.length() > 0) {
@@ -10716,13 +10750,13 @@ var MyApp = (function () {
         });
     };
     __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_13" /* ViewChild */])("navigation"),
-        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* NavController */])
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])("navigation"),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavController */])
     ], MyApp.prototype, "nav", void 0);
     MyApp = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/app/app.html"*/'<ion-nav #navigation [root]="rootPage"></ion-nav>\n\n<div *ngIf="showTutorial()" class="tutorial" (click)="tutorialClicked($event)">\n	<img [src]="currentSlide()" alt="">\n</div>\n'/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/app/app.html"*/
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"/Users/nilos/software/whispeer/messenger/src/app/app.html"*/`<ion-nav #navigation [root]="rootPage"></ion-nav>\n\n<div *ngIf="showTutorial()" class="tutorial" (click)="tutorialClicked($event)">\n	<img [src]="currentSlide()" alt="">\n</div>\n`/*ion-inline-end:"/Users/nilos/software/whispeer/messenger/src/app/app.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["l" /* Platform */],
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* Platform */],
             __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__["a" /* SplashScreen */],
             __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__["a" /* StatusBar */],
             __WEBPACK_IMPORTED_MODULE_5__ionic_native_globalization__["a" /* Globalization */],
@@ -10736,27 +10770,29 @@ var MyApp = (function () {
 
 /***/ }),
 
-/***/ 439:
+/***/ 471:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PushService; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pages_messages_messages__ = __webpack_require__(293);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__storage_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__messages_messageService__ = __webpack_require__(150);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pages_messages_messages__ = __webpack_require__(306);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angularUtils__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__storage_service__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__error_service__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__messages_messageService__ = __webpack_require__(157);
 
 
 
 
 
-var initService = __webpack_require__(22);
 
-var sessionStorage = Object(__WEBPACK_IMPORTED_MODULE_3__storage_service__["withPrefix"])("whispeer.session");
-var sjcl = __webpack_require__(43);
+var initService = __webpack_require__(20);
+
+var sessionStorage = Object(__WEBPACK_IMPORTED_MODULE_4__storage_service__["withPrefix"])("whispeer.session");
+var sjcl = __webpack_require__(45);
 var PushService = (function () {
     function PushService(navCtrl, platform, push) {
         var _this = this;
@@ -10796,21 +10832,21 @@ var PushService = (function () {
         this.registration = function (data) {
             console.log("-> registration", data);
             var type = _this.getType();
-            __WEBPACK_IMPORTED_MODULE_1_bluebird__["all"]([
+            __WEBPACK_IMPORTED_MODULE_2_bluebird__["all"]([
                 sessionStorage.awaitLoading(),
                 initService.awaitLoading(),
-                __WEBPACK_IMPORTED_MODULE_2__socket_service__["default"].awaitConnection()
+                __WEBPACK_IMPORTED_MODULE_3__socket_service__["default"].awaitConnection()
             ]).then(function () {
                 var pushKey = _this.getOrCreatePushkey();
                 if (!type) {
                     return;
                 }
-                return __WEBPACK_IMPORTED_MODULE_2__socket_service__["default"].definitlyEmit("pushNotification.subscribe", {
+                return __WEBPACK_IMPORTED_MODULE_3__socket_service__["default"].definitlyEmit("pushNotification.subscribe", {
                     token: data.registrationId,
                     key: sjcl.codec.hex.fromBits(pushKey),
                     type: type
                 });
-            }).catch(__WEBPACK_IMPORTED_MODULE_4__error_service__["default"].criticalError);
+            }).catch(__WEBPACK_IMPORTED_MODULE_5__error_service__["default"].criticalError);
         };
         this.getActiveNav = function () { return _this.navCtrl.getActive().instance; };
         this.isOnMessagesPage = function () {
@@ -10825,8 +10861,7 @@ var PushService = (function () {
                 if (_this.isActiveChat(chatID)) {
                     return;
                 }
-                var index = _this.navCtrl.getActive().index;
-                _this.navCtrl.remove(index);
+                return Object(__WEBPACK_IMPORTED_MODULE_1__angularUtils__["a" /* replaceView */])(_this.navCtrl, "Messages", { chatID: chatID });
             }
             return _this.navCtrl.push("Messages", { chatID: chatID });
         };
@@ -10845,7 +10880,7 @@ var PushService = (function () {
             console.info("Got Push notification with data", data);
             if (data && data.additionalData) {
                 var additionalData_1 = data.additionalData;
-                __WEBPACK_IMPORTED_MODULE_1_bluebird__["all"]([
+                __WEBPACK_IMPORTED_MODULE_2_bluebird__["all"]([
                     sessionStorage.awaitLoading(),
                     initService.awaitLoading()
                 ]).then(function () {
@@ -10868,7 +10903,7 @@ var PushService = (function () {
                             delete message.meta.topicid;
                             delete message.meta.messageid;
                         }
-                        return __WEBPACK_IMPORTED_MODULE_5__messages_messageService__["a" /* default */].addSocketData(additionalData_1.content);
+                        return __WEBPACK_IMPORTED_MODULE_6__messages_messageService__["a" /* default */].addSocketData(additionalData_1.content);
                     }
                 }).then(function () {
                     return _this.pushInstance.finish();
@@ -10876,7 +10911,10 @@ var PushService = (function () {
             }
         };
         this.unregister = function () {
-            return _this.pushInstance.unregister();
+            if (_this.pushInstance) {
+                _this.pushInstance.unregister();
+                _this.pushInstance = null;
+            }
         };
         this.register = function () {
             try {
@@ -10901,18 +10939,19 @@ var PushService = (function () {
 
 /***/ }),
 
-/***/ 46:
+/***/ 48:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__crypto_keyStore_js__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__crypto_keyStore_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__crypto_keyStore_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_session_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_mutableObjectLoader__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__asset_securedDataWithMetaData__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helper_helper__ = __webpack_require__(6);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -10931,14 +10970,52 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+
+var keyStore = __webpack_require__(28);
+
+var initService = __webpack_require__(20);
 
 
 
 
-var initService = __webpack_require__(22);
-
-var EncryptedData = __webpack_require__(375);
-var SecuredData = __webpack_require__(33);
+var EncryptedData = __webpack_require__(387);
+var RELOAD_DELAY = 10000;
 var notVisible = {
     encrypt: true,
     visibility: []
@@ -10999,7 +11076,7 @@ var turnOldSettingsToNew = function (settings) {
         meta: { initialLanguage: undefined },
         content: {}
     };
-    __WEBPACK_IMPORTED_MODULE_4__helper_helper__["default"].objectEach(settings, function (key, val) {
+    __WEBPACK_IMPORTED_MODULE_6__helper_helper__["default"].objectEach(settings, function (key, val) {
         if (isBranchPublic(key)) {
             result.meta[key] = val;
         }
@@ -11009,90 +11086,114 @@ var turnOldSettingsToNew = function (settings) {
     });
     return result;
 };
+var migrate = function (givenSettings) {
+    console.warn("migrating settings to format 2");
+    if (!givenSettings.ct) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](new __WEBPACK_IMPORTED_MODULE_5__asset_securedDataWithMetaData__["SecuredData"](givenSettings.content, givenSettings.meta, securedDataOptions, false));
+    }
+    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+        keyStore.security.allowPrivateActions();
+        var oldSettings = new EncryptedData(givenSettings);
+        return oldSettings.decrypt();
+    }).then(function (decryptedSettings) {
+        var _a = turnOldSettingsToNew(decryptedSettings), meta = _a.meta, content = _a.content;
+        meta.initialLanguage = __WEBPACK_IMPORTED_MODULE_6__helper_helper__["default"].getLanguageFromPath();
+        var ownUser = __webpack_require__(9).default.getOwn();
+        var transformedSettings = new Settings(content, meta);
+        return transformedSettings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey());
+    }).then(function (signedAndEncryptedSettings) {
+        var settings = new __WEBPACK_IMPORTED_MODULE_5__asset_securedDataWithMetaData__["SecuredData"](signedAndEncryptedSettings.content, signedAndEncryptedSettings.meta, securedDataOptions, false);
+        return __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].emit("settings.setSettings", {
+            settings: signedAndEncryptedSettings,
+        }).thenReturn(settings);
+    });
+};
+var Settings = (function () {
+    function Settings(content, meta, server) {
+        if (server === void 0) { server = {}; }
+        var _this = this;
+        this.content = content;
+        this.meta = meta;
+        this.server = server;
+        this.changed = false;
+        this.getContent = function () { return _this.content; };
+        this.getMeta = function () { return _this.meta; };
+        this.getServer = function () { return _this.server; };
+        this.getBranch = function (branchName) {
+            if (isBranchServer(branchName)) {
+                return _this.server[branchName];
+            }
+            if (isBranchPublic(branchName)) {
+                return _this.meta[branchName];
+            }
+            return _this.content[branchName];
+        };
+        this.isChanged = function () { return _this.changed; };
+        this.setBranch = function (branchName, value) {
+            if (isBranchServer(branchName)) {
+                _this.server[branchName] = value;
+            }
+            else if (isBranchPublic(branchName)) {
+                _this.meta[branchName] = value;
+            }
+            else {
+                _this.content[branchName] = value;
+            }
+            _this.changed = true;
+        };
+        this.update = function (content, meta, server) {
+            _this.content = content;
+            _this.meta = meta;
+            _this.server = server;
+            _this.changed = false;
+        };
+        this.getUpdatedData = function (signKey, encryptKey) {
+            return __WEBPACK_IMPORTED_MODULE_5__asset_securedDataWithMetaData__["default"].createAsync(_this.content, _this.meta, securedDataOptions, signKey, encryptKey)
+                .then(function (encryptedSettings) {
+                return __assign({}, encryptedSettings, { server: _this.server });
+            });
+        };
+    }
+    return Settings;
+}());
+var loadSettings = function (givenSettings) {
+    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var secured, ownUser;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, migrate(givenSettings)];
+                    case 1:
+                        secured = _a.sent();
+                        return [4 /*yield*/, __webpack_require__(9).default.getOwnAsync()];
+                    case 2:
+                        ownUser = _a.sent();
+                        return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                                secured.decrypt(),
+                                secured.verifyAsync(ownUser.getSignKey(), "settings")
+                            ])];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/, {
+                                content: secured.contentGet(),
+                                meta: secured.metaGet(),
+                                server: givenSettings.server
+                            }];
+                }
+            });
+        });
+    });
+};
+var settings;
 var SettingsService = (function (_super) {
     __extends(SettingsService, _super);
     function SettingsService() {
         var _this = _super.call(this) || this;
-        _this.serverSettings = {};
-        _this.loadCachePromise = __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
-        _this.migrateToFormat2 = function (givenOldSettings) {
-            console.warn("migrating settings to format 2");
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-                __WEBPACK_IMPORTED_MODULE_2__crypto_keyStore_js__["security"].allowPrivateActions();
-                var oldSettings = new EncryptedData(givenOldSettings);
-                return oldSettings.decrypt();
-            }).then(function (decryptedSettings) {
-                var data = turnOldSettingsToNew(decryptedSettings);
-                data.meta.initialLanguage = __WEBPACK_IMPORTED_MODULE_4__helper_helper__["default"].getLanguageFromPath();
-                var ownUser = __webpack_require__(9).default.getOwn();
-                return SecuredData.createAsync(data.content, data.meta, securedDataOptions, ownUser.getSignKey(), ownUser.getMainKey());
-            }).then(function (signedAndEncryptedSettings) {
-                _this.settings = SecuredData.load(signedAndEncryptedSettings.content, signedAndEncryptedSettings.meta, securedDataOptions);
-                return __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].emit("settings.setSettings", {
-                    settings: signedAndEncryptedSettings,
-                }).thenReturn(_this.settings);
-            });
-        };
-        _this.loadSettings = function (givenSettings) {
-            _this.serverSettings = givenSettings.server || {};
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-                if (givenSettings.ct) {
-                    return _this.migrateToFormat2(givenSettings);
-                }
-                else {
-                    return SecuredData.load(givenSettings.content, givenSettings.meta, securedDataOptions);
-                }
-            }).then(function (_settings) {
-                _this.settings = _settings;
-                var decryptAsync = __WEBPACK_IMPORTED_MODULE_0_bluebird__["promisify"](_this.decrypt.bind(_this));
-                return decryptAsync();
-            }).then(function () {
-                _this.notify("", "loaded");
-            });
-        };
-        _this.loadFromCache = function (cacheEntry) {
-            var userService = __webpack_require__(9).default;
-            _this.loadCachePromise = userService.getOwnAsync().then(function () {
-                return _this.loadSettings(cacheEntry.data);
-            });
-            return _this.loadCachePromise;
-        };
-        _this.loadFromServer = function (data) {
-            return _this.loadCachePromise.then(function () {
-                if (data.unChanged) {
-                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
-                }
-                var givenSettings = data.content;
-                var toCache = __WEBPACK_IMPORTED_MODULE_4__helper_helper__["default"].deepCopyObj(givenSettings);
-                var userService = __webpack_require__(9).default;
-                return userService.getOwnAsync().then(function () {
-                    return _this.loadSettings(givenSettings);
-                }).thenReturn(toCache);
-            });
-        };
         _this.setDefaultLanguage = function (language) { return defaultSettings.uiLanguage = language; };
-        _this.getContent = function () { return _this.settings.contentGet(); };
-        _this.setContent = function (content) { return _this.settings.contentSet(content); };
-        _this.decrypt = function (cb) {
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-                var ownUser = __webpack_require__(9).default.getOwn();
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
-                    _this.settings.decrypt(),
-                    _this.settings.verify(ownUser.getSignKey(), null, "settings")
-                ]);
-            }).nodeify(cb);
-        };
-        _this.getBranchContent = function (branchName) {
-            if (isBranchServer(branchName)) {
-                return _this.serverSettings[branchName];
-            }
-            if (isBranchPublic(branchName)) {
-                return _this.settings.metaAttr(branchName);
-            }
-            return _this.settings.contentGet()[branchName];
-        };
+        _this.getContent = function () { return settings.getContent(); };
+        _this.getBranchContent = function (branchName) { return settings.getBranch(branchName); };
         _this.getBranch = function (branchName) {
-            if (!_this.settings) {
+            if (!settings) {
                 return defaultSettings[branchName];
             }
             var branchContent = _this.getBranchContent(branchName);
@@ -11102,15 +11203,7 @@ var SettingsService = (function (_super) {
             return branchContent;
         };
         _this.updateBranch = function (branchName, value) {
-            if (isBranchServer(branchName)) {
-                _this.serverSettings[branchName] = value;
-            }
-            else if (isBranchPublic(branchName)) {
-                _this.settings.metaSetAttr(branchName, value);
-            }
-            else {
-                _this.settings.contentSetAttr(branchName, value);
-            }
+            settings.setBranch(branchName, value);
             _this.notify("", "updated");
         };
         _this.setPrivacy = function (privacy) {
@@ -11126,26 +11219,22 @@ var SettingsService = (function (_super) {
             return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
                 var privacy = _this.getBranch("privacy");
                 privacyAttributes.forEach(function (safetyName) {
-                    __WEBPACK_IMPORTED_MODULE_4__helper_helper__["default"].removeArray(privacy[safetyName].visibility, "circle:" + id);
+                    __WEBPACK_IMPORTED_MODULE_6__helper_helper__["default"].removeArray(privacy[safetyName].visibility, "circle:" + id);
                 });
-                __WEBPACK_IMPORTED_MODULE_4__helper_helper__["default"].removeArray(privacy.basic.firstname.visibility, "circle:" + id);
-                __WEBPACK_IMPORTED_MODULE_4__helper_helper__["default"].removeArray(privacy.basic.lastname.visibility, "circle:" + id);
+                __WEBPACK_IMPORTED_MODULE_6__helper_helper__["default"].removeArray(privacy.basic.firstname.visibility, "circle:" + id);
+                __WEBPACK_IMPORTED_MODULE_6__helper_helper__["default"].removeArray(privacy.basic.lastname.visibility, "circle:" + id);
                 return _this.setPrivacy(privacy);
             });
         };
         _this.uploadChangedData = function () {
-            if (!_this.settings.isChanged()) {
+            if (!settings.isChanged()) {
                 return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](true);
             }
             var userService = __webpack_require__(9).default;
-            return _this.settings.getUpdatedData(userService.getOwn().getSignKey()).then(function (newEncryptedSettings) {
-                newEncryptedSettings.server = _this.serverSettings;
-                return __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].emit("settings.setSettings", {
-                    settings: newEncryptedSettings
-                });
-            }).then(function (result) {
-                return result.success;
-            });
+            var ownUser = userService.getOwn();
+            return settings.getUpdatedData(ownUser.getSignKey(), ownUser.getMainKey())
+                .then(function (settings) { return __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].emit("settings.setSettings", { settings: settings }); })
+                .then(function (result) { return result.success; });
         };
         _this.getBlockedUsers = function () { return _this.getBranch("safety").blockedUsers; };
         _this.setBlockedUsers = function (blockedUsers) {
@@ -11189,21 +11278,63 @@ var SettingsService = (function (_super) {
                 return false;
             }
         };
-        initService.get("settings.get", _this.loadFromServer, {
-            cacheCallback: _this.loadFromCache,
-            cache: true
-        });
         return _this;
     }
     return SettingsService;
-}(__WEBPACK_IMPORTED_MODULE_3__asset_observer__["default"]));
+}(__WEBPACK_IMPORTED_MODULE_2__asset_observer__["default"]));
 ;
 /* harmony default export */ __webpack_exports__["default"] = (new SettingsService());
+var SettingsLoader = (function (_super) {
+    __extends(SettingsLoader, _super);
+    function SettingsLoader() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return SettingsLoader;
+}(Object(__WEBPACK_IMPORTED_MODULE_4__services_mutableObjectLoader__["c" /* default */])({
+    download: function (id, previousInstance) {
+        return __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].awaitConnection()
+            .then(function () { return __WEBPACK_IMPORTED_MODULE_1__socket_service__["default"].definitlyEmit("settings.get", {
+            responseKey: "content",
+            cacheSignature: previousInstance && previousInstance.getMeta()._signature
+        }); })
+            .then(function (response) { return response.content; });
+    },
+    load: function (response, previousInstance) {
+        if (previousInstance && response.unChanged) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]({
+                content: previousInstance.getContent(),
+                meta: previousInstance.getMeta(),
+                server: response.content.server
+            });
+        }
+        return loadSettings(response.content);
+    },
+    restore: function (_a, previousInstance) {
+        var content = _a.content, meta = _a.meta, server = _a.server;
+        if (previousInstance) {
+            previousInstance.update(content, meta, server);
+            return previousInstance;
+        }
+        return new Settings(content, meta, server);
+    },
+    shouldUpdate: function (event, instance) {
+        if (event === __WEBPACK_IMPORTED_MODULE_4__services_mutableObjectLoader__["b" /* UpdateEvent */].wake) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["delay"](RELOAD_DELAY).thenReturn(true);
+        }
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](false);
+    },
+    getID: function (settingsData) { return __WEBPACK_IMPORTED_MODULE_3__services_session_service__["default"].getUserID(); },
+    cacheName: "settings"
+})));
+initService.registerCallback(function () {
+    return SettingsLoader.get(__WEBPACK_IMPORTED_MODULE_3__services_session_service__["default"].getUserID())
+        .then(function (loadedSettings) { return settings = loadedSettings; });
+});
 //# sourceMappingURL=settings.service.js.map
 
 /***/ }),
 
-/***/ 47:
+/***/ 49:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11218,8 +11349,8 @@ var SettingsService = (function (_super) {
 /* unused harmony export isBlockedReturnUrl */
 /* unused harmony export setReturnUrl */
 /* unused harmony export getUrlParameter */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__storage_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__storage_service__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
 
 
 var loginStorage = __WEBPACK_IMPORTED_MODULE_0__storage_service__["withPrefix"]("whispeer.login");
@@ -11300,66 +11431,345 @@ var getUrlParameter = function (param) {
 
 /***/ }),
 
-/***/ 48:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ 55:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-function extendError(ParentErrorClass, name) {
-	if (ParentErrorClass.prototype instanceof Error || ParentErrorClass === Error) {
-		var F = function F() {};
-		var CustomError = function CustomError(message, data) {
-			var _this = this;
-
-			var tmp = new ParentErrorClass(message);
-			tmp.name = this.name = name || "Error";
-
-			_this.data = data;
-			_this.stack = tmp.stack;
-			_this.message = tmp.message;
-			_this.name = name;
-
-			return _this;
-		};
-		var SubClass = function SubClass() {};
-		SubClass.prototype = ParentErrorClass.prototype;
-		F.prototype = CustomError.prototype = new SubClass();
-		CustomError.prototype.constructor = CustomError;
-
-		return CustomError;
-	} else {
-		throw new Error("our error should inherit from error!");
-	}
-}
-
-var InvalidDataError = extendError(Error, "InvalidDataError");
-var InvalidHexError = extendError(InvalidDataError, "InvalidHexError");
-var InvalidFilter = extendError(InvalidDataError, "InvalidFilter");
-
-var SecurityError = extendError(Error, "SecurityError");
-var AccessViolation = extendError(SecurityError, "AccessViolation");
-var DecryptionError = extendError(SecurityError, "DecryptionError");
-var ValidationError = extendError(SecurityError, "ValidationError");
-
-var LoginError = extendError(Error, "LoginError");
-
-module.exports = {
-	SecurityError: SecurityError,
-	AccessViolation: AccessViolation,
-	DecryptionError: DecryptionError,
-	ValidationError: ValidationError,
-
-	InvalidDataError: InvalidDataError,
-	InvalidHexError: InvalidHexError,
-	InvalidFilter: InvalidFilter,
-
-	LoginError: LoginError
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return unpath; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__ = __webpack_require__(378);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__asset_Queue__ = __webpack_require__(75);
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var _this = this;
+
+var debug = __webpack_require__(15);
+
+
+
+
+
+
+var initService = __webpack_require__(20);
+var keyStore = __webpack_require__(28);
+var knownBlobURLs = {};
+var downloadBlobQueue = new __WEBPACK_IMPORTED_MODULE_6__asset_Queue__["a" /* default */](5);
+downloadBlobQueue.start();
+var debugName = "whispeer:blobService";
+var blobServiceDebug = debug(debugName);
+var time = function (name) {
+    if (debug.enabled(debugName)) {
+        // eslint-disable-next-line no-console
+        console.time(name);
+    }
+};
+var timeEnd = function (name) {
+    if (debug.enabled(debugName)) {
+        // eslint-disable-next-line no-console
+        console.timeEnd(name);
+    }
+};
+var unpath = function (path) {
+    var index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1;
+    return {
+        directory: path.substr(0, index),
+        name: path.substr(index)
+    };
+};
+var MyBlob = (function () {
+    function MyBlob(blobData, blobID, options) {
+        this.blobData = blobData;
+        options = options || {};
+        if (blobID) {
+            this.blobID = blobID;
+            this.uploaded = true;
+        }
+        else {
+            this.uploaded = false;
+        }
+        this.meta = options.meta || {};
+        this.key = this.meta._key || this.meta.key;
+        this.decrypted = options.decrypted || !this.key;
+        this.uploadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
+        this.encryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
+        this.decryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
+    }
+    MyBlob.prototype.isDecrypted = function () {
+        return this.decrypted;
+    };
+    MyBlob.prototype.isUploaded = function () {
+        return this.uploaded;
+    };
+    MyBlob.prototype.getSize = function () {
+        return this.blobData.size;
+    };
+    MyBlob.prototype.getMeta = function () {
+        return this.meta;
+    };
+    MyBlob.prototype.getArrayBuffer = function () {
+        var _this = this;
+        Object(__WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["b" /* fixFileReader */])();
+        if (this.blobData.originalUrl) {
+            var _a = unpath(this.blobData.originalUrl), directory = _a.directory, name_1 = _a.name;
+            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].readFileAsArrayBuffer(directory, name_1).timeout(2 * 60 * 1000);
+        }
+        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
+            var reader = new FileReader();
+            if (reader.addEventListener) {
+                reader.addEventListener("loadend", resolve);
+            }
+            else {
+                reader.onloadend = resolve;
+            }
+            reader.readAsArrayBuffer(_this.blobData);
+        }).then(function (event) {
+            var target = event.currentTarget || event.target;
+            if (target.error) {
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](target.error);
+            }
+            return target.result;
+        }).timeout(2 * 60 * 1000);
+    };
+    MyBlob.prototype.encryptAndUpload = function (key) {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+            var blobKey;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.encrypt()];
+                    case 1:
+                        blobKey = _a.sent();
+                        return [4 /*yield*/, keyStore.sym.symEncryptKey(blobKey, key)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.upload()];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/, blobKey];
+                }
+            });
+        }); });
+    };
+    MyBlob.prototype.encrypt = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().then(function () {
+            if (_this.uploaded || !_this.decrypted) {
+                throw new Error("trying to encrypt an already encrypted or public blob. add a key decryptor if you want to give users access");
+            }
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                keyStore.sym.generateKey(null, "blob key"),
+                _this.getArrayBuffer()
+            ]);
+        }).spread(function (key, buf) {
+            _this.key = key;
+            time("blobencrypt" + (_this.blobID || _this.preReservedID));
+            return keyStore.sym.encryptArrayBuffer(buf, _this.key, function (progress) {
+                _this.encryptProgress.progress(_this.getSize() * progress);
+            });
+        }).then(function (encryptedData) {
+            _this.encryptProgress.progress(_this.getSize());
+            timeEnd("blobencrypt" + (_this.blobID || _this.preReservedID));
+            blobServiceDebug(encryptedData.byteLength);
+            _this.decrypted = false;
+            _this.blobData = new Blob([encryptedData], { type: _this.blobData.type });
+            return _this.key;
+        });
+    };
+    MyBlob.prototype.decrypt = function () {
+        var _this = this;
+        if (this.decrypted) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
+        }
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            return _this.getArrayBuffer();
+        }).then(function (encryptedData) {
+            time("blobdecrypt" + _this.blobID);
+            return keyStore.sym.decryptArrayBuffer(encryptedData, _this.key, function (progress) {
+                _this.decryptProgress.progress(_this.getSize() * progress);
+            });
+        }).then(function (decryptedData) {
+            _this.decryptProgress.progress(_this.getSize());
+            timeEnd("blobdecrypt" + _this.blobID);
+            _this.decrypted = true;
+            _this.blobData = new Blob([decryptedData], { type: _this.blobData.type });
+            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(_this).catch(function (e) {
+                console.log("Could not store blob");
+                return _this.toURL();
+            });
+        });
+    };
+    MyBlob.prototype.toURL = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            if (_this.blobData.localURL) {
+                return _this.blobData.localURL;
+            }
+            if (typeof window.URL !== "undefined") {
+                return window.URL.createObjectURL(_this.blobData);
+            }
+            if (typeof webkitURL !== "undefined") {
+                return window.webkitURL.createObjectURL(_this.blobData);
+            }
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["fromCallback"](function (cb) {
+                __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].blobToDataURI(_this.blobData, cb);
+            });
+        }).catch(function () {
+            return "";
+        });
+    };
+    MyBlob.prototype.upload = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            if (_this.uploaded) {
+                return _this.blobID;
+            }
+            return _this.reserveID();
+        }).then(function (blobid) {
+            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].uploadBlob(_this.blobData, blobid, _this.uploadProgress);
+        }).then(function () {
+            _this.uploaded = true;
+            return _this.blobID;
+        });
+    };
+    MyBlob.prototype.getBlobID = function () {
+        return this.blobID;
+    };
+    MyBlob.prototype.getBlobData = function () {
+        return this.blobData;
+    };
+    MyBlob.prototype.reserveID = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            var meta = _this.meta;
+            meta._key = _this.key;
+            meta.one = 1;
+            if (_this.preReservedID) {
+                return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].definitlyEmit("blob.fullyReserveID", {
+                    blobid: _this.preReservedID,
+                    meta: meta
+                });
+            }
+            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].definitlyEmit("blob.reserveBlobID", {
+                meta: meta
+            });
+        }).then(function (data) {
+            if (data.blobid) {
+                _this.blobID = data.blobid;
+                return _this.blobID;
+            }
+        });
+    };
+    MyBlob.prototype.preReserveID = function () {
+        var _this = this;
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].definitlyEmit("blob.preReserveID", {});
+        }).then(function (data) {
+            if (data.blobid) {
+                _this.preReservedID = data.blobid;
+                return data.blobid;
+            }
+            throw new Error("got no blobid");
+        });
+    };
+    MyBlob.prototype.getHash = function () {
+        return this.getArrayBuffer().then(function (buf) {
+            return keyStore.hash.hashArrayBuffer(buf);
+        });
+    };
+    return MyBlob;
+}());
+var loadBlob = function (blobID, progress, estimatedSize) {
+    var decryptProgressStub = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
+    var downloadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
+    progress.addDepend(downloadProgress);
+    progress.addDepend(decryptProgressStub);
+    return downloadBlobQueue.enqueue(1, function () { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+        var data, blob;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, initService.awaitLoading()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, new __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__socket_service__["default"], blobID, downloadProgress).download()];
+                case 2:
+                    data = _a.sent();
+                    blob = new MyBlob(data.blob, blobID, { meta: data.meta });
+                    if (blob.isDecrypted()) {
+                        return [2 /*return*/, __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(blob).catch(function () { return blob.toURL(); })];
+                    }
+                    downloadProgress.progress(downloadProgress.getTotal());
+                    progress.removeDepend(decryptProgressStub);
+                    progress.addDepend(blob.decryptProgress);
+                    return [2 /*return*/, blob.decrypt()];
+            }
+        });
+    }); }); });
+};
+var getBlob = function (blobID, downloadProgress, estimatedSize) {
+    if (!knownBlobURLs[blobID]) {
+        knownBlobURLs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize);
+    }
+    return knownBlobURLs[blobID];
+};
+var blobService = {
+    createBlob: function (blob) {
+        return new MyBlob(blob);
+    },
+    isBlobLoaded: function (blobID) {
+        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].isLoaded(blobID);
+    },
+    getBlobUrl: function (blobID, progress, estimatedSize) {
+        if (progress === void 0) { progress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */](); }
+        if (estimatedSize === void 0) { estimatedSize = 0; }
+        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].getBlobUrl(blobID).catch(function () {
+            return getBlob(blobID, progress, estimatedSize);
+        });
+    },
+};
+/* harmony default export */ __webpack_exports__["a"] = (blobService);
+//# sourceMappingURL=blobService.js.map
 
 /***/ }),
 
-/***/ 5:
+/***/ 6:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11796,11 +12206,7 @@ var helper = {
         var timerStarted = false;
         function doLoad() {
             timerStarted = false;
-            callFunction(function (err) {
-                if (err) {
-                    throw err;
-                }
-            });
+            callFunction();
         }
         return function () {
             if (!timerStarted) {
@@ -12537,23 +12943,43 @@ var helper = {
 };
 /* harmony default export */ __webpack_exports__["default"] = (helper);
 //# sourceMappingURL=helper.js.map
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(12), __webpack_require__(69)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(12), __webpack_require__(72)))
 
 /***/ }),
 
-/***/ 53:
+/***/ 61:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var h = __webpack_require__(6).default;
+var baseConfig = __webpack_require__(357);
+var config = __webpack_require__(358);
+
+module.exports = h.extend(h.extend({}, baseConfig), config);
+
+/***/ }),
+
+/***/ 62:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return unpath; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return UpdateEvent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SYMBOL_UNCHANGED; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_Progress__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__ = __webpack_require__(366);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__asset_Queue__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_error_service__ = __webpack_require__(32);
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -12589,316 +13015,200 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
-
-var debug = __webpack_require__(15);
 
 
 
 
-
-
-var initService = __webpack_require__(22);
-var keyStore = __webpack_require__(26);
-var knownBlobURLs = {};
-var downloadBlobQueue = new __WEBPACK_IMPORTED_MODULE_6__asset_Queue__["a" /* default */](5);
-downloadBlobQueue.start();
-var debugName = "whispeer:blobService";
-var blobServiceDebug = debug(debugName);
-var time = function (name) {
-    if (debug.enabled(debugName)) {
-        // eslint-disable-next-line no-console
-        console.time(name);
-    }
-};
-var timeEnd = function (name) {
-    if (debug.enabled(debugName)) {
-        // eslint-disable-next-line no-console
-        console.timeEnd(name);
-    }
-};
-var unpath = function (path) {
-    var index = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1;
-    return {
-        directory: path.substr(0, index),
-        name: path.substr(index)
+var UpdateEvent;
+(function (UpdateEvent) {
+    UpdateEvent[UpdateEvent["wake"] = 0] = "wake";
+    UpdateEvent[UpdateEvent["blink"] = 1] = "blink";
+})(UpdateEvent || (UpdateEvent = {}));
+var SYMBOL_UNCHANGED = Symbol("UNCHANGED");
+var LONG_APP_PAUSE = 2 * 60 * 1000;
+var LONG_DISCONNECT = 60 * 1000;
+function createLoader(_a) {
+    var download = _a.download, load = _a.load, restore = _a.restore, getID = _a.getID, cacheName = _a.cacheName, shouldUpdate = _a.shouldUpdate;
+    var loading = {};
+    var byId = {};
+    var cache = new __WEBPACK_IMPORTED_MODULE_2__services_Cache__["default"](cacheName);
+    var considerLoaded = function (id) {
+        loading = __assign({}, loading);
+        delete loading[id];
     };
-};
-var MyBlob = (function () {
-    function MyBlob(blobData, blobID, options) {
-        this.blobData = blobData;
-        options = options || {};
-        if (blobID) {
-            this.blobID = blobID;
-            this.uploaded = true;
-        }
-        else {
-            this.uploaded = false;
-        }
-        this.meta = options.meta || {};
-        this.key = this.meta._key || this.meta.key;
-        this.decrypted = options.decrypted || !this.key;
-        this.uploadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
-        this.encryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
-        this.decryptProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: this.getSize() });
-    }
-    MyBlob.prototype.isDecrypted = function () {
-        return this.decrypted;
+    var cacheInMemory = function (id, instance, lastUpdated) {
+        byId = __assign({}, byId, (_a = {}, _a[id] = { instance: instance, lastUpdated: lastUpdated, updating: false }, _a));
+        var _a;
     };
-    MyBlob.prototype.isUploaded = function () {
-        return this.uploaded;
-    };
-    MyBlob.prototype.getSize = function () {
-        return this.blobData.size;
-    };
-    MyBlob.prototype.getMeta = function () {
-        return this.meta;
-    };
-    MyBlob.prototype.getArrayBuffer = function () {
-        var _this = this;
-        Object(__WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["b" /* fixFileReader */])();
-        if (this.blobData.originalUrl) {
-            var _a = unpath(this.blobData.originalUrl), directory = _a.directory, name_1 = _a.name;
-            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].readFileAsArrayBuffer(directory, name_1).timeout(2 * 60 * 1000);
-        }
-        return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function (resolve) {
-            var reader = new FileReader();
-            if (reader.addEventListener) {
-                reader.addEventListener("loadend", resolve);
-            }
-            else {
-                reader.onloadend = resolve;
-            }
-            reader.readAsArrayBuffer(_this.blobData);
-        }).then(function (event) {
-            var target = event.currentTarget || event.target;
-            if (target.error) {
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](target.error);
-            }
-            return target.result;
-        }).timeout(2 * 60 * 1000);
-    };
-    MyBlob.prototype.encryptAndUpload = function (key) {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-            var blobKey;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.encrypt()];
-                    case 1:
-                        blobKey = _a.sent();
-                        return [4 /*yield*/, keyStore.sym.symEncryptKey(blobKey, key)];
-                    case 2:
-                        _a.sent();
-                        return [4 /*yield*/, this.upload()];
-                    case 3:
-                        _a.sent();
-                        return [2 /*return*/, blobKey];
-                }
-            });
-        }); });
-    };
-    MyBlob.prototype.encrypt = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]().then(function () {
-            if (_this.uploaded || !_this.decrypted) {
-                throw new Error("trying to encrypt an already encrypted or public blob. add a key decryptor if you want to give users access");
-            }
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
-                keyStore.sym.generateKey(null, "blob key"),
-                _this.getArrayBuffer()
-            ]);
-        }).spread(function (key, buf) {
-            _this.key = key;
-            time("blobencrypt" + (_this.blobID || _this.preReservedID));
-            return keyStore.sym.encryptArrayBuffer(buf, _this.key, function (progress) {
-                _this.encryptProgress.progress(_this.getSize() * progress);
-            });
-        }).then(function (encryptedData) {
-            _this.encryptProgress.progress(_this.getSize());
-            timeEnd("blobencrypt" + (_this.blobID || _this.preReservedID));
-            blobServiceDebug(encryptedData.byteLength);
-            _this.decrypted = false;
-            _this.blobData = new Blob([encryptedData], { type: _this.blobData.type });
-            return _this.key;
+    var loadFromCache = function (id) {
+        var lastUpdated = Date.now();
+        return cache.get(id)
+            .then(function (cacheResponse) {
+            lastUpdated = cacheResponse.created;
+            return cacheResponse.data;
+        })
+            .then(function (cachedData) { return restore(cachedData, null); })
+            .then(function (instance) {
+            cacheInMemory(id, instance, lastUpdated);
+            considerLoaded(id);
+            scheduleInstanceUpdate(UpdateEvent.wake, id);
+            return instance;
         });
     };
-    MyBlob.prototype.decrypt = function () {
-        var _this = this;
-        if (this.decrypted) {
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"]();
+    var serverResponseToInstance = function (response, id, activeInstance) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var loadedData, instance;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, load(response, activeInstance)];
+                        case 1:
+                            loadedData = _a.sent();
+                            if (loadedData === SYMBOL_UNCHANGED) {
+                                return [2 /*return*/, activeInstance];
+                            }
+                            if (loadedData instanceof Symbol) {
+                                throw new Error("invalid symbol returned by load " + cacheName);
+                            }
+                            return [4 /*yield*/, cache.store(id, loadedData)];
+                        case 2:
+                            _a.sent();
+                            return [4 /*yield*/, restore(loadedData, activeInstance)];
+                        case 3:
+                            instance = _a.sent();
+                            if (activeInstance && activeInstance !== instance) {
+                                console.warn("Restore should update active instance");
+                            }
+                            cacheInMemory(id, instance, Date.now());
+                            return [2 /*return*/, instance];
+                    }
+                });
+            });
+        }).finally(function () { return considerLoaded(id); });
+    };
+    var updateInstance = function (id, instance) {
+        return download(id, instance).then(function (response) {
+            return serverResponseToInstance(response, id, instance);
+        });
+    };
+    var scheduleInstanceUpdate = function (event, id) {
+        var _a = byId[id], instance = _a.instance, lastUpdated = _a.lastUpdated, updating = _a.updating;
+        if (updating) {
+            console.info("Not updating instance because update is already running " + cacheName + "/" + id);
+            return;
         }
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            return _this.getArrayBuffer();
-        }).then(function (encryptedData) {
-            time("blobdecrypt" + _this.blobID);
-            return keyStore.sym.decryptArrayBuffer(encryptedData, _this.key, function (progress) {
-                _this.decryptProgress.progress(_this.getSize() * progress);
-            });
-        }).then(function (decryptedData) {
-            _this.decryptProgress.progress(_this.getSize());
-            timeEnd("blobdecrypt" + _this.blobID);
-            _this.decrypted = true;
-            _this.blobData = new Blob([decryptedData], { type: _this.blobData.type });
-            return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(_this).catch(function (e) {
-                console.log("Could not store blob");
-                return _this.toURL();
-            });
-        });
-    };
-    MyBlob.prototype.toURL = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            if (_this.blobData.localURL) {
-                return _this.blobData.localURL;
-            }
-            if (typeof window.URL !== "undefined") {
-                return window.URL.createObjectURL(_this.blobData);
-            }
-            if (typeof webkitURL !== "undefined") {
-                return window.webkitURL.createObjectURL(_this.blobData);
-            }
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["fromCallback"](function (cb) {
-                __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].blobToDataURI(_this.blobData, cb);
-            });
-        }).catch(function () {
-            return "";
-        });
-    };
-    MyBlob.prototype.upload = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            if (_this.uploaded) {
-                return _this.blobID;
-            }
-            return _this.reserveID();
-        }).then(function (blobid) {
-            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].uploadBlob(_this.blobData, blobid, _this.uploadProgress);
-        }).then(function () {
-            _this.uploaded = true;
-            return _this.blobID;
-        });
-    };
-    MyBlob.prototype.getBlobID = function () {
-        return this.blobID;
-    };
-    MyBlob.prototype.getBlobData = function () {
-        return this.blobData;
-    };
-    MyBlob.prototype.reserveID = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            var meta = _this.meta;
-            meta._key = _this.key;
-            meta.one = 1;
-            if (_this.preReservedID) {
-                return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.fullyReserveID", {
-                    blobid: _this.preReservedID,
-                    meta: meta
+        byId[id].updating = true;
+        shouldUpdate(event, instance, lastUpdated).then(function (shouldUpdate) {
+            if (shouldUpdate) {
+                console.info("Schedule " + cacheName + " instance " + id + " update with event " + UpdateEvent[event]);
+                return updateInstance(id, instance).then(function () {
+                    return byId[id].lastUpdated = Date.now();
                 });
             }
-            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.reserveBlobID", {
-                meta: meta
-            });
-        }).then(function (data) {
-            if (data.blobid) {
-                _this.blobID = data.blobid;
-                return _this.blobID;
-            }
-        });
+        }).catch(__WEBPACK_IMPORTED_MODULE_3__services_error_service__["default"].criticalError).finally(function () { return byId[id].updating = false; });
+        return;
     };
-    MyBlob.prototype.preReserveID = function () {
-        var _this = this;
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            return __WEBPACK_IMPORTED_MODULE_4__socket_service__["default"].emit("blob.preReserveID", {});
-        }).then(function (data) {
-            if (data.blobid) {
-                _this.preReservedID = data.blobid;
-                return data.blobid;
-            }
-            throw new Error("got no blobid");
-        });
+    var scheduleInstancesUpdate = function (event) {
+        console.info("Schedule " + cacheName + " instances update with event " + UpdateEvent[event]);
+        Object.keys(byId)
+            .forEach(function (id) { return scheduleInstanceUpdate(event, id); });
     };
-    MyBlob.prototype.getHash = function () {
-        return this.getArrayBuffer().then(function (buf) {
-            return keyStore.hash.hashArrayBuffer(buf);
-        });
-    };
-    return MyBlob;
-}());
-var loadBlob = function (blobID, progress, estimatedSize) {
-    var decryptProgressStub = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
-    var downloadProgress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */]({ total: estimatedSize });
-    progress.addDepend(downloadProgress);
-    progress.addDepend(decryptProgressStub);
-    return downloadBlobQueue.enqueue(1, function () { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-        var data, blob;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, initService.awaitLoading()];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, new __WEBPACK_IMPORTED_MODULE_5__blobDownloader_service__["a" /* default */](__WEBPACK_IMPORTED_MODULE_4__socket_service__["default"], blobID, downloadProgress).download()];
-                case 2:
-                    data = _a.sent();
-                    blob = new MyBlob(data.blob, blobID, { meta: data.meta });
-                    if (blob.isDecrypted()) {
-                        return [2 /*return*/, __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].store(blob).catch(function () { return blob.toURL(); })];
-                    }
-                    downloadProgress.progress(downloadProgress.getTotal());
-                    progress.removeDepend(decryptProgressStub);
-                    progress.addDepend(blob.decryptProgress);
-                    return [2 /*return*/, blob.decrypt()];
+    var lastHeartbeat = Date.now();
+    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].listen(function () { return lastHeartbeat = Date.now(); }, "heartbeat");
+    __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].on("connect", function () {
+        console.info("connect at " + Date.now() + " after " + (Date.now() - lastHeartbeat));
+        if (Date.now() - lastHeartbeat > LONG_DISCONNECT) {
+            scheduleInstancesUpdate(UpdateEvent.wake);
+        }
+        else {
+            scheduleInstancesUpdate(UpdateEvent.blink);
+        }
+        lastHeartbeat = Date.now();
+    });
+    var pauseStarted = 0;
+    document.addEventListener("pause", function () { return pauseStarted = Date.now(); }, false);
+    document.addEventListener("resume", function () {
+        console.info("ended pause at " + Date.now() + " after " + (Date.now() - pauseStarted));
+        if (Date.now() - pauseStarted > LONG_APP_PAUSE) {
+            scheduleInstancesUpdate(UpdateEvent.wake);
+        }
+        else {
+            scheduleInstancesUpdate(UpdateEvent.blink);
+        }
+    }, false);
+    return _b = (function () {
+            function ObjectLoader() {
             }
-        });
-    }); }); });
-};
-var getBlob = function (blobID, downloadProgress, estimatedSize) {
-    if (!knownBlobURLs[blobID]) {
-        knownBlobURLs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize);
-    }
-    return knownBlobURLs[blobID];
-};
-var blobService = {
-    createBlob: function (blob) {
-        return new MyBlob(blob);
-    },
-    isBlobLoaded: function (blobID) {
-        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].isLoaded(blobID);
-    },
-    getBlobUrl: function (blobID, progress, estimatedSize) {
-        if (progress === void 0) { progress = new __WEBPACK_IMPORTED_MODULE_2__asset_Progress__["a" /* default */](); }
-        if (estimatedSize === void 0) { estimatedSize = 0; }
-        return __WEBPACK_IMPORTED_MODULE_3__asset_blobCache__["a" /* default */].getBlobUrl(blobID).catch(function () {
-            return getBlob(blobID, progress, estimatedSize);
-        });
-    },
-};
-/* harmony default export */ __webpack_exports__["a"] = (blobService);
-//# sourceMappingURL=blobService.js.map
+            ObjectLoader.getLoaded = function (id) {
+                if (!ObjectLoader.isLoaded(id)) {
+                    throw new Error("Not yet loaded: " + id);
+                }
+                return byId[id].instance;
+            };
+            ObjectLoader.isLoaded = function (id) {
+                return byId.hasOwnProperty(id);
+            };
+            ObjectLoader.load = function (source) {
+                var id = getID(source);
+                if (byId[id]) {
+                    serverResponseToInstance(source, id, byId[id].instance);
+                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+                }
+                if (!loading[id]) {
+                    loading = __assign({}, loading, (_a = {}, _a[id] = loadFromCache(id)
+                        .catch(function () { return serverResponseToInstance(source, id, null); }), _a));
+                }
+                return loading[id];
+                var _a;
+            };
+            ObjectLoader.updateCache = function (id, cacheableData) {
+                return cache.store(id, cacheableData);
+            };
+            // Throws
+            ObjectLoader.getFromCache = function (id) {
+                if (byId[id]) {
+                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+                }
+                return loadFromCache(id);
+            };
+            ObjectLoader.get = function (id) {
+                if (typeof id === "undefined" || id === null) {
+                    throw new Error("Can't get object with id " + id + " - " + cacheName);
+                }
+                if (byId[id]) {
+                    return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](byId[id].instance);
+                }
+                if (!loading[id]) {
+                    var promise = loadFromCache(id)
+                        .catch(function () { return download(id, null).then(function (response) { return serverResponseToInstance(response, id, null); }); });
+                    loading = __assign({}, loading, (_a = {}, _a[id] = promise, _a));
+                }
+                return loading[id];
+                var _a;
+            };
+            return ObjectLoader;
+        }()),
+        _b.getAll = function () {
+            return byId;
+        },
+        _b.removeLoaded = function (id) { return delete byId[id]; },
+        _b.addLoaded = function (id, obj) {
+            byId[id] = { instance: obj, lastUpdated: Date.now(), updating: false };
+        },
+        _b;
+    var _b;
+}
+/* harmony default export */ __webpack_exports__["c"] = (createLoader);
+//# sourceMappingURL=mutableObjectLoader.js.map
 
 /***/ }),
 
-/***/ 56:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var h = __webpack_require__(5).default;
-var baseConfig = __webpack_require__(344);
-var config = __webpack_require__(345);
-
-module.exports = h.extend(h.extend({}, baseConfig), config);
-
-/***/ }),
-
-/***/ 65:
+/***/ 70:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(6);
 
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -13015,624 +13325,275 @@ var Progress = (function (_super) {
 
 /***/ }),
 
-/***/ 66:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ 71:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TRUST_SECURED_OPTIONS", function() { return TRUST_SECURED_OPTIONS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TrustStore", function() { return TrustStore; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "trustStates", function() { return trustStates; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformLegacy", function() { return transformLegacy; });
+/* harmony export (immutable) */ __webpack_exports__["userToDataSet"] = userToDataSet;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__asset_securedDataWithMetaData__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__asset_enum__ = __webpack_require__(194);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_error_service__ = __webpack_require__(32);
+
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
+            t[p[i]] = s[p[i]];
+    return t;
+};
 
 
-var Observer = __webpack_require__(17);
-var SecuredData = __webpack_require__(33);
-var Enum = __webpack_require__(183);
-var errors = __webpack_require__(48);
-var Bluebird = __webpack_require__(3);
-var database,
-    loaded = false,
-    trustManager;
 
-var sortedTrustStates = ["BROKEN", "UNTRUSTED", "TIMETRUSTED", "WHISPEERVERIFIED", "NETWORKVERIFIED", "VERIFIED", "OWN"];
 
-var trustStates = new Enum.default(sortedTrustStates);
 
-sortedTrustStates = sortedTrustStates.map(function (trustLevel) {
-	return trustStates.fromString("|" + trustLevel + "|");
+var errors = __webpack_require__(42);
+
+
+var initService = __webpack_require__(20);
+var THROTTLE = 50;
+var TRUST_SECURED_OPTIONS = {
+    type: "trustManager"
+};
+var TrustStore = (function () {
+    function TrustStore(_a) {
+        var nicknames = _a.nicknames, ids = _a.ids, me = _a.me, keys = _a.keys, signature = _a.signature;
+        var _this = this;
+        this.getSignature = function () { return _this.signature; };
+        this.update = function (_a) {
+            var nicknames = _a.nicknames, ids = _a.ids, me = _a.me, keys = _a.keys;
+            var newKeys = Object.keys(keys)
+                .filter(function (key) { return !_this.keys.hasOwnProperty(key); });
+            var trustIncreasedKeys = Object.keys(keys)
+                .filter(function (key) { return _this.keys.hasOwnProperty(key); })
+                .filter(function (key) {
+                var oldTrust = unserializeTrust(_this.keys[key].trust);
+                var newTrust = unserializeTrust(keys[key].trust);
+                return sortedTrustStates.indexOf(oldTrust) < sortedTrustStates.indexOf(newTrust);
+            });
+            newKeys
+                .forEach(function (signKey) { return _this.add(keys[signKey]); });
+            trustIncreasedKeys
+                .forEach(function (key) { return _this.keys[key].trust = keys[key].trust; });
+            if (newKeys.length > 0 || trustIncreasedKeys.length > 0) {
+                scheduleTrustmanagerUpload();
+            }
+        };
+        this.add = function (dataSet) {
+            var key = dataSet.key, userid = dataSet.userid, nickname = dataSet.nickname;
+            var idKey = _this.ids[userid];
+            var nicknameKey = _this.nicknames[nickname];
+            if (idKey && idKey !== key) {
+                throw new errors.SecurityError("we already have got a key for this users id");
+            }
+            if (nicknameKey && nicknameKey !== key) {
+                throw new errors.SecurityError("we already have got a key for this users nickname");
+            }
+            _this.keys[key] = dataSet;
+            if (nickname) {
+                _this.nicknames[nickname] = key;
+            }
+            _this.ids[userid] = key;
+        };
+        this.get = function (key) { return _this.keys[key]; };
+        this.setKeyTrustLevel = function (key, trustLevel) {
+            _this.keys[key].trust = trustLevel;
+        };
+        this.getUpdatedVersion = function () {
+            var info = {
+                nicknames: _this.nicknames,
+                ids: _this.ids,
+                me: _this.me
+            };
+            Object.keys(_this.keys).forEach(function (key) {
+                info[key] = _this.keys[key];
+            });
+            var secured = new __WEBPACK_IMPORTED_MODULE_3__asset_securedDataWithMetaData__["SecuredData"](null, info, TRUST_SECURED_OPTIONS, true);
+            return secured.sign(ownKey);
+        };
+        this.getTrustSet = function () { return ({
+            nicknames: _this.nicknames,
+            keys: _this.keys,
+            ids: _this.ids,
+            me: _this.me,
+            signature: _this.signature
+        }); };
+        this.hasKeyData = function (key) { return _this.keys.hasOwnProperty(key); };
+        this.nicknames = nicknames;
+        this.ids = ids;
+        this.me = me;
+        this.keys = keys;
+        this.signature = signature;
+    }
+    return TrustStore;
+}());
+
+var trustStore;
+var loaded = false;
+var fakeKeyExistence = 0;
+var ownKey;
+var sortedTrustStatesNames = ["BROKEN", "UNTRUSTED", "TIMETRUSTED", "WHISPEERVERIFIED", "NETWORKVERIFIED", "VERIFIED", "OWN"];
+var trustStates = new __WEBPACK_IMPORTED_MODULE_4__asset_enum__["a" /* default */](sortedTrustStatesNames);
+var transformLegacy = function (_a) {
+    var nicknames = _a.nicknames, ids = _a.ids, me = _a.me, _signature = _a._signature, rest = __rest(_a, ["nicknames", "ids", "me", "_signature"]);
+    var keys = {};
+    Object.keys(rest).filter(function (key) { return __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].isRealID(key); }).forEach(function (key) {
+        keys[key] = rest[key];
+    });
+    return {
+        nicknames: nicknames,
+        ids: ids,
+        me: me,
+        keys: keys,
+        signature: _signature
+    };
+};
+var sortedTrustStates = sortedTrustStatesNames.map(function (trustLevel) {
+    return trustStates.fromString("|" + trustLevel + "|");
 });
-
 function serializeTrust(trustLevel) {
-	return trustStates.toString(trustLevel);
+    return trustStates.toString(trustLevel);
 }
-
 function unserializeTrust(trustLevel) {
-	return trustStates.fromString(trustLevel);
+    return trustStates.fromString(trustLevel);
 }
-
-function KeyTrustData(data) {
-	var trustSymbol = unserializeTrust(data.trust);
-
-	this.getAddedTime = function () {
-		return data.added;
-	};
-	this.getKey = function () {
-		return data.key;
-	};
-	this.getUserID = function () {
-		return data.userid;
-	};
-	this.getNickname = function () {
-		return data.nickname;
-	};
-	this.getTrust = function () {
-		return trustSymbol;
-	};
-
-	this.isUntrusted = function () {
-		return trustSymbol === trustStates.UNTRUSTED;
-	};
-	this.isTimeTrusted = function () {
-		return trustSymbol === trustStates.TIMETRUSTED;
-	};
-	this.isWhispeerVerified = function () {
-		return trustSymbol === trustStates.WHISPEERVERIFIED;
-	};
-	this.isNetworkVerified = function () {
-		return trustSymbol === trustStates.NETWORKVERIFIED;
-	};
-	this.isVerified = function () {
-		return trustSymbol === trustStates.VERIFIED;
-	};
-	this.isOwn = function () {
-		return trustSymbol === trustStates.OWN;
-	};
-
-	this.setTrust = function (trustLevel) {
-		trustManager.setKeyTrustLevel(data.key, trustLevel);
-	};
+var KeyTrustData = (function () {
+    function KeyTrustData(data) {
+        var _this = this;
+        this.data = data;
+        this.getAddedTime = function () { return _this.data.added; };
+        this.getKey = function () { return _this.data.key; };
+        this.getUserID = function () { return _this.data.userid; };
+        this.getNickname = function () { return _this.data.nickname; };
+        this.getTrust = function () { return _this.trustSymbol; };
+        this.isUntrusted = function () { return _this.trustSymbol === trustStates.UNTRUSTED; };
+        this.isTimeTrusted = function () { return _this.trustSymbol === trustStates.TIMETRUSTED; };
+        this.isWhispeerVerified = function () { return _this.trustSymbol === trustStates.WHISPEERVERIFIED; };
+        this.isNetworkVerified = function () { return _this.trustSymbol === trustStates.NETWORKVERIFIED; };
+        this.isVerified = function () { return _this.trustSymbol === trustStates.VERIFIED; };
+        this.isOwn = function () { return _this.trustSymbol === trustStates.OWN; };
+        this.trustSymbol = unserializeTrust(data.trust);
+    }
+    return KeyTrustData;
+}());
+function userToDataSet(_a, trustLevel) {
+    var key = _a.key, userid = _a.userid, nickname = _a.nickname;
+    if (trustLevel === void 0) { trustLevel = trustStates.UNTRUSTED; }
+    return {
+        added: new Date().getTime(),
+        trust: serializeTrust(trustLevel),
+        key: key,
+        userid: userid,
+        nickname: nickname
+    };
 }
-
-function userToDataSet(_ref, trustLevel) {
-	var key = _ref.key,
-	    userid = _ref.userid,
-	    nickname = _ref.nickname;
-
-	var content = {
-		added: new Date().getTime(),
-		trust: serializeTrust(trustLevel || trustStates.UNTRUSTED),
-		key: key,
-		userid: userid,
-		nickname: nickname
-	};
-
-	return content;
-}
-
-var fakeKeyExistence = 0,
-    ownKey,
-    specialKeys = ["me", "nicknames", "ids"];
-
-trustManager = {
-	allow: function allow(count) {
-		if (!loaded) {
-			fakeKeyExistence = count;
-		}
-	},
-	disallow: function disallow() {
-		fakeKeyExistence = 0;
-	},
-	trustStates: trustStates,
-	isLoaded: function isLoaded() {
-		return loaded;
-	},
-	createDatabase: function createDatabase(_ref2) {
-		var key = _ref2.key,
-		    userid = _ref2.userid,
-		    nickname = _ref2.nickname;
-
-		var data = {};
-
-		data.nicknames = {};
-		data.ids = {};
-
-		data[key] = userToDataSet({ key: key, userid: userid, nickname: nickname }, trustStates.OWN);
-
-		data.nicknames[nickname] = key;
-		data.ids[userid] = key;
-		data.me = key;
-
-		database = SecuredData.load(undefined, data, {
-			type: "trustManager"
-		});
-
-		loaded = true;
-	},
-	setOwnSignKey: function setOwnSignKey(_ownKey) {
-		ownKey = _ownKey;
-	},
-	addDataSet: function addDataSet(dataSet) {
-		var signKey = dataSet.key;
-
-		var idKey = database.metaAttr(["ids", dataSet.userid]);
-		var nicknameKey = database.metaAttr(["nicknames", dataSet.nickname]);
-
-		if (idKey && idKey !== signKey) {
-			throw new errors.SecurityError("we already have got a key for this users id");
-		}
-
-		if (nicknameKey && nicknameKey !== signKey) {
-			throw new errors.SecurityError("we already have got a key for this users nickname");
-		}
-
-		database.metaAdd([signKey], dataSet);
-
-		if (dataSet.nickname) {
-			database.metaAdd(["nicknames", dataSet.nickname], signKey);
-		}
-
-		database.metaAdd(["ids", dataSet.userid], signKey);
-	},
-	updateDatabase: function updateDatabase(data, cb) {
-		if (!loaded || data._signature === database.metaAttr("_signature")) {
-			return Bluebird.resolve().nodeify(cb);
-		}
-
-		var givenDatabase = SecuredData.load(undefined, data, {
-			type: "trustManager"
-		});
-		return Bluebird.try(function () {
-			if (data.me === ownKey) {
-				return givenDatabase.verifyAsync(ownKey, "user");
-			}
-
-			throw new errors.SecurityError("not my trust database");
-		}).then(function () {
-			var newKeys = givenDatabase.metaKeys().filter(function (key) {
-				return !database.metaHasAttr(key);
-			});
-
-			var oldKeys = givenDatabase.metaKeys().filter(function (key) {
-				return database.metaHasAttr(key);
-			}).filter(function (key) {
-				return specialKeys.indexOf(key) === -1;
-			});
-
-			var changed = false;
-
-			newKeys.forEach(function (signKey) {
-				changed = true;
-
-				var userDataSet = givenDatabase.metaAttr(signKey);
-
-				trustManager.addDataSet(userDataSet);
-			});
-
-			oldKeys.forEach(function (signKey) {
-				var oldValue = database.metaAttr(signKey);
-				var newValue = givenDatabase.metaAttr(signKey);
-
-				var oldTrust = unserializeTrust(oldValue.trust);
-				var newTrust = unserializeTrust(newValue.trust);
-
-				if (sortedTrustStates.indexOf(oldTrust) < sortedTrustStates.indexOf(newTrust)) {
-					changed = true;
-					database.metaAdd([signKey, "trust"], newValue.trust);
-				}
-			});
-
-			if (changed) {
-				trustManager.notify("", "updated");
-			}
-
-			return changed;
-		}).nodeify(cb);
-	},
-	loadDatabase: function loadDatabase(data, cb) {
-		if (loaded) {
-			return;
-		}
-
-		if (data.me !== ownKey) {
-			throw new errors.SecurityError("not my trust database");
-		}
-
-		var givenDatabase = SecuredData.load(undefined, data, {
-			type: "trustManager"
-		});
-		return Bluebird.try(function () {
-			return givenDatabase.verifyAsync(ownKey, "user");
-		}).then(function () {
-			trustManager.disallow();
-			database = givenDatabase;
-			loaded = true;
-
-			trustManager.notify("", "loaded");
-		}).nodeify(cb);
-	},
-	hasKeyData: function hasKeyData(keyid) {
-		if (!loaded) {
-			if (keyid === ownKey) {
-				return true;
-			} else if (fakeKeyExistence > 0) {
-				fakeKeyExistence -= 1;
-				return true;
-			} else {
-				throw new Error("trust manager not yet loaded");
-			}
-		}
-		return database.metaHasAttr(keyid);
-	},
-	getKeyData: function getKeyData(keyid) {
-		var keyData = database.metaAttr(keyid);
-
-		if (keyData) {
-			return new KeyTrustData(keyData);
-		}
-
-		return false;
-	},
-	addUser: function addUser(userInfo) {
-		trustManager.addDataSet(userToDataSet(userInfo));
-	},
-	setKeyTrustLevel: function setKeyTrustLevel(signKey, trustLevel) {
-		if (trustLevel === trustStates.OWN) {
-			throw new Error("do not use setKeyTrustLevel for own keys.");
-		}
-
-		if (database.metaHasAttr(signKey)) {
-			database.metaAdd([signKey, "trust"], serializeTrust(trustLevel));
-
-			return true;
-		}
-
-		return false;
-	},
-	getUpdatedVersion: function getUpdatedVersion(cb) {
-		return database.sign(ownKey).nodeify(cb);
-	}
+var uploadDatabase = function () {
+    return initService.awaitLoading()
+        .then(function () { return trustStore.getUpdatedVersion(); })
+        .then(function (content) { return __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].emit("trustManager.set", { content: content }); })
+        .then(function (response) { return !response.success ? __WEBPACK_IMPORTED_MODULE_6__services_error_service__["default"].criticalError(response) : null; });
 };
-
-Observer.extend(trustManager);
-
-module.exports = trustManager;
+var scheduleTrustmanagerUpload = __WEBPACK_IMPORTED_MODULE_0__helper_helper__["default"].aggregateOnce(THROTTLE, uploadDatabase);
+var trustManager = {
+    notify: null,
+    /*listen: <any> null,*/
+    allow: function (count) {
+        if (!loaded) {
+            fakeKeyExistence = count;
+        }
+    },
+    disallow: function () {
+        fakeKeyExistence = 0;
+    },
+    isLoaded: function () { return loaded; },
+    setOwnSignKey: function (_ownKey) {
+        ownKey = _ownKey;
+    },
+    addDataSet: function (dataSet) {
+        trustStore.add(dataSet);
+    },
+    updateDatabase: function (data, cb) {
+        if (!loaded) {
+            throw new Error("cant update database: not loaded");
+        }
+        var givenDatabase = __WEBPACK_IMPORTED_MODULE_3__asset_securedDataWithMetaData__["default"].load(undefined, data, TRUST_SECURED_OPTIONS);
+        return __WEBPACK_IMPORTED_MODULE_5_bluebird__["try"](function () {
+            if (data.me === ownKey) {
+                return givenDatabase.verifyAsync(ownKey, "user");
+            }
+            throw new errors.SecurityError("not my trust database");
+        }).then(function () { return trustStore.update(transformLegacy(givenDatabase.metaGet())); }).nodeify(cb);
+    },
+    hasKeyData: function (keyid) {
+        if (!loaded) {
+            if (keyid === ownKey) {
+                return true;
+            }
+            else if (fakeKeyExistence > 0) {
+                fakeKeyExistence -= 1;
+                return true;
+            }
+            else {
+                throw new Error("trust manager not yet loaded");
+            }
+        }
+        return trustStore.hasKeyData(keyid);
+    },
+    getKeyData: function (keyid) {
+        var keyData = trustStore.get(keyid);
+        if (keyData) {
+            return new KeyTrustData(keyData);
+        }
+        throw new Error("key not in trust database " + keyid);
+    },
+    uploadDatabase: uploadDatabase,
+    verifyUser: function (user) {
+        var signKey = user.getSignKey();
+        if (signKey === ownKey) {
+            throw new Error("Tried to verify own user.");
+        }
+        if (trustStore.hasKeyData(signKey)) {
+            trustStore.setKeyTrustLevel(signKey, serializeTrust(trustStates.VERIFIED));
+        }
+        return uploadDatabase();
+    },
+    addNewUsers: function (userInfo) {
+        if (trustManager.isLoaded() && !trustManager.hasKeyData(userInfo.key)) {
+            trustManager.addDataSet(userToDataSet(userInfo));
+            scheduleTrustmanagerUpload();
+        }
+    },
+    setTrustStore: function (givenTrustStore) {
+        if (trustStore) {
+            throw new Error("trying to overwrite trust store. Please update instance");
+        }
+        trustManager.disallow();
+        trustStore = givenTrustStore;
+        loaded = true;
+        trustManager.notify("", "loaded");
+    }
+};
+__WEBPACK_IMPORTED_MODULE_2__asset_observer__["default"].extend(trustManager);
+__WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].channel("notify.trustManager", function (_e, data) {
+    trustManager.updateDatabase(data).catch(__WEBPACK_IMPORTED_MODULE_6__services_error_service__["default"].criticalError);
+});
+/* harmony default export */ __webpack_exports__["default"] = (trustManager);
+//# sourceMappingURL=trustManager.js.map
 
 /***/ }),
 
-/***/ 72:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var h = __webpack_require__(5).default;
-var config = __webpack_require__(56);
-var Observer = __webpack_require__(17);
-var keyStore = __webpack_require__(26);
-var chelper = __webpack_require__(152);
-var Bluebird = __webpack_require__(3);
-var loaded = false,
-    changed = false,
-    isLoaded = {};
-
-isLoaded.promise = new Bluebird(function (resolve) {
-	isLoaded.promiseResolve = resolve;
-});
-
-function dataSetToHash(signature, hash, key) {
-	var data = {
-		signature: chelper.bits2hex(signature),
-		signatureHash: chelper.bits2hex(hash),
-		key: key
-	};
-
-	return keyStore.hash.hashObjectOrValueHex(data, config.hashVersion);
-}
-
-/*
-	user:  signedKeys, signedFriendList, profile
-	me: circle, trustManager, settings
-	message: topic, message
-	post: post, comment
-
-	noCache: friendShip, removeFriend
-*/
-
-var types = {
-	me: {
-		maxCount: -1,
-		saveID: true
-	},
-	user: {
-		maxCount: 500,
-		saveID: true
-	},
-	topic: {
-		maxCount: 30,
-		saveID: false
-	},
-	message: {
-		maxCount: 200,
-		saveID: false
-	},
-	post: {
-		maxCount: 100,
-		saveID: false
-	}
-};
-
-var cacheTypes = {
-	signatureCache: "noCache",
-
-	signedFriendList: "user",
-
-	circle: "me",
-	trustManager: "me",
-	settings: "me",
-
-	topicUpdate: "noCache",
-
-	post: "post",
-	postPrivate: "post",
-
-	topic: "noCache",
-	message: "noCache",
-
-	profile: "noCache",
-	signedKeys: "noCache",
-
-	comment: "noCache",
-	friendShip: "noCache",
-	removeFriend: "noCache"
-};
-
-var Database = function Database(type, options) {
-	this._type = type;
-
-	this._maxCount = options.maxCount;
-	this._saveID = options.saveID;
-
-	this._signatures = {};
-};
-
-Database.prototype.getType = function () {
-	return this._type;
-};
-
-Database.prototype.getCacheEntry = function (id) {
-	var entry = {};
-	if (this._maxCount > -1) {
-		entry.date = new Date().getTime();
-	}
-
-	if (this._saveID && id) {
-		entry.id = id;
-	}
-
-	return entry;
-};
-
-Database.prototype.allEntries = function () {
-	return this.allSignatures().map(function (signatureHash) {
-		var entry = h.deepCopyObj(this.getEntry(signatureHash));
-		entry.signatureHash = signatureHash;
-		return entry;
-	}, this);
-};
-
-Database.prototype.getEntry = function (signatureHash) {
-	return this._signatures[signatureHash];
-};
-
-Database.prototype.joinEntries = function (entries) {
-	entries.forEach(function (entry) {
-		var signatureHash = entry.signatureHash;
-
-		delete entry.signatureHash;
-
-		if (!this._signatures[signatureHash]) {
-			this._signatures[signatureHash] = entry;
-		}
-	}, this);
-};
-
-Database.prototype.deleteByID = function (id) {
-	if (!this._saveID || !id) {
-		return;
-	}
-
-	this.allEntries().filter(function (entry) {
-		return entry.id === id;
-	}).forEach(function (entry) {
-		this.deleteEntry(entry.signatureHash);
-	}, this);
-};
-
-Database.prototype.deleteEntry = function (signatureHash) {
-	delete this._signatures[signatureHash];
-};
-
-Database.prototype.addSignature = function (signature, hash, key, id) {
-	if (!h.isRealID(key) || !h.isSignature(chelper.bits2hex(signature))) {
-		throw new Error("invalid input");
-	}
-
-	var sHash = dataSetToHash(signature, hash, key);
-
-	changed = true;
-
-	this.deleteByID(id);
-	this._signatures[sHash] = this.getCacheEntry(id);
-
-	this.cleanUp();
-};
-
-Database.prototype.hasEntry = function (signatureHash) {
-	if (this._signatures[signatureHash]) {
-		return true;
-	}
-
-	return false;
-};
-
-Database.prototype.hasSignature = function (signature, hash, key) {
-	var sHash = dataSetToHash(signature, hash, key);
-	return this.hasEntry(sHash);
-};
-
-Database.prototype.cleanUp = function () {
-	if (this._maxCount === -1) {
-		return;
-	}
-
-	var entries = this.allEntries();
-	if (entries.length <= this._maxCount) {
-		return;
-	}
-
-	console.log("Cleaning up database of type " + this._type + " (" + entries.length + ")");
-
-	entries.sort(function (a, b) {
-		return a.date - b.date;
-	});
-
-	entries.slice(0, entries.length - this._maxCount).forEach(function (entry) {
-		this.deleteEntry(entry.signatureHash);
-	}, this);
-};
-
-Database.prototype.allSignatures = function () {
-	return Object.keys(this._signatures);
-};
-
-var allDatabases = [];
-h.objectEach(types, function (name, val) {
-	types[name] = new Database(name, val);
-	allDatabases.push(types[name]);
-});
-
-var signatureCache = {
-	awaitLoading: function awaitLoading() {
-		return isLoaded.promise;
-	},
-	/**
-  * Has the signature cache changed? (was a signature added/removed?)
-  */
-	isChanged: function isChanged() {
-		return changed;
-	},
-	resetChanged: function resetChanged() {
-		changed = false;
-	},
-	isLoaded: function isLoaded() {
-		return loaded;
-	},
-	/**
-  * Load a given signature cache
-  * @param signatureCacheData signature cache data to load.
-  * @param ownKey own signing key
-  */
-	load: function load(signatureCacheData, ownKey) {
-		if (signatureCacheData.internalHashVersion !== config.hashVersion) {
-			console.warn("resetting signature cache to upgrade to new hash version");
-			signatureCache.initialize(ownKey);
-
-			return;
-		}
-
-		if (signatureCacheData.me !== ownKey) {
-			console.warn("not my signature cache");
-			signatureCache.initialize(ownKey);
-
-			return;
-		}
-
-		signatureCacheData.databases.forEach(function (db) {
-			types[db.type].joinEntries(db.entries);
-		});
-
-		signatureCache.initialize(ownKey);
-	},
-	/**
-  * Initialize cache
-  * @param ownKey id of the own sign key
-  */
-	initialize: function initialize() {
-		loaded = true;
-
-		isLoaded.promiseResolve();
-	},
-	/**
-  * Get the signed updated version of this signature cache
-  */
-	getUpdatedVersion: function getUpdatedVersion() {
-		if (!loaded) {
-			return Bluebird.reject("Signature Cache not yet loaded!");
-		}
-
-		var databases = allDatabases.map(function (db) {
-			return {
-				type: db.getType(),
-				entries: db.allEntries()
-			};
-		});
-
-		var data = {
-			internalHashVersion: config.hashVersion,
-			databases: databases
-		};
-
-		return Bluebird.resolve(data);
-	},
-	/**
-  * Check if a signature is in the cache
-  * @param signature the signature to check for
-  * @param hash hash that was signed
-  * @param key key that was used to sign the signature
-  */
-	isValidSignatureInCache: function isValidSignatureInCache(signature, hash, key) {
-		var sHash = dataSetToHash(signature, hash, key);
-
-		return allDatabases.filter(function (database) {
-			return database.hasEntry(sHash);
-		}).length > 0;
-	},
-	/**
-  * Add a valid signature to the cache.
-  * @param signature the signature to add
-  * @param hash the hash that was signed by the signature
-  * @param key the key used to verify the signature
-  * @param type type of the signed object
-  * @param (id) id of the signed object
-  */
-	addValidSignature: function addValidSignature(signature, hash, key, type, id) {
-		if (!h.isRealID(key) || !h.isSignature(chelper.bits2hex(signature))) {
-			throw new Error("invalid input");
-		}
-
-		var reducedType = cacheTypes[type];
-
-		if (!reducedType) {
-			console.warn("unknown type: " + type);
-			return;
-		}
-
-		if (reducedType === "noCache") {
-			return;
-		}
-
-		if (id) {
-			id = type + "-" + id;
-		}
-
-		var db = types[reducedType];
-		db.addSignature(signature, hash, key, id);
-	}
-};
-
-Observer.extend(signatureCache);
-
-module.exports = signatureCache;
-
-/***/ }),
-
-/***/ 73:
+/***/ 75:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13689,13 +13650,13 @@ var Queue = (function () {
 
 /***/ }),
 
-/***/ 74:
+/***/ 76:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_Cache__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_Cache__ = __webpack_require__(27);
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -13799,7 +13760,7 @@ function createLoader(_a) {
 
 /***/ }),
 
-/***/ 85:
+/***/ 87:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13809,14 +13770,14 @@ function createLoader(_a) {
 * friendsService
 **/
 
-var h = __webpack_require__(5).default;
-var Observer = __webpack_require__(17);
-var SecuredData = __webpack_require__(33);
+var h = __webpack_require__(6).default;
+var Observer = __webpack_require__(16);
+var SecuredData = __webpack_require__(26).default;
 var Bluebird = __webpack_require__(3);
 
-var socket = __webpack_require__(11).default;
-var keyStore = __webpack_require__(32).default;
-var initService = __webpack_require__(22);
+var socket = __webpack_require__(10).default;
+var keyStore = __webpack_require__(34).default;
+var initService = __webpack_require__(20);
 
 var friends = [],
     requests = [],
@@ -14023,7 +13984,7 @@ friendsService = {
 		}
 
 		var userService = __webpack_require__(9).default,
-		    circleService = __webpack_require__(189);
+		    circleService = __webpack_require__(199);
 		var otherUser,
 		    ownUser = userService.getOwn(),
 		    userCircles = circleService.inWhichCircles(uid);
@@ -14254,23 +14215,23 @@ module.exports = friendsService;
 
 /***/ }),
 
-/***/ 86:
+/***/ 88:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Chat; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_mutableObjectLoader__ = __webpack_require__(101);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__chatChunk__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__message__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_keyStore_service__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__asset_observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_settings_service__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_session_service__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_mutableObjectLoader__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__chatChunk__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__message__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_Cache__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_keyStore_service__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__asset_observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_settings_service__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_session_service__ = __webpack_require__(19);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -14335,7 +14296,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 
 
 
-var initService = __webpack_require__(22);
+var initService = __webpack_require__(20);
 var messageSendCache = new __WEBPACK_IMPORTED_MODULE_6__services_Cache__["default"]("unsentMessages", { maxEntries: -1, maxBlobSize: -1 });
 var unreadChatIDs = [];
 var addAfterTime = function (arr, id, time) {
@@ -14391,16 +14352,17 @@ var Chat = (function (_super) {
         _this.unreadMessageIDs = [];
         _this.draft = false;
         _this.newMessage = "";
+        _this.getInfo = function () { return ({
+            id: _this.id,
+            unreadMessageIDs: _this.unreadMessageIDs,
+            latestMessageID: _this.getLatestSentMessage(),
+            latestChunkID: _this.getLatestChunk()
+        }); };
         _this.store = function () {
             if (_this.draft) {
                 return;
             }
-            var storeInfo = {
-                id: _this.id,
-                unreadMessageIDs: _this.unreadMessageIDs,
-                latestMessageID: _this.getLatestMessage(),
-                latestChunkID: _this.getLatestChunk()
-            };
+            var storeInfo = _this.getInfo();
             if (__WEBPACK_IMPORTED_MODULE_5__helper_helper__["default"].deepEqual(_this.lastStoredInfo, storeInfo)) {
                 return;
             }
@@ -14850,6 +14812,15 @@ var Chat = (function (_super) {
             return __WEBPACK_IMPORTED_MODULE_5__helper_helper__["default"].array.last(this.messages).id;
         }
     };
+    Chat.prototype.getLatestSentMessage = function () {
+        var messages = this.messages.map(function (_a) {
+            var id = _a.id;
+            return __WEBPACK_IMPORTED_MODULE_4__message__["b" /* default */].getLoaded(id);
+        }).filter(function (m) { return m.hasBeenSent(); });
+        if (messages.length > 0) {
+            return __WEBPACK_IMPORTED_MODULE_5__helper_helper__["default"].array.last(messages).getClientID();
+        }
+    };
     Chat.prototype.localMarkRead = function () {
         var _this = this;
         if (this.unreadMessageIDs.length === 0 && unreadChatIDs.indexOf(this.id) === -1) {
@@ -14882,17 +14853,36 @@ var Chat = (function (_super) {
     return Chat;
 }(__WEBPACK_IMPORTED_MODULE_8__asset_observer__["default"]));
 
+var loadChatInfo = function (ids) {
+    return __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].definitlyEmit("chat.getMultiple", { ids: ids })
+        .then(function (_a) {
+        var chats = _a.chats;
+        return ids.map(function (id) { return chats.find(function (_a) {
+            var chat = _a.chat;
+            return chat.id === id;
+        }); });
+    });
+};
+var getChatInfo = __WEBPACK_IMPORTED_MODULE_5__helper_helper__["default"].delayMultiplePromise(__WEBPACK_IMPORTED_MODULE_0_bluebird__, 50, loadChatInfo, 10);
 var ChatLoader = (function (_super) {
     __extends(ChatLoader, _super);
     function ChatLoader() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     return ChatLoader;
-}(Object(__WEBPACK_IMPORTED_MODULE_2__services_mutableObjectLoader__["b" /* default */])({
+}(Object(__WEBPACK_IMPORTED_MODULE_2__services_mutableObjectLoader__["c" /* default */])({
     download: function (id) {
-        return __WEBPACK_IMPORTED_MODULE_1__services_socket_service__["default"].definitlyEmit("chat.get", { id: id }).then(function (response) { return response.chat; });
+        return getChatInfo(id).then(function (chatInfo) {
+            if (chatInfo.chat.id !== id) {
+                throw new Error("fail");
+            }
+            return chatInfo;
+        });
     },
-    load: function (chatResponse) {
+    load: function (chatResponse, previousInstance) {
+        if (previousInstance && __WEBPACK_IMPORTED_MODULE_5__helper_helper__["default"].deepEqual(previousInstance.getInfo(), chatResponse.chat)) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](__WEBPACK_IMPORTED_MODULE_2__services_mutableObjectLoader__["a" /* SYMBOL_UNCHANGED */]);
+        }
         var loadChunks = __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"](chatResponse.chunks.map(function (chunkData) {
             return __WEBPACK_IMPORTED_MODULE_3__chatChunk__["b" /* default */].load(chunkData);
         }));
@@ -15002,18 +14992,19 @@ initService.listen(function () {
 
 /***/ }),
 
-/***/ 87:
+/***/ 89:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Chunk; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_cachedObjectLoader__ = __webpack_require__(74);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__chatTitleUpdate__ = __webpack_require__(418);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_observer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__asset_securedDataWithMetaData__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_cachedObjectLoader__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__chatTitleUpdate__ = __webpack_require__(444);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -15069,16 +15060,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 
-var validator = __webpack_require__(188);
+var validator = __webpack_require__(198);
 
-var SecuredData = __webpack_require__(33);
+
 
 var debug = __webpack_require__(15);
 var userService = __webpack_require__(9).default;
 
 
-var keyStore = __webpack_require__(32).default;
-var sessionService = __webpack_require__(21).default;
+var keyStore = __webpack_require__(34).default;
+var sessionService = __webpack_require__(19).default;
 
 var debugName = "whispeer:chunk";
 var chunkDebug = debug(debugName);
@@ -15191,12 +15182,12 @@ var Chunk = (function (_super) {
         };
         _this.getPredecessor = function () {
             if (!_this.hasPredecessor()) {
-                return __WEBPACK_IMPORTED_MODULE_2_bluebird__["resolve"](null);
+                return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"](null);
             }
             return ChunkLoader.get(_this.getPredecessorID()).catch(function (err) {
                 console.log(err);
                 return null;
-            }, __WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].errors.Server);
+            }, __WEBPACK_IMPORTED_MODULE_4__services_socket_service__["default"].errors.Server);
         };
         _this.setSuccessor = function (successorID) {
             _this.successorID = successorID;
@@ -15216,7 +15207,7 @@ var Chunk = (function (_super) {
             if (_this.successorID) {
                 return ChunkLoader.get(_this.successorID);
             }
-            return __WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].emit("chat.chunk.successor", { id: _this.getID() }).then(function (response) {
+            return __WEBPACK_IMPORTED_MODULE_4__services_socket_service__["default"].emit("chat.chunk.successor", { id: _this.getID() }).then(function (response) {
                 if (!response.chunk) {
                     return;
                 }
@@ -15233,7 +15224,7 @@ var Chunk = (function (_super) {
             throw err;
         }
         meta.receiver.sort();
-        _this.securedData = SecuredData.createRaw(content, meta, CHUNK_SECURED_DATA_OPTIONS);
+        _this.securedData = __WEBPACK_IMPORTED_MODULE_2__asset_securedDataWithMetaData__["default"].createRaw(content, meta, CHUNK_SECURED_DATA_OPTIONS);
         _this.id = server.id;
         _this.chatID = server.chatID;
         _this.predecessorID = server.predecessorID;
@@ -15257,10 +15248,10 @@ var Chunk = (function (_super) {
     }
     Chunk.loadChunkChain = function (newChunk, oldChunk) {
         if (newChunk.getID() === oldChunk.getID()) {
-            return __WEBPACK_IMPORTED_MODULE_2_bluebird__["resolve"]();
+            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"]();
         }
         if (newChunk.getPredecessorID() === oldChunk.getID()) {
-            return __WEBPACK_IMPORTED_MODULE_2_bluebird__["resolve"]();
+            return __WEBPACK_IMPORTED_MODULE_3_bluebird__["resolve"]();
         }
         return newChunk.getPredecessor().then(function (pred) {
             if (!pred) {
@@ -15275,7 +15266,7 @@ var Chunk = (function (_super) {
     Chunk.createRawData = function (receiver, _a) {
         var _this = this;
         var _b = _a.content, content = _b === void 0 ? {} : _b, _c = _a.meta, meta = _c === void 0 ? {} : _c, givenKey = _a.givenKey, predecessorChunk = _a.predecessorChunk;
-        return __WEBPACK_IMPORTED_MODULE_2_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+        return __WEBPACK_IMPORTED_MODULE_3_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
             var receiverIDs, receiverObjects, receiverObjectsExceptOwn, givenInfo, _a, cryptInfo, chunkKey, _b, chunkMeta, secured, cData;
             return __generator(this, function (_c) {
                 switch (_c.label) {
@@ -15300,7 +15291,7 @@ var Chunk = (function (_super) {
                         _a = _b, cryptInfo = _a.cryptInfo, chunkKey = _a.chunkKey;
                         receiverIDs.sort();
                         chunkMeta = __assign({}, meta, { createTime: new Date().getTime(), receiver: receiverIDs, creator: userService.getOwn().getID() });
-                        secured = SecuredData.createRaw(content, chunkMeta, { type: "topic" });
+                        secured = __WEBPACK_IMPORTED_MODULE_2__asset_securedDataWithMetaData__["default"].createRaw(content, chunkMeta, { type: "topic" });
                         if (predecessorChunk) {
                             secured.setParent(predecessorChunk.getSecuredData());
                         }
@@ -15329,7 +15320,7 @@ var Chunk = (function (_super) {
                     return [4 /*yield*/, Chunk.createChunkKey()];
                 case 1:
                     chunkKey = _a.sent();
-                    return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_2_bluebird__["all"](receiverObjectsExceptOwn.map(function (receiverObject) {
+                    return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_3_bluebird__["all"](receiverObjectsExceptOwn.map(function (receiverObject) {
                             var crypt = receiverObject.getCryptKey();
                             return keyStore.sym.asymEncryptKey(chunkKey, crypt);
                         }))];
@@ -15352,7 +15343,7 @@ var Chunk = (function (_super) {
 
 __WEBPACK_IMPORTED_MODULE_1__asset_observer__["default"].extend(Chunk);
 var decryptAndVerifyTitleUpdate = function (titleUpdate) {
-    return __WEBPACK_IMPORTED_MODULE_2_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+    return __WEBPACK_IMPORTED_MODULE_3_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
         var content, meta, server, securedData, sender;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -15361,11 +15352,11 @@ var decryptAndVerifyTitleUpdate = function (titleUpdate) {
                         return [2 /*return*/];
                     }
                     content = titleUpdate.content, meta = titleUpdate.meta, server = titleUpdate.server;
-                    securedData = SecuredData.load(content, meta, { type: "topicUpdate" });
+                    securedData = __WEBPACK_IMPORTED_MODULE_2__asset_securedDataWithMetaData__["default"].load(content, meta, { type: "topicUpdate" });
                     return [4 /*yield*/, userService.get(meta.userID)];
                 case 1:
                     sender = _a.sent();
-                    return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_2_bluebird__["all"]([
+                    return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_3_bluebird__["all"]([
                             securedData.decrypt(),
                             securedData.verify(sender.getSignKey())
                         ])];
@@ -15386,12 +15377,12 @@ var ChunkLoader = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     return ChunkLoader;
-}(Object(__WEBPACK_IMPORTED_MODULE_4__services_cachedObjectLoader__["a" /* default */])({
+}(Object(__WEBPACK_IMPORTED_MODULE_5__services_cachedObjectLoader__["a" /* default */])({
     cacheName: "chunk",
-    download: function (id) { return __WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].emit("chat.chunk.get", { id: id }); },
+    download: function (id) { return __WEBPACK_IMPORTED_MODULE_4__services_socket_service__["default"].emit("chat.chunk.get", { id: id }); },
     restore: function (_a) {
         var meta = _a.meta, content = _a.content, server = _a.server, titleUpdate = _a.titleUpdate;
-        return __WEBPACK_IMPORTED_MODULE_2_bluebird__["try"](function () {
+        return __WEBPACK_IMPORTED_MODULE_3_bluebird__["try"](function () {
             return __awaiter(this, void 0, void 0, function () {
                 var loadReceiverPromise, creator, chunk, _a, _b, chatTitleUpdate, _c, _d;
                 return __generator(this, function (_e) {
@@ -15418,7 +15409,7 @@ var ChunkLoader = (function (_super) {
                             chunk = new (_a.apply(Chunk, [void 0, (_b.receiverObjects = _e.sent(),
                                     _b)]))();
                             if (!titleUpdate) return [3 /*break*/, 4];
-                            _c = __WEBPACK_IMPORTED_MODULE_5__chatTitleUpdate__["a" /* default */].bind;
+                            _c = __WEBPACK_IMPORTED_MODULE_6__chatTitleUpdate__["a" /* default */].bind;
                             _d = {
                                 content: titleUpdate.content,
                                 meta: titleUpdate.meta,
@@ -15426,7 +15417,7 @@ var ChunkLoader = (function (_super) {
                             };
                             return [4 /*yield*/, userService.get(titleUpdate.meta.userID)];
                         case 3:
-                            chatTitleUpdate = new (_c.apply(__WEBPACK_IMPORTED_MODULE_5__chatTitleUpdate__["a" /* default */], [void 0, (_d.sender = _e.sent(),
+                            chatTitleUpdate = new (_c.apply(__WEBPACK_IMPORTED_MODULE_6__chatTitleUpdate__["a" /* default */], [void 0, (_d.sender = _e.sent(),
                                     _d)]))();
                             chunk.setLatestTitleUpdate(chatTitleUpdate);
                             _e.label = 4;
@@ -15438,13 +15429,13 @@ var ChunkLoader = (function (_super) {
     },
     load: function (_a) {
         var content = _a.content, meta = _a.meta, server = _a.server, latestTitleUpdate = _a.latestTitleUpdate;
-        return __WEBPACK_IMPORTED_MODULE_2_bluebird__["try"](function () {
+        return __WEBPACK_IMPORTED_MODULE_3_bluebird__["try"](function () {
             return __awaiter(this, void 0, void 0, function () {
                 var securedData, creator, titleUpdate;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            securedData = SecuredData.load(content, meta, CHUNK_SECURED_DATA_OPTIONS);
+                            securedData = __WEBPACK_IMPORTED_MODULE_2__asset_securedDataWithMetaData__["default"].load(content, meta, CHUNK_SECURED_DATA_OPTIONS);
                             return [4 /*yield*/, userService.get(securedData.metaAttr("creator"))];
                         case 1:
                             creator = _a.sent();
@@ -15475,535 +15466,6 @@ var ChunkLoader = (function (_super) {
 
 /***/ }),
 
-/***/ 88:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Message; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helper_helper__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_cachedObjectLoader__ = __webpack_require__(74);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__chatChunk__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_blobService__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__asset_Progress__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_settings_service__ = __webpack_require__(46);
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-
-var userService = __webpack_require__(9).default;
-var keyStore = __webpack_require__(32).default;
-var SecuredData = __webpack_require__(33);
-
-
-
-
-
-
-
-var extractImagesInfo = function (infos, key) {
-    return infos.map(function (info) {
-        return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].objectMap(info, function (val) { return val[key]; });
-    });
-};
-var Message = (function () {
-    function Message(messageData, chat, attachments, id) {
-        var _this = this;
-        this.initialize = function (_a) {
-            var meta = _a.meta, content = _a.content, server = _a.server, sender = _a.sender;
-            _this.wasSent = true;
-            var _b = Message.idFromData(server), serverID = _b.serverID, clientID = _b.clientID;
-            _this.serverID = serverID;
-            _this.clientID = clientID;
-            _this.previousID = server.previousMessage;
-            _this.chunkID = server.chunkID;
-            _this.sendTime = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(server.sendTime);
-            _this.securedData = SecuredData.createRaw(content, meta, { type: "message" });
-            _this.setDefaultData();
-            _this.data.sender = sender.data;
-            _this.isOwnMessage = sender.isOwn();
-            _this.setAttachmentInfo("files");
-            _this.setAttachmentInfo("voicemails");
-            _this.setImagesInfo();
-        };
-        this.initializePending = function (chat, message, attachments, id) {
-            _this.wasSent = false;
-            _this.chat = chat;
-            _this.attachments = attachments;
-            _this.clientID = id || __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].generateUUID();
-            var meta = {
-                createTime: new Date().getTime(),
-                messageUUID: _this.clientID
-            };
-            _this.securedData = Message.createRawSecuredData(message, meta);
-            _this.setDefaultData();
-            _this.data.sender = userService.getOwn().data;
-            _this.isOwnMessage = true;
-            _this.data.images = attachments.images.map(function (image) {
-                if (!image.convertForGallery) {
-                    return image;
-                }
-                return image.convertForGallery();
-            });
-            _this.data.files = attachments.files.map(function (file) { return (__assign({}, file.getInfo(), { getProgress: function () {
-                    return file.getProgress();
-                } })); });
-            _this.data.voicemails = attachments.voicemails.map(function (voicemail) { return (__assign({}, voicemail.getInfo(), { getProgress: function () {
-                    return voicemail.getProgress();
-                } })); });
-            _this.prepareAttachments();
-        };
-        this.hasAttachments = function () {
-            return _this.attachments.images.length !== 0 || _this.attachments.files.length !== 0 || _this.attachments.voicemails.length !== 0;
-        };
-        this.isBlockedSince = function () {
-            return __WEBPACK_IMPORTED_MODULE_7__services_settings_service__["default"].isBlockedSince(_this.data.sender.id, _this.getTime());
-        };
-        this.isBlocked = function () {
-            return __WEBPACK_IMPORTED_MODULE_7__services_settings_service__["default"].isBlocked(_this.data.sender.id);
-        };
-        this.hasFiles = function () {
-            return _this.data.files && _this.data.files.length > 0;
-        };
-        this.hasVoicemail = function () {
-            return _this.data.voicemails && _this.data.voicemails.length > 0;
-        };
-        this.hasText = function () {
-            return _this.data.text && _this.data.text.length > 0;
-        };
-        this.hasImages = function () {
-            return _this.data.images && _this.data.images.length > 0;
-        };
-        this.prepareAttachments = function () {
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
-                Message.prepare(_this.attachments.files),
-                Message.prepare(_this.attachments.images),
-                Message.prepare(_this.attachments.voicemails)
-            ]);
-        };
-        this.setDefaultData = function () {
-            var content = _this.securedData.contentGet();
-            _this.data = {
-                text: typeof content === "string" ? content : content.message,
-                timestamp: _this.getTime(),
-                date: new Date(_this.getTime()),
-                sent: _this.wasSent,
-                id: _this.clientID,
-                obj: _this
-            };
-        };
-        this.getChunkID = function () {
-            return _this.chunkID || _this.chat.getLatestChunk();
-        };
-        this.hasBeenSent = function () { return _this.wasSent; };
-        this.uploadAttachments = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function (chunkKey) {
-            return _this.prepareAttachments().then(function () {
-                var attachments = _this.attachments.images.concat(_this.attachments.files, _this.attachments.voicemails);
-                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"](attachments.map(function (attachment) {
-                    return attachment.upload(chunkKey);
-                }));
-            }).then(function (imageKeys) {
-                return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].array.flatten(imageKeys);
-            });
-        });
-        this.sendContinously = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].cacheResult(function () {
-            return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].repeatUntilTrue(__WEBPACK_IMPORTED_MODULE_0_bluebird__, function () {
-                return _this.send();
-            }, 2000);
-        });
-        this.send = function () {
-            if (_this.wasSent) {
-                throw new Error("trying to send an already sent message");
-            }
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
-                var _this = this;
-                var messageIDs, messages, unsentMessages, messageIndex, chunk, chunkKey, sentMessages, newest, signAndEncryptPromise, keys, request, _a, receiverKeys, keys_1, initialChunk, response_1, chatInfo, messageInfo, chunkInfo, response;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0: return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_2__services_socket_service__["default"].awaitConnection()];
-                        case 1:
-                            _b.sent();
-                            messageIDs = this.chat.getMessages();
-                            messages = messageIDs.filter(function (_a) {
-                                var id = _a.id;
-                                return MessageLoader.isLoaded(id);
-                            }).map(function (_a) {
-                                var id = _a.id;
-                                return MessageLoader.getLoaded(id);
-                            });
-                            unsentMessages = messages.filter(function (m) { return !m.hasBeenSent(); });
-                            messageIndex = unsentMessages.findIndex(function (m) { return m === _this; });
-                            if (!unsentMessages[messageIndex - 1]) return [3 /*break*/, 3];
-                            return [4 /*yield*/, unsentMessages[messageIndex - 1].sendContinously()];
-                        case 2:
-                            _b.sent();
-                            _b.label = 3;
-                        case 3: return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_4__chatChunk__["b" /* default */].get(this.chat.getLatestChunk())];
-                        case 4:
-                            chunk = _b.sent();
-                            this.securedData.setParent(chunk.getSecuredData());
-                            return [4 /*yield*/, Message.setAttachmentsInfo(this.securedData, this.attachments)];
-                        case 5:
-                            _b.sent();
-                            chunkKey = chunk.getKey();
-                            sentMessages = messages.filter(function (m) { return m.hasBeenSent(); });
-                            newest = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].array.last(sentMessages);
-                            if (newest && newest.getChunkID() === this.chat.getLatestChunk()) {
-                                this.securedData.setAfterRelationShip(newest.getSecuredData());
-                            }
-                            signAndEncryptPromise = this.securedData._signAndEncrypt(userService.getOwn().getSignKey(), chunkKey);
-                            return [4 /*yield*/, this.uploadAttachments(chunkKey)];
-                        case 6:
-                            keys = _b.sent();
-                            return [4 /*yield*/, signAndEncryptPromise];
-                        case 7:
-                            request = _b.sent();
-                            if (!this.chat.isDraft()) return [3 /*break*/, 9];
-                            _a = chunk.chunkData, receiverKeys = _a.receiverKeys, keys_1 = _a.keys, initialChunk = _a.chunk;
-                            return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_2__services_socket_service__["default"].emit("chat.create", {
-                                    initialChunk: initialChunk,
-                                    firstMessage: request,
-                                    receiverKeys: receiverKeys,
-                                    keys: keys_1
-                                })];
-                        case 8:
-                            response_1 = _b.sent();
-                            chatInfo = response_1.chat.chat;
-                            messageInfo = response_1.chat.messages[0];
-                            chunkInfo = response_1.chat.chunks[0];
-                            chunk.create(chunkInfo);
-                            this.chat.create(chatInfo);
-                            this.sendSuccess();
-                            this.setServerInfo(messageInfo.server);
-                            return [2 /*return*/, true];
-                        case 9: return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_2__services_socket_service__["default"].emit("chat.message.create", {
-                                chunkID: chunk.getID(),
-                                message: request,
-                                keys: keys.map(keyStore.upload.getKey)
-                            })];
-                        case 10:
-                            response = _b.sent();
-                            if (response.success) {
-                                this.sendSuccess();
-                            }
-                            if (response.server) {
-                                this.setServerInfo(response.server);
-                            }
-                            return [2 /*return*/, response.success];
-                    }
-                });
-            }); }).catch(__WEBPACK_IMPORTED_MODULE_2__services_socket_service__["default"].errors.Disconnect, function (e) {
-                console.warn(e);
-                return false;
-            }).catch(__WEBPACK_IMPORTED_MODULE_2__services_socket_service__["default"].errors.Server, function () {
-                return false;
-            });
-        };
-        this.sendSuccess = function () {
-            _this.wasSent = true;
-            _this.data.sent = true;
-            _this.setAttachmentInfo("files");
-            _this.setAttachmentInfo("voicemails");
-            _this.setImagesInfo();
-        };
-        this.setServerInfo = function (_a) {
-            var sendTime = _a.sendTime, id = _a.id, chunkID = _a.chunkID, previousMessage = _a.previousMessage;
-            _this.sendTime = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(sendTime);
-            _this.serverID = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(id);
-            _this.chunkID = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(chunkID);
-            _this.previousID = previousMessage;
-            _this.data.timestamp = _this.getTime();
-        };
-        this.getSecuredData = function () {
-            return _this.securedData;
-        };
-        this.getServerID = function () {
-            return _this.serverID;
-        };
-        this.getPreviousID = function () {
-            return _this.previousID;
-        };
-        this.getClientID = function () {
-            return _this.clientID;
-        };
-        this.getTopicID = function () {
-            return _this.chunkID;
-        };
-        this.getTime = function () {
-            if (_this.getServerID()) {
-                return _this.sendTime;
-            }
-            return __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(_this.securedData.metaAttr("createTime"));
-        };
-        this.isOwn = function () {
-            return _this.isOwnMessage;
-        };
-        this.verifyParent = function (chunk) {
-            _this.securedData.checkParent(chunk.getSecuredData());
-        };
-        this.getText = function () {
-            return _this.data.text;
-        };
-        this.setAttachmentInfo = function (attr) {
-            var fullContent = _this.securedData.contentGet();
-            if (typeof fullContent === "string") {
-                return;
-            }
-            var content = fullContent[attr];
-            var meta = _this.securedData.metaAttr(attr);
-            if (!content) {
-                return;
-            }
-            _this.data[attr] = content.map(function (file, index) { return (__assign({}, file, meta[index], { loaded: false })); });
-            __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.data[attr]).filter(function (ele) {
-                return __WEBPACK_IMPORTED_MODULE_5__services_blobService__["a" /* default */].isBlobLoaded(ele.blobID);
-            }).each(function (loadedAttachment) {
-                loadedAttachment.loaded = true;
-            });
-        };
-        this.downloadVoicemail = function (voicemailDownloadProgress) {
-            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.data.voicemails).each(function (voicemail) {
-                var progress = new __WEBPACK_IMPORTED_MODULE_6__asset_Progress__["a" /* default */]();
-                voicemailDownloadProgress.addDepend(progress);
-                return __WEBPACK_IMPORTED_MODULE_5__services_blobService__["a" /* default */].getBlobUrl(voicemail.blobID, voicemailDownloadProgress, voicemail.size).then(function (url) {
-                    voicemail.url = url;
-                    voicemail.loaded = true;
-                });
-            });
-        };
-        this.setImagesInfo = function () {
-            var content = _this.securedData.contentGet();
-            var imagesMeta = _this.securedData.metaAttr("images") || [];
-            if (typeof content === "string") {
-                _this.data.images = imagesMeta;
-                return;
-            }
-            var imagesContent = content.images;
-            _this.data.images = imagesMeta.map(function (imageMeta, index) {
-                var imageContent = imagesContent[index];
-                var data = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].objectMap(imageMeta, function (val, key) {
-                    return __assign({}, val, imageContent[key]);
-                });
-                return data;
-            });
-        };
-        if (chat) {
-            this.initializePending(chat, messageData, attachments, id);
-        }
-        else {
-            this.initialize(messageData);
-        }
-    }
-    Message.createRawSecuredData = function (message, meta, chunk) {
-        var secured = SecuredData.createRaw({ message: message }, meta, {
-            type: "message",
-        });
-        if (chunk) {
-            secured.setParent(chunk.getSecuredData());
-        }
-        return secured;
-    };
-    Message.idFromData = function (server) {
-        var serverID = __WEBPACK_IMPORTED_MODULE_1__helper_helper__["default"].parseDecimal(server.id);
-        var clientID = server.uuid;
-        return {
-            serverID: serverID,
-            clientID: clientID
-        };
-    };
-    Message.prepare = function (uploads) { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](uploads).map(function (upload) { return upload.prepare(); }); };
-    Message.setAttachmentsInfo = function (securedData, attachments) {
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var imagesInfo, voicemailsInfo, filesInfo;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, Message.prepare(attachments.images)];
-                        case 1:
-                            imagesInfo = _a.sent();
-                            return [4 /*yield*/, Message.prepare(attachments.voicemails)];
-                        case 2:
-                            voicemailsInfo = _a.sent();
-                            return [4 /*yield*/, Message.prepare(attachments.files)];
-                        case 3:
-                            filesInfo = _a.sent();
-                            if (imagesInfo.length > 0 || filesInfo.length > 0 || voicemailsInfo.length > 0) {
-                                securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"));
-                                securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"));
-                                securedData.metaSetAttr("files", filesInfo.map(function (info) { return info.meta; }));
-                                securedData.contentSetAttr("files", filesInfo.map(function (info) { return info.content; }));
-                                securedData.metaSetAttr("voicemails", voicemailsInfo.map(function (info) { return info.meta; }));
-                                securedData.contentSetAttr("voicemails", voicemailsInfo.map(function (info) { return info.content; }));
-                            }
-                            else if (typeof securedData.contentGet() !== "string") {
-                                securedData.contentSet(securedData.contentGet().message);
-                            }
-                            return [2 /*return*/];
-                    }
-                });
-            });
-        });
-    };
-    return Message;
-}());
-
-var loadMessageSender = function (senderID) {
-    return userService.get(senderID)
-        .then(function (sender) { return sender.loadBasicData().thenReturn(sender); });
-};
-var MessageLoader = (function (_super) {
-    __extends(MessageLoader, _super);
-    function MessageLoader() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return MessageLoader;
-}(Object(__WEBPACK_IMPORTED_MODULE_3__services_cachedObjectLoader__["a" /* default */])({
-    cacheName: "message",
-    getID: function (_a) {
-        var server = _a.server;
-        return server.uuid;
-    },
-    download: function (id) { return __WEBPACK_IMPORTED_MODULE_2__services_socket_service__["default"].emit("chat.message.get", { id: id }); },
-    load: function (messageResponse) {
-        var content = messageResponse.content, meta = messageResponse.meta, server = messageResponse.server;
-        var securedData = SecuredData.load(content, meta, { type: "message" });
-        var senderID = server.sender;
-        // !! Typescript is broken for async arrow functions without a this context !!
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var sender;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, loadMessageSender(senderID)];
-                        case 1:
-                            sender = _a.sent();
-                            return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
-                                    securedData.decrypt(),
-                                    securedData.verify(sender.getSignKey())
-                                ])];
-                        case 2:
-                            _a.sent();
-                            return [2 /*return*/, {
-                                    content: securedData.contentGet(),
-                                    meta: securedData.metaGet(),
-                                    server: messageResponse.server,
-                                }];
-                    }
-                });
-            });
-        });
-    },
-    restore: function (messageInfo) {
-        return loadMessageSender(messageInfo.server.sender)
-            .then(function (sender) { return new Message(__assign({}, messageInfo, { sender: sender })); });
-    },
-})));
-/* harmony default export */ __webpack_exports__["b"] = (MessageLoader);
-//# sourceMappingURL=message.js.map
-
-/***/ }),
-
-/***/ 89:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["checkLocalStorage"] = checkLocalStorage;
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "storageInfo", function() { return storageInfo; });
-/* harmony export (immutable) */ __webpack_exports__["promoteMainWindow"] = promoteMainWindow;
-/* harmony export (immutable) */ __webpack_exports__["withPrefix"] = withPrefix;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Cache__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Storage__ = __webpack_require__(349);
-
-
-function checkLocalStorage() {
-    try {
-        localStorage.setItem("localStorageTest", "localStorageTest");
-        localStorage.removeItem("localStorageTest");
-        return true;
-    }
-    catch (e) {
-        return false;
-    }
-}
-var storages = [];
-var storageInfo = {
-    Cache: new __WEBPACK_IMPORTED_MODULE_0__Cache__["default"]("localStorage"),
-    hasLocalStorage: checkLocalStorage(),
-    broken: false
-};
-function promoteMainWindow() {
-    window.top.whispeerGetStorage = function (prefix) {
-        return this.storages[prefix];
-    };
-}
-function withPrefix(prefix) {
-    if (!storages[prefix]) {
-        try {
-            storages[prefix] = new __WEBPACK_IMPORTED_MODULE_1__Storage__["a" /* default */](prefix);
-        }
-        catch (e) {
-            storageInfo.broken = true;
-        }
-    }
-    return storages[prefix];
-}
-//# sourceMappingURL=storage.service.js.map
-
-/***/ }),
-
 /***/ 9:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -16011,15 +15473,15 @@ function withPrefix(prefix) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_session_service__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__user__ = __webpack_require__(365);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_session_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__user__ = __webpack_require__(377);
 
 
 
 
-var sjcl = __webpack_require__(43);
-var initService = __webpack_require__(22);
+var sjcl = __webpack_require__(45);
+var initService = __webpack_require__(20);
 var userService;
 function loadUser(identifier) {
     return __WEBPACK_IMPORTED_MODULE_3__user__["a" /* default */].get(identifier);
@@ -16089,20 +15551,8 @@ userService = {
     },
     /** get own user. synchronous */
     getOwn: function () { return __WEBPACK_IMPORTED_MODULE_3__user__["a" /* default */].getLoaded(__WEBPACK_IMPORTED_MODULE_2__services_session_service__["default"].getUserID()); },
-    getOwnAsync: function () {
-        return __WEBPACK_IMPORTED_MODULE_3__user__["a" /* default */].get(__WEBPACK_IMPORTED_MODULE_2__services_session_service__["default"].getUserID());
-    }
+    getOwnAsync: function () { return __WEBPACK_IMPORTED_MODULE_3__user__["a" /* default */].get(__WEBPACK_IMPORTED_MODULE_2__services_session_service__["default"].getUserID()); }
 };
-initService.registerCacheCallback(function () {
-    return __WEBPACK_IMPORTED_MODULE_3__user__["a" /* default */].get(__WEBPACK_IMPORTED_MODULE_2__services_session_service__["default"].getUserID()).catch(function (e) {
-        if (e instanceof sjcl.exception.corrupt) {
-            alert("Password did not match. Logging out");
-            __WEBPACK_IMPORTED_MODULE_2__services_session_service__["default"].logout();
-            return new __WEBPACK_IMPORTED_MODULE_0_bluebird__(function () { });
-        }
-        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](e);
-    });
-});
 initService.registerCallback(function () {
     return __WEBPACK_IMPORTED_MODULE_3__user__["a" /* default */].get(__WEBPACK_IMPORTED_MODULE_2__services_session_service__["default"].getUserID()).catch(function (e) {
         if (e instanceof sjcl.exception.corrupt) {
@@ -16122,11 +15572,539 @@ initService.registerCallback(function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Message; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helper_helper__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_socket_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_cachedObjectLoader__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__chatChunk__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_blobService__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__asset_Progress__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_settings_service__ = __webpack_require__(48);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+var userService = __webpack_require__(9).default;
+var keyStore = __webpack_require__(34).default;
+
+
+
+
+
+
+
+
+var extractImagesInfo = function (infos, key) {
+    return infos.map(function (info) {
+        return __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].objectMap(info, function (val) { return val[key]; });
+    });
+};
+var Message = (function () {
+    function Message(messageData, chat, attachments, id) {
+        var _this = this;
+        this.initialize = function (_a) {
+            var meta = _a.meta, content = _a.content, server = _a.server, sender = _a.sender;
+            _this.wasSent = true;
+            var _b = Message.idFromData(server), serverID = _b.serverID, clientID = _b.clientID;
+            _this.serverID = serverID;
+            _this.clientID = clientID;
+            _this.previousID = server.previousMessage;
+            _this.chunkID = server.chunkID;
+            _this.sendTime = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].parseDecimal(server.sendTime);
+            _this.securedData = new __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["SecuredData"](content, meta, { type: "message" }, true);
+            _this.setDefaultData();
+            _this.data.sender = sender.data;
+            _this.isOwnMessage = sender.isOwn();
+            _this.setAttachmentInfo("files");
+            _this.setAttachmentInfo("voicemails");
+            _this.setImagesInfo();
+        };
+        this.initializePending = function (chat, message, attachments, id) {
+            _this.wasSent = false;
+            _this.chat = chat;
+            _this.attachments = attachments;
+            _this.clientID = id || __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].generateUUID();
+            var meta = {
+                createTime: new Date().getTime(),
+                messageUUID: _this.clientID
+            };
+            _this.securedData = Message.createRawSecuredData(message, meta);
+            _this.setDefaultData();
+            _this.data.sender = userService.getOwn().data;
+            _this.isOwnMessage = true;
+            _this.data.images = attachments.images.map(function (image) {
+                if (!image.convertForGallery) {
+                    return image;
+                }
+                return image.convertForGallery();
+            });
+            _this.data.files = attachments.files.map(function (file) { return (__assign({}, file.getInfo(), { getProgress: function () {
+                    return file.getProgress();
+                } })); });
+            _this.data.voicemails = attachments.voicemails.map(function (voicemail) { return (__assign({}, voicemail.getInfo(), { getProgress: function () {
+                    return voicemail.getProgress();
+                } })); });
+            _this.prepareAttachments();
+        };
+        this.hasAttachments = function () {
+            return _this.attachments.images.length !== 0 || _this.attachments.files.length !== 0 || _this.attachments.voicemails.length !== 0;
+        };
+        this.isBlockedSince = function () {
+            return __WEBPACK_IMPORTED_MODULE_8__services_settings_service__["default"].isBlockedSince(_this.data.sender.id, _this.getTime());
+        };
+        this.isBlocked = function () {
+            return __WEBPACK_IMPORTED_MODULE_8__services_settings_service__["default"].isBlocked(_this.data.sender.id);
+        };
+        this.hasFiles = function () {
+            return _this.data.files && _this.data.files.length > 0;
+        };
+        this.hasVoicemail = function () {
+            return _this.data.voicemails && _this.data.voicemails.length > 0;
+        };
+        this.hasText = function () {
+            return _this.data.text && _this.data.text.length > 0;
+        };
+        this.hasImages = function () {
+            return _this.data.images && _this.data.images.length > 0;
+        };
+        this.prepareAttachments = function () {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                Message.prepare(_this.attachments.files),
+                Message.prepare(_this.attachments.images),
+                Message.prepare(_this.attachments.voicemails)
+            ]);
+        };
+        this.setDefaultData = function () {
+            var content = _this.securedData.contentGet();
+            _this.data = {
+                text: typeof content === "string" ? content : content.message,
+                timestamp: _this.getTime(),
+                date: new Date(_this.getTime()),
+                sent: _this.wasSent,
+                id: _this.clientID,
+                obj: _this
+            };
+        };
+        this.getChunkID = function () {
+            return _this.chunkID || _this.chat.getLatestChunk();
+        };
+        this.hasBeenSent = function () { return _this.wasSent; };
+        this.uploadAttachments = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].cacheResult(function (chunkKey) {
+            return _this.prepareAttachments().then(function () {
+                var attachments = _this.attachments.images.concat(_this.attachments.files, _this.attachments.voicemails);
+                return __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"](attachments.map(function (attachment) {
+                    return attachment.upload(chunkKey);
+                }));
+            }).then(function (imageKeys) {
+                return __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].array.flatten(imageKeys);
+            });
+        });
+        this.sendContinously = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].cacheResult(function () {
+            return __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].repeatUntilTrue(__WEBPACK_IMPORTED_MODULE_0_bluebird__, function () {
+                return _this.send();
+            }, 2000);
+        });
+        this.send = function () {
+            if (_this.wasSent) {
+                throw new Error("trying to send an already sent message");
+            }
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
+                var _this = this;
+                var messageIDs, messages, unsentMessages, messageIndex, chunk, chunkKey, sentMessages, newest, signAndEncryptPromise, keys, request, _a, receiverKeys, chunkKeys, initialChunk, response_1, chatInfo, messageInfo, chunkInfo, response;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0: return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].awaitConnection()];
+                        case 1:
+                            _b.sent();
+                            messageIDs = this.chat.getMessages();
+                            messages = messageIDs.filter(function (_a) {
+                                var id = _a.id;
+                                return MessageLoader.isLoaded(id);
+                            }).map(function (_a) {
+                                var id = _a.id;
+                                return MessageLoader.getLoaded(id);
+                            });
+                            unsentMessages = messages.filter(function (m) { return !m.hasBeenSent(); });
+                            messageIndex = unsentMessages.findIndex(function (m) { return m === _this; });
+                            if (!unsentMessages[messageIndex - 1]) return [3 /*break*/, 3];
+                            return [4 /*yield*/, unsentMessages[messageIndex - 1].sendContinously()];
+                        case 2:
+                            _b.sent();
+                            _b.label = 3;
+                        case 3: return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_5__chatChunk__["b" /* default */].get(this.chat.getLatestChunk())];
+                        case 4:
+                            chunk = _b.sent();
+                            this.securedData.setParent(chunk.getSecuredData());
+                            return [4 /*yield*/, Message.setAttachmentsInfo(this.securedData, this.attachments)];
+                        case 5:
+                            _b.sent();
+                            chunkKey = chunk.getKey();
+                            sentMessages = messages.filter(function (m) { return m.hasBeenSent(); });
+                            newest = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].array.last(sentMessages);
+                            if (newest && newest.getChunkID() === this.chat.getLatestChunk()) {
+                                this.securedData.setAfterRelationShip(newest.getSecuredData());
+                            }
+                            signAndEncryptPromise = this.securedData.signAndEncrypt(userService.getOwn().getSignKey(), chunkKey);
+                            return [4 /*yield*/, this.uploadAttachments(chunkKey)];
+                        case 6:
+                            keys = (_b.sent()).map(keyStore.upload.getKey);
+                            return [4 /*yield*/, signAndEncryptPromise];
+                        case 7:
+                            request = _b.sent();
+                            if (!this.chat.isDraft()) return [3 /*break*/, 9];
+                            _a = chunk.chunkData, receiverKeys = _a.receiverKeys, chunkKeys = _a.keys, initialChunk = _a.chunk;
+                            return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].emit("chat.create", {
+                                    initialChunk: initialChunk,
+                                    firstMessage: request,
+                                    receiverKeys: receiverKeys,
+                                    keys: chunkKeys.concat(keys)
+                                })];
+                        case 8:
+                            response_1 = _b.sent();
+                            chatInfo = response_1.chat.chat;
+                            messageInfo = response_1.chat.messages[0];
+                            chunkInfo = response_1.chat.chunks[0];
+                            chunk.create(chunkInfo);
+                            this.chat.create(chatInfo);
+                            this.sendSuccess();
+                            this.setServerInfo(messageInfo.server);
+                            return [2 /*return*/, true];
+                        case 9: return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].emit("chat.message.create", {
+                                chunkID: chunk.getID(),
+                                message: request,
+                                keys: keys
+                            })];
+                        case 10:
+                            response = _b.sent();
+                            if (response.success) {
+                                this.sendSuccess();
+                            }
+                            if (response.server) {
+                                this.setServerInfo(response.server);
+                            }
+                            return [2 /*return*/, response.success];
+                    }
+                });
+            }); }).catch(__WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].errors.Disconnect, function (e) {
+                console.warn(e);
+                return false;
+            }).catch(__WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].errors.Server, function () {
+                return false;
+            });
+        };
+        this.sendSuccess = function () {
+            _this.wasSent = true;
+            _this.data.sent = true;
+            _this.setAttachmentInfo("files");
+            _this.setAttachmentInfo("voicemails");
+            _this.setImagesInfo();
+        };
+        this.setServerInfo = function (_a) {
+            var sendTime = _a.sendTime, id = _a.id, chunkID = _a.chunkID, previousMessage = _a.previousMessage;
+            _this.sendTime = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].parseDecimal(sendTime);
+            _this.serverID = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].parseDecimal(id);
+            _this.chunkID = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].parseDecimal(chunkID);
+            _this.previousID = previousMessage;
+            _this.data.timestamp = _this.getTime();
+        };
+        this.getSecuredData = function () {
+            return _this.securedData;
+        };
+        this.getServerID = function () {
+            return _this.serverID;
+        };
+        this.getPreviousID = function () {
+            return _this.previousID;
+        };
+        this.getClientID = function () {
+            return _this.clientID;
+        };
+        this.getTopicID = function () {
+            return _this.chunkID;
+        };
+        this.getTime = function () {
+            if (_this.getServerID()) {
+                return _this.sendTime;
+            }
+            return __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].parseDecimal(_this.securedData.metaAttr("createTime"));
+        };
+        this.isOwn = function () {
+            return _this.isOwnMessage;
+        };
+        this.verifyParent = function (chunk) {
+            _this.securedData.checkParent(chunk.getSecuredData());
+        };
+        this.getText = function () {
+            return _this.data.text;
+        };
+        this.setAttachmentInfo = function (attr) {
+            var fullContent = _this.securedData.contentGet();
+            if (typeof fullContent === "string") {
+                return;
+            }
+            var content = fullContent[attr];
+            var meta = _this.securedData.metaAttr(attr);
+            if (!content) {
+                return;
+            }
+            _this.data[attr] = content.map(function (file, index) { return (__assign({}, file, meta[index], { loaded: false })); });
+            __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.data[attr]).filter(function (ele) {
+                return __WEBPACK_IMPORTED_MODULE_6__services_blobService__["a" /* default */].isBlobLoaded(ele.blobID);
+            }).each(function (loadedAttachment) {
+                loadedAttachment.loaded = true;
+            });
+        };
+        this.downloadVoicemail = function (voicemailDownloadProgress) {
+            return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](_this.data.voicemails).each(function (voicemail) {
+                var progress = new __WEBPACK_IMPORTED_MODULE_7__asset_Progress__["a" /* default */]();
+                voicemailDownloadProgress.addDepend(progress);
+                return __WEBPACK_IMPORTED_MODULE_6__services_blobService__["a" /* default */].getBlobUrl(voicemail.blobID, voicemailDownloadProgress, voicemail.size).then(function (url) {
+                    voicemail.url = url;
+                    voicemail.loaded = true;
+                });
+            });
+        };
+        this.setImagesInfo = function () {
+            var content = _this.securedData.contentGet();
+            var imagesMeta = _this.securedData.metaAttr("images") || [];
+            if (typeof content === "string") {
+                _this.data.images = imagesMeta;
+                return;
+            }
+            var imagesContent = content.images;
+            _this.data.images = imagesMeta.map(function (imageMeta, index) {
+                var imageContent = imagesContent[index];
+                var data = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].objectMap(imageMeta, function (val, key) {
+                    return __assign({}, val, imageContent[key]);
+                });
+                return data;
+            });
+        };
+        if (chat) {
+            this.initializePending(chat, messageData, attachments, id);
+        }
+        else {
+            this.initialize(messageData);
+        }
+    }
+    Message.createRawSecuredData = function (message, meta, chunk) {
+        var secured = new __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["SecuredData"]({ message: message }, meta, { type: "message" }, true);
+        if (chunk) {
+            secured.setParent(chunk.getSecuredData());
+        }
+        return secured;
+    };
+    Message.idFromData = function (server) {
+        var serverID = __WEBPACK_IMPORTED_MODULE_2__helper_helper__["default"].parseDecimal(server.id);
+        var clientID = server.uuid;
+        return {
+            serverID: serverID,
+            clientID: clientID
+        };
+    };
+    Message.prepare = function (uploads) { return __WEBPACK_IMPORTED_MODULE_0_bluebird__["resolve"](uploads).map(function (upload) { return upload.prepare(); }); };
+    Message.setAttachmentsInfo = function (securedData, attachments) {
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var imagesInfo, voicemailsInfo, filesInfo;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, Message.prepare(attachments.images)];
+                        case 1:
+                            imagesInfo = _a.sent();
+                            return [4 /*yield*/, Message.prepare(attachments.voicemails)];
+                        case 2:
+                            voicemailsInfo = _a.sent();
+                            return [4 /*yield*/, Message.prepare(attachments.files)];
+                        case 3:
+                            filesInfo = _a.sent();
+                            if (imagesInfo.length > 0 || filesInfo.length > 0 || voicemailsInfo.length > 0) {
+                                securedData.metaSetAttr("images", extractImagesInfo(imagesInfo, "meta"));
+                                securedData.contentSetAttr("images", extractImagesInfo(imagesInfo, "content"));
+                                securedData.metaSetAttr("files", filesInfo.map(function (info) { return info.meta; }));
+                                securedData.contentSetAttr("files", filesInfo.map(function (info) { return info.content; }));
+                                securedData.metaSetAttr("voicemails", voicemailsInfo.map(function (info) { return info.meta; }));
+                                securedData.contentSetAttr("voicemails", voicemailsInfo.map(function (info) { return info.content; }));
+                            }
+                            else if (typeof securedData.contentGet() !== "string") {
+                                securedData.contentSet(securedData.contentGet().message);
+                            }
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
+    };
+    return Message;
+}());
+
+var loadMessageSender = function (senderID) {
+    return userService.get(senderID)
+        .then(function (sender) { return sender.loadBasicData().thenReturn(sender); });
+};
+var MessageLoader = (function (_super) {
+    __extends(MessageLoader, _super);
+    function MessageLoader() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return MessageLoader;
+}(Object(__WEBPACK_IMPORTED_MODULE_4__services_cachedObjectLoader__["a" /* default */])({
+    cacheName: "message",
+    getID: function (_a) {
+        var server = _a.server;
+        return server.uuid;
+    },
+    download: function (id) { return __WEBPACK_IMPORTED_MODULE_3__services_socket_service__["default"].definitlyEmit("chat.message.get", { id: id }); },
+    load: function (messageResponse) {
+        var content = messageResponse.content, meta = messageResponse.meta, server = messageResponse.server;
+        var securedData = __WEBPACK_IMPORTED_MODULE_1__asset_securedDataWithMetaData__["default"].load(content, meta, { type: "message" });
+        var senderID = server.sender;
+        // !! Typescript is broken for async arrow functions without a this context !!
+        return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var sender;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, loadMessageSender(senderID)];
+                        case 1:
+                            sender = _a.sent();
+                            return [4 /*yield*/, __WEBPACK_IMPORTED_MODULE_0_bluebird__["all"]([
+                                    securedData.decrypt(),
+                                    securedData.verify(sender.getSignKey())
+                                ])];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/, {
+                                    content: securedData.contentGet(),
+                                    meta: securedData.metaGet(),
+                                    server: messageResponse.server,
+                                }];
+                    }
+                });
+            });
+        });
+    },
+    restore: function (messageInfo) {
+        return loadMessageSender(messageInfo.server.sender)
+            .then(function (sender) { return new Message(__assign({}, messageInfo, { sender: sender })); });
+    },
+})));
+/* harmony default export */ __webpack_exports__["b"] = (MessageLoader);
+//# sourceMappingURL=message.js.map
+
+/***/ }),
+
+/***/ 91:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["checkLocalStorage"] = checkLocalStorage;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "storageInfo", function() { return storageInfo; });
+/* harmony export (immutable) */ __webpack_exports__["promoteMainWindow"] = promoteMainWindow;
+/* harmony export (immutable) */ __webpack_exports__["withPrefix"] = withPrefix;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Cache__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Storage__ = __webpack_require__(362);
+
+
+function checkLocalStorage() {
+    try {
+        localStorage.setItem("localStorageTest", "localStorageTest");
+        localStorage.removeItem("localStorageTest");
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}
+var storages = [];
+var storageInfo = {
+    Cache: new __WEBPACK_IMPORTED_MODULE_0__Cache__["default"]("localStorage"),
+    hasLocalStorage: checkLocalStorage(),
+    broken: false
+};
+function promoteMainWindow() {
+    window.top.whispeerGetStorage = function (prefix) {
+        return this.storages[prefix];
+    };
+}
+function withPrefix(prefix) {
+    if (!storages[prefix]) {
+        try {
+            storages[prefix] = new __WEBPACK_IMPORTED_MODULE_1__Storage__["a" /* default */](prefix);
+        }
+        catch (e) {
+            storageInfo.broken = true;
+        }
+    }
+    return storages[prefix];
+}
+//# sourceMappingURL=storage.service.js.map
+
+/***/ }),
+
+/***/ 92:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return fixFileReader; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_bluebird___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_bluebird__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_file__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_file__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_Cache__ = __webpack_require__(27);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -16284,7 +16262,6 @@ var blobCache = {
                         if (clearing)
                             throw new Error('Cannot store blob, currently clearing cache.');
                         storing++;
-                        console.warn("storing++ " + (storing - 1) + " -> " + storing + ", blob: " + blob.getBlobID());
                         blobID = blob.getBlobID();
                         if (!blob.isDecrypted()) {
                             throw new Error("trying to store an undecrypted blob");
@@ -16307,10 +16284,7 @@ var blobCache = {
         }); }).catch(function (e) {
             console.warn("Storing blob failed");
             return __WEBPACK_IMPORTED_MODULE_0_bluebird__["reject"](e);
-        }).finally(function () {
-            storing--;
-            console.warn("storing-- " + (storing + 1) + " -> " + storing + ", blob: " + blob.getBlobID());
-        });
+        }).finally(function () { return storing--; });
     },
     getBlobUrl: function (blobID) {
         return __WEBPACK_IMPORTED_MODULE_0_bluebird__["try"](function () { return __awaiter(_this, void 0, void 0, function () {
@@ -16398,5 +16372,5 @@ var blobCache = {
 
 /***/ })
 
-},[298]);
+},[311]);
 //# sourceMappingURL=main.js.map

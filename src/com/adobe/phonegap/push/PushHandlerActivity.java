@@ -11,7 +11,7 @@ import android.support.v4.app.RemoteInput;
 
 
 public class PushHandlerActivity extends Activity implements PushConstants {
-    private static String LOG_TAG = "PushPlugin_PushHandlerActivity";
+    private static String LOG_TAG = "Push_HandlerActivity";
 
     /*
      * this activity will be started if the user touches a notification that we own.
@@ -21,7 +21,7 @@ public class PushHandlerActivity extends Activity implements PushConstants {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        GCMIntentService gcm = new GCMIntentService();
+        FCMService gcm = new FCMService();
 
         Intent intent = getIntent();
 
@@ -34,28 +34,36 @@ public class PushHandlerActivity extends Activity implements PushConstants {
         Log.d(LOG_TAG, "callback = " + callback);
         boolean foreground = getIntent().getExtras().getBoolean("foreground", true);
         boolean startOnBackground = getIntent().getExtras().getBoolean(START_IN_BACKGROUND, false);
+        boolean dismissed = getIntent().getExtras().getBoolean(DISMISSED, false);
+        Log.d(LOG_TAG, "dismissed = " + dismissed);
 
         if(!startOnBackground){
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.cancel(GCMIntentService.getAppName(this), notId);
+            notificationManager.cancel(FCMService.getAppName(this), notId);
         }
-
-        Log.d(LOG_TAG, "bringToForeground = " + foreground);
 
         boolean isPushPluginActive = PushPlugin.isActive();
         boolean inline = processPushBundle(isPushPluginActive, intent);
 
+        if(inline && android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N && !startOnBackground){
+            foreground = true;
+        }
+
+        Log.d(LOG_TAG, "bringToForeground = " + foreground);
+
         finish();
 
-        Log.d(LOG_TAG, "isPushPluginActive = " + isPushPluginActive);
-
-        if (!isPushPluginActive && foreground && inline) {
-            Log.d(LOG_TAG, "forceMainActivityReload");
-            forceMainActivityReload(false);
-        } else if(startOnBackground) {
-            forceMainActivityReload(true);
-        } else {
-            Log.d(LOG_TAG, "don't want main activity");
+        if(!dismissed) {
+            Log.d(LOG_TAG, "isPushPluginActive = " + isPushPluginActive);
+            if (!isPushPluginActive && foreground && inline) {
+                Log.d(LOG_TAG, "forceMainActivityReload");
+                forceMainActivityReload(false);
+            } else if(startOnBackground) {
+                Log.d(LOG_TAG, "startOnBackgroundTrue");
+                forceMainActivityReload(true);
+            } else {
+                Log.d(LOG_TAG, "don't want main activity");
+            }
         }
     }
 
@@ -67,12 +75,14 @@ public class PushHandlerActivity extends Activity implements PushConstants {
         Bundle extras = getIntent().getExtras();
         Bundle remoteInput = null;
 
-        if (extras != null)	{
+        if (extras != null) {
             Bundle originalExtras = extras.getBundle(PUSH_BUNDLE);
 
             originalExtras.putBoolean(FOREGROUND, false);
             originalExtras.putBoolean(COLDSTART, !isPushPluginActive);
+            originalExtras.putBoolean(DISMISSED, extras.getBoolean(DISMISSED));
             originalExtras.putString(ACTION_CALLBACK, extras.getString(CALLBACK));
+            originalExtras.remove(NO_CACHE);
 
             remoteInput = RemoteInput.getResultsFromIntent(intent);
             if (remoteInput != null) {
