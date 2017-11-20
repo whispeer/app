@@ -1,20 +1,87 @@
-var path = require("path");
-var webpack = require("webpack");
-var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
+const path = require("path");
+const webpack = require("webpack");
+const ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
 
-var ModuleConcatPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
-var PurifyPlugin = require("@angular-devkit/build-optimizer").PurifyPlugin;
+const ModuleConcatPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
+const PurifyPlugin = require("@angular-devkit/build-optimizer").PurifyPlugin;
 
-var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
-var WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").WebpackBundleSizeAnalyzerPlugin;
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const WebpackBundleSizeAnalyzerPlugin = require("webpack-bundle-size-analyzer").WebpackBundleSizeAnalyzerPlugin;
 
-var data = require(path.resolve("package.json"))
+const data = require(path.resolve("package.json"))
 
-var prodPlugins = [
+const prodPlugins = [
 	new ModuleConcatPlugin(),
 	new PurifyPlugin(),
 ];
+
+const prodLoaders = [
+	{
+		test: /\.json$/,
+		loader: "json-loader"
+	},
+	{
+		test: /\.js$/,
+		loader: [
+			{
+				loader: process.env.IONIC_CACHE_LOADER
+			},
+
+			{
+				loader: "@angular-devkit/build-optimizer/webpack-loader",
+				options: {
+					sourceMap: true
+				}
+			},
+		]
+	},
+	{
+		test: /\.ts$/,
+		loader: [
+			{
+				loader: process.env.IONIC_CACHE_LOADER
+			},
+
+			{
+				loader: "@angular-devkit/build-optimizer/webpack-loader",
+				options: {
+					sourceMap: true
+				}
+			},
+
+			{
+				loader: process.env.IONIC_WEBPACK_LOADER
+			}
+		]
+	}
+];
+
+const devLoaders = [
+	{
+		test: /\.json$/,
+		loader: "json-loader"
+	},
+	{
+		test: /\.ts$/,
+		loader: process.env.IONIC_WEBPACK_LOADER
+	}, {
+		test: /\.js$/,
+		exclude: /(node_modules|bower_components)/,
+		loader: "babel-loader"
+	}, {
+		test: /\.svg$/,
+		use: "raw-loader"
+	}
+]
+
+function getLoaders(production) {
+	if (production && process.env.IONIC_OPTIMIZE_JS === "true") {
+		return prodLoaders;
+	}
+
+	return devLoaders;
+}
 
 const commit = require("child_process")
 	.execSync("git rev-parse --short HEAD")
@@ -41,26 +108,7 @@ const getConfig = (production) => {
 		},
 
 		module: {
-			loaders: [{
-					test: /\.json$/,
-					loader: "json-loader"
-				},
-				{
-					//test: /\.(ts|ngfactory.js)$/,
-					test: /\.ts$/,
-					loader: process.env.IONIC_WEBPACK_LOADER
-				}, {
-					test: /\.js$/,
-					loader: process.env.IONIC_WEBPACK_TRANSPILE_LOADER
-				}, {
-					test: /\.js$/,
-					exclude: /(node_modules|bower_components)/,
-					loader: "babel-loader"
-				}, {
-					test: /\.svg$/,
-					use: "raw-loader"
-				}
-			],
+			loaders: getLoaders(production),
 			noParse: [
 				/sjcl\.js$/,
 				/socket\.io\.slim/,
@@ -103,6 +151,6 @@ const getConfig = (production) => {
 }
 
 module.exports = {
-  dev: getConfig(false),
-  prod: getConfig(true),
+	dev: getConfig(false),
+	prod: getConfig(true),
 }
