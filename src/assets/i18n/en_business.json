@@ -102,8 +102,11 @@
 		"logoutWarning": "Do you want to log out from this device?",
 		"blocked": "Blocked Users",
 		"backup": {
-			"button": "Show Backup-Key",
-			"confirm": "This key is used to recover your password in case you forget it. Please handle this key with care."
+			"button": "Request Backup Key",
+			"title": "Save your Backup Key?",
+			"message": "To save your backup key you will see it now. With this key you can reset your password.<br><br>Therefore please keep it in a really safe place.",
+			"save": "Save",
+			"cancel": "Cancel"
 		}
 	},
 	"blocked": {

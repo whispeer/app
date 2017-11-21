@@ -103,7 +103,10 @@
 		"blocked": "Blockierte Nutzer",
 		"backup": {
 			"button": "Backup-Schlüssel abrufen",
-			"confirm": "Der Backup-Schlüssel wird dir nun zum Abspeichern angezeigt. Mit diesem Schlüssel kannst du dein Passwort zurücksetzen. Bitte gehe sorgfältig damit um."
+			"title": "Backup-Schlüssel speichern?",
+			"message": "Im Folgenden wird dir dein Backup-Schlüssel zum Abspeichern angezeigt. Mit diesem Schlüssel kannst du dein Passwort zurücksetzen.<br><br>Bitte bewahre ihn daher an einem wirklich sicheren Ort auf.",
+			"save": "Speichern",
+			"cancel": "Abbrechen"
 		}
 	},
 	"blocked": {
