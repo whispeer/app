@@ -94,12 +94,18 @@
 		"privacy": "Datenschutzbestimmungen",
 		"contact": "Kontaktiere uns",
 		"feedback": "Gib uns Feedback",
-		"logout": "Abmelden",
-		"companyName": "whispeer {{version}} von mindpost GmbH",
+		"logout": {
+			"button": "Abmelden",
+			"title": "Jetzt Abmelden?",
+			"warning": "Bist du sicher, dass du dich auf diesem Gerät abmelden möchtest?",
+			"logout": "Abmelden",
+			"cancel": "Abbrechen"
+		},
+		"companyName": "whispeer von mindpost GmbH",
+		"version": "App-Version: {{version}}",
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Möchtest du dich auf diesem Gerät abmelden?",
 		"blocked": "Blockierte Nutzer",
 		"backup": {
 			"button": "Backup-Schlüssel abrufen",

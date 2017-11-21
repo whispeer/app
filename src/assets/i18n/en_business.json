@@ -94,12 +94,18 @@
 		"privacy": "Privacy Policy",
 		"contact": "Contact us",
 		"feedback": "Give us Feedback",
-		"logout": "Logout",
-		"companyName": "whispeer {{version}} by mindpost GmbH",
+		"logout": {
+			"button": "Logout",
+			"title": "Log out now?",
+			"warning": "Are you sure you want to log out on this device?",
+			"logout": "Logout",
+			"cancel": "Cancel"
+		},
+		"companyName": "whispeer by mindpost GmbH",
+		"version": "App-Version: {{version}}",
 		"madeInGermany": "Made in Germany with",
 		"humanRights": "for human rights",
 		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
-		"logoutWarning": "Do you want to log out from this device?",
 		"blocked": "Blocked Users",
 		"backup": {
 			"button": "Request Backup Key",
