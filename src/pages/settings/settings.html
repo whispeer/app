@@ -53,11 +53,12 @@
 		</ion-item>
 	</ion-list>
 
-	<button ion-button full color="danger" (click)="logout()">{{ 'settings.logout' | translate}}</button>
+	<button ion-button full color="danger" (click)="logout()">{{ 'settings.logout.button' | translate}}</button>
 
 	<div text-center class="space-for-fab">
 		<p class="text-grey" padding-vertical>
-			{{ 'settings.companyName' | translate:version }}<br>
+			{{ 'settings.companyName' | translate }}<br>
+			{{ 'settings.version' | translate:version }}<br>
 			{{ 'settings.madeInGermany' | translate }} <ion-icon name="md-heart"></ion-icon> {{ 'settings.humanRights' | translate }}
 		</p>
 	</div>
