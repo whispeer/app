@@ -54,12 +54,24 @@ export class SettingsPage {
 		alert(this.translate.instant("settings.pushAlert"));
 	}
 
+	startBackup() {
+		let backupConfirm = this.alertCtrl.create({
+			title: this.translate.instant("settings.backup.title"),
+			message: this.translate.instant("settings.backup.message"),
+			buttons: [
+				{ text: this.translate.instant("settings.backup.cancel"), role: 'cancel'},
+				{ text: this.translate.instant("settings.backup.save"), handler: () => { this.generateBackup() } }
+			]
+		});
+		// there seems to be a bug in current ionic, which prevents
+		// cssClass properties in options to propagate, instead these have
+		// to be set with a subsequent call like this:
+		backupConfirm.setCssClass('backup-save');
+		backupConfirm.present();
+	}
+
 	generateBackup() {
 		return Bluebird.try(async () => {
-			if(!confirm(this.translate.instant("settings.backup.confirm"))) {
-				return
-			}
-
 			const keyData = await userService.getOwn().createBackupKey();
 
 			const image: any = await new Bluebird((resolve) => {

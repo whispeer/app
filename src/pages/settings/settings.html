@@ -16,7 +16,7 @@
 			<ion-label>{{ 'settings.push' | translate}}</ion-label>
 			<ion-toggle checked="true" disabled (ngModelChange)="pushWarning()"></ion-toggle>
 		</ion-item>
-		<button ion-item (click)="generateBackup()">
+		<button ion-item (click)="startBackup()">
 			{{ 'settings.backup.button' | translate }}
 		</button>
 		<ion-item>
