@@ -55,6 +55,7 @@
 		"fileTooBigTitle": "The size is too damn high!",
 		"fileTooBigDetail": "File uploads for private users are currently limited to {{max_size}}MB.",
 		"changed": "changed the title to",
+		"loadAll": "Load all Images",
 		"detail": {
 			"title": "Details",
 			"chatTitle": "Conversation Title",
