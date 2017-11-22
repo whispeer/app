@@ -22,12 +22,12 @@ import { replaceView } from "../../lib/angularUtils"
 import messageService from "../../lib/messages/messageService";
 import ChatLoader, { Chat } from "../../lib/messages/chat"
 import MessageLoader, { Message } from "../../lib/messages/message"
+import { sameBurst } from "../../lib/messages/burstHelper"
 
 import h from "../../lib/helper/helper"
 import VoicemailPlayer, { audioInfo, recordingType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
-import Burst from "../../lib/messages/burst"
 import featureToggles from "../../lib/services/featureToggles"
 
 import { isBusinessVersion } from "../../lib/services/location.manager";
@@ -176,8 +176,6 @@ export class MessagesPage {
 
 	mutationObserver: MutationObserver
 
-	bursts: Burst[]
-
 	private recordingInfo = {
 		UUID: "",
 		duration: 0,
@@ -279,6 +277,8 @@ export class MessagesPage {
 			// TODO
 		})
 	}
+
+	sameBurst = (m1: Message, m2: Message) => sameBurst(m1, m2)
 
 	sendMessageToChat = () => {
 		if (this.isRecordingUIVisible()) {

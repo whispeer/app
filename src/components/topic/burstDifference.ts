@@ -5,32 +5,7 @@ import h from "../../lib/helper/helper";
 import ChunkLoader, { Chunk } from "../../lib/messages/chatChunk"
 import { Message } from "../../lib/messages/message"
 import { Chat } from "../../lib/messages/chat"
-
-const sameDay = (message1, message2) => {
-	if (!message1 || !message2) {
-		return false;
-	}
-
-	var date1 = new Date(h.parseDecimal(message1.getTime()));
-	var date2 = new Date(h.parseDecimal(message2.getTime()));
-
-	if (date1.getDate() !== date2.getDate()) {
-		return false;
-	}
-
-	if (date1.getMonth() !== date2.getMonth()) {
-		return false;
-	}
-
-	if (date1.getFullYear() !== date2.getFullYear()) {
-		return false;
-	}
-
-	return true;
-}
-
-const sameChunk = (m1: Message, m2: Message) =>
-	m1 && m2 && m1.getChunkID() === m2.getChunkID()
+import { sameDay, sameChunk } from "../../lib/messages/burstHelper"
 
 @Component({
 	selector: "BurstDifference",

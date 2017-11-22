@@ -37,9 +37,9 @@
 			</ion-item>
 			<ion-item
 				class="messages__burst" *ngFor="let message of getMessages(); let $index=index; let $last=last"
-				[ngClass]="{'burst--me': message.isOwn(), 'burst--other': !message.isOwn()}"
+				[ngClass]="{'burst--me': message.isOwn(), 'burst--other': !message.isOwn(), 'burst--new': !sameBurst(message, getMessages()[$index - 1])}"
 			>
-				<BurstDifference [chat]="chat" [message]="message" [previousMessage]="getMessages()[$index - 1]"></BurstDifference>
+				<BurstDifference [chat]="chat" [message]="message" [previousMessage]="getMessages()[$index - 1]" *ngIf="!sameBurst(message, getMessages()[$index - 1])"></BurstDifference>
 
 				<div *ngIf="isPreviousMissing(message)" style="
 					display: flex;
