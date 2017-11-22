@@ -766,7 +766,7 @@ export class MessagesPage {
 			return "burst--first"
 		}
 
-		return "burst--single"
+		return "burst--last burst--first"
 	}
 
 	getMessageItemClass = (message, $index) => {
