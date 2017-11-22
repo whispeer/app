@@ -80,16 +80,19 @@ page-messages {
 		}
 	}
 
-	.burst--first {
+	.messages__burst {
 		.label {
 			margin-bottom: 0;
+			margin-top: 0;
 		}
 	}
 
-	.burst--last {
-		.label {
-			margin-top: 0;
-		}
+	.burst--first message {
+		margin-top: 11px;
+	}
+
+	.burst--last message {
+		margin-bottom: 11px;
 	}
 
 	.burst--middle {
@@ -97,6 +100,10 @@ page-messages {
 			margin-top: 0;
 			margin-bottom: 0;
 		}
+	}
+
+	.item-block {
+		min-height: auto;
 	}
 }
 
@@ -286,57 +293,59 @@ $bubble-radius-android: 5px;
 	}
 }
 
-message:last-of-type .messages__message.last {
+.messages__message.last {
 	$outer-radius: 16px 14px;
 	$inner-radius: 10px;
 	$size: 20px;
 
-	// &.messages__message-blocked:before { display: none; }
-
 	&:before {
-		content: "";
-		position: absolute;
-		bottom: -2px;
-		height: $size;
-		transform: translate(0, -2px);
-		z-index: -1;
+		.burst--last & {
+			content: "";
+			position: absolute;
+			bottom: -2px;
+			height: $size;
+			transform: translate(0, -2px);
+			z-index: -1;
+		}
 
-		.burst--me & {
+		.burst--last.burst--me & {
 			right: -7px;
 			border-right: $size solid $message-bubble-color;
 			border-bottom-left-radius: $outer-radius;
 		}
 
-		.burst--other & {
+		.burst--last.burst--other & {
 			left: -7px;
 			border-left: $size solid map-get($colors, other_grey);
 			border-bottom-right-radius: $outer-radius;
 		}
 	}
 
-	.burst--me & {
-		&.sending:before { border-color: $message-sending-bubble-color; }
-	}
-
 	&:after {
-		content: "";
-		position: absolute;
-		bottom: -2px;
-		height: $size;
-		width: 26px;
-		transform: translate(-30px, -2px);
-		background: white;
-		z-index: -1;
+		.burst--last & {
+			content: "";
+			position: absolute;
+			bottom: -2px;
+			height: $size;
+			width: 26px;
+			transform: translate(-30px, -2px);
+			background: white;
+			z-index: -1;
+		}
 
-		.burst--me & {
+		.burst--last.burst--me & {
 			right: -56px;
 			border-bottom-left-radius: $inner-radius;
 		}
 
-		.burst--other & {
+		.burst--last.burst--other & {
 			left: 4px;
 			border-bottom-right-radius: $inner-radius;
 		}
+	}
+
+	.burst--last.burst--me & {
+		&.sending:before { border-color: $message-sending-bubble-color; }
 	}
 }
 

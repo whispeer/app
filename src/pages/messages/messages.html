@@ -49,10 +49,8 @@
 					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>
 				</div>
 
-				<span>
-					<div *ngIf="!message.isOwn() && getPartners().length > 1">{{message.data.sender.name}}</div>
-					<Message [message]="message"></Message>
-				</span>
+				<div *ngIf="!message.isOwn() && getPartners().length > 1">{{message.data.sender.name}}</div>
+				<Message [message]="message"></Message>
 
 				<BurstDifference [chat]="chat" [previousMessage]="message" [noDates]="true" *ngIf="$last"></BurstDifference>
 			</ion-item>
