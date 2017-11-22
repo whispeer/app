@@ -130,10 +130,9 @@ export class BurstDifferenceComponent {
 			return false
 		}
 
-		const burstChunk = this.getChunk()
 		const previousBurstChunk = ChunkLoader.getLoaded(this.previousMessage.getChunkID())
 
-		return burstChunk.getTitle() !== previousBurstChunk.getTitle()
+		return this.getChunk().getTitle() !== previousBurstChunk.getTitle()
 	}
 
 	getTitle = () => this.getChunk().getTitle()
