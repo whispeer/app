@@ -873,6 +873,10 @@ export class MessagesPage {
 		return this.chat.getPartners()
 	}
 
+	getMessages = () =>
+		!this.chat ? [] : this.chat.getMessages()
+			.map(({ id }) => MessageLoader.getLoaded(id))
+
 	private getBursts = (options) => {
 		if (!this.chat || this.chat.getMessages().length === 0) {
 			return { changed: false, bursts: [] };
