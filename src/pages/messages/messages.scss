@@ -79,6 +79,25 @@ page-messages {
 			}
 		}
 	}
+
+	.burst--first {
+		.label {
+			margin-bottom: 0;
+		}
+	}
+
+	.burst--last {
+		.label {
+			margin-top: 0;
+		}
+	}
+
+	.burst--middle {
+		.label {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
 }
 
 .md {

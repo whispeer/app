@@ -85,15 +85,14 @@ const initService = require("../../lib/services/initService");
 	templateUrl: 'messages.html'
 })
 export class MessagesPage {
-	chatID: number;
-	chat: Chat;
+	private chatID: number;
+	private chat: Chat;
 
-	messagesLoading: boolean = true;
+	private messagesLoading: boolean = true;
 
-	burstTopic: number = 0;
-	lastMessageElement: any;
+	private lastMessageElement: any;
 
-	messages: any[];
+	private messages: any[];
 
 	constructor(
 		public navCtrl: NavController,
@@ -742,9 +741,40 @@ export class MessagesPage {
 		return this.chat.getPartners()
 	}
 
-	getMessages = () =>
-		!this.chat ? [] : this.chat.getMessages()
+	getMessages = () => {
+		if (!this.chat) {
+			return this.messages = []
+		}
+
+		return this.messages = this.chat.getMessages()
 			.map(({ id }) => MessageLoader.getLoaded(id))
+	}
+
+	getBurstClass = (message, $index) => {
+		const previousMessageSameBurst = sameBurst(message, this.messages[$index - 1])
+		const nextMessageSameBurst = sameBurst(message, this.messages[$index + 1])
+
+		if (previousMessageSameBurst && nextMessageSameBurst) {
+			return "burst--middle"
+		}
+
+		if (previousMessageSameBurst) {
+			return "burst--last"
+		}
+
+		if (nextMessageSameBurst) {
+			return "burst--first"
+		}
+
+		return "burst--single"
+	}
+
+	getMessageItemClass = (message, $index) => {
+		const meOrOther = message.isOwn() ? "burst--me" : "burst--other"
+		const burstClass = this.getBurstClass(message, $index)
+
+		return [meOrOther, burstClass]
+	}
 
 	ngAfterViewChecked() {
 		this.registerMarkReadListener()
