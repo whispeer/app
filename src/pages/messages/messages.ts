@@ -75,86 +75,6 @@ const inView = require("in-view");
 
 const initService = require("../../lib/services/initService");
 
-namespace BurstHelper {
-	export const getNewElements = (messagesAndUpdates, bursts) => {
-		return messagesAndUpdates.filter((message) => {
-			return bursts.reduce((prev, current) => {
-				return prev && !current.hasItem(message);
-			}, true);
-		});
-	}
-
-	export const calculateBursts = (messages: any[]) => {
-		var bursts = [new Burst()];
-		var currentBurst = bursts[0];
-
-		messages.sort((m1, m2) => {
-			return m2.getTime() - m1.getTime();
-		});
-
-		messages.forEach((messageOrUpdate) => {
-			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst();
-				bursts.push(currentBurst);
-			}
-			currentBurst.addItem(messageOrUpdate);
-		});
-
-		return bursts;
-	}
-
-	const hasMatchingMessage = (oldBurst, newBurst) => {
-		var matchingMessages = newBurst.getItems().filter((message) => {
-			return oldBurst.hasItem(message);
-		});
-
-		return matchingMessages.length > 0;
-	}
-
-	const addBurst = (bursts, burst) => {
-		bursts.push(burst);
-
-		return true;
-	}
-
-	const mergeBurst = (oldBurst, newBurst) => {
-		var newMessages = newBurst.getItems().filter((message) => {
-			return !oldBurst.hasItem(message);
-		});
-
-		newMessages.forEach((message) => {
-			oldBurst.addItem(message);
-		});
-
-		return true;
-	}
-
-	const addBurstOrMerge = (bursts, burst) => {
-		var possibleMatches = bursts.filter((oldBurst) => {
-			return hasMatchingMessage(oldBurst, burst);
-		});
-
-		if (possibleMatches.length === 0) {
-			return addBurst(bursts, burst);
-		}
-
-		if (possibleMatches.length === 1) {
-			return mergeBurst(possibleMatches[0], burst);
-		}
-
-		if (possibleMatches.length > 1) {
-			errorService.criticalError(new Error("Burst merging possible matches > 1 wtf..."));
-			return false;
-		}
-	}
-
-	export const mergeBursts = (bursts, newBursts) => {
-		return newBursts.reduce((prev, burst) => {
-			return prev && addBurstOrMerge(bursts, burst);
-		}, true);
-	}
-}
-
 @IonicPage({
 	name: "Messages",
 	segment: "messages/:chatID",
@@ -718,55 +638,6 @@ export class MessagesPage {
 		}
 	}
 
-	afterViewBurstMessages() {
-		const id = this.getFirstInViewMessageId()
-
-		if (!id) {
-			return { changed: false, bursts: [] }
-		}
-
-		const { changed, bursts } = this.messageBurstsFunction({
-			after: id
-		})
-
-		return { changed, bursts }
-	}
-
-	allBurstMessages() {
-		const { bursts } = this.messageBurstsFunction()
-
-		return bursts
-	}
-
-	messageBursts = () => {
-		const { changed, bursts } = this.afterViewBurstMessages()
-
-		if (changed) {
-			const scrollFromBottom = this.scrollFromBottom()
-
-			if (scrollFromBottom > 15) {
-				this.bursts = bursts
-				return bursts
-			}
-		}
-
-		this.firstRender = false
-
-		this.bursts = this.allBurstMessages()
-
-		return this.bursts
-	}
-
-	messageBurstsFunction = (options?) => {
-		var burstInfo = this.getBursts(options);
-
-		burstInfo.bursts.sort((b1, b2) => {
-			return b1.firstItem().getTime() - b2.firstItem().getTime();
-		});
-
-		return burstInfo;
-	}
-
 	isPreviousMissing(message: Message) {
 		const messages = this.getMessages()
 
@@ -874,52 +745,6 @@ export class MessagesPage {
 	getMessages = () =>
 		!this.chat ? [] : this.chat.getMessages()
 			.map(({ id }) => MessageLoader.getLoaded(id))
-
-	private getBursts = (options) => {
-		if (!this.chat || this.chat.getMessages().length === 0) {
-			return { changed: false, bursts: [] };
-		}
-
-		const messages = this.chat.getMessages()
-			.map(({ id }) => MessageLoader.getLoaded(id))
-
-		if (this.burstTopic !== this.chat.getID()) {
-			this.bursts = BurstHelper.calculateBursts(messages);
-			this.burstTopic = this.chat.getID();
-
-			return { changed: true, bursts: this.bursts };
-		}
-
-		var newElements = BurstHelper.getNewElements(messages, this.bursts);
-
-		if (options) {
-			const firstViewMessage = messages.find((elem) => {
-				return options.after == elem.getClientID().toString()
-			})
-
-			const index = messages.indexOf(firstViewMessage)
-
-			newElements = newElements.filter((element) => {
-				return messages.indexOf(element) > index
-			})
-		}
-
-		if (newElements.length === 0) {
-			return { changed: false, bursts: this.bursts };
-		}
-
-		this.bursts.forEach((burst) =>
-			burst.removeAllExceptLast()
-		)
-
-		var newBursts = BurstHelper.calculateBursts(messages);
-		if (!BurstHelper.mergeBursts(this.bursts, newBursts)) {
-			console.warn("Rerender all bursts!");
-			this.bursts = newBursts;
-		}
-
-		return { changed: true, bursts: this.bursts };
-	}
 
 	ngAfterViewChecked() {
 		this.registerMarkReadListener()

@@ -32,17 +32,15 @@
 		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 		<div class="messages_filler"></div>
 		<ion-list no-lines>
-			<!--
-			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">
-				<BurstDifference [chat]="chat" [burst]="bursts[0]"></BurstDifference>
+			<ion-item class="messages__burst" *ngIf="getMessages().length === 0">
+				<BurstDifference [chat]="chat"></BurstDifference>
 			</ion-item>
-			-->
 			<ion-item
 				class="messages__burst" *ngFor="let message of getMessages(); let $index=index; let $last=last"
 				[ngClass]="{'burst--me': message.isOwn(), 'burst--other': !message.isOwn()}"
 			>
 				<!--
-				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>
+				<BurstDifference [chat]="chat" [message]="message" [previousMessage]="getMessages()[$index - 1]"></BurstDifference>
 				-->
 
 				<div *ngIf="isPreviousMissing(message)" style="
@@ -59,7 +57,7 @@
 				</span>
 
 				<!--
-				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>
+				<BurstDifference [chat]="chat" [previousMessage]="message" [noDates]="true" *ngIf="$last"></BurstDifference>
 				-->
 			</ion-item>
 		</ion-list>
