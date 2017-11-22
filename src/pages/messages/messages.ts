@@ -21,7 +21,7 @@ import { replaceView } from "../../lib/angularUtils"
 
 import messageService from "../../lib/messages/messageService";
 import ChatLoader, { Chat } from "../../lib/messages/chat"
-import MessageLoader from "../../lib/messages/message"
+import MessageLoader, { Message } from "../../lib/messages/message"
 
 import h from "../../lib/helper/helper"
 import VoicemailPlayer, { audioInfo, recordingType } from "../../lib/asset/voicemailPlayer"
@@ -767,17 +767,15 @@ export class MessagesPage {
 		return burstInfo;
 	}
 
-	isPreviousMissing(burst: Burst) {
-		const message = burst.getItems()[0]
+	isPreviousMissing(message: Message) {
+		const messages = this.getMessages()
 
-		if (this.bursts[0] === burst || !message.getPreviousID()) {
+		if (messages[0] === message || !message.getPreviousID()) {
 			return false
 		}
 
-		return this.bursts.findIndex((burst) =>
-			burst.getItems().findIndex((m) =>
-				m.getClientID() === message.getPreviousID()
-			) > -1
+		return messages.findIndex((m) =>
+			m.getClientID() === message.getPreviousID()
 		) === -1
 	}
 

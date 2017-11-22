@@ -45,15 +45,13 @@
 				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>
 				-->
 
-				<!--
-				<div *ngIf="isPreviousMissing(burst)" style="
+				<div *ngIf="isPreviousMissing(message)" style="
 					display: flex;
 					justify-content: center;
 					align-items: center;
 				">
 					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>
 				</div>
-				-->
 
 				<span>
 					<div *ngIf="!message.isOwn() && getPartners().length > 1">{{message.data.sender.name}}</div>
