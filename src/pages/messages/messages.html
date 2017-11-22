@@ -39,9 +39,7 @@
 				class="messages__burst" *ngFor="let message of getMessages(); let $index=index; let $last=last"
 				[ngClass]="{'burst--me': message.isOwn(), 'burst--other': !message.isOwn()}"
 			>
-				<!--
 				<BurstDifference [chat]="chat" [message]="message" [previousMessage]="getMessages()[$index - 1]"></BurstDifference>
-				-->
 
 				<div *ngIf="isPreviousMissing(message)" style="
 					display: flex;
@@ -56,9 +54,7 @@
 					<Message [message]="message"></Message>
 				</span>
 
-				<!--
 				<BurstDifference [chat]="chat" [previousMessage]="message" [noDates]="true" *ngIf="$last"></BurstDifference>
-				-->
 			</ion-item>
 		</ion-list>
 	</div>

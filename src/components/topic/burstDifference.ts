@@ -3,8 +3,34 @@ import { Component, Input } from "@angular/core";
 import h from "../../lib/helper/helper";
 
 import ChunkLoader, { Chunk } from "../../lib/messages/chatChunk"
+import { Message } from "../../lib/messages/message"
 import { Chat } from "../../lib/messages/chat"
-import Burst from "../../lib/messages/burst"
+
+const sameDay = (message1, message2) => {
+	if (!message1 || !message2) {
+		return false;
+	}
+
+	var date1 = new Date(h.parseDecimal(message1.getTime()));
+	var date2 = new Date(h.parseDecimal(message2.getTime()));
+
+	if (date1.getDate() !== date2.getDate()) {
+		return false;
+	}
+
+	if (date1.getMonth() !== date2.getMonth()) {
+		return false;
+	}
+
+	if (date1.getFullYear() !== date2.getFullYear()) {
+		return false;
+	}
+
+	return true;
+}
+
+const sameChunk = (m1: Message, m2: Message) =>
+	m1 && m2 && m1.getChunkID() === m2.getChunkID()
 
 @Component({
 	selector: "BurstDifference",
@@ -12,8 +38,8 @@ import Burst from "../../lib/messages/burst"
 })
 export class BurstDifferenceComponent {
 	@Input() chat: Chat
-	@Input() burst: Burst
-	@Input() previousBurst: Burst
+	@Input() message: Message
+	@Input() previousMessage: Message
 	@Input() noDates: boolean
 
 	constructor() {}
@@ -23,8 +49,8 @@ export class BurstDifferenceComponent {
 			return false
 		}
 
-		if (this.burst && this.previousBurst) {
-			return !this.burst.sameDay(this.previousBurst)
+		if (this.message && this.previousMessage) {
+			return !sameDay(this.message, this.previousMessage)
 		}
 
 		return true
@@ -35,27 +61,27 @@ export class BurstDifferenceComponent {
 			return false
 		}
 
-		if (this.burst && this.previousBurst) {
-			return !this.burst.sameChunk(this.previousBurst)
+		if (this.message && this.previousMessage) {
+			return !sameChunk(this.message, this.previousMessage)
 		}
 
-		if (this.previousBurst) {
-			return this.previousBurst.getChunkID() !== this.chat.getLatestChunk()
+		if (this.previousMessage) {
+			return this.previousMessage.getChunkID() !== this.chat.getLatestChunk()
 		}
 
 		return true
 	}
 
 	chunksBetweenBursts = () => {
-		if (!this.previousBurst) {
+		if (!this.previousMessage) {
 			return []
 		}
 
-		const currentChunkID = this.burst ? this.burst.getChunkID() : this.chat.getLatestChunk()
+		const currentChunkID = this.message ? this.message.getChunkID() : this.chat.getLatestChunk()
 
 		return this.getChunksBetween(
 			ChunkLoader.getLoaded(currentChunkID),
-			ChunkLoader.getLoaded(this.previousBurst.getChunkID())
+			ChunkLoader.getLoaded(this.previousMessage.getChunkID())
 		).reverse()
 	}
 
@@ -97,20 +123,20 @@ export class BurstDifferenceComponent {
 	}
 
 	hasPreviousChunk = () => {
-		return Boolean(this.previousBurst)
+		return Boolean(this.previousMessage)
 	}
 
 	receiver = () => {
-		if (this.burst) {
-			return ChunkLoader.getLoaded(this.burst.getChunkID()).getPartners()
+		if (this.message) {
+			return ChunkLoader.getLoaded(this.message.getChunkID()).getPartners()
 		}
 
 		return ChunkLoader.getLoaded(this.chat.getLatestChunk()).getPartners()
 	}
 
 	getTime = () => {
-		if (this.burst) {
-			return this.burst.firstItem().getTime()
+		if (this.message) {
+			return this.message.getTime()
 		}
 
 		const latestChunk = ChunkLoader.getLoaded(this.chat.getLatestChunk())
@@ -119,18 +145,18 @@ export class BurstDifferenceComponent {
 	}
 
 	getChunk = () => {
-		const burstChunkID = this.burst ? this.burst.getChunkID() : this.chat.getLatestChunk()
+		const burstChunkID = this.message ? this.message.getChunkID() : this.chat.getLatestChunk()
 
 		return ChunkLoader.getLoaded(burstChunkID)
 	}
 
 	hasTitleDifference = () => {
-		if (!this.previousBurst) {
+		if (!this.previousMessage) {
 			return false
 		}
 
 		const burstChunk = this.getChunk()
-		const previousBurstChunk = ChunkLoader.getLoaded(this.previousBurst.getChunkID())
+		const previousBurstChunk = ChunkLoader.getLoaded(this.previousMessage.getChunkID())
 
 		return burstChunk.getTitle() !== previousBurstChunk.getTitle()
 	}
