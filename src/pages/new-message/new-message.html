@@ -25,27 +25,32 @@
 		</ion-list-header>
 	</ion-list>
 	<ion-list [virtualScroll]="selectedUsers" class="friends__list" *ngIf="!loading">
-		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
+		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact) [ngClass]="{'user__blocked': contact.user.isBlocked()}">
 			<ion-label class="checkbox__label--user checkbox__label--user-selected">
 				<ion-avatar class="hexagon--border"
 						[ngClass]="{'hexagon__image--active': contact.online}" item-left>
 					<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
 				</ion-avatar>
 				<h2 class="checkbox__label__username">
-					<strong *ngIf="contact.names.firstname">
-						{{contact.names.firstname}}
-					</strong>
-					<span *ngIf="contact.names.firstname && contact.names.lastname">
-						{{contact.names.lastname}}
+					<span *ngIf="!contact.user.isBlocked(); else blockedUser">
+						<strong *ngIf="contact.names.firstname">
+							{{contact.names.firstname}}
+						</strong>
+						<span *ngIf="contact.names.firstname && contact.names.lastname">
+							{{contact.names.lastname}}
+						</span>
+						<strong
+							*ngIf="!contact.names.firstname && contact.names.lastname">
+							{{contact.names.lastname}}
+						</strong>
+						<strong
+							*ngIf="!contact.names.firstname && !contact.names.lastname">
+							{{contact.name}}
+						</strong>
 					</span>
-					<strong
-						*ngIf="!contact.names.firstname && contact.names.lastname">
-						{{contact.names.lastname}}
-					</strong>
-					<strong
-						*ngIf="!contact.names.firstname && !contact.names.lastname">
-						{{contact.name}}
-					</strong>
+					<ng-template #blockedUser>
+						{{'blocked.userReplacement' | translate}} ({{contact.names.nickname}})
+					</ng-template>
 				</h2>
 			</ion-label>
 
@@ -73,27 +78,32 @@
 			{{ header }}
 		</ion-item-divider>
 
-		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact)>
+		<ion-item *virtualItem="let contact" (click)=updateSelectedUsers(contact) [ngClass]="{'user__blocked': contact.user.isBlocked()}">
 			<ion-label class="checkbox__label--user">
 				<ion-avatar class="hexagon--border"
 						[ngClass]="{'hexagon__image--active': contact.online}" item-left>
 					<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
 				</ion-avatar>
 				<h2>
-					<strong *ngIf="contact.names.firstname">
-						{{contact.names.firstname}}
-					</strong>
-					<span *ngIf="contact.names.firstname && contact.names.lastname">
-						{{contact.names.lastname}}
+					<span *ngIf="!contact.user.isBlocked(); else blockedUser">
+						<strong *ngIf="contact.names.firstname">
+							{{contact.names.firstname}}
+						</strong>
+						<span *ngIf="contact.names.firstname && contact.names.lastname">
+							{{contact.names.lastname}}
+						</span>
+						<strong
+							*ngIf="!contact.names.firstname && contact.names.lastname">
+							{{contact.names.lastname}}
+						</strong>
+						<strong
+							*ngIf="!contact.names.firstname && !contact.names.lastname">
+							{{contact.name}}
+						</strong>
 					</span>
-					<strong
-						*ngIf="!contact.names.firstname && contact.names.lastname">
-						{{contact.names.lastname}}
-					</strong>
-					<strong
-						*ngIf="!contact.names.firstname && !contact.names.lastname">
-						{{contact.name}}
-					</strong>
+					<ng-template #blockedUser>
+						{{'blocked.userReplacement' | translate}} ({{contact.names.nickname}})
+					</ng-template>
 				</h2>
 			</ion-label>
 			<div item-content class="checkbox checkbox-hexagon" [class.checkbox-ios]="ios" [class.checkbox-md]="!ios">

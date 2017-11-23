@@ -47,7 +47,10 @@
 				</div>
 
 				<span>
-					<div *ngIf="burst.isOther() && getPartners().length > 1">{{burst.firstItem().data.sender.name}}</div>
+					<div *ngIf="burst.isOther() && getPartners().length > 1">
+						<span *ngIf="!burst.firstItem().data.sender.user.isBlocked(); else blockedUser">{{burst.firstItem().data.sender.name}}</span>
+						<ng-template #blockedUser>{{ 'blocked.userReplacement' | translate }}</ng-template>
+					</div>
 					<Message [message]="message" *ngFor="let message of burst.items"></Message>
 				</span>
 
