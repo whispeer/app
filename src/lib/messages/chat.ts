@@ -687,7 +687,7 @@ const getChatInfo = h.delayMultiplePromise(Bluebird, 50, loadChatInfo, 10)
 export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 	download: (id) => {
 		return getChatInfo(id).then((chatInfo) => {
-			if (chatInfo.chat.id !== id) {
+			if (h.parseDecimal(chatInfo.chat.id) !== h.parseDecimal(id)) {
 				throw new Error(`Chat ID incorrect after loading. Should be ${id} but is ${chatInfo.chat.id}`)
 			}
 			return chatInfo
