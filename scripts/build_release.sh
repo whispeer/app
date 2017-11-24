@@ -74,4 +74,7 @@ done
 cd ../..
 
 sentry-cli releases -o sentry -p messenger new $VERSION
-sentry-cli releases -o sentry -p messenger files $VERSION upload-sourcemaps release/sourcemaps/
+sentry-cli releases -o sentry -p messenger files $VERSION upload-sourcemaps release/sourcemaps/ --validate
+sentry-cli releases -o sentry -p messenger files $VERSION upload-sourcemaps release/sourcemaps/ --url-prefix '~/android_asset/www/build/'
+sentry-cli releases -o sentry -p messenger files $VERSION upload-sourcemaps release/sourcemaps/ --url-prefix '~/www/build/'
+sentry-cli releases -o sentry -p messenger files $VERSION upload-sourcemaps release/sourcemaps/ --url-prefix '~/build/'
