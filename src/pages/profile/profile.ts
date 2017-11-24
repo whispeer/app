@@ -132,6 +132,10 @@ export class ProfilePage {
 			return this.translate.instant("profile.ownTitle")
 		}
 
+		if(this.isBlocked()) {
+			return this.translate.instant("blocked.userReplacement")
+		}
+
 		return this.translate.instant("profile.otherTitle", { name: this.user.name })
 	}
 
@@ -462,6 +466,29 @@ export class ProfilePage {
 
 		reportConfirm.setCssClass('logout-confirm');
 		reportConfirm.present();
+	}
+
+	reportAndBlock = () => {
+		if(this.isBlocked) {
+			return
+		}
+
+		const reportAndBlockConfirm = this.alertCtrl.create({
+			title: this.translate.instant("profile.contacts.reportAndBlockConfirm.title"),
+			message: this.translate.instant("profile.contacts.reportAndBlockConfirm.message"),
+			buttons: [{
+				text: this.translate.instant("profile.contacts.reportAndBlockConfirm.cancel")
+			}, {
+				text: this.translate.instant("profile.contacts.reportAndBlockConfirm.confirm"),
+				handler: () => {
+					reportService.sendReport("user", this.user.id);
+					settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+				}
+			}]
+		});
+
+		reportAndBlockConfirm.setCssClass('logout-confirm');
+		reportAndBlockConfirm.present();
 	}
 
 	close = () => {
