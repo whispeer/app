@@ -84,7 +84,7 @@ const devLoaders = [
 
 function getLoaders(production) {
 	if (production && process.env.IONIC_OPTIMIZE_JS === "true") {
-		return prodLoaders;
+		return devLoaders;
 	}
 
 	return devLoaders;
