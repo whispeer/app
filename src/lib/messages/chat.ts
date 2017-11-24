@@ -688,7 +688,7 @@ export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 	download: (id) => {
 		return getChatInfo(id).then((chatInfo) => {
 			if (chatInfo.chat.id !== id) {
-				throw new Error("fail")
+				throw new Error(`Chat ID incorrect after loading. Should be ${id} but is ${chatInfo.chat.id}`)
 			}
 			return chatInfo
 		})
