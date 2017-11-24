@@ -2,7 +2,6 @@
   "author": "mindpost GmbH",
   "config": {
     "ionic_copy": "./config/copy.config.js",
-    "ionic_optimization": "./config/optimization.config.js",
     "ionic_sass": "./config/sass.config.js",
     "ionic_watch": "./config/watch.config.js",
     "ionic_webpack": "./config/webpack.config.js"
