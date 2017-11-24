@@ -70,7 +70,8 @@ Raven.config(SENTRY_KEY, {
 	autoBreadcrumbs: false,
 	tags: {
 		git_commit: CLIENT_INFO.commit
-	}
+	},
+	environment: `${IONIC_ENV}-${WHISPEER_ENV}`
 }).install();
 
 export class RavenErrorHandler implements ErrorHandler {
@@ -226,6 +227,8 @@ export class AppModule {
 				cancellation: false,
 				monitoring: false
 			})
+		} else {
+			console.warn("Not in production - not disabling longStackTraces")
 		}
 
 		Bluebird.setScheduler((fn) => {
