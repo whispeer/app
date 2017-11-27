@@ -60862,6 +60862,10 @@ ion-fab-list[side="top"] button:last-child {
   min-height: calc(44px + 20px);
 }
 
+.navigator--hexagon--border {
+  stroke: #003b4c;
+}
+
 page-contacts ion-list {
   border-bottom: .55px solid #e5e5e5;
 }
@@ -61582,10 +61586,18 @@ page-messages .burst-seperator .burst-seperator-text:after {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  width: 192px;
-  height: 47px;
   overflow: visible;
   padding: 5px 0 5px 25px;
+}
+
+.message__file {
+  min-height: 55px;
+  width: 100%;
+}
+
+.message__voicemail {
+  width: 192px;
+  height: 47px;
 }
 
 .message__voicemail {
