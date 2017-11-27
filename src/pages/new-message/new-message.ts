@@ -113,6 +113,10 @@ export class NewMessagePage extends ContactsWithSearch {
 
 			return Chunk.createRawData(users.map(({ id }) => id), { content: {} })
 		}).then((chunkData) => {
+			if (!chunkData) {
+				return
+			}
+
 			const chunk = new Chunk({
 				content: {},
 				server: {
