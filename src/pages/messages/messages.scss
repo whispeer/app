@@ -140,11 +140,19 @@ page-messages {
 .message__file,
 .message__voicemail {
 	display: flex;
-	width: 192px;
-	height: 47px;
 
 	overflow: visible;
 	padding: 5px 0 5px 25px;
+}
+
+.message__file {
+	min-height: 55px;
+	width: 100%;
+}
+
+.message__voicemail {
+	width: 192px;
+	height: 47px;
 }
 
 .message__voicemail {
