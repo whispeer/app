@@ -14,6 +14,8 @@ import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
 
+import { AndroidPermissions } from '@ionic-native/android-permissions'
+
 import ImageUpload from "../../lib/services/imageUpload.service"
 import FileUpload from "../../lib/services/fileUpload.service"
 import errorService from "../../lib/services/error.service";
@@ -185,7 +187,8 @@ export class MessagesPage {
 		private media: Media,
 		private alertController: AlertController,
 		public navParams: NavParams,
-		private element: ElementRef
+		private element: ElementRef,
+		private androidPermissions: AndroidPermissions
 	) {
 		this.cameraOptions = {
 			quality: 50,
@@ -468,22 +471,33 @@ export class MessagesPage {
 			return
 		}
 
-		this.recordingInfo.UUID = uuidv4()
+		this.androidPermissions.requestPermissions([
+			this.androidPermissions.PERMISSION.RECORD_AUDIO,
+			this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE,
+		]).then(({ hasPermission }) => {
+			if (!hasPermission) {
+				return
+			}
 
-		this.recordingFile = this.media.create(this.getRecordingFileName())
+			RecordingStateMachine.go(RecordingStates.Recording)
 
-		this.recordingInfo.startTime = Date.now()
-		this.recordingFile.startRecord()
+			this.recordingInfo.UUID = uuidv4()
 
-		clearInterval(this.recordingInfo.updateInterval)
-		this.recordingInfo.updateInterval = window.setInterval(() => {
-			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
-		}, 100)
+			this.recordingFile = this.media.create(this.getRecordingFileName())
 
-		if (VoicemailPlayer.activePlayer) {
-			VoicemailPlayer.activePlayer.pause()
-		}
-		VoicemailPlayer.setPlaybackBlocked(true)
+			this.recordingInfo.startTime = Date.now()
+			this.recordingFile.startRecord()
+
+			clearInterval(this.recordingInfo.updateInterval)
+			this.recordingInfo.updateInterval = window.setInterval(() => {
+				this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
+			}, 100)
+
+			if (VoicemailPlayer.activePlayer) {
+				VoicemailPlayer.activePlayer.pause()
+			}
+			VoicemailPlayer.setPlaybackBlocked(true)
+		})
 	}
 
 	formatTime = (seconds) => {
@@ -535,7 +549,6 @@ export class MessagesPage {
 				VoicemailPlayer.setPlaybackBlocked(false)
 			})
 		} else {
-			RecordingStateMachine.go(RecordingStates.Recording)
 			return this.startRecording()
 		}
 	}
