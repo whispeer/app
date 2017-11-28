@@ -62,6 +62,25 @@ import { isBusinessVersion } from "../lib/services/location.manager";
 import "../lib/services/featureToggles"
 import "../lib/services/settings.service"
 
+import * as Raven from "raven-js"
+
+const SENTRY_KEY = "https://5efbdc23f6a749f79b9efb0231bcbb50@errors.whispeer.de/6"
+
+Raven.config(SENTRY_KEY, {
+	release: CLIENT_INFO.version,
+	autoBreadcrumbs: false,
+	tags: {
+		git_commit: CLIENT_INFO.commit
+	},
+	environment: `${IONIC_ENV}-${WHISPEER_ENV}`
+}).install();
+
+export class RavenErrorHandler implements ErrorHandler {
+	handleError(err:any) : void {
+		Raven.captureException(err);
+	}
+}
+
 (window as any).startup = new Date().getTime();
 
 export function createTranslateLoader(http: Http) {
@@ -97,7 +116,8 @@ const DEFAULT_LANG = "de"
 		MyApp,
 	],
 	providers: [
-		{provide: ErrorHandler, useClass: IonicErrorHandler},
+		{ provide: ErrorHandler, useClass: IonicErrorHandler },
+		{ provide: ErrorHandler, useClass: RavenErrorHandler },
 		DatePipe,
 		BarcodeScanner,
 		SplashScreen,
@@ -209,6 +229,8 @@ export class AppModule {
 				cancellation: false,
 				monitoring: false
 			})
+		} else {
+			console.warn("Not in production - not disabling longStackTraces")
 		}
 
 		Bluebird.setScheduler((fn) => {
