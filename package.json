@@ -19,6 +19,7 @@
       },
       "com-sarriaroman-photoviewer": {},
       "cordova-filechooser": {},
+      "cordova-plugin-android-permissions": {},
       "cordova-plugin-camera": {
         "CAMERA_USAGE_DESCRIPTION": "whispeer needs access to your Camera to allow you to take Photos directly from the app.",
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
@@ -56,6 +57,7 @@
     "@angular/http": "5.0.0",
     "@angular/platform-browser": "5.0.0",
     "@angular/platform-browser-dynamic": "5.0.0",
+    "@ionic-native/android-permissions": "^4.4.2",
     "@ionic-native/barcode-scanner": "3.6.1",
     "@ionic-native/camera": "3.6.1",
     "@ionic-native/core": "3.6.1",
@@ -87,6 +89,7 @@
     "cordova-android": "~6.3.0",
     "cordova-filechooser": "https://github.com/whispeer/cordova-filechooser.git#feature/full_path",
     "cordova-ios": "^4.5.2",
+    "cordova-plugin-android-permissions": "^1.0.0",
     "cordova-plugin-camera": "https://github.com/whispeer/cordova-plugin-camera.git#fix/tmp-image-reuse",
     "cordova-plugin-compat": "~1.1.0",
     "cordova-plugin-device": "~1.1.4",
