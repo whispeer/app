@@ -4,7 +4,8 @@
 		"cancel": "Abbrechen",
 		"ok": "Ok",
 		"accept": "Akzeptieren",
-		"decline": "Ablehnen"
+		"decline": "Ablehnen",
+		"yes": "Ja"
 	},
 	"time": {
 		"today": "Heute",
@@ -155,6 +156,11 @@
 			"requestSentMessage": "Du hast eine Kontaktanfrage an {{name}} gesendet.",
 			"reportContact": "Diesen Nutzer melden",
 			"reportAndBlockContact": "Diesen Nutzer melden und blockieren",
+			"blocked": {
+				"removeTitle": "Möchtest Du diesen Kontakt behalten?",
+				"removeQuestion": "Du kannst diesen Nutzer als Kontakt behalten. Er erscheint dann ausgegraut.",
+				"removeConfirmButtonText": "Nein, entfernen"
+			},
 			"blockConfirm": {
 				"title": "Diesen Nutzer blockieren?",
 				"message": "Blockieren schützt dich vor allem, was dieser Nutzer dir sendet. Du wirst nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.",

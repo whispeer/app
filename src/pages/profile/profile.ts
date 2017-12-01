@@ -169,6 +169,7 @@ export class ProfilePage {
 				text: this.translate.instant("profile.contacts.blockConfirm.confirm"),
 				handler: () => {
 					settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+					this.removeBlockedUser()
 				}
 			}]
 		});
@@ -309,6 +310,29 @@ export class ProfilePage {
 				role: "cancel"
 			}, {
 				text: this.translate.instant("profile.contacts.removeConfirmButtonText"),
+				role: "destructive",
+				cssClass: "alert-button-danger",
+				handler: () => {
+					this.user.user.removeAsFriend();
+				}
+			}]
+		}).present();
+	}
+
+	removeBlockedUser = () => {
+		if(this.isRequest) {
+			return
+		}
+
+		// this is pretty similar to removeFriendClick but at the same time it's different enough to create a new function
+		this.alertCtrl.create(<AlertOptions>{
+			title: this.translate.instant("profile.contacts.blocked.removeTitle"),
+			message: this.translate.instant("profile.contacts.blocked.removeQuestion", { name: this.user.name }),
+			buttons: [{
+				text: this.translate.instant("general.yes"),
+				role: "cancel"
+			}, {
+				text: this.translate.instant("profile.contacts.blocked.removeConfirmButtonText"),
 				role: "destructive",
 				cssClass: "alert-button-danger",
 				handler: () => {
@@ -460,6 +484,7 @@ export class ProfilePage {
 				text: this.translate.instant("profile.contacts.reportConfirm.confirm"),
 				handler: () => {
 					reportService.sendReport("user", this.user.id);
+					this.removeBlockedUser()
 				}
 			}]
 		});
@@ -469,7 +494,7 @@ export class ProfilePage {
 	}
 
 	reportAndBlock = () => {
-		if(this.isBlocked) {
+		if(this.isBlocked()) {
 			return
 		}
 
@@ -483,6 +508,7 @@ export class ProfilePage {
 				handler: () => {
 					reportService.sendReport("user", this.user.id);
 					settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+					this.removeBlockedUser()
 				}
 			}]
 		});
