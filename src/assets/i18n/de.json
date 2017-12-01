@@ -46,7 +46,8 @@
 		"searchResultExplain": "Falls du die gewünschte Person nicht finden kannst, versuche nach deren Nutzernamen zu suchen."
 	},
 	"requests": {
-		"title": "Kontaktanfragen"
+		"title": "Kontaktanfragen",
+		"noRequests": "Du hast keine Kontaktanfragen."
 	},
 	"topic": {
 		"takePhoto": "Foto aufnehmen",

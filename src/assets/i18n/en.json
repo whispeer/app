@@ -46,7 +46,8 @@
 		"searchResultExplain": "If you cannot find who you are looking for, try searching for their username."
 	},
 	"requests": {
-		"title": "Contact Requests"
+		"title": "Contact Requests",
+		"noRequests": "You have no contact requests."
 	},
 	"topic": {
 		"takePhoto": "Take a Photo",
