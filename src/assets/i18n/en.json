@@ -111,6 +111,7 @@
 	"blocked": {
 		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",
 		"title": "Blocked Users",
+		"userReplacement": "Blocked User",
 		"messageReplacement": "- blocked content -"
 	},
 	"profile": {
@@ -154,6 +155,12 @@
 			"acceptedMessage": "{{name}} is now a Contact.",
 			"requestSentMessage": "You've sent a Contact Request to {{name}}.",
 			"reportContact": "Report this User",
+			"reportAndBlockContact": "Report and block this user",
+			"blocked": {
+				"removeTitle": "Would you like to keep this contact?",
+				"removeQuestion": "You may keep this user as a contact in your contact list. Blocked contacts appear greyed out.",
+				"removeConfirmButtonText": "No, remove"
+			},
 			"blockConfirm": {
 				"title": "Block this User?",
 				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.",
@@ -165,6 +172,11 @@
 				"message": "Please confirm that you want to report this user. We will get in touch with you.",
 				"cancel": "Cancel",
 				"confirm": "Report"
+			},
+			"reportAndBlockConfirm": {
+				"title": "Report and block this user?",
+				"cancel": "Cancel",
+				"confirm": "Report + Block"
 			}
 		},
 		"image": {
