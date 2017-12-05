@@ -133,7 +133,7 @@ export class ContactsWithSearch {
 		});
 	}, 100)
 
-	getUsers = () => {
+	getUsers = () : any[] => {
 		return this.memoizer.getValue()
 	}
 }

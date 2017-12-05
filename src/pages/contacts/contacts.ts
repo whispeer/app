@@ -6,6 +6,8 @@ const contactsService = require("../../lib/services/friendsService");
 import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
 import { TranslateService } from '@ngx-translate/core';
 
+const isBusiness = WHISPEER_BUSINESS
+
 @IonicPage({
 	name: "Contacts",
 	segment: "contacts"
@@ -19,9 +21,19 @@ export class ContactsPage extends ContactsWithSearch {
 	@ViewChild(Searchbar) searchBar: Searchbar;
 
 	requests: any[] = [];
+	view: string = "contacts"
+	business = isBusiness
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, public translate: TranslateService) {
 		super(translate)
+	}
+
+	getContacts = () => {
+		if (this.view === "contacts") {
+			return this.getUsers()
+		}
+
+		return this.getUsers().slice(20)
 	}
 
 	ionViewDidEnter() {
