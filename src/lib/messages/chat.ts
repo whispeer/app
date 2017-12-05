@@ -679,7 +679,7 @@ type ChatCache = {
 const loadChatInfo = (ids) =>
 	socketService.definitlyEmit("chat.getMultiple", { ids })
 		.then(({ chats }) =>
-			ids.map((id) => chats.find(({ chat }) => chat.id === id))
+			ids.map((id) => chats.find(({ chat }) => h.parseDecimal(chat.id) === h.parseDecimal(id)))
 		)
 
 const getChatInfo = h.delayMultiplePromise(Bluebird, 50, loadChatInfo, 10)
