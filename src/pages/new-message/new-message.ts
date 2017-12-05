@@ -10,7 +10,6 @@ import h from "../../lib/helper/helper";
 import { replaceView } from "../../lib/angularUtils"
 
 import userService from "../../lib/users/userService"
-const friendsService = require("../../lib/services/friendsService");
 
 import * as Bluebird from 'bluebird';
 
@@ -80,12 +79,7 @@ export class NewMessagePage extends ContactsWithSearch {
 			return
 		}
 
-		friendsService.awaitLoading().then(() => {
-			friendsService.listen(this.loadContactsUsers);
-			this.loadContactsUsers().then(() => {
-				this.contactsLoading = false
-			});
-		});
+		this.init()
 
 		this.loading = false
 	}

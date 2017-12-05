@@ -10,37 +10,62 @@ import h from "../helper/helper";
 
 import Memoizer from "../../lib/asset/memoizer"
 
-const filterContacts = (contacts, searchTerm) => {
-	if (!searchTerm) {
-		return contacts;
-	}
-
-	return contacts.filter((contact) =>
-		contact.names.searchName.indexOf(searchTerm.toLowerCase()) > -1
-	)
-}
+const CONTACTS_VIEW = "contacts"
 
 export class ContactsWithSearch {
-	contacts: any[] = [];
-	contactsLoading: boolean = true;
+	contacts: any[] = []
+	requests: any[] = []
+	contactsLoading: boolean = true
 
-	searchResults: any[] = [];
-	searchResultsLoading: boolean = false;
+	colleagues: any[] = []
+	colleaguesLoading: boolean = true
+
+	searchResults: any[] = []
+	searchResultsLoading: boolean = false
 
 	loadedContactIDs: number[] = []
+	loadedColleagueIDs: number[] = []
 
-	searchTerm: string = "";
+	searchTerm: string = ""
+
+	view: string = "contacts"
 
 	private memoizer: Memoizer
 
 	constructor(public translate: TranslateService) {
 		this.memoizer = new Memoizer([
 			() => this.contacts,
+			() => this.colleagues,
+
+			() => this.view,
+
 			() => this.searchResults,
 			() => this.searchTerm
-		], (contacts, searchResults, searchTerm) => {
-			return filterContacts(contacts, searchTerm).concat(searchResults)
+		], (contacts, colleagues, view, searchResults, searchTerm) => {
+			if (!searchTerm) {
+				return view === CONTACTS_VIEW ? contacts : colleagues
+			}
+
+			return contacts.concat(colleagues).filter((contact) =>
+				contact.names.searchName.indexOf(searchTerm.toLowerCase()) > -1
+			).concat(searchResults)
 		})
+	}
+
+	init = () => {
+		contactsService.awaitLoading().then(() => {
+			contactsService.listen(this.load);
+			return this.load()
+		})
+	}
+
+	private load = () => {
+		this.requests = contactsService.getRequests()
+
+		return this.loadContacts()
+			.then(() => this.contactsLoading = false)
+			.then(() => this.loadColleagues())
+			.then(() => this.colleaguesLoading = false)
 	}
 
 	static sort = (users) => users.sort((a: any, b: any): number => {
@@ -56,7 +81,21 @@ export class ContactsWithSearch {
 		}
 	});
 
-	protected loadContactsUsers = () => {
+	private loadColleagues = () => {
+		var colleagues = contactsService.getFriends();
+
+		if (h.arrayEqual(this.loadedColleagueIDs, colleagues)) {
+			return Bluebird.resolve()
+		}
+
+		this.loadedColleagueIDs = colleagues.slice()
+
+		return userService.getMultipleFormatted(colleagues)
+			.then(ContactsWithSearch.sort)
+			.then((result: any[]) => this.colleagues = result)
+	}
+
+	private loadContacts = () => {
 		var contacts = contactsService.getFriends();
 
 		if (h.arrayEqual(this.loadedContactIDs, contacts)) {
@@ -133,7 +172,5 @@ export class ContactsWithSearch {
 		});
 	}, 100)
 
-	getUsers = () : any[] => {
-		return this.memoizer.getValue()
-	}
+	getUsers = () : any[] => this.memoizer.getValue()
 }
