@@ -144,7 +144,7 @@ export class Chat extends Observer {
 	}
 
 	isBlocked = () => {
-		if (this.getReceiverIDs.length > 2) {
+		if (this.getReceiverIDs().length > 2) {
 			return false
 		}
 
