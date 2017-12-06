@@ -143,6 +143,16 @@ export class Chat extends Observer {
 		ChatLoader.removeLoaded(-1)
 	}
 
+	getBlockedCount = () =>
+		this.getReceiverIDsWithoutSelf().reduce(
+			(acc, val) =>
+				acc + (settings.isBlocked(val) ? 1 : 0)
+			, 0
+		)
+
+	allPartnersBlocked = () =>
+		this.getBlockedCount() === this.getReceiverIDsWithoutSelf().length
+
 	isBlocked = () => {
 		if (this.getReceiverIDs().length > 2) {
 			return false
@@ -452,6 +462,11 @@ export class Chat extends Observer {
 
 		return latestChunk.getReceiverIDs()
 	}
+
+	getReceiverIDsWithoutSelf = () =>
+		this.getReceiverIDs().filter((id) =>
+			id !== sessionService.getUserID()
+		)
 
 	getTitle = () => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())

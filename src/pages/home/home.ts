@@ -43,6 +43,9 @@ const getChatMemoizer = (chatID) => {
 			info.blocked = chat.isBlocked()
 
 			info.partners = latestChunk.getPartners()
+
+			info.allBlocked = chat.allPartnersBlocked()
+
 			info.partnersDisplay = latestChunk.getPartnerDisplay()
 			info.title = latestChunk.getTitle()
 			info.time = latestChunk.getTime()
@@ -149,15 +152,15 @@ export class HomePage {
 			.filter((id, i) => i < this.numberOfChatsToDisplay)
 			.map((chatID) => getChatMemoizer(chatID).getValue())
 			.sort((a, b) => {
-				if(a.blocked && b.blocked) {
+				if(a.allBlocked && b.allBlocked) {
 					return 0
 				}
 
-				if(a.blocked) {
+				if(a.allBlocked) {
 					return 1
 				}
 
-				if(b.blocked) {
+				if(b.allBlocked) {
 					return -1
 				}
 
