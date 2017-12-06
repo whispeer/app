@@ -8,7 +8,7 @@ import * as Bluebird from 'bluebird';
 import h from "../helper/helper";
 
 import Memoizer from "../../lib/asset/memoizer"
-
+import { isBusinessVersion } from "../../lib/services/location.manager"
 import CompanyLoader, { getOwnCompanyID } from "../../lib/services/companyService"
 
 const CONTACTS_VIEW = "contacts"
@@ -85,6 +85,10 @@ export class ContactsWithSearch {
 	});
 
 	private loadColleagues = () => {
+		if (!isBusinessVersion()) {
+			return Bluebird.resolve()
+		}
+
 		return getOwnCompanyID()
 			.then((companyID) => CompanyLoader.get(companyID))
 			.then((company) => {
