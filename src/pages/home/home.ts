@@ -149,6 +149,10 @@ export class HomePage {
 			.filter((id, i) => i < this.numberOfChatsToDisplay)
 			.map((chatID) => getChatMemoizer(chatID).getValue())
 			.sort((a, b) => {
+				if(a.blocked && b.blocked) {
+					return 0
+				}
+
 				if(a.blocked) {
 					return 1
 				}
