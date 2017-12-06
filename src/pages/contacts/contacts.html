@@ -17,7 +17,7 @@
 		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
-	<ion-toolbar padding color="light" *ngIf="business && !contactsLoading">
+	<ion-toolbar padding color="light" *ngIf="business && !contactsLoading && !searchTerm">
 		<ion-segment [(ngModel)]="view" color="grey">
 			<ion-segment-button value="contacts">
 				{{ 'contacts.contacts' | translate }}

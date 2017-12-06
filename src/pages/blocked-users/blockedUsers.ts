@@ -16,11 +16,11 @@ import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
 	selector: 'blocked-users',
 	templateUrl: 'blockedUsers.html'
 })
-export class BlockedUsersPage extends ContactsWithSearch {
+export class BlockedUsersPage {
+	contacts: any[] = []
+	contactsLoading: boolean = true
 
-	constructor(private navCtrl: NavController, translate: TranslateService) {
-		super(translate)
-	}
+	constructor(private navCtrl: NavController, translate: TranslateService) {}
 
 	load() {
 		if (settings.getBlockedUsers().length === 0) {

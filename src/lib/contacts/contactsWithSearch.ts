@@ -2,13 +2,14 @@ import { TranslateService } from '@ngx-translate/core'
 
 const contactsService = require("../../lib/services/friendsService");
 const userService = require("../../lib/users/userService").default;
-import errorService from "../../lib/services/error.service";
 
 import * as Bluebird from 'bluebird';
 
 import h from "../helper/helper";
 
 import Memoizer from "../../lib/asset/memoizer"
+
+import CompanyLoader, { getOwnCompanyID } from "../../lib/services/companyService"
 
 const CONTACTS_VIEW = "contacts"
 
@@ -46,7 +47,9 @@ export class ContactsWithSearch {
 				return view === CONTACTS_VIEW ? contacts : colleagues
 			}
 
-			return contacts.concat(colleagues).filter((contact) =>
+			const colleaguesWithoutFriends = colleagues.filter((record) => !this.isFriend(record))
+
+			return contacts.concat(colleaguesWithoutFriends).filter((contact) =>
 				contact.names.searchName.indexOf(searchTerm.toLowerCase()) > -1
 			).concat(searchResults)
 		})
@@ -82,17 +85,21 @@ export class ContactsWithSearch {
 	});
 
 	private loadColleagues = () => {
-		var colleagues = contactsService.getFriends();
+		return getOwnCompanyID()
+			.then((companyID) => CompanyLoader.get(companyID))
+			.then((company) => {
+				const colleagues = company.getUserIDs();
 
-		if (h.arrayEqual(this.loadedColleagueIDs, colleagues)) {
-			return Bluebird.resolve()
-		}
+				if (h.arrayEqual(this.loadedColleagueIDs, colleagues)) {
+					return Bluebird.resolve()
+				}
 
-		this.loadedColleagueIDs = colleagues.slice()
+				this.loadedColleagueIDs = colleagues.slice()
 
-		return userService.getMultipleFormatted(colleagues)
-			.then(ContactsWithSearch.sort)
-			.then((result: any[]) => this.colleagues = result)
+				return userService.getMultipleFormatted(colleagues)
+					.then(ContactsWithSearch.sort)
+					.then((result: any[]) => this.colleagues = result)
+			})
 	}
 
 	private loadContacts = () => {
@@ -109,36 +116,56 @@ export class ContactsWithSearch {
 			.then((result: any[]) => this.contacts = result)
 	}
 
-	contactDividers = (record, recordIndex, records) => {
-		const firstChar: string = record.name[0];
+	private isFriend = (record) => record.isMyFriend
 
-		if(recordIndex === 0) {
-			if (this.searchTerm) {
-				if (record.isMyFriend) {
-					return this.translate.instant("chooseFriends.contacts")
-				} else {
-					return this.translate.instant("chooseFriends.global")
-				}
-			}
+	private isColleague = (record) => this.colleagues.indexOf(record) > -1
 
-			return firstChar.toUpperCase();
+	private getType = (record) => {
+		if (this.isFriend(record)) {
+			return "contacts"
 		}
 
-		const previousEntry = records[recordIndex - 1];
+		if (this.isColleague(record)) {
+			return "colleagues"
+		}
+
+		return "global"
+	}
+
+	private typeDiffers = (record, previous) => {
+		if (!previous) {
+			return true
+		}
+
+		return this.getType(record) !== this.getType(previous)
+	}
+
+	private getSearchDividers = (record, previousRecord) => {
+		if (this.typeDiffers(record, previousRecord)) {
+			return this.translate.instant(`chooseFriends.${this.getType(record)}`)
+		}
+
+		return null
+	}
+
+	private firstCharDiffers = (record, previousRecord) => {
+		if (!previousRecord) {
+			return true
+		}
+
+		return record.name[0].toLowerCase() !== previousRecord.name[0].toLowerCase()
+	}
+
+	contactDividers = (record, recordIndex, records) => {
+		const previousRecord = records[recordIndex - 1];
 
 		if (this.searchTerm) {
-			if (previousEntry.isMyFriend && !record.isMyFriend) {
-				return this.translate.instant("chooseFriends.global")
-			}
-
-			return null;
+			return this.getSearchDividers(record, previousRecord)
 		}
 
-		if(firstChar.toLowerCase() !== previousEntry.name[0].toLowerCase()) {
-			return firstChar.toUpperCase();
+		if(this.firstCharDiffers(record, previousRecord)) {
+			return record.name[0].toUpperCase();
 		}
-
-		console.log('return null')
 
 		return null;
 	}
@@ -147,29 +174,15 @@ export class ContactsWithSearch {
 		this.searchResultsLoading = true;
 
 		const query = this.searchTerm;
-		const contacts = contactsService.getFriends();
 
-		userService.query(query).bind(this).filter((user) => {
-			return contacts.indexOf(user.getID()) === -1;
-		}).map(function (user) {
-			if (this.searchTerm !== query) {
-				return;
-			}
-
-			return user.loadBasicData().thenReturn(user);
-		}).then(function (users) {
-			if (this.searchTerm !== query) {
-				return;
-			}
-
-			return users.map(function (user) {
-				user.loadBasicData().catch(errorService.criticalError);
-				return user.data;
+		userService.query(query).bind(this)
+			.filter((user) => !this.isFriend(user.data) && !this.isColleague(user.data))
+			.map((user) => this.searchTerm !== query ? [] : user.loadBasicData().thenReturn(user))
+			.then((users) => this.searchTerm !== query ? [] : users.map((user) => user.data))
+			.then((userData = []) => {
+				this.searchResults = userData
+				this.searchResultsLoading = false
 			});
-		}).then((userData) => {
-			this.searchResults = userData || [];
-			this.searchResultsLoading = false;
-		});
 	}, 100)
 
 	getUsers = () : any[] => this.memoizer.getValue()
