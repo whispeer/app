@@ -1,11 +1,11 @@
-<div *ngIf="message.isBlocked()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
+<div *ngIf="message.isBlockedSince()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
 	<div class="messages__message messages__message-blocked">
 		<span>{{ 'blocked.messageReplacement' | translate }}</span>
 	</div>
 	<span class="messages__time"></span>
 </div>
 
-<ng-container *ngIf="!message.isBlocked()">
+<ng-container *ngIf="!message.isBlockedSince()">
 
 	<div *ngIf="message.hasText() || message.hasImages()" attr.data-messageid="{{message.data.id}}" class="messages__wrap">
 		<div class="messages__message last" [ngClass]="{'messages__message--emoji-only': message.data.emojiOnly, 'sending': !message.hasBeenSent()}">
