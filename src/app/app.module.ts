@@ -64,8 +64,6 @@ import "../lib/services/settings.service"
 
 import * as Raven from "raven-js"
 
-const SENTRY_KEY = "https://5efbdc23f6a749f79b9efb0231bcbb50@errors.whispeer.de/6"
-
 Raven.config(SENTRY_KEY, {
 	release: CLIENT_INFO.version,
 	autoBreadcrumbs: false,

@@ -5,4 +5,5 @@ declare var CLIENT_INFO: {
 };
 
 declare var WHISPEER_ENV: string;
+declare var SENTRY_KEY: string;
 declare var WHISPEER_BUSINESS: string;
