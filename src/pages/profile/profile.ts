@@ -320,7 +320,7 @@ export class ProfilePage {
 	}
 
 	removeBlockedUser = () => {
-		if(this.isRequest) {
+		if(this.isRequest || this.isRequestable) {
 			return
 		}
 
