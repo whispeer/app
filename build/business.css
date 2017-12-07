@@ -61509,6 +61509,28 @@ page-messages .burst-seperator .burst-seperator-text:after {
   margin-left: 5px;
 }
 
+page-messages .messages__burst .label {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+page-messages .burst--first message {
+  margin-top: 11px;
+}
+
+page-messages .burst--last message {
+  margin-bottom: 11px;
+}
+
+page-messages .burst--middle .label {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+page-messages .item-block {
+  min-height: auto;
+}
+
 .md .messages__header-image {
   position: absolute;
   top: 50%;
@@ -61747,7 +61769,7 @@ page-messages .burst-seperator .burst-seperator-text:after {
   color: #545b5e;
 }
 
-message:last-of-type .messages__message.last:before {
+.burst--last .messages__message.last:before {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -61757,23 +61779,19 @@ message:last-of-type .messages__message.last:before {
   z-index: -1;
 }
 
-.burst--me message:last-of-type .messages__message.last:before {
+.burst--last.burst--me .messages__message.last:before {
   right: -7px;
   border-right: 20px solid #788286;
   border-bottom-left-radius: 16px 14px;
 }
 
-.burst--other message:last-of-type .messages__message.last:before {
+.burst--last.burst--other .messages__message.last:before {
   left: -7px;
   border-left: 20px solid #ebeced;
   border-bottom-right-radius: 16px 14px;
 }
 
-.burst--me message:last-of-type .messages__message.last.sending:before {
-  border-color: #d5d8da;
-}
-
-message:last-of-type .messages__message.last:after {
+.burst--last .messages__message.last:after {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -61785,14 +61803,18 @@ message:last-of-type .messages__message.last:after {
   z-index: -1;
 }
 
-.burst--me message:last-of-type .messages__message.last:after {
+.burst--last.burst--me .messages__message.last:after {
   right: -56px;
   border-bottom-left-radius: 10px;
 }
 
-.burst--other message:last-of-type .messages__message.last:after {
+.burst--last.burst--other .messages__message.last:after {
   left: 4px;
   border-bottom-right-radius: 10px;
+}
+
+.burst--last.burst--me .messages__message.last.sending:before {
+  border-color: #d5d8da;
 }
 
 .burst--me a {
