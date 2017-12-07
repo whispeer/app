@@ -95,8 +95,7 @@
 		"feedback": "Geben Sie uns Feedback",
 		"logout": {
 			"button": "Abmelden",
-			"title": "Jetzt Abmelden?",
-			"warning": "Sind Sie sicher, dass Sie sich auf diesem Gerät abmelden möchten?",
+			"title": "Sind Sie sicher, dass Sie sich auf diesem Gerät abmelden möchten?",
 			"logout": "Abmelden",
 			"cancel": "Abbrechen"
 		},

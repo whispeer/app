@@ -115,7 +115,7 @@ export class SettingsPage {
 
 	logout() {
 		let logoutConfirm = this.alertCtrl.create({
-			title: this.translate.instant("settings.logout.warning"),
+			title: this.translate.instant("settings.logout.title"),
 			buttons: [
 				{ text: this.translate.instant("settings.logout.cancel"), role: 'cancel' },
 				{ text: this.translate.instant("settings.logout.logout"),

@@ -96,8 +96,7 @@
 		"feedback": "Give us Feedback",
 		"logout": {
 			"button": "Logout",
-			"title": "Log out now?",
-			"warning": "Are you sure you want to log out on this device?",
+			"title": "Are you sure you want to log out on this device?",
 			"logout": "Logout",
 			"cancel": "Cancel"
 		},
@@ -110,7 +109,7 @@
 		"backup": {
 			"button": "Request Backup Key",
 			"title": "Save your Backup Key?",
-			"message": "To save your backup key you will see it now. With this key you can reset your password.<br><br>Therefore please keep it in a really safe place.",
+			"message": "You will now see your backup key to save it. With this key you can reset your password.<br><br>Therefore please keep it in a really safe place.",
 			"save": "Save",
 			"cancel": "Cancel"
 		}
