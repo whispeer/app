@@ -694,7 +694,7 @@ type ChatCache = {
 const loadChatInfo = (ids) =>
 	socketService.definitlyEmit("chat.getMultiple", { ids })
 		.then(({ chats }) =>
-			ids.map((id) => chats.find(({ chat }) => chat.id === id))
+			ids.map((id) => chats.find(({ chat }) => h.parseDecimal(chat.id) === h.parseDecimal(id)))
 		)
 
 const getChatInfo = h.delayMultiplePromise(Bluebird, 50, loadChatInfo, 10)
@@ -702,8 +702,8 @@ const getChatInfo = h.delayMultiplePromise(Bluebird, 50, loadChatInfo, 10)
 export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 	download: (id) => {
 		return getChatInfo(id).then((chatInfo) => {
-			if (chatInfo.chat.id !== id) {
-				throw new Error("fail")
+			if (h.parseDecimal(chatInfo.chat.id) !== h.parseDecimal(id)) {
+				throw new Error(`Chat ID incorrect after loading. Should be ${id} but is ${chatInfo.chat.id}`)
 			}
 			return chatInfo
 		})

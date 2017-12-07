@@ -14,6 +14,8 @@ import { Camera, CameraOptions } from '@ionic-native/camera'
 
 import { TranslateService } from '@ngx-translate/core'
 
+import { AndroidPermissions } from '@ionic-native/android-permissions'
+
 import ImageUpload from "../../lib/services/imageUpload.service"
 import FileUpload from "../../lib/services/fileUpload.service"
 import errorService from "../../lib/services/error.service";
@@ -21,13 +23,13 @@ import { replaceView } from "../../lib/angularUtils"
 
 import messageService from "../../lib/messages/messageService";
 import ChatLoader, { Chat } from "../../lib/messages/chat"
-import MessageLoader from "../../lib/messages/message"
+import MessageLoader, { Message } from "../../lib/messages/message"
+import { sameBurst } from "../../lib/messages/burstHelper"
 
 import h from "../../lib/helper/helper"
 import VoicemailPlayer, { audioInfo, recordingType } from "../../lib/asset/voicemailPlayer"
 
 import { unpath } from "../../lib/services/blobService"
-import Burst from "../../lib/messages/burst"
 import featureToggles from "../../lib/services/featureToggles"
 
 import { isBusinessVersion } from "../../lib/services/location.manager";
@@ -75,86 +77,6 @@ const inView = require("in-view");
 
 const initService = require("../../lib/services/initService");
 
-namespace BurstHelper {
-	export const getNewElements = (messagesAndUpdates, bursts) => {
-		return messagesAndUpdates.filter((message) => {
-			return bursts.reduce((prev, current) => {
-				return prev && !current.hasItem(message);
-			}, true);
-		});
-	}
-
-	export const calculateBursts = (messages: any[]) => {
-		var bursts = [new Burst()];
-		var currentBurst = bursts[0];
-
-		messages.sort((m1, m2) => {
-			return m2.getTime() - m1.getTime();
-		});
-
-		messages.forEach((messageOrUpdate) => {
-			if(!currentBurst.fitsItem(messageOrUpdate)) {
-				currentBurst = new Burst();
-				bursts.push(currentBurst);
-			}
-			currentBurst.addItem(messageOrUpdate);
-		});
-
-		return bursts;
-	}
-
-	const hasMatchingMessage = (oldBurst, newBurst) => {
-		var matchingMessages = newBurst.getItems().filter((message) => {
-			return oldBurst.hasItem(message);
-		});
-
-		return matchingMessages.length > 0;
-	}
-
-	const addBurst = (bursts, burst) => {
-		bursts.push(burst);
-
-		return true;
-	}
-
-	const mergeBurst = (oldBurst, newBurst) => {
-		var newMessages = newBurst.getItems().filter((message) => {
-			return !oldBurst.hasItem(message);
-		});
-
-		newMessages.forEach((message) => {
-			oldBurst.addItem(message);
-		});
-
-		return true;
-	}
-
-	const addBurstOrMerge = (bursts, burst) => {
-		var possibleMatches = bursts.filter((oldBurst) => {
-			return hasMatchingMessage(oldBurst, burst);
-		});
-
-		if (possibleMatches.length === 0) {
-			return addBurst(bursts, burst);
-		}
-
-		if (possibleMatches.length === 1) {
-			return mergeBurst(possibleMatches[0], burst);
-		}
-
-		if (possibleMatches.length > 1) {
-			errorService.criticalError(new Error("Burst merging possible matches > 1 wtf..."));
-			return false;
-		}
-	}
-
-	export const mergeBursts = (bursts, newBursts) => {
-		return newBursts.reduce((prev, burst) => {
-			return prev && addBurstOrMerge(bursts, burst);
-		}, true);
-	}
-}
-
 @IonicPage({
 	name: "Messages",
 	segment: "messages/:chatID",
@@ -165,15 +87,14 @@ namespace BurstHelper {
 	templateUrl: 'messages.html'
 })
 export class MessagesPage {
-	chatID: number;
-	chat: Chat;
+	private chatID: number;
+	private chat: Chat;
 
-	messagesLoading: boolean = true;
+	private messagesLoading: boolean = true;
 
-	burstTopic: number = 0;
-	lastMessageElement: any;
+	private lastMessageElement: any;
 
-	messages: any[];
+	private messages: any[];
 
 	constructor(
 		public navCtrl: NavController,
@@ -185,7 +106,8 @@ export class MessagesPage {
 		private media: Media,
 		private alertController: AlertController,
 		public navParams: NavParams,
-		private element: ElementRef
+		private element: ElementRef,
+		private androidPermissions: AndroidPermissions
 	) {
 		this.cameraOptions = {
 			quality: 50,
@@ -255,8 +177,6 @@ export class MessagesPage {
 	cameraOptions: CameraOptions
 
 	mutationObserver: MutationObserver
-
-	bursts: Burst[]
 
 	private recordingInfo = {
 		UUID: "",
@@ -359,6 +279,8 @@ export class MessagesPage {
 			// TODO
 		})
 	}
+
+	sameBurst = (m1: Message, m2: Message) => sameBurst(m1, m2)
 
 	sendMessageToChat = () => {
 		if (this.isRecordingUIVisible()) {
@@ -468,22 +390,33 @@ export class MessagesPage {
 			return
 		}
 
-		this.recordingInfo.UUID = uuidv4()
+		this.androidPermissions.requestPermissions([
+			this.androidPermissions.PERMISSION.RECORD_AUDIO,
+			this.androidPermissions.PERMISSION.WRITE_EXTERNAL_STORAGE,
+		]).then(({ hasPermission }) => {
+			if (!hasPermission) {
+				return
+			}
 
-		this.recordingFile = this.media.create(this.getRecordingFileName())
+			RecordingStateMachine.go(RecordingStates.Recording)
 
-		this.recordingInfo.startTime = Date.now()
-		this.recordingFile.startRecord()
+			this.recordingInfo.UUID = uuidv4()
 
-		clearInterval(this.recordingInfo.updateInterval)
-		this.recordingInfo.updateInterval = window.setInterval(() => {
-			this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
-		}, 100)
+			this.recordingFile = this.media.create(this.getRecordingFileName())
 
-		if (VoicemailPlayer.activePlayer) {
-			VoicemailPlayer.activePlayer.pause()
-		}
-		VoicemailPlayer.setPlaybackBlocked(true)
+			this.recordingInfo.startTime = Date.now()
+			this.recordingFile.startRecord()
+
+			clearInterval(this.recordingInfo.updateInterval)
+			this.recordingInfo.updateInterval = window.setInterval(() => {
+				this.recordingInfo.duration = (Date.now() - this.recordingInfo.startTime) / 1000
+			}, 100)
+
+			if (VoicemailPlayer.activePlayer) {
+				VoicemailPlayer.activePlayer.pause()
+			}
+			VoicemailPlayer.setPlaybackBlocked(true)
+		})
 	}
 
 	formatTime = (seconds) => {
@@ -535,7 +468,6 @@ export class MessagesPage {
 				VoicemailPlayer.setPlaybackBlocked(false)
 			})
 		} else {
-			RecordingStateMachine.go(RecordingStates.Recording)
 			return this.startRecording()
 		}
 	}
@@ -718,66 +650,15 @@ export class MessagesPage {
 		}
 	}
 
-	afterViewBurstMessages() {
-		const id = this.getFirstInViewMessageId()
+	isPreviousMissing(message: Message) {
+		const messages = this.getMessages()
 
-		if (!id) {
-			return { changed: false, bursts: [] }
-		}
-
-		const { changed, bursts } = this.messageBurstsFunction({
-			after: id
-		})
-
-		return { changed, bursts }
-	}
-
-	allBurstMessages() {
-		const { bursts } = this.messageBurstsFunction()
-
-		return bursts
-	}
-
-	messageBursts = () => {
-		const { changed, bursts } = this.afterViewBurstMessages()
-
-		if (changed) {
-			const scrollFromBottom = this.scrollFromBottom()
-
-			if (scrollFromBottom > 15) {
-				this.bursts = bursts
-				return bursts
-			}
-		}
-
-		this.firstRender = false
-
-		this.bursts = this.allBurstMessages()
-
-		return this.bursts
-	}
-
-	messageBurstsFunction = (options?) => {
-		var burstInfo = this.getBursts(options);
-
-		burstInfo.bursts.sort((b1, b2) => {
-			return b1.firstItem().getTime() - b2.firstItem().getTime();
-		});
-
-		return burstInfo;
-	}
-
-	isPreviousMissing(burst: Burst) {
-		const message = burst.getItems()[0]
-
-		if (this.bursts[0] === burst || !message.getPreviousID()) {
+		if (messages[0] === message || !message.getPreviousID()) {
 			return false
 		}
 
-		return this.bursts.findIndex((burst) =>
-			burst.getItems().findIndex((m) =>
-				m.getClientID() === message.getPreviousID()
-			) > -1
+		return messages.findIndex((m) =>
+			m.getClientID() === message.getPreviousID()
 		) === -1
 	}
 
@@ -873,50 +754,39 @@ export class MessagesPage {
 		return this.chat.getPartners()
 	}
 
-	private getBursts = (options) => {
-		if (!this.chat || this.chat.getMessages().length === 0) {
-			return { changed: false, bursts: [] };
+	getMessages = () => {
+		if (!this.chat) {
+			return this.messages = []
 		}
 
-		const messages = this.chat.getMessages()
+		return this.messages = this.chat.getMessages()
 			.map(({ id }) => MessageLoader.getLoaded(id))
+	}
 
-		if (this.burstTopic !== this.chat.getID()) {
-			this.bursts = BurstHelper.calculateBursts(messages);
-			this.burstTopic = this.chat.getID();
+	getBurstClass = (message, $index) => {
+		const previousMessageSameBurst = sameBurst(message, this.messages[$index - 1])
+		const nextMessageSameBurst = sameBurst(message, this.messages[$index + 1])
 
-			return { changed: true, bursts: this.bursts };
+		if (previousMessageSameBurst && nextMessageSameBurst) {
+			return "burst--middle"
 		}
 
-		var newElements = BurstHelper.getNewElements(messages, this.bursts);
-
-		if (options) {
-			const firstViewMessage = messages.find((elem) => {
-				return options.after == elem.getClientID().toString()
-			})
-
-			const index = messages.indexOf(firstViewMessage)
-
-			newElements = newElements.filter((element) => {
-				return messages.indexOf(element) > index
-			})
+		if (previousMessageSameBurst) {
+			return "burst--last"
 		}
 
-		if (newElements.length === 0) {
-			return { changed: false, bursts: this.bursts };
+		if (nextMessageSameBurst) {
+			return "burst--first"
 		}
 
-		this.bursts.forEach((burst) =>
-			burst.removeAllExceptLast()
-		)
+		return "burst--last burst--first"
+	}
 
-		var newBursts = BurstHelper.calculateBursts(messages);
-		if (!BurstHelper.mergeBursts(this.bursts, newBursts)) {
-			console.warn("Rerender all bursts!");
-			this.bursts = newBursts;
-		}
+	getMessageItemClass = (message, $index) => {
+		const meOrOther = message.isOwn() ? "burst--me" : "burst--other"
+		const burstClass = this.getBurstClass(message, $index)
 
-		return { changed: true, bursts: this.bursts };
+		return [meOrOther, burstClass]
 	}
 
 	ngAfterViewChecked() {

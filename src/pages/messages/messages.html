@@ -32,13 +32,16 @@
 		<ion-spinner *ngIf="messagesLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
 		<div class="messages_filler"></div>
 		<ion-list no-lines>
-			<ion-item class="messages__burst" *ngIf="messageBursts() && bursts.length === 0">
-				<BurstDifference [chat]="chat" [burst]="bursts[0]"></BurstDifference>
+			<ion-item class="messages__burst" *ngIf="getMessages().length === 0">
+				<BurstDifference [chat]="chat"></BurstDifference>
 			</ion-item>
-			<ion-item class="messages__burst" *ngFor="let burst of bursts; let $index=index; let $last=last" [ngClass]="{'burst--me': burst.isMe(), 'burst--other': burst.isOther()}">
-				<BurstDifference [chat]="chat" [burst]="burst" [previousBurst]="bursts[$index - 1]"></BurstDifference>
+			<ion-item
+				class="messages__burst" *ngFor="let message of getMessages(); let $index=index; let $last=last"
+				[ngClass]="getMessageItemClass(message, $index)"
+			>
+				<BurstDifference [chat]="chat" [message]="message" [previousMessage]="this.messages[$index - 1]" *ngIf="!sameBurst(message, this.messages[$index - 1])"></BurstDifference>
 
-				<div *ngIf="isPreviousMissing(burst)" style="
+				<div *ngIf="isPreviousMissing(message)" style="
 					display: flex;
 					justify-content: center;
 					align-items: center;
@@ -46,15 +49,13 @@
 					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>
 				</div>
 
-				<span>
-					<div *ngIf="burst.isOther() && getPartners().length > 1">
-						<span *ngIf="!burst.firstItem().data.sender.user.isBlocked(); else blockedUser">{{burst.firstItem().data.sender.name}}</span>
-						<ng-template #blockedUser>{{ 'blocked.userReplacement' | translate }}</ng-template>
-					</div>
-					<Message [message]="message" *ngFor="let message of burst.items"></Message>
-				</span>
+				<div *ngIf="!message.isOwn() && getPartners().length > 1 && !sameBurst(message, this.messages[$index - 1])">
+					<span *ngIf="!burst.firstItem().data.sender.user.isBlocked(); else blockedUser">{{message.data.sender.name}}</span>
+					<ng-template #blockedUser>{{ 'blocked.userReplacement' | translate }}</ng-template>
+				</div>
+				<Message [message]="message"></Message>
 
-				<BurstDifference [chat]="chat" [previousBurst]="burst" [noDates]="true" *ngIf="$last"></BurstDifference>
+				<BurstDifference [chat]="chat" [previousMessage]="message" [noDates]="true" *ngIf="$last"></BurstDifference>
 			</ion-item>
 		</ion-list>
 	</div>

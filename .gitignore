@@ -36,3 +36,5 @@ UserInterfaceState.xcuserstate
 .io-config.json
 config.xml.bak
 .sourcemaps
+
+release/sourcemaps

@@ -389,3 +389,7 @@ ion-fab-list[side="top"] {
 	height: calc(44px + 20px);
 	min-height: calc(44px + 20px);
 }
+
+.navigator--hexagon--border {
+	stroke: map-get($colors, primary);
+}

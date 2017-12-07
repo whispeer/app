@@ -51,6 +51,7 @@ import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { Media } from '@ionic-native/media';
 import { Keyboard } from '@ionic-native/keyboard';
+import { AndroidPermissions } from '@ionic-native/android-permissions'
 
 import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -60,6 +61,23 @@ import { isBusinessVersion } from "../lib/services/location.manager";
 
 import "../lib/services/featureToggles"
 import "../lib/services/settings.service"
+
+import * as Raven from "raven-js"
+
+Raven.config(SENTRY_KEY, {
+	release: CLIENT_INFO.version,
+	autoBreadcrumbs: false,
+	tags: {
+		git_commit: CLIENT_INFO.commit
+	},
+	environment: `${IONIC_ENV}-${WHISPEER_ENV}`
+}).install();
+
+export class RavenErrorHandler implements ErrorHandler {
+	handleError(err:any) : void {
+		Raven.captureException(err);
+	}
+}
 
 (window as any).startup = new Date().getTime();
 
@@ -96,7 +114,8 @@ const DEFAULT_LANG = "de"
 		MyApp,
 	],
 	providers: [
-		{provide: ErrorHandler, useClass: IonicErrorHandler},
+		{ provide: ErrorHandler, useClass: IonicErrorHandler },
+		{ provide: ErrorHandler, useClass: RavenErrorHandler },
 		DatePipe,
 		BarcodeScanner,
 		SplashScreen,
@@ -110,6 +129,7 @@ const DEFAULT_LANG = "de"
 		InAppBrowser,
 		Media,
 		Keyboard,
+		AndroidPermissions,
 	]
 })
 export class AppModule {
@@ -207,6 +227,8 @@ export class AppModule {
 				cancellation: false,
 				monitoring: false
 			})
+		} else {
+			console.warn("Not in production - not disabling longStackTraces")
 		}
 
 		Bluebird.setScheduler((fn) => {

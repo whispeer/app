@@ -1,19 +1,16 @@
 console.warn(`Whispeer startup at ${Date.now()}`)
 console.time("Spinner on Home")
 
-var errorService = require("./error.service").errorServiceInstance;
-var keyStore = require("crypto/keyStore");
-var socketService = require("services/socket.service").default;
-var CacheService = require("./Cache").default;
+const errorService = require("./error.service").errorServiceInstance;
+const keyStore = require("crypto/keyStore");
 
-var debug = require("debug");
-var Observer = require("asset/observer");
-var Bluebird = require("bluebird");
+const debug = require("debug");
+const Observer = require("asset/observer");
+const Bluebird = require("bluebird");
 
-var sessionService = require("services/session.service").default;
+const sessionService = require("services/session.service").default;
 
-var debugName = "whispeer:initService";
-var initServiceDebug = debug(debugName);
+const debugName = "whispeer:initService";
 
 function time(name) {
 	if (debug.enabled(debugName)) {
@@ -60,13 +57,6 @@ initService = {
 	*/
 	awaitLoading: function () {
 		return loadingPromise
-	},
-	get: function (domain, cb, options) {
-		initRequestsList.push({
-			domain: domain,
-			callback: cb,
-			options: options || {}
-		});
 	},
 	registerCallback: function (cb) {
 		initCallbacks.push(cb);

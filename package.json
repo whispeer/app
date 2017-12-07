@@ -2,7 +2,6 @@
   "author": "mindpost GmbH",
   "config": {
     "ionic_copy": "./config/copy.config.js",
-    "ionic_optimization": "./config/optimization.config.js",
     "ionic_sass": "./config/sass.config.js",
     "ionic_watch": "./config/watch.config.js",
     "ionic_webpack": "./config/webpack.config.js"
@@ -19,6 +18,7 @@
       },
       "com-sarriaroman-photoviewer": {},
       "cordova-filechooser": {},
+      "cordova-plugin-android-permissions": {},
       "cordova-plugin-camera": {
         "CAMERA_USAGE_DESCRIPTION": "whispeer needs access to your Camera to allow you to take Photos directly from the app.",
         "PHOTOLIBRARY_USAGE_DESCRIPTION": "whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts."
@@ -56,6 +56,7 @@
     "@angular/http": "5.0.0",
     "@angular/platform-browser": "5.0.0",
     "@angular/platform-browser-dynamic": "5.0.0",
+    "@ionic-native/android-permissions": "^4.4.2",
     "@ionic-native/barcode-scanner": "3.6.1",
     "@ionic-native/camera": "3.6.1",
     "@ionic-native/core": "3.6.1",
@@ -87,6 +88,7 @@
     "cordova-android": "~6.3.0",
     "cordova-filechooser": "https://github.com/whispeer/cordova-filechooser.git#feature/full_path",
     "cordova-ios": "^4.5.2",
+    "cordova-plugin-android-permissions": "^1.0.0",
     "cordova-plugin-camera": "https://github.com/whispeer/cordova-plugin-camera.git#fix/tmp-image-reuse",
     "cordova-plugin-compat": "~1.1.0",
     "cordova-plugin-device": "~1.1.4",
@@ -113,6 +115,7 @@
     "phonegap-plugin-barcodescanner": "~6.0.6",
     "phonegap-plugin-push": "^2.1.0",
     "qrious": "^4.0.2",
+    "raven-js": "^3.20.1",
     "rxjs": "5.5.2",
     "sjcl": "git+https://github.com/whispeer/sjcl.git#custom-build",
     "socket.io-client": "~2.0.2",

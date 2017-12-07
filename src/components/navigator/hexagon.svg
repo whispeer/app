@@ -8,6 +8,6 @@
     <g transform="scale(1.02)">
       <use fill="#FFF" fill-opacity="0.95" xlink:href="#green-c"/>
     </g>
-    <path stroke="#5AB70D" stroke-width="4" d="M36.5,2.30940108 L2,22.2279854 L2,62.0651539 L36.5,81.9837382 L71,62.0651539 L71,22.2279854 L36.5,2.30940108 Z"/>
+    <path class="navigator--hexagon--border" stroke-width="4" d="M36.5,2.30940108 L2,22.2279854 L2,62.0651539 L36.5,81.9837382 L71,62.0651539 L71,22.2279854 L36.5,2.30940108 Z"/>
   </g>
 </svg>
