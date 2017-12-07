@@ -28,25 +28,7 @@
 				<user-image [id]="contact.id" [image]="contact.basic.image"></user-image>
 			</ion-avatar>
 			<h2>
-				<span *ngIf="!contact.user.isBlocked(); else blockedUser">
-					<strong *ngIf="contact.names.firstname">
-						{{contact.names.firstname}}
-					</strong>
-					<span *ngIf="contact.names.firstname && contact.names.lastname">
-						{{contact.names.lastname}}
-					</span>
-					<strong
-						*ngIf="!contact.names.firstname && contact.names.lastname">
-						{{contact.names.lastname}}
-					</strong>
-					<strong
-						*ngIf="!contact.names.firstname && !contact.names.lastname">
-						{{contact.name}}
-					</strong>
-				</span>
-				<ng-template #blockedUser>
-					{{'blocked.userReplacement' | translate}} ({{contact.names.nickname}})
-				</ng-template>
+				<username [user]="contact"></username>
 			</h2>
 		</ion-item>
 	</ion-list>
