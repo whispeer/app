@@ -25,6 +25,14 @@ module.exports = [
     ]
   },
   {
+    "id": "cordova-plugin-android-permissions.Permissions",
+    "file": "plugins/cordova-plugin-android-permissions/www/permissions-dummy.js",
+    "pluginId": "cordova-plugin-android-permissions",
+    "clobbers": [
+      "cordova.plugins.permissions"
+    ]
+  },
+  {
     "id": "cordova-plugin-camera.Camera",
     "file": "plugins/cordova-plugin-camera/www/CameraConstants.js",
     "pluginId": "cordova-plugin-camera",
@@ -350,6 +358,7 @@ module.exports.metadata =
   "ImagePicker": "2.1.8",
   "com-sarriaroman-photoviewer": "1.1.11",
   "cordova-filechooser": "1.0.1",
+  "cordova-plugin-android-permissions": "1.0.0",
   "cordova-plugin-compat": "1.2.0",
   "cordova-plugin-camera": "2.3.1",
   "cordova-plugin-device": "1.1.7",
@@ -365,7 +374,7 @@ module.exports.metadata =
   "cordova-plugin-whitelist": "1.3.3",
   "ionic-plugin-keyboard": "2.2.1",
   "phonegap-plugin-barcodescanner": "6.0.8",
-  "phonegap-plugin-push": "2.1.0"
+  "phonegap-plugin-push": "2.1.2"
 };
 // BOTTOM OF METADATA
 });
