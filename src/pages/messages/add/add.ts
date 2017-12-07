@@ -57,13 +57,7 @@ export class AddPage extends ContactsWithSearch {
 	}
 
 	ngOnInit() {
-		contactsService.awaitLoading().then(() => {
-			contactsService.listen(this.loadContactsUsers);
-
-			this.loadContactsUsers().then(() => {
-				this.contactsLoading = false
-			});
-		});
+		this.init()
 
 		const chatID = parseInt(this.navParams.get("chatID"), 10);
 

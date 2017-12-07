@@ -1,10 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, IonicPage, Searchbar } from 'ionic-angular';
 
-const contactsService = require("../../lib/services/friendsService");
-
 import { ContactsWithSearch } from '../../lib/contacts/contactsWithSearch'
 import { TranslateService } from '@ngx-translate/core';
+
+import { isBusinessVersion } from "../../lib/services/location.manager"
 
 @IonicPage({
 	name: "Contacts",
@@ -18,10 +18,14 @@ export class ContactsPage extends ContactsWithSearch {
 
 	@ViewChild(Searchbar) searchBar: Searchbar;
 
-	requests: any[] = [];
+	business = isBusinessVersion()
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, public translate: TranslateService) {
 		super(translate)
+	}
+
+	getContacts = () => {
+		return this.getUsers()
 	}
 
 	ionViewDidEnter() {
@@ -33,17 +37,7 @@ export class ContactsPage extends ContactsWithSearch {
 	}
 
 	ionViewDidLoad() {
-		contactsService.awaitLoading().then(() => {
-			this.requests = contactsService.getRequests()
-
-			contactsService.listen(() => {
-				this.requests = contactsService.getRequests()
-				this.loadContactsUsers()
-			});
-			return this.loadContactsUsers().then(() => {
-				this.contactsLoading = false;
-			});
-		})
+		this.init()
 	}
 
 	get requestsLabel() {
