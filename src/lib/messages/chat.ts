@@ -143,15 +143,11 @@ export class Chat extends Observer {
 		ChatLoader.removeLoaded(-1)
 	}
 
-	getBlockedCount = () =>
-		this.getReceiverIDsWithoutSelf().reduce(
-			(acc, val) =>
-				acc + (settings.isBlocked(val) ? 1 : 0)
-			, 0
-		)
-
 	allPartnersBlocked = () =>
-		this.getBlockedCount() === this.getReceiverIDsWithoutSelf().length
+		// this is true if we can't find a user that is not blocked
+		!this.getReceiverIDsWithoutSelf().find(
+			(user) => !settings.isBlocked(user)
+		)
 
 	isBlocked = () => {
 		if (this.getReceiverIDs().length > 2) {
