@@ -4,7 +4,8 @@
 		"cancel": "Abbrechen",
 		"ok": "Ok",
 		"accept": "Akzeptieren",
-		"decline": "Ablehnen"
+		"decline": "Ablehnen",
+		"yes": "Ja"
 	},
 	"time": {
 		"today": "Heute",
@@ -46,7 +47,8 @@
 		"searchResultExplain": "Falls Sie die gewünschte Person nicht finden können, versuchen Sie nach deren Nutzernamen zu suchen."
 	},
 	"requests": {
-		"title": "Kontaktanfragen"
+		"title": "Kontaktanfragen",
+		"noRequests": "Du hast keine Kontaktanfragen."
 	},
 	"topic": {
 		"takePhoto": "Foto aufnehmen",
@@ -77,6 +79,7 @@
 		"title": "Kontakte auswählen",
 		"selected": "Ausgewählt",
 		"search": "Suche",
+		"searchFor": "Suche nach \"{{searchTerm}}\"",
 		"contacts": "Kontakte",
 		"global": "Weltweit",
 		"selectedContacts": "Ausgewählte Kontakte",
@@ -106,7 +109,10 @@
 		}
 	},
 	"blocked": {
-		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Sie können sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken."
+		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Sie können sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken.",
+		"title": "Blockiert",
+		"userReplacement": "Blockierter Nutzer",
+		"messageReplacement": "- blockierter Inhalt -"
 	},
 	"profile": {
 		"ownTitle": "Profil",
@@ -149,9 +155,12 @@
 			"acceptedMessage": "{{name}} ist nun Ihr Kontakt.",
 			"requestSentMessage": "Sie haben eine Kontaktanfrage an {{name}} gesendet.",
 			"reportContact": "Diesen Nutzer melden",
+			"reportAndBlockContact": "Diesen Nutzer melden und blockieren",
 			"blocked": {
 				"removeTitle": "Möchten Sie diesen Kontakt behalten?",
-				"removeQuestion": "Sie können diesen Nutzer als Kontakt in Ihrer Kontaktliste behalten. Blockierte Kontakte erscheinen ausgegraut."
+				"removeQuestion": "Sie können diesen Nutzer als Kontakt in Ihrer Kontaktliste behalten. Blockierte Kontakte erscheinen ausgegraut.",
+				"removeCancelButtonText": "Behalten",
+				"removeConfirmButtonText": "Entfernen"
 			},
 			"blockConfirm": {
 				"title": "Diesen Nutzer blockieren?",

@@ -4,7 +4,8 @@
 		"cancel": "Cancel",
 		"ok": "Ok",
 		"accept": "Accept",
-		"decline": "Decline"
+		"decline": "Decline",
+		"yes": "Yes"
 	},
 	"time": {
 		"today": "Today",
@@ -46,14 +47,15 @@
 		"searchResultExplain": "If you cannot find who you are looking for, try searching for their username."
 	},
 	"requests": {
-		"title": "Contact Requests"
+		"title": "Contact Requests",
+		"noRequests": "You have no contact requests."
 	},
 	"topic": {
 		"takePhoto": "Take a Photo",
 		"selectGallery": "Select from Gallery",
 		"selectFile": "Send a File",
 		"fileTooBigTitle": "The size is too damn high!",
-		"fileTooBigDetail": "File uploads are currently limited to {{max_size}}MB.",
+		"fileTooBigDetail": "File uploads for private users are currently limited to {{max_size}}MB.",
 		"changed": "changed the title to",
 		"detail": {
 			"title": "Details",
@@ -62,7 +64,6 @@
 			"admin": "Administrator",
 			"member": "Member",
 			"addMore": "Add more contacts...",
-			"reportTopic": "Report this Chat",
 			"reportTopic": "Report this Chat",
 			"reportConfirm": {
 				"title": "Report this Chat?",
@@ -78,6 +79,7 @@
 		"title": "Select Contacts",
 		"selected": "Selected",
 		"search": "Search",
+		"searchFor": "Search for \"{{searchTerm}}\"",
 		"contacts": "Contacts",
 		"global": "Worldwide",
 		"selectedContacts": "Selected Contacts",
@@ -109,6 +111,7 @@
 	"blocked": {
 		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",
 		"title": "Blocked Users",
+		"userReplacement": "Blocked User",
 		"messageReplacement": "- blocked content -"
 	},
 	"profile": {
@@ -152,6 +155,13 @@
 			"acceptedMessage": "{{name}} is now a Contact.",
 			"requestSentMessage": "You've sent a Contact Request to {{name}}.",
 			"reportContact": "Report this User",
+			"reportAndBlockContact": "Report and block this user",
+			"blocked": {
+				"removeTitle": "Would you like to keep this contact?",
+				"removeQuestion": "You may keep this user as a contact in your contact list. Blocked contacts appear greyed out.",
+				"removeCancelButtonText": "Keep",
+				"removeConfirmButtonText": "Remove"
+			},
 			"blockConfirm": {
 				"title": "Block this User?",
 				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.<br><br>In the Settings is a list of all blocked users.",
