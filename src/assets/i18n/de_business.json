@@ -106,9 +106,7 @@
 		}
 	},
 	"blocked": {
-		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Sie können sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken.",
-		"title": "Blockiert",
-		"messageReplacement": "- blockierter Inhalt -"
+		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Sie können sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken."
 	},
 	"profile": {
 		"ownTitle": "Profil",
@@ -151,9 +149,13 @@
 			"acceptedMessage": "{{name}} ist nun Ihr Kontakt.",
 			"requestSentMessage": "Sie haben eine Kontaktanfrage an {{name}} gesendet.",
 			"reportContact": "Diesen Nutzer melden",
+			"blocked": {
+				"removeTitle": "Möchten Sie diesen Kontakt behalten?",
+				"removeQuestion": "Sie können diesen Nutzer als Kontakt in Ihrer Kontaktliste behalten. Blockierte Kontakte erscheinen ausgegraut."
+			},
 			"blockConfirm": {
 				"title": "Diesen Nutzer blockieren?",
-				"message": "Blockieren schützt Sie vor allem, was dieser Nutzer Ihnen sendet. Sie werden nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.",
+				"message": "Blockieren schützt Sie vor allem, was dieser Nutzer Ihnen sendet. Sie werden nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.<br><br>In den Einstellungen finden Sie eine Liste aller gesperrten Nutzer.",
 				"cancel": "Abbrechen",
 				"confirm": "Blockieren"
 			},
@@ -162,6 +164,12 @@
 				"message": "Bitte bestätigen Sie, dass Sie diesen Nutzer melden möchten. Wir setzen uns dann mit Ihnen in Verbindung.",
 				"cancel": "Abbrechen",
 				"confirm": "Melden"
+			},
+			"reportAndBlockConfirm": {
+				"title": "Diesen Nutzer melden und blockieren?",
+				"message": "Blockieren schützt Sie vor allem, was dieser Nutzer Ihnen sendet. Sie werden nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.<br><br>Bitte bestätigen Sie außerdem, dass Sie diesen Nutzer melden möchten. Wir setzen uns dann mit Ihnen in Verbindung.",
+				"cancel": "Abbrechen",
+				"confirm": "Melden & Blockieren"
 			}
 		},
 		"image": {

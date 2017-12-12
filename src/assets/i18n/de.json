@@ -158,12 +158,13 @@
 			"reportAndBlockContact": "Diesen Nutzer melden und blockieren",
 			"blocked": {
 				"removeTitle": "Möchtest Du diesen Kontakt behalten?",
-				"removeQuestion": "Du kannst diesen Nutzer als Kontakt behalten. Er erscheint dann ausgegraut.",
-				"removeConfirmButtonText": "Nein, entfernen"
+				"removeQuestion": "Du kannst diesen Nutzer als Kontakt in deiner Kontaktliste behalten. Blockierte Kontakte erscheinen ausgegraut.",
+				"removeCancelButtonText": "Behalten",
+				"removeConfirmButtonText": "Entfernen"
 			},
 			"blockConfirm": {
 				"title": "Diesen Nutzer blockieren?",
-				"message": "Blockieren schützt dich vor allem, was dieser Nutzer dir sendet. Du wirst nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.",
+				"message": "Blockieren schützt dich vor allem, was dieser Nutzer dir sendet. Du wirst nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.<br><br>In den Einstellungen findest du eine Liste aller gesperrten Nutzer.",
 				"cancel": "Abbrechen",
 				"confirm": "Blockieren"
 			},
@@ -175,8 +176,9 @@
 			},
 			"reportAndBlockConfirm": {
 				"title": "Diesen Nutzer melden und blockieren?",
+				"message": "Blockieren schützt dich vor allem, was dieser Nutzer dir sendet. Du wirst nicht mehr über dessen Aktivitäten benachrichtigt und der Nutzer erscheint in Auflistungen ausgegraut.<br><br>Bitte bestätige außerdem, dass du diesen Nutzer melden möchtest. Wir setzen uns dann mit dir in Verbindung.",
 				"cancel": "Abbrechen",
-				"confirm": "Melden + Blockieren"
+				"confirm": "Melden & Blockieren"
 			}
 		},
 		"image": {

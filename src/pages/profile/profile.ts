@@ -329,7 +329,7 @@ export class ProfilePage {
 			title: this.translate.instant("profile.contacts.blocked.removeTitle"),
 			message: this.translate.instant("profile.contacts.blocked.removeQuestion", { name: this.user.name }),
 			buttons: [{
-				text: this.translate.instant("general.yes"),
+				text: this.translate.instant("profile.contacts.blocked.removeCancelButtonText"),
 				role: "cancel"
 			}, {
 				text: this.translate.instant("profile.contacts.blocked.removeConfirmButtonText"),

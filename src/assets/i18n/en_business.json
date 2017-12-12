@@ -154,7 +154,7 @@
 			"reportContact": "Report this User",
 			"blockConfirm": {
 				"title": "Block this User?",
-				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.",
+				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.<br><br>In the Settings is a list of all blocked users.",
 				"cancel": "Cancel",
 				"confirm": "Block"
 			},
@@ -163,6 +163,12 @@
 				"message": "Please confirm that you want to report this user. We will get in touch with you.",
 				"cancel": "Cancel",
 				"confirm": "Report"
+			},
+			"reportAndBlockConfirm": {
+				"title": "Report and block this user?",
+				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.<br><br>Please confirm that you want to report this user. We will get in touch with you.",
+				"cancel": "Cancel",
+				"confirm": "Report & Block"
 			}
 		},
 		"image": {
