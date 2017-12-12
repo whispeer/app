@@ -17,8 +17,9 @@
 		</ion-list-header>
 
 		<ion-item class="no--padding--right">
-			<ion-input type="text" placeholder="Chat Title" *ngIf="featureEnabled('chat.changeTitle') && amIAdmin()" [(ngModel)]="title"></ion-input>
-			<button ion-button item-end class="full--height" *ngIf="featureEnabled('chat.changeTitle') && amIAdmin()" [disabled]="saving" (click)="setTitle(title)">Change</button>
+			<ion-input type="text" [placeholder]="'topic.detail.chatTitlePlaceholder' | translate" *ngIf="featureEnabled('chat.changeTitle') && amIAdmin()" [(ngModel)]="title"></ion-input>
+			<button ion-button item-end class="full--height" *ngIf="featureEnabled('chat.changeTitle') && amIAdmin()" [disabled]="saving" (click)="setTitle(title)">
+				{{ "topic.detail.changeButtonText" | translate }}</button>
 			<div *ngIf="!featureEnabled('chat.changeTitle') || !amIAdmin()">
 				{{ title }}
 			</div>
@@ -47,11 +48,11 @@
 				</span>
 			</ion-item>
 			<ion-item-options side="left" *ngIf="featureEnabled('chat.promoteReceiver') && !isAdmin(receiver.user) && amIAdmin()">
-				<button ion-button color="primary" [disabled]="saving" (click)="promote(receiver.user)">Promote</button>
+				<button ion-button color="primary" [disabled]="saving" (click)="promote(receiver.user)">{{ "topic.detail.promote" | translate }}</button>
 			</ion-item-options>
 
 			<ion-item-options side="right" *ngIf="featureEnabled('chat.removeReceiver') && !isAdmin(receiver.user) && amIAdmin()">
-				<button ion-button color="danger" [disabled]="saving" (click)="remove(receiver.user)">Remove</button>
+				<button ion-button color="danger" [disabled]="saving" (click)="remove(receiver.user)">{{ "topic.detail.remove" | translate }}</button>
 			</ion-item-options>
 		</ion-item-sliding>
 
