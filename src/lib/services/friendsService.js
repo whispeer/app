@@ -331,12 +331,15 @@ friendsService = {
 
 		return "request";
 	},
-	getRequests: function () {
-		friendsService.ensureIsLoaded("getRequests");
+	getRequestsWithBlocked: function() {
+		friendsService.ensureIsLoaded("getRequests")
 
-		return requests.slice().filter(
+		return requests.slice()
+	},
+	getRequests: function () {
+		return friendsService.getRequestsWithBlocked().filter(
 			(user) => !settingsService.isBlocked(user)
-		);
+		)
 	},
 	getFriends: function () {
 		friendsService.ensureIsLoaded("getFriends");

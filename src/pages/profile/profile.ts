@@ -97,12 +97,15 @@ export class ProfilePage {
 		this.isOwn = true;
 
 		const awaitFriendsService = friendsService.awaitLoading().then(() => {
-			var requests = friendsService.getRequests();
+			// get requests including requests from blocked users
+			// if we only get requests excluding blocked users this user will
+			// show up as a friend, as it's not requestable and not a request.
+			let requests = friendsService.getRequestsWithBlocked()
 			this.isRequest = requests.indexOf(this.userId) > -1
 
 			this.isOwn = this.userId === parseInt(sessionService.userid, 10)
 
-			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn;
+			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn
 		});
 
 		Bluebird.all([
