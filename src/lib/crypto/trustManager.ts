@@ -61,7 +61,7 @@ export class TrustStore {
 
 	getSignature = () => this.signature
 
-	update = ({ nicknames, ids, me, keys } : trustSet) => {
+	update = ({ keys } : trustSet) => {
 		const newKeys = Object.keys(keys)
 			.filter((key) => !this.keys.hasOwnProperty(key))
 

@@ -372,7 +372,7 @@ type CachedSettings = {
 }
 
 class SettingsLoader extends MutableObjectLoader<Settings, CachedSettings>({
-	download: (id, previousInstance: Settings) =>
+	download: (_id, previousInstance: Settings) =>
 		socketService.awaitConnection()
 			.then(() => socketService.definitlyEmit("settings.get", {
 				responseKey: "content",
@@ -398,14 +398,14 @@ class SettingsLoader extends MutableObjectLoader<Settings, CachedSettings>({
 
 		return new Settings(content, meta, server)
 	},
-	shouldUpdate: (event, instance) => {
+	shouldUpdate: (event) => {
 		if (event === UpdateEvent.wake) {
 			return Bluebird.delay(RELOAD_DELAY).thenReturn(true)
 		}
 
 		return Bluebird.resolve(false)
 	},
-	getID: (settingsData) => sessionService.getUserID(),
+	getID: () => sessionService.getUserID(),
 	cacheName: "settings"
 }) {}
 
