@@ -45,7 +45,7 @@
 		"search": "Suche",
 		"searchResultExplain": "Falls Sie die gewünschte Person nicht finden können, versuchen Sie nach deren Nutzernamen zu suchen.",
 		"contacts": "Kontakte",
-		"company": "Kollegen"
+		"company": "Belegschaft"
 	},
 	"requests": {
 		"title": "Kontaktanfragen"
@@ -87,7 +87,7 @@
 		"selected": "Ausgewählt",
 		"search": "Suche",
 		"contacts": "Kontakte",
-		"colleagues": "Kollegen",
+		"colleagues": "Belegschaft",
 		"global": "Weltweit",
 		"selectedContacts": "Ausgewählte Kontakte",
 		"selectedExplain": "Oben genannte Kontakte werden zur neuen Konversation hinzugefügt. Sie können sie danach noch verwalten und weitere hinzufügen.",
