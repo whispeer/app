@@ -61,14 +61,20 @@
 		"detail": {
 			"title": "Details",
 			"chatTitle": "Conversation Title",
+			"chatTitlePlaceholder": "Title of the Conversation",
+			"changeButtonText": "Change",
 			"allMembers": "All Members",
 			"admin": "Administrator",
 			"member": "Member",
+			"promote": "Promote",
+			"remove": "Remove",
 			"addMore": "Add more contacts...",
-			"reportTopic": "Report this Chat",
+			"reportTopic": "Report this Conversation",
 			"reportConfirm": {
-				"title": "Report this Chat?",
-				"message": "Please confirm that you want to report this chat. We will then get in touch with you."
+				"title": "Report this Conversation?",
+				"message": "Please confirm that you want to report this conversation. We will then get in touch with you.",
+				"cancel": "Cancel",
+				"confirm": "Report"
 			}
 		},
 		"add": {

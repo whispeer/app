@@ -61,14 +61,20 @@
 		"detail": {
 			"title": "Details",
 			"chatTitle": "Konversationstitel",
+			"chatTitlePlaceholder": "Titel der Konversation",
+			"changeButtonText": "Ändern",
 			"allMembers": "Alle Mitglieder",
 			"admin": "Administrator",
 			"member": "Mitglied",
+			"promote": "Befördern",
+			"remove": "Entfernen",
 			"addMore": "Nutzer hinzufügen...",
-			"reportTopic": "Diesen Chat melden",
+			"reportTopic": "Diese Konversation melden",
 			"reportConfirm": {
-				"title": "Diesen Chat melden?",
-				"message": "Bitte bestätigen Sie, dass Sie diesen Chat melden möchten. Wir setzen uns dann mit Ihnen in Verbindung."
+				"title": "Diese Konversation melden?",
+				"message": "Bitte bestätigen Sie, dass Sie diese Konversation melden möchten. Wir setzen uns dann mit Ihnen in Verbindung.",
+				"cancel": "Abbrechen",
+				"confirm": "Melden"
 			}
 		},
 		"add": {
