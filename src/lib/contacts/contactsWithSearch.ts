@@ -130,7 +130,7 @@ export class ContactsWithSearch {
 		}
 
 		if (this.isColleague(record)) {
-			return "colleagues"
+			return "company"
 		}
 
 		return "global"

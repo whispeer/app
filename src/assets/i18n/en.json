@@ -45,7 +45,7 @@
 		"search": "Search",
 		"searchResultExplain": "If you cannot find who you are looking for, try searching for their username.",
 		"contacts": "Contacts",
-		"company": "Colleagues"
+		"company": "Staff"
 	},
 	"requests": {
 		"title": "Contact Requests"
@@ -88,7 +88,7 @@
 		"search": "Search",
 		"searchFor": "Search for \"{{searchTerm}}\"",
 		"contacts": "Contacts",
-		"colleagues": "Colleagues",
+		"company": "Staff",
 		"global": "Worldwide",
 		"selectedContacts": "Selected Contacts",
 		"selectedExplain": "Above contacts will be added to the new conversation. You can later manage all members and add more.",
