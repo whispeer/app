@@ -132,7 +132,7 @@
     "babel-loader": "^7.1.1",
     "babel-preset-env": "^1.5.2",
     "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz",
-    "ionic": "^3.9.2",
+    "ionic": "^3.19.0",
     "mathsass": "^0.9.5",
     "node-sass": "^4.5.2",
     "raw-loader": "^0.5.1",
