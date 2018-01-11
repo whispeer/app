@@ -86,6 +86,7 @@
 		"title": "Select Contacts",
 		"selected": "Selected",
 		"search": "Search",
+		"searchFor": "Search for \"{{searchTerm}}\"",
 		"contacts": "Contacts",
 		"company": "Staff",
 		"global": "Worldwide",
