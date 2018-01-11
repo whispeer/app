@@ -57,6 +57,7 @@
 		"fileTooBigTitle": "Datei zu groß!",
 		"fileTooBigDetail": "Dateiübertragungen für Privatnutzer sind derzeit auf {{max_size}}MB beschränkt.",
 		"changed": "änderte den Titel zu",
+		"loadMore": "Weitere Bilder laden",
 		"detail": {
 			"title": "Details",
 			"chatTitle": "Konversationstitel",
