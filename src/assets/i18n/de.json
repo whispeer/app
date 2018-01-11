@@ -98,16 +98,24 @@
 		"privacy": "Datenschutzbestimmungen",
 		"contact": "Kontaktiere uns",
 		"feedback": "Gib uns Feedback",
-		"logout": "Abmelden",
-		"companyName": "whispeer {{version}} von mindpost GmbH",
+		"logout": {
+			"button": "Abmelden",
+			"title": "Bist du sicher, dass du dich auf diesem Gerät abmelden möchtest?",
+			"logout": "Abmelden",
+			"cancel": "Abbrechen"
+		},
+		"companyName": "whispeer von mindpost GmbH",
+		"version": "App-Version: {{version}}",
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Möchtest du dich auf diesem Gerät abmelden?",
 		"blocked": "Blockierte Nutzer",
 		"backup": {
 			"button": "Backup-Schlüssel abrufen",
-			"confirm": "Der Backup-Schlüssel wird dir nun zum Abspeichern angezeigt. Mit diesem Schlüssel kannst du dein Passwort zurücksetzen. Bitte gehe sorgfältig damit um."
+			"title": "Backup-Schlüssel speichern?",
+			"message": "Im Folgenden wird dir dein Backup-Schlüssel zum Abspeichern angezeigt. Mit diesem Schlüssel kannst du dein Passwort zurücksetzen.<br><br>Bitte bewahre ihn daher an einem wirklich sicheren Ort auf.",
+			"save": "Speichern",
+			"cancel": "Abbrechen"
 		}
 	},
 	"blocked": {
