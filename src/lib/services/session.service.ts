@@ -8,6 +8,7 @@ import keyStore from "./keyStore.service";
 import { landingPage } from "./location.manager";
 import { withPrefix } from "./storage.service";
 import h from "../helper/helper"
+import { goToBusinessVersion, isBusinessVersion } from "./location.manager";
 
 export class SessionService extends Observer {
 	sid: string = "";
@@ -50,6 +51,11 @@ export class SessionService extends Observer {
 	loadLogin = () => {
 		return this.sessionStorage.awaitLoading().then(() => {
 			const loggedin = this.sessionStorage.get("loggedin") === "true" && this.sessionStorage.get("password");
+
+			if (this.sessionStorage.get("business") && !isBusinessVersion()) {
+				goToBusinessVersion()
+			}
+
 			if (!loggedin) {
 				return this.clear().thenReturn(false);
 			}
