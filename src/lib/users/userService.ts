@@ -30,7 +30,7 @@ const userService = {
 	* @param query query string to search for
 	* @param cb user objects
 	*/
-	query: function (query, cb) {
+	query: function (query, cb?) {
 		return initService.awaitLoading().then(function () {
 			return socketService.definitlyEmit("user.search", {
 				text: query,

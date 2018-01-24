@@ -1,7 +1,7 @@
 import { TranslateService } from '@ngx-translate/core'
 
 const contactsService = require("../../lib/services/friendsService");
-const userService = require("../../lib/users/userService").default;
+import userService from "../../lib/users/userService"
 
 import * as Bluebird from 'bluebird';
 
@@ -110,7 +110,7 @@ export class ContactsWithSearch {
 		var contacts = contactsService.getFriends();
 
 		if (h.arrayEqual(this.loadedContactIDs, contacts)) {
-			return Bluebird.resolve()
+			return Bluebird.resolve(this.contacts)
 		}
 
 		this.loadedContactIDs = contacts.slice()
