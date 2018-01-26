@@ -3,6 +3,7 @@ import Storage from "./Storage"
 import h from "../helper/helper"
 
 const loginStorage: Storage = StorageService.withPrefix("whispeer.login");
+const sessionStorage: Storage = StorageService.withPrefix("whispeer.session");
 
 const blockedReturnUrls: string[] = ["/b2c", "/recovery"];
 
@@ -35,6 +36,7 @@ export const isBusinessVersion = () => {
 }
 
 export const goToPrivateHome = () => {
+	sessionStorage.remove("business")
 	setTopPath("/index.html")
 }
 
@@ -43,6 +45,7 @@ export const loginPage = () => {
 }
 
 export const goToBusinessVersion = () => {
+	sessionStorage.set("business", "true")
 	setTopPath("/business.html")
 }
 
