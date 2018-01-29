@@ -505,7 +505,7 @@ export class Chat extends Observer {
 	}
 
 	loadAllChunks = () => {
-		return socketService.emit("chat.getChunks", { id: this.id }).then(({ chunks }) =>
+		return socketService.definitlyEmit("chat.getChunks", { id: this.id }).then(({ chunks }) =>
 			chunks
 		).map((chunk) =>
 			ChunkLoader.load(chunk)
@@ -784,7 +784,7 @@ const loadUnreadChatIDs = () => {
 	}).then(function () {
 		return socketService.awaitConnection();
 	}).then(function () {
-		return socketService.emit("chat.getUnreadIDs", {});
+		return socketService.definitlyEmit("chat.getUnreadIDs", {});
 	}).then(function (data) {
 		if (!data.chatIDs) {
 			console.warn("got no chat ids from socket request")

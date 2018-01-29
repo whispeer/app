@@ -238,7 +238,7 @@ export class Chunk extends Observer {
 			return ChunkLoader.get(this.successorID)
 		}
 
-		return socket.emit("chat.chunk.successor", { id: this.getID() }).then((response) => {
+		return socket.definitlyEmit("chat.chunk.successor", { id: this.getID() }).then((response) => {
 			if (!response.chunk) {
 				return
 			}
@@ -386,7 +386,7 @@ type ChunkCache = {
 
 export default class ChunkLoader extends ObjectLoader<Chunk, ChunkCache>({
 	cacheName: "chunk",
-	download: id => socket.emit("chat.chunk.get", { id }),
+	download: id => socket.definitlyEmit("chat.chunk.get", { id }),
 	restore: ({ meta, content, server, titleUpdate }: ChunkCache) => {
 		return Bluebird.try(async function () {
 			const loadReceiverPromise = userService.getMultipleFormatted(meta.receiver.sort().map(h.parseDecimal))
