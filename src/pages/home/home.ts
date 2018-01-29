@@ -17,6 +17,7 @@ import ChatLoader, { Chat } from "../../lib/messages/chat"
 import settings from "../../lib/services/settings.service"
 
 import errorService from "../../lib/services/error.service"
+import { isBusinessVersion } from "../../lib/services/location.manager"
 
 const chatMemoizer = {}
 
@@ -83,7 +84,7 @@ export class HomePage {
 	chatsLoading: boolean = true
 	moreTopicsAvailable: boolean = true
 
-	lang: string = "en"
+	lang: string = isBusinessVersion() ? "de" : "en"
 
 	numberOfChatsToDisplay = 0
 
@@ -93,12 +94,23 @@ export class HomePage {
 
 	ngOnInit() {}
 
+	private setLanguage() {
+		const lang = this.translate.currentLang
+
+		if (!lang) {
+			return
+		}
+
+		const en = (lang.toLowerCase().indexOf("de") === -1)
+		this.lang = en ? "en" : "de"
+	}
+
 	ionViewDidEnter = () => {
 		this.loadTopics()
 		this.loadRequests()
 
-		const en = (this.translate.currentLang.toLowerCase().indexOf("de") === -1)
-		this.lang = en ? "en" : "de"
+		this.setLanguage()
+		this.translate.onLangChange.subscribe(this.setLanguage)
 	}
 
 	loadTopics = () => {
