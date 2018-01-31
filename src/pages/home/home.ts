@@ -152,21 +152,7 @@ export class HomePage {
 			.filter((chatID) => ChatLoader.isLoaded(chatID))
 			.filter((id, i) => i < this.numberOfChatsToDisplay)
 			.map((chatID) => getChatMemoizer(chatID).getValue())
-			.sort((a, b) => {
-				if(a.allBlocked && b.allBlocked) {
-					return 0
-				}
-
-				if(a.allBlocked) {
-					return 1
-				}
-
-				if(b.allBlocked) {
-					return -1
-				}
-
-				return b.time - a.time
-			})
+			.sort((a, b) => b.time - a.time)
 	}
 
 	showNoConversationsPlaceholder = () => !this.chatsLoading && this.getChatCount() === 0
