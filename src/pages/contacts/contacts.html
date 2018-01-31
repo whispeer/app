@@ -17,7 +17,17 @@
 		{{requestsLabel}}
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
-	<ion-list [approxItemHeight]="'52px'" [virtualScroll]="getUsers()" [headerFn]="contactDividers" class="friends__list">
+	<ion-toolbar padding color="light" *ngIf="business && !contactsLoading && !searchTerm">
+		<ion-segment [(ngModel)]="view" color="grey">
+			<ion-segment-button value="contacts">
+				{{ 'contacts.contacts' | translate }}
+			</ion-segment-button>
+			<ion-segment-button value="company">
+				{{ 'contacts.company' | translate }}
+			</ion-segment-button>
+		</ion-segment>
+	</ion-toolbar>
+	<ion-list [approxItemHeight]="'52px'" [virtualScroll]="getContacts()" [headerFn]="contactDividers" class="friends__list">
 		<ion-item-divider *virtualHeader="let header; let i = index;" class="friends__divider" [ngClass]="{'friends__divider--first': i === 0}">
 			{{ header }}
 		</ion-item-divider>

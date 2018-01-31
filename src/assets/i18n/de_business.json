@@ -44,7 +44,9 @@
 	"contacts": {
 		"title": "Kontakte",
 		"search": "Suche",
-		"searchResultExplain": "Falls Sie die gewünschte Person nicht finden können, versuchen Sie nach deren Nutzernamen zu suchen."
+		"searchResultExplain": "Falls Sie die gewünschte Person nicht finden können, versuchen Sie nach deren Nutzernamen zu suchen.",
+		"contacts": "Kontakte",
+		"company": "Belegschaft"
 	},
 	"requests": {
 		"title": "Kontaktanfragen",
@@ -57,17 +59,24 @@
 		"fileTooBigTitle": "Datei zu groß!",
 		"fileTooBigDetail": "Dateiübertragungen sind derzeit auf {{max_size}}MB beschränkt.",
 		"changed": "änderte den Titel zu",
+		"loadMore": "Weitere Bilder laden",
 		"detail": {
 			"title": "Details",
 			"chatTitle": "Konversationstitel",
+			"chatTitlePlaceholder": "Titel der Konversation",
+			"changeButtonText": "Ändern",
 			"allMembers": "Alle Mitglieder",
 			"admin": "Administrator",
 			"member": "Mitglied",
+			"promote": "Befördern",
+			"remove": "Entfernen",
 			"addMore": "Nutzer hinzufügen...",
-			"reportTopic": "Diesen Chat melden",
+			"reportTopic": "Diese Konversation melden",
 			"reportConfirm": {
-				"title": "Diesen Chat melden?",
-				"message": "Bitte bestätigen Sie, dass Sie diesen Chat melden möchten. Wir setzen uns dann mit Ihnen in Verbindung."
+				"title": "Diese Konversation melden?",
+				"message": "Bitte bestätigen Sie, dass Sie diese Konversation melden möchten. Wir setzen uns dann mit Ihnen in Verbindung.",
+				"cancel": "Abbrechen",
+				"confirm": "Melden"
 			}
 		},
 		"add": {
@@ -81,6 +90,7 @@
 		"search": "Suche",
 		"searchFor": "Suche nach \"{{searchTerm}}\"",
 		"contacts": "Kontakte",
+		"company": "Belegschaft",
 		"global": "Weltweit",
 		"selectedContacts": "Ausgewählte Kontakte",
 		"selectedExplain": "Oben genannte Kontakte werden zur neuen Konversation hinzugefügt. Sie können sie danach noch verwalten und weitere hinzufügen.",
@@ -96,16 +106,24 @@
 		"privacy": "Datenschutzbestimmungen",
 		"contact": "Kontaktieren Sie uns",
 		"feedback": "Geben Sie uns Feedback",
-		"logout": "Abmelden",
-		"companyName": "whispeer {{version}} von mindpost GmbH",
+		"logout": {
+			"button": "Abmelden",
+			"title": "Sind Sie sicher, dass Sie sich auf diesem Gerät abmelden möchten?",
+			"logout": "Abmelden",
+			"cancel": "Abbrechen"
+		},
+		"companyName": "whispeer von mindpost GmbH",
+		"version": "App-Version: {{version}}",
 		"madeInGermany": "Made in Germany mit",
 		"humanRights": "für Menschenrechte",
 		"pushAlert": "Diese Funktion ist noch nicht fertig, aber wir arbeiten daran. Versprochen!",
-		"logoutWarning": "Möchten Sie sich auf diesem Gerät abmelden?",
 		"blocked": "Blockierte Nutzer",
 		"backup": {
 			"button": "Backup-Schlüssel abrufen",
-			"confirm": "Der Backup-Schlüssel wird Ihnen nun zum Abspeichern angezeigt. Mit diesem Schlüssel können Sie Ihr Passwort zurücksetzen. Bitte gehen Sie sorgfältig damit um."
+			"title": "Backup-Schlüssel speichern?",
+			"message": "Im Folgenden wird Ihnen Ihr Backup-Schlüssel zum Abspeichern angezeigt. Mit diesem Schlüssel können Sie Ihr Passwort zurücksetzen.<br><br>Bitte bewahren Sie ihn daher an einem wirklich sicheren Ort auf.",
+			"save": "Speichern",
+			"cancel": "Abbrechen"
 		}
 	},
 	"blocked": {

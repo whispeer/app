@@ -128,6 +128,7 @@ const getConfig = (production) => {
 			ionicWebpackFactory.getCommonChunksPlugin(),
 			new webpack.DefinePlugin({
 				"WHISPEER_ENV": JSON.stringify(process.env.WHISPEER_ENV || "production"),
+				"WHISPEER_BUSINESS": JSON.stringify(!!process.env.WHISPEER_BUSINESS),
 				"IONIC_ENV": JSON.stringify(process.env.IONIC_ENV),
 				"SENTRY_KEY": JSON.stringify(process.env.IONIC_ENV === "prod" ? "https://5efbdc23f6a749f79b9efb0231bcbb50@errors.whispeer.de/6" : "https://65f6fc40c3514deeb38e7877e1813779@errors.whispeer.de/8"),
 				"CLIENT_INFO": JSON.stringify({

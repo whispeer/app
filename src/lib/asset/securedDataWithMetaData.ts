@@ -26,7 +26,6 @@ type optionsType = {
 export class SecuredData {
 	private type: string
 	private alternativeType: string
-	private removeEmpty: boolean
 	private encryptDepth: number
 	private attributesNotVerified: string[]
 	private decrypted: boolean
@@ -47,7 +46,6 @@ export class SecuredData {
 		this.type = options.type;
 		this.alternativeType = options.alternativeType
 
-		this.removeEmpty = options.removeEmpty;
 		this.encryptDepth = options.encryptDepth || 0;
 
 		this.attributesNotVerified = options.attributesNotVerified || [];

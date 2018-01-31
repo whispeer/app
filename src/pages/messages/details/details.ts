@@ -102,9 +102,9 @@ export class DetailPage {
 			title: this.translate.instant("topic.detail.reportConfirm.title"),
 			message: this.translate.instant("topic.detail.reportConfirm.message"),
 			buttons: [{
-				text: "Cancel"
+				text: this.translate.instant("topic.detail.reportConfirm.cancel")
 			}, {
-				text: "Report",
+				text: this.translate.instant("topic.detail.reportConfirm.confirm"),
 				handler: () => {
 					reportService.sendReport("chat", this.chat.getID());
 				}

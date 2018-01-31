@@ -7,13 +7,11 @@ import UserLoader from "./user"
 const sjcl = require("sjcl")
 const initService = require("services/initService")
 
-let userService
-
 function loadUser(identifier) {
 	return UserLoader.get(identifier)
 }
 
-userService = {
+const userService = {
 	/** search your friends */
 	queryFriends: function (query) {
 		return Bluebird.try(function () {
@@ -32,7 +30,7 @@ userService = {
 	* @param query query string to search for
 	* @param cb user objects
 	*/
-	query: function (query, cb) {
+	query: function (query, cb?) {
 		return initService.awaitLoading().then(function () {
 			return socketService.definitlyEmit("user.search", {
 				text: query,
@@ -50,7 +48,7 @@ userService = {
 	* @param cb called with results
 	* this function is asynchronous and returns immediatly. requests are also batched.
 	*/
-	get: function (identifier, cb) {
+	get: function (identifier, cb?) {
 		return loadUser(identifier).nodeify(cb)
 	},
 
@@ -59,7 +57,7 @@ userService = {
 	* @param cb called with results
 	* this function is asynchronous and returns immediatly. requests are also batched.
 	*/
-	getMultiple: function getMultipleF(identifiers, cb) {
+	getMultiple: function (identifiers, cb?) {
 		return Bluebird.resolve(identifiers).map(function (id) {
 			return loadUser(id)
 		}).nodeify(cb)
@@ -69,7 +67,7 @@ userService = {
 	* @param identifiers identifier of users to load
 	* @param cb called with users data.
 	*/
-	getMultipleFormatted: function (identifiers, cb) {
+	getMultipleFormatted: function (identifiers, cb?) {
 		return Bluebird.try(function () {
 			return userService.getMultiple(identifiers)
 		}).map(function (user: any) {

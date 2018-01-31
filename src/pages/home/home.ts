@@ -13,7 +13,7 @@ const contactsService = require("../../lib/services/friendsService")
 
 import ChunkLoader from "../../lib/messages/chatChunk"
 import MessageLoader from "../../lib/messages/message"
-import ChatLoader from "../../lib/messages/chat"
+import ChatLoader, { Chat } from "../../lib/messages/chat"
 import settings from "../../lib/services/settings.service"
 
 import errorService from "../../lib/services/error.service"
@@ -32,7 +32,7 @@ const getChatMemoizer = (chatID) => {
 			() => ChatLoader.getLoaded(chatID).getLatestMessage(),
 			() => ChatLoader.getLoaded(chatID).getUnreadMessageIDs(),
 			() => settings.getBlockedUsers()
-		], (chat, latestChunkID, latestMessageID, unreadMessageIDs, blockedUsers, previousValue) => {
+		], (chat: Chat, latestChunkID: number, latestMessageID, unreadMessageIDs: number[], blockedUsers, previousValue) => {
 			const latestChunk = ChunkLoader.getLoaded(chat.getLatestChunk())
 
 			const info = previousValue || { id: chat.getID() }
@@ -105,10 +105,11 @@ export class HomePage {
 	}
 
 	loadTopics = () => {
-		this.numberOfChatsToDisplay = CHATS_PER_SCREEN
+		this.numberOfChatsToDisplay = messageService.getChatIDs().length
 
 		console.warn("load more chats?", this.getLoadedChats().length)
 		if (this.getLoadedChats().length >= CHATS_PER_SCREEN) {
+			this.numberOfChatsToDisplay = this.getLoadedChats().length
 			return
 		}
 

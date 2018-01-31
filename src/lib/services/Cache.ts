@@ -1,7 +1,7 @@
 import { errorServiceInstance } from "./error.service";
 import * as Bluebird from "bluebird";
 import h from "../helper/helper"
-import idb, { Cursor, DB } from "idb" // tslint:disable-line:no-unused-variable
+import idb, { Cursor } from "idb" // tslint:disable-line:no-unused-variable
 
 const REINIT_CACHE_TIMEOUT = 2000
 let cachesDisabled = false
@@ -227,6 +227,10 @@ export default class Cache {
 
 	private isDisabled() {
 		return cachesDisabled || this.cacheDisabled
+	}
+
+	static disable() {
+		cachesDisabled = true;
 	}
 
 	disable() {

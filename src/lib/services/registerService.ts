@@ -1,19 +1,23 @@
-var keyStoreService = require("services/keyStore.service").default;
-var socketService = require("services/socket.service").default;
-var Profile = require("users/profile").default;
-var Storage = require("services/storage.service");
-var errorService = require("services/error.service").errorServiceInstance;
+import keyStoreService from "../services/keyStore.service"
+import socketService from "../services/socket.service"
+import Profile from "../users/profile"
+import { withPrefix } from "../services/storage.service"
+import errorService from "../services/error.service"
 
-var Bluebird = require("bluebird");
-var h = require("../helper/helper").default;
+import * as Bluebird from "bluebird"
+import h from "../helper/helper"
 
-var trustManager = require("crypto/trustManager").default;
-var SecuredData = require("../asset/securedDataWithMetaData").default;
+import trustManager from "../crypto/trustManager"
+import SecuredData from "../asset/securedDataWithMetaData"
 
-var keyGenPromise, sessionStorage = Storage.withPrefix("whispeer.session"), clientStorage = Storage.withPrefix("whispeer.client");
+const sessionStorage = withPrefix("whispeer.session")
+const tokenStorage = withPrefix("whispeer.token")
+const clientStorage = withPrefix("whispeer.client")
+
+var keyGenPromise
 var registerPromise;
 
-var registerService = {
+const registerService = {
 	register: function (nickname, mail, password, profile, settings, inviteCode) {
 		var keys;
 
@@ -42,7 +46,7 @@ var registerService = {
 					content: profile.pub || {}
 				}, { isPublicProfile: true });
 
-				var correctKeys = h.objectMap(keys, keyStoreService.correctKeyIdentifier);
+				var correctKeys : any = h.objectMap(keys, keyStoreService.correctKeyIdentifier);
 				var ownKeys = {main: correctKeys.main, sign: correctKeys.sign};
 				delete correctKeys.main;
 				delete correctKeys.profile;
@@ -71,7 +75,7 @@ var registerService = {
 				keys = h.objectMap(keys, keyStoreService.correctKeyIdentifier);
 				trustManager.disallow();
 
-				var registerData = {
+				var registerData : any = {
 					password: {
 						salt: salt,
 						hash: keyStoreService.hash.hashPW(password, salt),
@@ -101,6 +105,8 @@ var registerService = {
 				}
 
 				registerData.preID = clientStorage.get("preID") || "";
+
+				registerData.token = tokenStorage.get("token")
 
 				return socketService.emit("session.register", registerData);
 			}).then(function (result) {
@@ -133,7 +139,7 @@ var registerService = {
 		}).then(function (preID) {
 			clientStorage.set("preID", preID);
 
-			return socketService.emit("preRegisterID", {
+			return socketService.definitlyEmit("preRegisterID", {
 				id: preID
 			});
 		}).catch(errorService.criticalError);
@@ -183,7 +189,7 @@ var registerService = {
 		}
 
 		return Bluebird.try(function mailCheck() {
-			return socketService.emit("mailFree", {
+			return socketService.definitlyEmit("mailFree", {
 				mail: mail
 			});
 		}).then(function mailResult(data) {
@@ -205,7 +211,7 @@ var registerService = {
 		}
 
 		return socketService.awaitConnection().then(function () {
-			return socketService.emit("nicknameFree", {
+			return socketService.definitlyEmit("nicknameFree", {
 				nickname: nickname
 			});
 		}).then(function nicknameResult(data) {
@@ -220,4 +226,4 @@ var registerService = {
 	}
 };
 
-module.exports = registerService;
+export default registerService

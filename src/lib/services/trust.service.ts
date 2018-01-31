@@ -116,7 +116,7 @@ class TrustService {
 }
 
 class TrustStoreLoader extends MutableObjectLoader<TrustStore, trustSet>({
-	download: (id, previousInstance: TrustStore) =>
+	download: (_id, previousInstance: TrustStore) =>
 		socketService.awaitConnection()
 			.then(() => socketService.definitlyEmit("trustManager.get", {
 				responseKey: "content",
@@ -138,8 +138,8 @@ class TrustStoreLoader extends MutableObjectLoader<TrustStore, trustSet>({
 
 		return new TrustStore(content)
 	},
-	shouldUpdate: (event, instance) => Bluebird.resolve(true),
-	getID: (settingsData) => sessionService.getUserID(),
+	shouldUpdate: () => Bluebird.resolve(true),
+	getID: () => sessionService.getUserID(),
 	cacheName: "trustStore"
 }) {}
 

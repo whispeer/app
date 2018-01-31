@@ -523,7 +523,7 @@ export class Chat extends Observer {
 	}
 
 	loadAllChunks = () => {
-		return socketService.emit("chat.getChunks", { id: this.id }).then(({ chunks }) =>
+		return socketService.definitlyEmit("chat.getChunks", { id: this.id }).then(({ chunks }) =>
 			chunks
 		).map((chunk) =>
 			ChunkLoader.load(chunk)
@@ -660,6 +660,9 @@ export class Chat extends Observer {
 	sendMessage = (message, attachments, id?) => {
 		var messageObject = new Message(message, this, attachments, id)
 
+		MessageLoader.addLoaded(messageObject.getClientID(), messageObject)
+		this.addMessageID(messageObject.getClientID(), Number.MAX_SAFE_INTEGER)
+
 		return this.storeMessage(messageObject, message, id).finally(() => {
 			var sendMessagePromise = messageObject.sendContinously();
 
@@ -674,9 +677,6 @@ export class Chat extends Observer {
 				console.error(e);
 				alert("An error occured sending a message!" + e.toString());
 			});
-
-			MessageLoader.addLoaded(messageObject.getClientID(), messageObject)
-			this.addMessageID(messageObject.getClientID(), Number.MAX_SAFE_INTEGER)
 
 			return sendMessagePromise
 		})
@@ -757,7 +757,7 @@ export default class ChatLoader extends ObjectLoader<Chat, ChatCache>({
 			})
 		})
 	},
-	shouldUpdate: (event, instance) => Bluebird.resolve(!instance.isDraft()),
+	shouldUpdate: (_event, instance) => Bluebird.resolve(!instance.isDraft()),
 	cacheName: "chat"
 }) {}
 
@@ -802,7 +802,7 @@ const loadUnreadChatIDs = () => {
 	}).then(function () {
 		return socketService.awaitConnection();
 	}).then(function () {
-		return socketService.emit("chat.getUnreadIDs", {});
+		return socketService.definitlyEmit("chat.getUnreadIDs", {});
 	}).then(function (data) {
 		if (!data.chatIDs) {
 			console.warn("got no chat ids from socket request")
