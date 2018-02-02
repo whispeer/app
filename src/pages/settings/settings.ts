@@ -13,6 +13,7 @@ import Tutorial from "../../app/tutorial";
 import sessionService from "../../lib/services/session.service";
 import settings from "../../lib/services/settings.service"
 import userService from "../../lib/users/userService";
+import settingsService from "../../lib/services/settings.service";
 
 @IonicPage({
 	name: "Settings",
@@ -25,6 +26,7 @@ import userService from "../../lib/users/userService";
 export class SettingsPage {
 	pushEnabled = true;
 	tutorialPassed = true;
+	savingSettings = false;
 	version = { version: `${CLIENT_INFO.version}-${CLIENT_INFO.commit}` }
 
 	tutorialVisible() {
@@ -52,6 +54,18 @@ export class SettingsPage {
 	pushWarning() {
 		this.pushEnabled = true;
 		alert(this.translate.instant("settings.pushAlert"));
+	}
+
+	haveFriendsAccess = () => settingsService.getBranch("friendsAccess")
+
+	setFriendsAccess = ($event) => {
+		// TODO: add error handler!
+		settingsService.updateBranch("friendsAccess", $event.checked)
+
+		this.savingSettings = true
+
+		settingsService.uploadChangedData()
+			.finally(() => this.savingSettings = false)
 	}
 
 	startBackup() {
