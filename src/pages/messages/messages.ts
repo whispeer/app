@@ -657,6 +657,12 @@ export class MessagesPage {
 			return false
 		}
 
+		const previousMessage = messages[messages.indexOf(message) - 1]
+
+		if (previousMessage && previousMessage.getClientID() === message.getPreviousID()) {
+			return false
+		}
+
 		return messages.findIndex((m) =>
 			m.getClientID() === message.getPreviousID()
 		) === -1
