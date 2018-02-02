@@ -786,7 +786,7 @@ export class MessagesPage {
 		const meOrOther = message.isOwn() ? "burst--me" : "burst--other"
 		const burstClass = this.getBurstClass(message, $index)
 
-		return [meOrOther, burstClass]
+		return [meOrOther, burstClass].join(" ")
 	}
 
 	ngAfterViewChecked() {
