@@ -97,12 +97,15 @@ export class ProfilePage {
 		this.isOwn = true;
 
 		const awaitFriendsService = friendsService.awaitLoading().then(() => {
-			var requests = friendsService.getRequests();
+			// get requests including requests from blocked users
+			// if we only get requests excluding blocked users this user will
+			// show up as a friend, as it's not requestable and not a request.
+			let requests = friendsService.getRequestsWithBlocked()
 			this.isRequest = requests.indexOf(this.userId) > -1
 
 			this.isOwn = this.userId === parseInt(sessionService.userid, 10)
 
-			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn;
+			this.isRequestable = friendsService.noRequests(this.userId) && !this.isOwn
 		});
 
 		Bluebird.all([
@@ -130,6 +133,10 @@ export class ProfilePage {
 	getTitle() {
 		if (this.isOwn) {
 			return this.translate.instant("profile.ownTitle")
+		}
+
+		if(this.isBlocked()) {
+			return this.translate.instant("blocked.userReplacement")
 		}
 
 		return this.translate.instant("profile.otherTitle", { name: this.user.name })
@@ -165,6 +172,7 @@ export class ProfilePage {
 				text: this.translate.instant("profile.contacts.blockConfirm.confirm"),
 				handler: () => {
 					settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+					this.removeBlockedUser()
 				}
 			}]
 		});
@@ -305,6 +313,29 @@ export class ProfilePage {
 				role: "cancel"
 			}, {
 				text: this.translate.instant("profile.contacts.removeConfirmButtonText"),
+				role: "destructive",
+				cssClass: "alert-button-danger",
+				handler: () => {
+					this.user.user.removeAsFriend();
+				}
+			}]
+		}).present();
+	}
+
+	removeBlockedUser = () => {
+		if(this.isRequest || this.isRequestable) {
+			return
+		}
+
+		// this is pretty similar to removeFriendClick but at the same time it's different enough to create a new function
+		this.alertCtrl.create(<AlertOptions>{
+			title: this.translate.instant("profile.contacts.blocked.removeTitle"),
+			message: this.translate.instant("profile.contacts.blocked.removeQuestion", { name: this.user.name }),
+			buttons: [{
+				text: this.translate.instant("profile.contacts.blocked.removeCancelButtonText"),
+				role: "cancel"
+			}, {
+				text: this.translate.instant("profile.contacts.blocked.removeConfirmButtonText"),
 				role: "destructive",
 				cssClass: "alert-button-danger",
 				handler: () => {
@@ -456,12 +487,37 @@ export class ProfilePage {
 				text: this.translate.instant("profile.contacts.reportConfirm.confirm"),
 				handler: () => {
 					reportService.sendReport("user", this.user.id);
+					this.removeBlockedUser()
 				}
 			}]
 		});
 
 		reportConfirm.setCssClass('logout-confirm');
 		reportConfirm.present();
+	}
+
+	reportAndBlock = () => {
+		if(this.isBlocked()) {
+			return
+		}
+
+		const reportAndBlockConfirm = this.alertCtrl.create({
+			title: this.translate.instant("profile.contacts.reportAndBlockConfirm.title"),
+			message: this.translate.instant("profile.contacts.reportAndBlockConfirm.message"),
+			buttons: [{
+				text: this.translate.instant("profile.contacts.reportAndBlockConfirm.cancel")
+			}, {
+				text: this.translate.instant("profile.contacts.reportAndBlockConfirm.confirm"),
+				handler: () => {
+					reportService.sendReport("user", this.user.id);
+					settings.setBlockedUsers([...settings.getBlockedUsers(), { id: this.userId, since: Date.now() }])
+					this.removeBlockedUser()
+				}
+			}]
+		});
+
+		reportAndBlockConfirm.setCssClass('logout-confirm');
+		reportAndBlockConfirm.present();
 	}
 
 	close = () => {
