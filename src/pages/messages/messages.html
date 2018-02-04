@@ -50,7 +50,7 @@
 				</div>
 
 				<div *ngIf="!message.isOwn() && getPartners().length > 1 && !sameBurst(message, this.messages[$index - 1])">
-					<span *ngIf="!burst.firstItem().data.sender.user.isBlocked(); else blockedUser">{{message.data.sender.name}}</span>
+					<span *ngIf="!message.data.sender.user.isBlocked(); else blockedUser">{{message.data.sender.name}}</span>
 					<ng-template #blockedUser>{{ 'blocked.userReplacement' | translate }}</ng-template>
 				</div>
 				<Message [message]="message"></Message>
