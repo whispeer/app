@@ -43,6 +43,9 @@ const getChatMemoizer = (chatID) => {
 			info.blocked = chat.isBlocked()
 
 			info.partners = latestChunk.getPartners()
+
+			info.allBlocked = chat.allPartnersBlocked()
+
 			info.partnersDisplay = latestChunk.getPartnerDisplay()
 			info.title = latestChunk.getTitle()
 			info.time = latestChunk.getTime()
