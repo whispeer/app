@@ -9,12 +9,7 @@
 
 <ion-content>
 	<ion-spinner *ngIf="requestsLoading" text-center margin-vertical class="spinner--full"></ion-spinner>
-	<div *ngIf="requests.length == 0" class="space-for-fab">
-		<p class="text-grey not-found-footer" padding>
-			{{ 'requests.noRequests' | translate }}
-		</p>
-	</div>
-	<ion-list *ngIf="requests.length > 0" [virtualScroll]="requests" [headerFn]="friendDividers" class="friends__list">
+	<ion-list [virtualScroll]="requests" [headerFn]="friendDividers" class="friends__list">
 		<ion-item-divider *virtualHeader="let header" class="friends__divider">
 			{{ header }}
 		</ion-item-divider>

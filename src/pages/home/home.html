@@ -16,7 +16,7 @@
 		<ion-icon name="arrow-forward"></ion-icon>
 	</button>
 	<ion-list class="space-for-fab">
-		<ion-item *ngFor="let chat of getLoadedChats(); let i = index" class="topic" [ngClass]="{'topic--new': !chat.blocked && chat.unread, 'topic--blocked': chat.blocked}" tappable (click)="openChat(chat.id)">
+		<ion-item *ngFor="let chat of getLoadedChats(); let i = index" class="topic" [ngClass]="{'topic--new': !chat.blocked && chat.unread}" tappable (click)="openChat(chat.id)">
 			<div class="user__image-wrap" item-left>
 				<ion-avatar
 					*ngFor="let partner of chat.partnersDisplay"

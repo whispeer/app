@@ -10,14 +10,6 @@ page-profile {
 	}
 }
 
-.profile--blocked {
-	// this seems to be more efficient compared to exchanging every svg
-	.fill-primary,
-	.fill-primaryDark {
-		fill: map-get($colors, dark_grey);
-	}
-}
-
 .item-block {
 	border-top: none !important;
 }

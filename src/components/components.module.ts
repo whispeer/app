@@ -15,8 +15,6 @@ import { HexagonComponent } from "./hexagon";
 import { NavigatorHexagon } from "./navigator/hexagon";
 import { NavigatorIcon } from "./navigator/icon";
 
-import { UsernameComponent } from "./username"
-
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
@@ -30,8 +28,7 @@ import { TranslateModule } from '@ngx-translate/core';
 		HexagonComponent,
 		Navigator,
 		NavigatorHexagon,
-		NavigatorIcon,
-		UsernameComponent,
+		NavigatorIcon
 	],
 	imports: [
 		IonicModule,
@@ -50,7 +47,6 @@ import { TranslateModule } from '@ngx-translate/core';
 		Navigator,
 		NavigatorHexagon,
 		NavigatorIcon,
-		UsernameComponent,
 	]
 })
 export class ComponentsModule { }
