@@ -123,14 +123,6 @@ page-home {
 	}
 }
 
-.topic--blocked {
-	color: map-get($colors, dark_grey);
-
-	.label p {
-		color: map-get($colors, dark_grey);
-	}
-}
-
 .topic__badgeContainer {
 	display: inline-flex;
 	margin: auto 5px;

@@ -10,7 +10,6 @@ var Bluebird = require("bluebird");
 var socket = require("services/socket.service").default;
 var keyStore = require("services/keyStore.service").default;
 var initService = require("services/initService");
-const settingsService = require("services/settings.service").default;
 
 var friends = [],
 	requests = [],
@@ -331,15 +330,10 @@ friendsService = {
 
 		return "request";
 	},
-	getRequestsWithBlocked: function() {
-		friendsService.ensureIsLoaded("getRequests")
-
-		return requests.slice()
-	},
 	getRequests: function () {
-		return friendsService.getRequestsWithBlocked().filter(
-			(user) => !settingsService.isBlocked(user)
-		)
+		friendsService.ensureIsLoaded("getRequests");
+
+		return requests.slice();
 	},
 	getFriends: function () {
 		friendsService.ensureIsLoaded("getFriends");

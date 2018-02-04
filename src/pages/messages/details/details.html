@@ -31,14 +31,13 @@
 
 		<ion-item-sliding #item *ngFor="let receiver of getReceivers();">
 
-			<ion-item tappable (click)="goToUser(receiver.id)" [ngClass]="{'user__blocked': receiver.user.isBlocked()}">
+			<ion-item tappable (click)="goToUser(receiver.id)">
 				<ion-avatar class="hexagon--border" item-left>
 					<user-image [id]="receiver.id" [image]="receiver.basic.image"></user-image>
 				</ion-avatar>
 				<span>
 					<h2>
-						<span *ngIf="!receiver.user.isBlocked(); else blockedUser">{{ receiver.name }}</span>
-						<ng-template #blockedUser>{{'blocked.userReplacement' | translate}} ({{receiver.names.nickname}})</ng-template>
+						{{ receiver.name }}
 					</h2>
 					<small *ngIf="isAdmin(receiver.user)">
 						{{ "topic.detail.admin" | translate }}
