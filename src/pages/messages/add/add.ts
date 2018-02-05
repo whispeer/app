@@ -2,7 +2,6 @@ import { TranslateService } from '@ngx-translate/core'
 import { Component, ViewChild } from "@angular/core";
 import { Platform, NavController, NavParams, IonicPage, Searchbar } from "ionic-angular";
 
-const contactsService = require("../../../lib/services/friendsService");
 const initService = require("../../../lib/services/initService")
 
 import { replaceView } from "../../../lib/angularUtils"
