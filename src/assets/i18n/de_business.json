@@ -124,7 +124,8 @@
 			"message": "Im Folgenden wird Ihnen Ihr Backup-Schlüssel zum Abspeichern angezeigt. Mit diesem Schlüssel können Sie Ihr Passwort zurücksetzen.<br><br>Bitte bewahren Sie ihn daher an einem wirklich sicheren Ort auf.",
 			"save": "Speichern",
 			"cancel": "Abbrechen"
-		}
+		},
+		"friendsAccess": "Kontaktliste für Kontakte freigeben"
 	},
 	"blocked": {
 		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Sie können sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken.",
