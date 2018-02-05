@@ -10,6 +10,13 @@
 			<div *ngIf="isLoading(image)" class="overlay">
 				<ion-spinner text-center name="ios-small"></ion-spinner>
 			</div>
+			<div *ngIf="image.upload" class="overlay">
+				<loading-progress
+					backgroundClass="messages__message"
+					foregroundClass="progressIndicator"
+					[progress]="image.upload.getProgress">
+				</loading-progress>
+			</div>
 		</div>
 	</ng-container>
 </div>
