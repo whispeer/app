@@ -3,8 +3,8 @@ import h from "../helper/helper"
 import screenSizeService from "./screenSize.service"
 import FileUpload from "./fileUpload.service"
 import blobService from "./blobService"
-import Queue from '../asset/Queue'
 
+import Queue from "../asset/Queue"
 var imageLib = require("blueimp-load-image/js/load-image");
 
 var canvasToBlob : any = Bluebird.promisify(h.canvasToBlob.bind(h));
@@ -122,7 +122,7 @@ class ImageUpload extends FileUpload {
 		}
 	}
 
-	static isImage(file) {
+	static isImage(file: File) {
 		return file.type.match(/image.*/)
 	}
 
@@ -343,21 +343,25 @@ class ImageUpload extends FileUpload {
 		return result;
 	};
 
-	private _getImage = h.cacheResult<Bluebird<any>>(() => {
+	private getImage = h.cacheResult<Bluebird<any>>(() => {
 		return ImageUpload.imageLibLoad(this.getUrl());
 	})
 
 	private _resizeFile = (sizeOptions: size) => {
-		if (this.isGif && !sizeOptions.restrictions) {
-			return Bluebird.resolve(this.file);
-		}
-
 		var options: any = {
 			...sizeOptions.restrictions || {},
 			canvas: true
 		}
 
-		return this._getImage().then((img) => {
+		return this.getImage().then((img) => {
+			if (this.isGif && !sizeOptions.restrictions) {
+				return {
+					blob: this.file,
+					width: img.width,
+					height: img.height
+				}
+			}
+
 			if (options.square) {
 				img = imageLib.scale(img, {
 					contain: true,
