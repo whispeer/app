@@ -54,7 +54,7 @@ export class GalleryComponent {
 
 		data.loading = true
 
-		return Bluebird.try(() => blobService.getBlobUrl(blobid))
+		return Bluebird.try(() => blobService.getBlobUrl(blobid, "image/jpeg", 0))
 			.then((url) => {
 				data.loading = false
 				data.loaded = true

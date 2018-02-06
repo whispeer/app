@@ -428,7 +428,7 @@ export class ProfilePage {
 					const { blobid } = this.userObject.getProfileAttribute("imageBlob")
 					console.log("view image")
 
-					return blobService.getBlobUrl(blobid).then((url) => {
+					return blobService.getBlobUrl(blobid, "image/png", 0).then((url) => {
 						this.photoViewer.show(url);
 					});
 				}
