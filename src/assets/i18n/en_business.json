@@ -124,7 +124,9 @@
 			"message": "You will now see your backup key to save it. With this key you can reset your password.<br><br>Therefore please keep it in a really safe place.",
 			"save": "Save",
 			"cancel": "Cancel"
-		}
+		},
+		"friendsAccess": "Share contact list with my contacts",
+		"saveError": "Saving failed. Please try again!"
 	},
 	"blocked": {
 		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",
