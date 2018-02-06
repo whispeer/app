@@ -292,6 +292,7 @@ export class Message {
 
 			if (response.server) {
 				this.setServerInfo(response.server)
+				this.store(this.securedData.contentGet(), this.securedData.metaGet(), response.server)
 			}
 
 			return response.success
@@ -301,6 +302,10 @@ export class Message {
 		}).catch(socket.errors.Server, () => {
 			return false
 		})
+	}
+
+	private store = (content, meta, server) => {
+		MessageLoader.updateCache(this.getClientID(), { content, meta, server })
 	}
 
 	sendSuccess = () => {
@@ -393,7 +398,7 @@ export class Message {
 
 			voicemailDownloadProgress.addDepend(progress)
 
-			return blobService.getBlobUrl(voicemail.blobID, voicemailDownloadProgress, voicemail.size).then((url) => {
+			return blobService.getBlobUrl(voicemail.blobID, voicemail.type, voicemail.size, voicemailDownloadProgress).then((url) => {
 				voicemail.url = url
 				voicemail.loaded = true
 			})

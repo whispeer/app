@@ -143,8 +143,21 @@ export class Chat extends Observer {
 		ChatLoader.removeLoaded(-1)
 	}
 
+	allPartnersBlocked = () => {
+		const otherReceiver = this.getReceiverIDsWithoutSelf()
+
+		if (otherReceiver.length === 0) {
+			return
+		}
+
+		// this is true if we can't find a user that is not blocked
+		return !otherReceiver.find(
+			(user) => !settings.isBlocked(user)
+		)
+	}
+
 	isBlocked = () => {
-		if (this.getReceiverIDs.length > 2) {
+		if (this.getReceiverIDs().length > 2) {
 			return false
 		}
 
@@ -453,6 +466,11 @@ export class Chat extends Observer {
 		return latestChunk.getReceiverIDs()
 	}
 
+	getReceiverIDsWithoutSelf = () =>
+		this.getReceiverIDs().filter((id) =>
+			id !== sessionService.getUserID()
+		)
+
 	getTitle = () => {
 		const latestChunk = ChunkLoader.getLoaded(this.getLatestChunk())
 
@@ -505,7 +523,7 @@ export class Chat extends Observer {
 	}
 
 	loadAllChunks = () => {
-		return socketService.emit("chat.getChunks", { id: this.id }).then(({ chunks }) =>
+		return socketService.definitlyEmit("chat.getChunks", { id: this.id }).then(({ chunks }) =>
 			chunks
 		).map((chunk) =>
 			ChunkLoader.load(chunk)
@@ -784,7 +802,7 @@ const loadUnreadChatIDs = () => {
 	}).then(function () {
 		return socketService.awaitConnection();
 	}).then(function () {
-		return socketService.emit("chat.getUnreadIDs", {});
+		return socketService.definitlyEmit("chat.getUnreadIDs", {});
 	}).then(function (data) {
 		if (!data.chatIDs) {
 			console.warn("got no chat ids from socket request")

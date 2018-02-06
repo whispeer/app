@@ -25,6 +25,13 @@
 				[checked]="tutorialVisible()"
 				(ionChange)="resetTutorial($event)"></ion-toggle>
 		</ion-item>
+		<ion-item>
+			<ion-label>{{ 'settings.friendsAccess' | translate}}</ion-label>
+			<ion-toggle
+				[(ngModel)]="haveFriendsAccess"
+				[disabled]="savingSettings"
+				(ionChange)="setFriendsAccess($event)"></ion-toggle>
+		</ion-item>
 		<ion-item detail-push (click)="showBlocked()" *ngIf="hasBlocked()">
 			<ion-avatar item-start class="inline-avatar">
 				<img src="assets/img/blocked-icon.png" />

@@ -113,6 +113,7 @@ function deleteCache() {
 }
 
 export interface UserInterface {
+	data: any
 	getID: () => number
 
 	generateNewFriendsKey: () => any
@@ -175,8 +176,6 @@ class User implements UserInterface {
 
 	private addFriendState = new State()
 	private ignoreFriendState = new State()
-
-	private loadBasicDataPromise
 
 	data: any = {}
 
@@ -450,7 +449,6 @@ class User implements UserInterface {
 		}).then(() => {
 			this.profiles.me.updated()
 
-			this.loadBasicDataPromise = null
 			return this.loadBasicData()
 		}).nodeify(cb)
 	}
@@ -581,7 +579,7 @@ class User implements UserInterface {
 			return
 		}
 
-		return blobService.getBlobUrl(blob.blobid).then(url =>
+		return blobService.getBlobUrl(blob.blobid, blob.type || "image/png", 0).then(url =>
 			isIOS() ?
 				url.replace("file://", "") : url
 		).then((imageUrl) => {

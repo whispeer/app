@@ -6,7 +6,7 @@
 
 </ion-header>
 
-<ion-content class="has-main-menu">
+<ion-content class="has-main-menu" [ngClass]="{'profile--blocked': isBlocked()}">
 	<ion-toolbar *ngIf="isOwn" padding color="light">
 		<ion-segment [(ngModel)]="view" color="grey">
 			<ion-segment-button value="profile">
@@ -39,8 +39,16 @@
 				</ion-avatar>
 			</div>
 			<div class="profile__names">
-				<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
-				<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firstname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
+				<ng-template *ngIf="!isBlocked(); else blockedUser">
+					<h1 color="dark" text-center class="profile__big-name">{{user.name}}</h1>
+					<h3 color="grey" text-center class="profile__small-name" *ngIf="user.names.firstname || user.names.lastname"><small>{{user.names.nickname}}</small></h3>
+				</ng-template>
+				<ng-template #blockedUser>
+					<h1 color="grey" text-center class="profile__big-name">{{'blocked.userReplacement' | translate}}</h1>
+					<h3 color="grey" text-center class="profile__small-name">
+						<small>{{user.names.nickname}}</small>
+					</h3>
+				</ng-template>
 			</div>
 			<ion-list class="profile__info-list space-for-fab" inset *ngIf="!isBlocked()">
 				<ion-item *ngIf="attributeSet(user.advanced.birthday)">
@@ -93,6 +101,9 @@
 					</button>
 					<button ion-item (click)="unblock()" *ngIf="isBlocked()">
 						<span ion-text color="danger">{{ 'profile.contacts.unblockContact' | translate }}</span>
+					</button>
+					<button *ngIf="!isBlocked()" ion-item (click)="reportAndBlock()">
+						<span ion-text color="danger">{{ 'profile.contacts.reportAndBlockContact' | translate }}</span>
 					</button>
 				</ion-list>
 				<div padding-horizontal hideWhen="ios">

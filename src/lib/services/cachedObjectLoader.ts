@@ -113,6 +113,10 @@ function createLoader<ObjectType, CachedObjectType>({ download, load, restore, g
 		static addLoaded = (id, obj: ObjectType) => {
 			byId[id] = obj
 		}
+
+		static updateCache(id, cacheableData: CachedObjectType) {
+			return cache.store(id, cacheableData)
+		}
 	}
 }
 

@@ -20,9 +20,9 @@ import blobCache, { fixFileReader } from "../asset/blobCache"
 
 import socketService from "./socket.service"
 import BlobDownloader from "./blobDownloader.service"
-import Queue from '../asset/Queue'
 
 const initService = require("services/initService");
+import Queue from "../asset/Queue"
 const keyStore = require("crypto/keyStore");
 
 const knownBlobURLs = {};
@@ -110,7 +110,7 @@ class MyBlob {
 		if (this.blobData.originalUrl) {
 			const { directory, name } = unpath(this.blobData.originalUrl)
 
-			return blobCache.readFileAsArrayBuffer(directory, name).timeout(2 * 60 * 1000)
+			return blobCache.readFileAsArrayBuffer(directory, name)
 		}
 
 		return new Bluebird((resolve) => {
@@ -131,7 +131,7 @@ class MyBlob {
 			}
 
 			return target.result;
-		}).timeout(2 * 60 * 1000)
+		});
 	}
 
 	encryptAndUpload (key) {
@@ -173,7 +173,7 @@ class MyBlob {
 		})
 	}
 
-	decrypt () {
+	decrypt (originalSize: number) {
 		if (this.decrypted) {
 			return Bluebird.resolve()
 		}
@@ -189,12 +189,14 @@ class MyBlob {
 			this.decryptProgress.progress(this.getSize())
 			timeEnd("blobdecrypt" + this.blobID);
 
+			const unpaddedData = originalSize > 0 ? decryptedData.slice(0, originalSize) : decryptedData
+
 			this.decrypted = true;
 
-			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
+			this.blobData = new Blob([unpaddedData], {type: this.blobData.type});
 
 			return blobCache.store(this).catch((e) => {
-				console.log("Could not store blob")
+				console.log("Could not store blob", e)
 				return this.toURL()
 			})
 		})
@@ -292,16 +294,16 @@ class MyBlob {
 	}
 }
 
-const loadBlob = (blobID, progress, estimatedSize) => {
-	const decryptProgressStub = new Progress({ total: estimatedSize })
-	const downloadProgress = new Progress({ total: estimatedSize })
+const loadBlob = (blobID, type, progress, size: number) => {
+	const decryptProgressStub = new Progress({ total: size })
+	const downloadProgress = new Progress({ total: size })
 
 	progress.addDepend(downloadProgress)
 	progress.addDepend(decryptProgressStub)
 
 	return downloadBlobQueue.enqueue(1, () => Bluebird.try(async () => {
 		await initService.awaitLoading()
-		const data = await new BlobDownloader(socketService, blobID, downloadProgress).download()
+		const data = await new BlobDownloader(socketService, blobID, type, downloadProgress).download()
 
 		const blob = new MyBlob(data.blob, blobID, { meta: data.meta });
 
@@ -314,13 +316,13 @@ const loadBlob = (blobID, progress, estimatedSize) => {
 		progress.removeDepend(decryptProgressStub)
 		progress.addDepend(blob.decryptProgress)
 
-		return blob.decrypt()
+		return blob.decrypt(size)
 	}))
 }
 
-const getBlob = (blobID, downloadProgress: Progress, estimatedSize: number) => {
+const getBlob = (blobID, type, downloadProgress: Progress, estimatedSize: number) => {
 	if (!knownBlobURLs[blobID]) {
-		knownBlobURLs[blobID] = loadBlob(blobID, downloadProgress, estimatedSize)
+		knownBlobURLs[blobID] = loadBlob(blobID, type, downloadProgress, estimatedSize)
 	}
 
 	return knownBlobURLs[blobID]
@@ -333,9 +335,9 @@ const blobService = {
 	isBlobLoaded: (blobID) => {
 		return blobCache.isLoaded(blobID)
 	},
-	getBlobUrl: (blobID, progress: Progress = new Progress(), estimatedSize = 0): Bluebird<string> => {
+	getBlobUrl: (blobID, type: string, estimatedSize: number, progress: Progress = new Progress()): Bluebird<string> => {
 		return blobCache.getBlobUrl(blobID).catch(() => {
-			return getBlob(blobID, progress, estimatedSize)
+			return getBlob(blobID, type, progress, estimatedSize)
 		})
 	},
 }

@@ -18,3 +18,7 @@ page-details {
 		}
 	}
 }
+
+.user__blocked {
+	color: map-get($colors, dark_grey);
+}

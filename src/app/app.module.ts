@@ -89,6 +89,20 @@ import 'moment/locale/de';
 
 const DEFAULT_LANG = isBusinessVersion() ? "de" : "en"
 
+class MyErrorHandler implements ErrorHandler {
+	ionicHandler: ErrorHandler
+	ravenHandler: ErrorHandler
+
+	constructor() {
+		this.ionicHandler = new IonicErrorHandler()
+		this.ravenHandler = new RavenErrorHandler()
+	}
+	handleError = (e) => {
+		this.ionicHandler.handleError(e)
+		this.ravenHandler.handleError(e)
+	}
+}
+
 @NgModule({
 	declarations: [
 		MyApp
@@ -114,8 +128,7 @@ const DEFAULT_LANG = isBusinessVersion() ? "de" : "en"
 		MyApp,
 	],
 	providers: [
-		{ provide: ErrorHandler, useClass: IonicErrorHandler },
-		{ provide: ErrorHandler, useClass: RavenErrorHandler },
+		{ provide: ErrorHandler, useClass: MyErrorHandler  },
 		DatePipe,
 		BarcodeScanner,
 		SplashScreen,

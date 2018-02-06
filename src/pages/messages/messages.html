@@ -49,7 +49,10 @@
 					<ion-spinner text-center name="dots" duration="1500"></ion-spinner>
 				</div>
 
-				<div *ngIf="!message.isOwn() && getPartners().length > 1 && !sameBurst(message, this.messages[$index - 1])">{{message.data.sender.name}}</div>
+				<div *ngIf="!message.isOwn() && getPartners().length > 1 && !sameBurst(message, this.messages[$index - 1])">
+					<span *ngIf="!message.data.sender.user.isBlocked(); else blockedUser">{{message.data.sender.name}}</span>
+					<ng-template #blockedUser>{{ 'blocked.userReplacement' | translate }}</ng-template>
+				</div>
 				<Message [message]="message"></Message>
 
 				<BurstDifference [chat]="chat" [previousMessage]="message" [noDates]="true" *ngIf="$last"></BurstDifference>

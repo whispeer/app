@@ -1,0 +1,19 @@
+<span *ngIf="!user.user.isBlocked(); else blockedUser">
+	<strong *ngIf="user.names.firstname">
+		{{user.names.firstname}}
+	</strong>
+	<span *ngIf="user.names.firstname && user.names.lastname">
+		{{user.names.lastname}}
+	</span>
+	<strong
+		*ngIf="!user.names.firstname && user.names.lastname">
+		{{user.names.lastname}}
+	</strong>
+	<strong
+		*ngIf="!user.names.firstname && !user.names.lastname">
+		{{user.name}}
+	</strong>
+</span>
+<ng-template #blockedUser>
+	{{'blocked.userReplacement' | translate}} ({{user.names.nickname}})
+</ng-template>

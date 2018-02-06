@@ -139,7 +139,7 @@ const registerService = {
 		}).then(function (preID) {
 			clientStorage.set("preID", preID);
 
-			return socketService.emit("preRegisterID", {
+			return socketService.definitlyEmit("preRegisterID", {
 				id: preID
 			});
 		}).catch(errorService.criticalError);
@@ -189,7 +189,7 @@ const registerService = {
 		}
 
 		return Bluebird.try(function mailCheck() {
-			return socketService.emit("mailFree", {
+			return socketService.definitlyEmit("mailFree", {
 				mail: mail
 			});
 		}).then(function mailResult(data) {
@@ -211,7 +211,7 @@ const registerService = {
 		}
 
 		return socketService.awaitConnection().then(function () {
-			return socketService.emit("nicknameFree", {
+			return socketService.definitlyEmit("nicknameFree", {
 				nickname: nickname
 			});
 		}).then(function nicknameResult(data) {
