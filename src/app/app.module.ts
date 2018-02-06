@@ -35,8 +35,6 @@ import { Platform, IonicApp, IonicErrorHandler, IonicModule, Config } from 'ioni
 
 import * as Bluebird from 'bluebird';
 
-import { MyApp } from './app.component';
-
 import { BrowserModule } from '@angular/platform-browser';
 
 import { SplashScreen } from "@ionic-native/splash-screen";
@@ -58,6 +56,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpModule, Http } from '@angular/http';
 
 import { isBusinessVersion } from "../lib/services/location.manager";
+import { MyApp } from './app.component';
+import { withPrefix } from "../lib/services/storage.service";
 
 import "../lib/services/featureToggles"
 import "../lib/services/settings.service"
@@ -87,7 +87,7 @@ export function createTranslateLoader(http: Http) {
 
 import 'moment/locale/de';
 
-const DEFAULT_LANG = "de"
+const DEFAULT_LANG = isBusinessVersion() ? "de" : "en"
 
 class MyErrorHandler implements ErrorHandler {
 	ionicHandler: ErrorHandler
@@ -198,6 +198,40 @@ export class AppModule {
 		window.addEventListener("contextmenu", e => e.preventDefault())
 	}
 
+	private setLanguage(lang: string) {
+		return Bluebird.try(() => {
+			moment.locale(lang)
+
+			if (isBusinessVersion()) {
+				return this.translate.use(`${lang}_business`).toPromise()
+			}
+
+			return this.translate.use(lang).toPromise()
+		})
+	}
+
+	private determineLanguage() {
+		this.translate.setDefaultLang("en");
+
+		this.translate.get('general.backButtonText')
+			.subscribe((val: string) => this.config.set('ios', 'backButtonText', val))
+
+		const sessionStorage = withPrefix("whispeer.session")
+
+		if (sessionStorage.get("language")) {
+			return this.setLanguage(sessionStorage.get("language"))
+		}
+
+		this.platform.ready()
+			.then(() => this.globalization.getPreferredLanguage())
+			.then(({ value }) => value.split("-")[0].toLowerCase())
+			.catch(() => {
+				console.warn('Cannot get language from device, remaining with default language');
+				return DEFAULT_LANG
+			})
+			.then((lang) => this.setLanguage(lang))
+	}
+
 	constructor(
 		private zone: NgZone,
 		private translate: TranslateService, // tslint:disable-line:no-unused-variable
@@ -205,33 +239,10 @@ export class AppModule {
 		private config: Config, // tslint:disable-line:no-unused-variable
 		private platform: Platform // tslint:disable-line:no-unused-variable
 	) {
-		translate.setDefaultLang("en");
-
 		// this used to be a huge problem with long click in chrome.
 		// this.disableContextMenues()
 
-		platform.ready().then(() => {
-			this.globalization.getPreferredLanguage().then(({ value }) => {
-				console.warn(`Language from device: ${value}`)
-				return value.split("-")[0].toLowerCase()
-			}).catch(() => {
-				console.warn('Cannot get language from device, remaining with default language');
-				return DEFAULT_LANG
-			}).then((lang) => {
-				moment.locale(lang);
-
-				if (isBusinessVersion()) {
-					translate.use(`${lang}_business`)
-					return
-				}
-
-				translate.use(lang)
-			}).then(() => {
-				translate.get('general.backButtonText').subscribe((val: string) => {
-					config.set('ios', 'backButtonText', val);
-				})
-			})
-		})
+		this.determineLanguage()
 
 		if (IONIC_ENV === "prod") {
 			Bluebird.config({
