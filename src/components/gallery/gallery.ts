@@ -93,17 +93,14 @@ export class GalleryComponent {
 			|| image.lowest && image.lowest.loading
 	}
 
-	getProgress = () => 0
-
 	displayImage = (image) => {
 		if (image.upload) {
 			this.photoViewer.show(image.upload._file.originalUrl)
 			return
 		}
 
-		this.loadImage(image.highest || image.middle || image.lowest).then((url) => {
-			this.photoViewer.show(url)
-		})
+		this.loadImage(image.highest || image.middle || image.lowest)
+			.then((url) => this.photoViewer.show(url))
 	}
 
 	loadMoreImages() {
