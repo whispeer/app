@@ -28,7 +28,7 @@
 		<ion-item>
 			<ion-label>{{ 'settings.friendsAccess' | translate}}</ion-label>
 			<ion-toggle
-				[checked]="haveFriendsAccess()"
+				[(ngModel)]="haveFriendsAccess"
 				[disabled]="savingSettings"
 				(ionChange)="setFriendsAccess($event)"></ion-toggle>
 		</ion-item>

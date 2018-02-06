@@ -28,6 +28,7 @@ export class SettingsPage {
 	tutorialPassed = true;
 	savingSettings = false;
 	version = { version: `${CLIENT_INFO.version}-${CLIENT_INFO.commit}` }
+	haveFriendsAccess = false
 
 	tutorialVisible() {
 		return Tutorial.tutorialVisible
@@ -45,7 +46,12 @@ export class SettingsPage {
 		}
 	}
 
-	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService, private iab: InAppBrowser, private photoViewer: PhotoViewer) {}
+	loadSettings = () => this.haveFriendsAccess = settingsService.getBranch("friendsAccess")
+
+	constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, private translate: TranslateService, private iab: InAppBrowser, private photoViewer: PhotoViewer) {
+		this.loadSettings()
+		settingsService.listen(() => this.loadSettings(), "updated")
+	}
 
 	ionViewDidLoad() {
 		console.log('ionViewDidLoad SettingsPage');
@@ -56,15 +62,21 @@ export class SettingsPage {
 		alert(this.translate.instant("settings.pushAlert"));
 	}
 
-	haveFriendsAccess = () => settingsService.getBranch("friendsAccess")
-
 	setFriendsAccess = ($event) => {
-		// TODO: add error handler!
+		if ($event.checked === settingsService.getBranch("friendsAccess")) {
+			return
+		}
+
 		settingsService.updateBranch("friendsAccess", $event.checked)
 
 		this.savingSettings = true
 
 		settingsService.uploadChangedData()
+			.catch((e) => {
+				console.error(e)
+				settingsService.updateBranch("friendsAccess", !$event.checked)
+				alert(this.translate.instant("settings.saveError"))
+			})
 			.finally(() => this.savingSettings = false)
 	}
 

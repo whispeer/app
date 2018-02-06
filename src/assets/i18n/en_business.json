@@ -125,7 +125,8 @@
 			"save": "Save",
 			"cancel": "Cancel"
 		},
-		"friendsAccess": "Share contact list with my contacts"
+		"friendsAccess": "Share contact list with my contacts",
+		"saveError": "Saving failed. Please try again!"
 	},
 	"blocked": {
 		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",

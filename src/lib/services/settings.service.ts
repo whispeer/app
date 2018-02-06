@@ -362,8 +362,9 @@ class SettingsService extends Observer {
 	}
 };
 
-export default new SettingsService();
+const settingsService = new SettingsService();
 
+export default settingsService
 
 type CachedSettings = {
 	content: any,
@@ -393,6 +394,7 @@ class SettingsLoader extends MutableObjectLoader<Settings, CachedSettings>({
 	restore: ({ content, meta, server }, previousInstance) => {
 		if (previousInstance) {
 			previousInstance.update(content, meta, server)
+			settingsService.notify("", "updated");
 			return previousInstance
 		}
 
@@ -411,5 +413,8 @@ class SettingsLoader extends MutableObjectLoader<Settings, CachedSettings>({
 
 initService.registerCallback(() =>
 	SettingsLoader.get(sessionService.getUserID())
-		.then((loadedSettings) => settings = loadedSettings)
+		.then((loadedSettings) => {
+			settings = loadedSettings
+			settingsService.notify("", "updated");
+		})
 )

@@ -125,7 +125,8 @@
 			"save": "Speichern",
 			"cancel": "Abbrechen"
 		},
-		"friendsAccess": "Kontaktliste für Kontakte freigeben"
+		"friendsAccess": "Kontaktliste für Kontakte freigeben",
+		"saveError": "Das Speichern ist fehlgeschlagen. Bitte erneut versuchen!"
 	},
 	"blocked": {
 		"listExplanation": "Dies ist die Liste aller blockierten Nutzer. In allen anderen Auflistungen sind sie ausgegraut. Sie können sie über den \"Entblocken\"-Button in ihren jeweiligen Profilen wieder entblocken.",
