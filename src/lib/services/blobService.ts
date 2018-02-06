@@ -173,7 +173,7 @@ class MyBlob {
 		})
 	}
 
-	decrypt () {
+	decrypt (originalSize: number) {
 		if (this.decrypted) {
 			return Bluebird.resolve()
 		}
@@ -189,9 +189,11 @@ class MyBlob {
 			this.decryptProgress.progress(this.getSize())
 			timeEnd("blobdecrypt" + this.blobID);
 
+			const unpaddedData = originalSize > 0 ? decryptedData.slice(0, originalSize) : decryptedData
+
 			this.decrypted = true;
 
-			this.blobData = new Blob([decryptedData], {type: this.blobData.type});
+			this.blobData = new Blob([unpaddedData], {type: this.blobData.type});
 
 			return blobCache.store(this).catch((e) => {
 				console.log("Could not store blob", e)
@@ -292,9 +294,9 @@ class MyBlob {
 	}
 }
 
-const loadBlob = (blobID, type, progress, estimatedSize) => {
-	const decryptProgressStub = new Progress({ total: estimatedSize })
-	const downloadProgress = new Progress({ total: estimatedSize })
+const loadBlob = (blobID, type, progress, size: number) => {
+	const decryptProgressStub = new Progress({ total: size })
+	const downloadProgress = new Progress({ total: size })
 
 	progress.addDepend(downloadProgress)
 	progress.addDepend(decryptProgressStub)
@@ -314,7 +316,7 @@ const loadBlob = (blobID, type, progress, estimatedSize) => {
 		progress.removeDepend(decryptProgressStub)
 		progress.addDepend(blob.decryptProgress)
 
-		return blob.decrypt()
+		return blob.decrypt(size)
 	}))
 }
 
@@ -333,7 +335,7 @@ const blobService = {
 	isBlobLoaded: (blobID) => {
 		return blobCache.isLoaded(blobID)
 	},
-	getBlobUrl: (blobID, type: string, progress: Progress = new Progress(), estimatedSize = 0): Bluebird<string> => {
+	getBlobUrl: (blobID, type: string, estimatedSize: number, progress: Progress = new Progress()): Bluebird<string> => {
 		return blobCache.getBlobUrl(blobID).catch(() => {
 			return getBlob(blobID, type, progress, estimatedSize)
 		})
