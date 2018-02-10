@@ -89,7 +89,7 @@ import 'moment/locale/de';
 
 const DEFAULT_LANG = isBusinessVersion() ? "de" : "en"
 
-class MyErrorHandler implements ErrorHandler {
+export class MyErrorHandler implements ErrorHandler {
 	ionicHandler: ErrorHandler
 	ravenHandler: ErrorHandler
 
