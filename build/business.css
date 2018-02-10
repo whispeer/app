@@ -61060,6 +61060,14 @@ page-home .list-ios {
   line-height: 1em;
 }
 
+.topic--blocked {
+  color: #a0a7aa;
+}
+
+.topic--blocked .label p {
+  color: #a0a7aa;
+}
+
 .topic__badgeContainer {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -62054,12 +62062,21 @@ page-details .item .full--height {
   border-radius: 0;
 }
 
+.user__blocked {
+  color: #a0a7aa;
+}
+
 page-profile .item-block:last-child {
   border-bottom: 1px solid #ebeced !important;
 }
 
 page-profile .toolbar ion-title {
   padding: 0 0 1px;
+}
+
+.profile--blocked .fill-primary,
+.profile--blocked .fill-primaryDark {
+  fill: #a0a7aa;
 }
 
 .item-block {
@@ -62187,6 +62204,14 @@ page-profile .toolbar ion-title {
 
 page-settings ion-content {
   background-color: #f9f9fa !important;
+}
+
+.backup-save .button-inner {
+  color: #788286;
+}
+
+.backup-save .alert-button:last-child .button-inner {
+  color: #003b4c;
 }
 
 .logout-confirm .button-inner {
@@ -62672,6 +62697,10 @@ gallery > div .loading > img {
 gallery img {
   max-width: 100%;
   width: 100%;
+}
+
+gallery .imageContainer {
+  position: relative;
 }
 
 gallery .imageContainer ~ .imageContainer {

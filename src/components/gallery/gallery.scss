@@ -29,6 +29,10 @@ gallery {
 		width: 100%;
 	}
 
+	.imageContainer {
+		position: relative;
+	}
+
 	.imageContainer ~ .imageContainer {
 		margin-top: 3px;
 	}
