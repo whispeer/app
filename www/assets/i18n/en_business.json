@@ -4,7 +4,8 @@
 		"cancel": "Cancel",
 		"ok": "Ok",
 		"accept": "Accept",
-		"decline": "Decline"
+		"decline": "Decline",
+		"yes": "Yes"
 	},
 	"time": {
 		"today": "Today",
@@ -45,30 +46,37 @@
 		"search": "Search",
 		"searchResultExplain": "If you cannot find who you are looking for, try searching for their username.",
 		"contacts": "Contacts",
-		"company": "Colleagues"
+		"company": "Staff"
 	},
 	"requests": {
-		"title": "Contact Requests"
+		"title": "Contact Requests",
+		"noRequests": "You have no contact requests."
 	},
 	"topic": {
 		"takePhoto": "Take a Photo",
 		"selectGallery": "Select from Gallery",
 		"selectFile": "Send a File",
 		"fileTooBigTitle": "The size is too damn high!",
-		"fileTooBigDetail": "File uploads are currently limited to {{max_size}}MB.",
+		"fileTooBigDetail": "File uploads for private users are currently limited to {{max_size}}MB.",
 		"changed": "changed the title to",
+		"loadMore": "Load more Images",
 		"detail": {
 			"title": "Details",
 			"chatTitle": "Conversation Title",
+			"chatTitlePlaceholder": "Title of the Conversation",
+			"changeButtonText": "Change",
 			"allMembers": "All Members",
 			"admin": "Administrator",
 			"member": "Member",
+			"promote": "Promote",
+			"remove": "Remove",
 			"addMore": "Add more contacts...",
-			"reportTopic": "Report this Chat",
-			"reportTopic": "Report this Chat",
+			"reportTopic": "Report this Conversation",
 			"reportConfirm": {
-				"title": "Report this Chat?",
-				"message": "Please confirm that you want to report this chat. We will then get in touch with you."
+				"title": "Report this Conversation?",
+				"message": "Please confirm that you want to report this conversation. We will then get in touch with you.",
+				"cancel": "Cancel",
+				"confirm": "Report"
 			}
 		},
 		"add": {
@@ -80,8 +88,9 @@
 		"title": "Select Contacts",
 		"selected": "Selected",
 		"search": "Search",
+		"searchFor": "Search for \"{{searchTerm}}\"",
 		"contacts": "Contacts",
-		"colleagues": "Colleagues",
+		"company": "Staff",
 		"global": "Worldwide",
 		"selectedContacts": "Selected Contacts",
 		"selectedExplain": "Above contacts will be added to the new conversation. You can later manage all members and add more.",
@@ -97,21 +106,32 @@
 		"privacy": "Privacy Policy",
 		"contact": "Contact us",
 		"feedback": "Give us Feedback",
-		"logout": "Logout",
-		"companyName": "whispeer {{version}} by mindpost GmbH",
+		"logout": {
+			"button": "Logout",
+			"title": "Are you sure you want to log out on this device?",
+			"logout": "Logout",
+			"cancel": "Cancel"
+		},
+		"companyName": "whispeer by mindpost GmbH",
+		"version": "App-Version: {{version}}",
 		"madeInGermany": "Made in Germany with",
 		"humanRights": "for human rights",
 		"pushAlert": "This feature is not ready yet but we are working on it, promise!",
-		"logoutWarning": "Do you want to log out from this device?",
 		"blocked": "Blocked Users",
 		"backup": {
-			"button": "Show Backup-Key",
-			"confirm": "This key is used to recover your password in case you forget it. Please handle this key with care."
-		}
+			"button": "Request Backup Key",
+			"title": "Save your Backup Key?",
+			"message": "You will now see your backup key to save it. With this key you can reset your password.<br><br>Therefore please keep it in a really safe place.",
+			"save": "Save",
+			"cancel": "Cancel"
+		},
+		"friendsAccess": "Share contact list with my contacts",
+		"saveError": "Saving failed. Please try again!"
 	},
 	"blocked": {
 		"listExplanation": "This is a list of all users you blocked. They are greyed out in other listings. Unblock these users with the \"Unblock\" button in their respective profiles.",
 		"title": "Blocked Users",
+		"userReplacement": "Blocked User",
 		"messageReplacement": "- blocked content -"
 	},
 	"profile": {
@@ -155,9 +175,16 @@
 			"acceptedMessage": "{{name}} is now a Contact.",
 			"requestSentMessage": "You've sent a Contact Request to {{name}}.",
 			"reportContact": "Report this User",
+			"reportAndBlockContact": "Report and block this user",
+			"blocked": {
+				"removeTitle": "Would you like to keep this contact?",
+				"removeQuestion": "You may keep this user as a contact in your contact list. Blocked contacts appear greyed out.",
+				"removeCancelButtonText": "Keep",
+				"removeConfirmButtonText": "Remove"
+			},
 			"blockConfirm": {
 				"title": "Block this User?",
-				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.",
+				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.<br><br>In the Settings is a list of all blocked users.",
 				"cancel": "Cancel",
 				"confirm": "Block"
 			},
@@ -166,6 +193,12 @@
 				"message": "Please confirm that you want to report this user. We will get in touch with you.",
 				"cancel": "Cancel",
 				"confirm": "Report"
+			},
+			"reportAndBlockConfirm": {
+				"title": "Report and block this user?",
+				"message": "Blocking protects you from anything this user will send to you. You will not be notified about their activities and they will appear greyed out in listings.<br><br>Please confirm that you want to report this user. We will get in touch with you.",
+				"cancel": "Cancel",
+				"confirm": "Report & Block"
 			}
 		},
 		"image": {

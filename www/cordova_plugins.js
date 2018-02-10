@@ -356,7 +356,7 @@ module.exports.metadata =
 // TOP OF METADATA
 {
   "ImagePicker": "2.1.8",
-  "com-sarriaroman-photoviewer": "1.1.11",
+  "com-sarriaroman-photoviewer": "1.1.15",
   "cordova-filechooser": "1.0.1",
   "cordova-plugin-android-permissions": "1.0.0",
   "cordova-plugin-compat": "1.2.0",
@@ -365,7 +365,7 @@ module.exports.metadata =
   "cordova-plugin-file": "4.3.3",
   "cordova-plugin-file-opener2": "2.0.19",
   "cordova-plugin-filepicker": "1.1.4",
-  "cordova-plugin-globalization": "1.0.8",
+  "cordova-plugin-globalization": "1.0.9",
   "cordova-plugin-inappbrowser": "1.7.2",
   "cordova-plugin-ionic-webview": "1.1.16",
   "cordova-plugin-media": "3.0.1",
@@ -374,7 +374,7 @@ module.exports.metadata =
   "cordova-plugin-whitelist": "1.3.3",
   "ionic-plugin-keyboard": "2.2.1",
   "phonegap-plugin-barcodescanner": "6.0.8",
-  "phonegap-plugin-push": "2.1.2"
+  "phonegap-plugin-push": "2.1.3"
 };
 // BOTTOM OF METADATA
 });
