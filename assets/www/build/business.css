@@ -60862,6 +60862,10 @@ ion-fab-list[side="top"] button:last-child {
   min-height: calc(44px + 20px);
 }
 
+.navigator--hexagon--border {
+  stroke: #003b4c;
+}
+
 page-contacts ion-list {
   border-bottom: .55px solid #e5e5e5;
 }
@@ -61054,6 +61058,14 @@ page-home .list-ios {
 .topic .note .icon {
   font-size: 1em;
   line-height: 1em;
+}
+
+.topic--blocked {
+  color: #a0a7aa;
+}
+
+.topic--blocked .label p {
+  color: #a0a7aa;
 }
 
 .topic__badgeContainer {
@@ -61505,6 +61517,28 @@ page-messages .burst-seperator .burst-seperator-text:after {
   margin-left: 5px;
 }
 
+page-messages .messages__burst .label {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+page-messages .burst--first message {
+  margin-top: 11px;
+}
+
+page-messages .burst--last message {
+  margin-bottom: 11px;
+}
+
+page-messages .burst--middle .label {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+page-messages .item-block {
+  min-height: auto;
+}
+
 .md .messages__header-image {
   position: absolute;
   top: 50%;
@@ -61582,10 +61616,18 @@ page-messages .burst-seperator .burst-seperator-text:after {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  width: 192px;
-  height: 47px;
   overflow: visible;
   padding: 5px 0 5px 25px;
+}
+
+.message__file {
+  min-height: 55px;
+  width: 100%;
+}
+
+.message__voicemail {
+  width: 192px;
+  height: 47px;
 }
 
 .message__voicemail {
@@ -61735,7 +61777,7 @@ page-messages .burst-seperator .burst-seperator-text:after {
   color: #545b5e;
 }
 
-message:last-of-type .messages__message.last:before {
+.burst--last .messages__message.last:before {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -61745,23 +61787,19 @@ message:last-of-type .messages__message.last:before {
   z-index: -1;
 }
 
-.burst--me message:last-of-type .messages__message.last:before {
+.burst--last.burst--me .messages__message.last:before {
   right: -7px;
   border-right: 20px solid #788286;
   border-bottom-left-radius: 16px 14px;
 }
 
-.burst--other message:last-of-type .messages__message.last:before {
+.burst--last.burst--other .messages__message.last:before {
   left: -7px;
   border-left: 20px solid #ebeced;
   border-bottom-right-radius: 16px 14px;
 }
 
-.burst--me message:last-of-type .messages__message.last.sending:before {
-  border-color: #d5d8da;
-}
-
-message:last-of-type .messages__message.last:after {
+.burst--last .messages__message.last:after {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -61773,14 +61811,18 @@ message:last-of-type .messages__message.last:after {
   z-index: -1;
 }
 
-.burst--me message:last-of-type .messages__message.last:after {
+.burst--last.burst--me .messages__message.last:after {
   right: -56px;
   border-bottom-left-radius: 10px;
 }
 
-.burst--other message:last-of-type .messages__message.last:after {
+.burst--last.burst--other .messages__message.last:after {
   left: 4px;
   border-bottom-right-radius: 10px;
+}
+
+.burst--last.burst--me .messages__message.last.sending:before {
+  border-color: #d5d8da;
 }
 
 .burst--me a {
@@ -62020,12 +62062,21 @@ page-details .item .full--height {
   border-radius: 0;
 }
 
+.user__blocked {
+  color: #a0a7aa;
+}
+
 page-profile .item-block:last-child {
   border-bottom: 1px solid #ebeced !important;
 }
 
 page-profile .toolbar ion-title {
   padding: 0 0 1px;
+}
+
+.profile--blocked .fill-primary,
+.profile--blocked .fill-primaryDark {
+  fill: #a0a7aa;
 }
 
 .item-block {
@@ -62153,6 +62204,14 @@ page-profile .toolbar ion-title {
 
 page-settings ion-content {
   background-color: #f9f9fa !important;
+}
+
+.backup-save .button-inner {
+  color: #788286;
+}
+
+.backup-save .alert-button:last-child .button-inner {
+  color: #003b4c;
 }
 
 .logout-confirm .button-inner {
@@ -62638,6 +62697,10 @@ gallery > div .loading > img {
 gallery img {
   max-width: 100%;
   width: 100%;
+}
+
+gallery .imageContainer {
+  position: relative;
 }
 
 gallery .imageContainer ~ .imageContainer {
