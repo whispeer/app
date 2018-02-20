@@ -356,7 +356,7 @@ module.exports.metadata =
 // TOP OF METADATA
 {
   "ImagePicker": "2.1.8",
-  "com-sarriaroman-photoviewer": "1.1.15",
+  "com-sarriaroman-photoviewer": "1.1.10",
   "cordova-filechooser": "1.0.1",
   "cordova-plugin-android-permissions": "1.0.0",
   "cordova-plugin-compat": "1.2.0",
