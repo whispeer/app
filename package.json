@@ -84,7 +84,7 @@
     "bluebird": "^3.4.7",
     "blueimp-canvas-to-blob": "^3.11.0",
     "blueimp-load-image": "^2.10.0",
-    "com-sarriaroman-photoviewer": "~1.1.10",
+    "com-sarriaroman-photoviewer": "=1.1.10",
     "cordova-android": "~6.3.0",
     "cordova-filechooser": "https://github.com/whispeer/cordova-filechooser.git#feature/full_path",
     "cordova-ios": "^4.5.2",
