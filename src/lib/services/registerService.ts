@@ -18,7 +18,7 @@ var keyGenPromise
 var registerPromise;
 
 const registerService = {
-	register: function (nickname, mail, password, profile, settings, inviteCode) {
+	register: function (nickname, mail, password, profile, settings, inviteCode?) {
 		var keys;
 
 		if (!registerPromise) {
@@ -205,7 +205,7 @@ const registerService = {
 		}).nodeify(callback);
 	},
 
-	nicknameUsed: function (nickname, callback) {
+	nicknameUsed: function (nickname, callback?) {
 		if (nickname === "" || !h.isNickname(nickname)) {
 			return Bluebird.resolve(true).nodeify(callback);
 		}

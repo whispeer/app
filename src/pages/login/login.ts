@@ -7,7 +7,7 @@ import { failureCodes } from "../../lib/services/login.service";
 import loginService from "../../lib/services/login.service";
 import passwordStrength from '../../lib/services/passwordStrength.service'
 
-const registerService = require('../../lib/services/registerService');
+import registerService from '../../lib/services/registerService'
 import whispeerHelper from "../../lib/helper/helper"
 
 import { TranslateService } from '@ngx-translate/core';

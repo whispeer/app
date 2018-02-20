@@ -1424,7 +1424,7 @@ colors@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.1.2.tgz#168a4701756b6a7f51a12ce0c97bfa28c084ed63"
 
-com-sarriaroman-photoviewer@~1.1.10:
+com-sarriaroman-photoviewer@=1.1.10:
   version "1.1.10"
   resolved "https://registry.yarnpkg.com/com-sarriaroman-photoviewer/-/com-sarriaroman-photoviewer-1.1.10.tgz#e18f1535751fe105ae180c4fc5a164120471900d"
 
