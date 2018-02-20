@@ -97,7 +97,7 @@ export class HomePage {
 
 	ngOnInit() {}
 
-	private setLanguage() {
+	private setLanguage = () => {
 		const lang = this.translate.currentLang
 
 		if (!lang) {
