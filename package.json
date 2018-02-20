@@ -155,5 +155,5 @@
     "ionic:serve": "ionic-app-scripts serve --dev",
     "start": "npm run ionic:serve"
   },
-  "version": "0.3.11"
+  "version": "0.3.12"
 }
