@@ -63,7 +63,10 @@ class FileUpload {
 			if (this.file.originalUrl) {
 				const { directory, name } = unpath(this.file.originalUrl)
 
-				return blobCache.moveFileToBlob(directory, name, this.blob.getBlobID()).then(() => keys)
+				const blobID = this.blob.getBlobID()
+				const type = this.blob.getType()
+
+				return blobCache.moveFileToBlob(directory, name, blobID, type).then(() => keys)
 			}
 
 			return keys

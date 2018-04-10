@@ -47,10 +47,6 @@ const removeOldFiles = () => {
 
 document.addEventListener("deviceready", removeOldFiles, false);
 
-const readFileAsBlob = (path, filename, type) => {
-	fixFileReader()
-	return FILE.readAsArrayBuffer(path, filename).then((buf) => new Blob([buf], { type }))
-}
 const writeToFile = (path, filename, data: Blob | string) => {
 	fixFileReader()
 	return FILE.writeFile(path, filename, data)
@@ -63,7 +59,12 @@ const existsFile = (path, filename) =>
 		return Bluebird.reject(e)
 	})
 
-const idToFileName = (blobID) => `${blobID}.aac`
+const idToFileName = (blobID, type: string) => {
+	const types = type.split("/")
+	const extension = types[types.length - 1]
+
+	return `${blobID}.${extension}`
+}
 
 let clearing = false
 let storing = 0
@@ -94,11 +95,11 @@ const blobCache = {
 		}).finally(() => clearing = false)
 	},
 
-	moveFileToBlob: (currentDirectory, currentFilename, blobID) => {
+	moveFileToBlob: (currentDirectory, currentFilename, blobID, type) => {
 		return Bluebird.try(async () => {
 			if (clearing) throw new Error('Cannot get blob, currently clearing cache.')
 			const path = await getCacheDirectory()
-			const filename = idToFileName(blobID)
+			const filename = idToFileName(blobID, type)
 			return FILE.moveFile(currentDirectory, currentFilename, path, filename)
 		})
 	},
@@ -117,7 +118,7 @@ const blobCache = {
 			}
 
 			const path = await getCacheDirectory()
-			const filename = idToFileName(blobID)
+			const filename = idToFileName(blobID, blob.getType())
 			const exists = await existsFile(path, filename)
 
 			if (!exists) {
@@ -131,11 +132,11 @@ const blobCache = {
 		}).finally(() => storing-- )
 	},
 
-	getBlobUrl: (blobID) => {
+	getBlobUrl: (blobID, type) => {
 		return Bluebird.try(async () => {
 			if (clearing) throw new Error('Cannot get blob URL, currently clearing cache.')
 			const path = await getCacheDirectory()
-			const filename = idToFileName(blobID)
+			const filename = idToFileName(blobID, type)
 			const exists = await existsFile(path, filename)
 
 			if (!exists) {
@@ -146,10 +147,10 @@ const blobCache = {
 		})
 	},
 
-	copyBlobToDownloads: (blobID, filename: string) => {
+	copyBlobToDownloads: (blobID, filename: string, type: string) => {
 		return Bluebird.try(async () => {
 			const cacheDir = await getCacheDirectory()
-			const blobFile = idToFileName(blobID)
+			const blobFile = idToFileName(blobID, type)
 			const path = isAndroid() ? `${FILE.externalRootDirectory}Download/` : `${FILE.documentsDirectory}`
 			const existsSource = await existsFile(cacheDir, blobFile)
 			const existsDestination = await existsFile(path, filename)
@@ -172,17 +173,9 @@ const blobCache = {
 		.then((file: FileEntry) => new Bluebird<any>((resolve, reject) => file.file(resolve, reject))
 		.then((file) => file.type)),
 
-	isLoaded: (blobID) => blobCache.getBlobUrl(blobID).then(() => true).catch(() => false),
-
-	get: (blobID) => {
-		return Bluebird.try(async () => {
-			if (clearing) throw new Error('Cannot get blob, currently clearing cache.')
-			const path = await getCacheDirectory()
-			const filename = idToFileName(blobID)
-			const blob = await readFileAsBlob(path, filename, "")
-			return { blob, blobID, decrypted: true, meta: {} }
-		})
-	}
+	isLoaded: (blobID, type) => blobCache.getBlobUrl(blobID, type)
+		.then(() => true)
+		.catch(() => false),
 }
 
 export default blobCache

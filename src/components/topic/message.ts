@@ -82,7 +82,7 @@ export class MessageComponent {
 		fileTransferQueue.enqueue(1, () =>
 			blobService
 				.getBlobUrl(file.blobID, file.type, file.size, loadProgress)
-				.then(url => blobCache.copyBlobToDownloads(file.blobID, file.name))
+				.then(url => blobCache.copyBlobToDownloads(file.blobID, file.name, file.type))
 				.delay(FILE_DOWNLOAD_DELAY)
 				.then((url) => {
 					file.loaded = true
