@@ -102,7 +102,7 @@ export class ContactsWithSearch {
 
 				return userService.getMultipleFormatted(colleagues)
 					.then(ContactsWithSearch.sort)
-					.then((result: any[]) => this.colleagues = result)
+					.then((result: any[]) => { this.colleagues = result })
 			})
 	}
 

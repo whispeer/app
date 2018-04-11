@@ -58,7 +58,7 @@ const writeToFile = (path, filename, data: Blob | string) => {
 const existsFile = (path, filename) =>
 	FILE.checkFile(path, filename).catch((e) => {
 		if (e.code === 1) {
-			return false
+			return Bluebird.resolve(false)
 		}
 		return Bluebird.reject(e)
 	})
