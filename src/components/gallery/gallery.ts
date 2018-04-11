@@ -65,7 +65,6 @@ export class GalleryComponent {
 
 				return url
 			})
-			.catch(errorService.criticalError)
 	}
 
 	loadImagePreviews(images: imageQualities[]) {
@@ -84,6 +83,7 @@ export class GalleryComponent {
 			}
 
 			this.loadImage(image.lowest)
+				.catch(errorService.criticalError)
 		})
 	}
 
@@ -101,6 +101,7 @@ export class GalleryComponent {
 
 		this.loadImage(image.highest || image.middle || image.lowest)
 			.then((url) => this.photoViewer.show(url))
+			.catch(errorService.criticalError)
 	}
 
 	loadMoreImages() {
