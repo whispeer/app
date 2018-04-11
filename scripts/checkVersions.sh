@@ -28,13 +28,12 @@ function checkVersion () {
 }
 
 # check node foundation
-checkVersion node -v 'v7.10.1'
-checkVersion npm -v '4.2.0'
-checkVersion yarn -v '1.1.0'
+checkVersion node -v 'v8.11.1'
+checkVersion npm -v '5.6.0'
 
 # check cordova and ionic
 checkVersion cordova -v '7.1.0'
-checkVersion ionic -v '3.9.2'
+checkVersion ionic -v '3.19.0'
 
 # for completeness, show ionic info
 ionic info
