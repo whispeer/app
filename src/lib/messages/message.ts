@@ -386,7 +386,7 @@ export class Message {
 		}))
 
 		Bluebird.resolve(this.data[attr]).filter((ele: any) => {
-			return blobService.isBlobLoaded(ele.blobID)
+			return blobService.isBlobLoaded(ele.blobID, ele.type)
 		}).each((loadedAttachment: any) => {
 			loadedAttachment.loaded = true
 		})

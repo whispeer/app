@@ -292,6 +292,10 @@ class MyBlob {
 			return keyStore.hash.hashArrayBuffer(buf)
 		})
 	}
+
+	getType() {
+		return this.blobData.type
+	}
 }
 
 const loadBlob = (blobID, type, progress, size: number) => {
@@ -332,13 +336,12 @@ const blobService = {
 	createBlob: (blob) => {
 		return new MyBlob(blob);
 	},
-	isBlobLoaded: (blobID) => {
-		return blobCache.isLoaded(blobID)
+	isBlobLoaded: (blobID, type: string) => {
+		return blobCache.isLoaded(blobID, type)
 	},
 	getBlobUrl: (blobID, type: string, estimatedSize: number, progress: Progress = new Progress()): Bluebird<string> => {
-		return blobCache.getBlobUrl(blobID).catch(() => {
-			return getBlob(blobID, type, progress, estimatedSize)
-		})
+		return blobCache.getBlobUrl(blobID, type)
+			.catch(() => getBlob(blobID, type, progress, estimatedSize))
 	},
 }
 
