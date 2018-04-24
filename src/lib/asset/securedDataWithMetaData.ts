@@ -355,14 +355,6 @@ export class SecuredData {
 		this._updated.meta[attr] = value;
 	}
 
-	/** set a certain attribute in the meta object
-			@param attrs [] list of which attribute to set
-			@param value value to set attribute to
-	*/
-	metaAdd = (attrs, value) => {
-		this.changed = h.deepSetCreate(this._updated.meta, attrs, value);
-	}
-
 	setParent = (parentSecuredData) => {
 		this._updated.meta._parent = parentSecuredData.getHash();
 	}
