@@ -23,6 +23,11 @@
 		}
 	</script>-->
 
+	<link rel="preload" as="script" href="/build/polyfills.js" />
+	<link rel="preload" as="script" href="/build/vendor.js" />
+	<link rel="preload" as="script" href="/build/main.js" />
+	<link rel="preload" as="script" href="/build/5.js" />
+
 	<link href="build/main.css" rel="stylesheet">
 
 </head>
@@ -32,11 +37,11 @@
 	<ion-app></ion-app>
 
 	<!-- The polyfills js is generated during the build process -->
-	<script src="build/polyfills.js"></script>
+	<script src="build/polyfills.js" defer></script>
 
 	<!-- The bundle js is generated during the build process -->
-	<script src="build/vendor.js"></script>
-	<script src="build/main.js" async></script>
+	<script src="build/vendor.js" defer></script>
+	<script src="build/main.js" defer></script>
 
 </body>
 </html>

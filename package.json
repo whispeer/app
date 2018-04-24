@@ -141,6 +141,7 @@
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.4.0",
     "webpack-bundle-size-analyzer": "^2.6.0",
+    "ws": "3.3.2",
     "xml2js": "^0.4.17"
   },
   "homepage": "http://whispeer.de/",
