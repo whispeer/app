@@ -24,7 +24,7 @@ fi
 set -x
 
 rm -rf node_modules platforms plugins www/*
-yarn
+npm i
 cordova prepare
 npm run businessSass
 
