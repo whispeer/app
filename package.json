@@ -110,7 +110,7 @@
     "jquery": "~3.1.0",
     "moment": "^2.18.1",
     "phonegap-plugin-barcodescanner": "~6.0.6",
-    "phonegap-plugin-push": "^2.1.0",
+    "phonegap-plugin-push": "2.1.0",
     "qrious": "^4.0.2",
     "raven-js": "^3.20.1",
     "rxjs": "5.5.2",
