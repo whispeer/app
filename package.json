@@ -8,8 +8,8 @@
   },
   "cordova": {
     "platforms": [
-      "android",
-      "ios"
+      "ios",
+      "android"
     ],
     "plugins": {
       "ImagePicker": {
@@ -84,7 +84,7 @@
     "blueimp-canvas-to-blob": "^3.11.0",
     "blueimp-load-image": "^2.10.0",
     "com-sarriaroman-photoviewer": "=1.1.10",
-    "cordova-android": "~6.3.0",
+    "cordova-android": "^6.4.0",
     "cordova-filechooser": "https://github.com/whispeer/cordova-filechooser.git#feature/full_path",
     "cordova-ios": "4.5.4",
     "cordova-plugin-android-permissions": "^1.0.0",
