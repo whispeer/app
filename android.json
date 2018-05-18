@@ -75,34 +75,6 @@
             {
               "xml": "<feature name=\"PushNotification\"><param name=\"android-package\" value=\"com.adobe.phonegap.push.PushPlugin\" /></feature>",
               "count": 1
-            },
-            {
-              "xml": "<preference name=\"webView\" value=\"org.crosswalk.engine.XWalkWebViewEngine\" />",
-              "count": 1
-            },
-            {
-              "xml": "<preference name=\"xwalkVersion\" value=\"23+\" />",
-              "count": 1
-            },
-            {
-              "xml": "<preference name=\"xwalkLiteVersion\" value=\"xwalk_core_library_canary:17+\" />",
-              "count": 1
-            },
-            {
-              "xml": "<preference name=\"xwalkCommandLine\" value=\"--disable-pull-to-refresh-effect\" />",
-              "count": 1
-            },
-            {
-              "xml": "<preference name=\"xwalkMode\" value=\"embedded\" />",
-              "count": 1
-            },
-            {
-              "xml": "<preference name=\"xwalkMultipleApk\" value=\"true\" />",
-              "count": 1
-            },
-            {
-              "xml": "<preference name=\"android-minSdkVersion\" value=\"16\" />",
-              "count": 1
             }
           ],
           "/widget": [
@@ -215,14 +187,6 @@
             {
               "xml": "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\" />",
               "count": 1
-            },
-            {
-              "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
-              "count": 1
-            },
-            {
-              "xml": "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\" />",
-              "count": 1
             }
           ],
           "application": [
@@ -292,14 +256,6 @@
     },
     "phonegap-plugin-push": {
       "FCM_VERSION": "11.0.1",
-      "PACKAGE_NAME": "whispeer.app"
-    },
-    "cordova-plugin-crosswalk-webview": {
-      "XWALK_VERSION": "23+",
-      "XWALK_LITEVERSION": "xwalk_core_library_canary:17+",
-      "XWALK_COMMANDLINE": "--disable-pull-to-refresh-effect",
-      "XWALK_MODE": "embedded",
-      "XWALK_MULTIPLEAPK": "true",
       "PACKAGE_NAME": "whispeer.app"
     }
   },
@@ -651,14 +607,14 @@
   ],
   "plugin_metadata": {
     "ImagePicker": "2.1.8",
-    "com-sarriaroman-photoviewer": "1.1.15",
+    "com-sarriaroman-photoviewer": "1.1.10",
     "cordova-filechooser": "1.0.1",
     "cordova-plugin-android-permissions": "1.0.0",
     "cordova-plugin-camera": "2.3.1",
     "cordova-plugin-device": "1.1.7",
     "cordova-plugin-file": "4.3.3",
     "cordova-plugin-file-opener2": "2.0.19",
-    "cordova-plugin-filepicker": "1.1.4",
+    "cordova-plugin-filepicker": "1.1.5",
     "cordova-plugin-globalization": "1.0.9",
     "cordova-plugin-inappbrowser": "1.7.2",
     "cordova-plugin-ionic-webview": "1.1.16",

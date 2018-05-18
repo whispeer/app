@@ -32,7 +32,7 @@ buildscript {
     // http://tools.android.com/tech-docs/new-build-system/version-compatibility
     // and https://issues.apache.org/jira/browse/CB-8143
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
     }
 }
 
@@ -47,7 +47,7 @@ allprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = '4.1.0'
 }
 
 // Configuration properties. Set these via environment variables, build-extras.gradle, or gradle.properties.
@@ -97,7 +97,6 @@ apply from: "ImagePicker/app-androidtarget.gradle"
 apply from: "com-sarriaroman-photoviewer/app-photoviewer.gradle"
 apply from: "phonegap-plugin-barcodescanner/app-barcodescanner.gradle"
 apply from: "phonegap-plugin-push/app-push.gradle"
-apply from: "cordova-plugin-crosswalk-webview/app-xwalk.gradle"
 // PLUGIN GRADLE EXTENSIONS END
 
 def hasBuildExtras = file('build-extras.gradle').exists()
@@ -255,12 +254,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
+    implementation fileTree(dir: 'libs', include: '*.jar')
     // SUB-PROJECT DEPENDENCIES START
-    debugCompile(project(path: "CordovaLib", configuration: "debug"))
-    releaseCompile(project(path: "CordovaLib", configuration: "release"))
+    implementation(project(path: "CordovaLib"))
     compile "com.android.support:appcompat-v7:23+"
-    compile "com.android.support:support-v4:24.1.1+"
+    compile "com.android.support:support-v4:27.1.0"
     compile "com.android.support:support-v4:+"
     compile "com.android.support:support-v13:26.+"
     compile "me.leolin:ShortcutBadger:1.1.17@aar"
@@ -282,7 +280,7 @@ def promptForReleaseKeyPassword() {
 
 gradle.taskGraph.whenReady { taskGraph ->
     taskGraph.getAllTasks().each() { task ->
-        if (task.name == 'validateReleaseSigning' || task.name == 'validateSigningRelease') {
+        if (['validateReleaseSigning', 'validateSigningRelease', 'validateSigningArmv7Release', 'validateSigningX86Release'].contains(task.name)) {
             promptForReleaseKeyPassword()
         }
     }
@@ -327,3 +325,10 @@ for (def func : cdvPluginPostBuildExtras) {
 if (hasProperty('postBuildExtras')) {
     postBuildExtras()
 }
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:support-v4:26.1.0'
+    }
+}
+

@@ -13,3 +13,6 @@ out
 # Gradle builds
 /build
 .gradle
+assets/www/build
+CordovaLib/build
+*/node_modules/*
