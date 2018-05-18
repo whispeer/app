@@ -98,8 +98,9 @@
     <hook src="scripts/copyPushIcon.js" type="after_prepare" />
     <hook src="scripts/fixPackageFormatting.sh" type="after_prepare" />
     <hook src="scripts/correctIOSSimVersion.sh" type="after_platform_add" />
-    <hook src="scripts/fixAndroidSupportLibrary.sh" type="after_platform_add"
+    <hook src="scripts/fixAndroidSupportLibrary.sh" type="after_platform_add" />
     <engine name="ios" spec="4.5.4" />
+    <engine name="android" spec="^6.4.0" />
     <plugin name="ImagePicker" spec="https://github.com/whispeer/ImagePicker.git#fix/tmp-image-reuse">
         <variable name="CAMERA_USAGE_DESCRIPTION" value="whispeer needs access to your Camera to allow you to take Photos directly from the app." />
         <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value="whispeer needs access to your Photo Library to allow you to send Photos from your Phone to your Contacts." />
@@ -132,5 +133,4 @@
     <plugin name="phonegap-plugin-push" spec="2.1.3">
         <variable name="FCM_VERSION" value="11.0.1" />
     </plugin>
-    <engine name="android" spec="~6.4.0" />
 </widget>
