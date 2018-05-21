@@ -65,14 +65,6 @@ module.exports = [
     ]
   },
   {
-    "id": "cordova-plugin-device.device",
-    "file": "plugins/cordova-plugin-device/www/device.js",
-    "pluginId": "cordova-plugin-device",
-    "clobbers": [
-      "device"
-    ]
-  },
-  {
     "id": "cordova-plugin-file.DirectoryEntry",
     "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
     "pluginId": "cordova-plugin-file",
@@ -336,6 +328,14 @@ module.exports = [
     ]
   },
   {
+    "id": "cordova-plugin-device.device",
+    "file": "plugins/cordova-plugin-device/www/device.js",
+    "pluginId": "cordova-plugin-device",
+    "clobbers": [
+      "device"
+    ]
+  },
+  {
     "id": "phonegap-plugin-push.PushNotification",
     "file": "plugins/phonegap-plugin-push/www/push.js",
     "pluginId": "phonegap-plugin-push",
@@ -352,20 +352,19 @@ module.exports.metadata =
   "cordova-filechooser": "1.0.1",
   "cordova-plugin-android-permissions": "1.0.0",
   "cordova-plugin-camera": "2.3.1",
-  "cordova-plugin-device": "1.1.6",
   "cordova-plugin-file": "4.3.3",
   "cordova-plugin-file-opener2": "2.0.19",
   "cordova-plugin-filepicker": "1.1.5",
   "cordova-plugin-globalization": "1.0.9",
   "cordova-plugin-inappbrowser": "1.7.2",
-  "cordova-plugin-ionic-webview": "1.1.8",
   "cordova-plugin-media": "3.0.1",
   "cordova-plugin-splashscreen": "4.0.3",
   "cordova-plugin-statusbar": "2.2.3",
-  "cordova-plugin-whitelist": "1.3.2",
   "ionic-plugin-keyboard": "2.2.1",
   "phonegap-plugin-barcodescanner": "6.0.8",
-  "phonegap-plugin-push": "2.1.0"
+  "cordova-plugin-device": "1.1.7",
+  "cordova-plugin-whitelist": "1.3.3",
+  "phonegap-plugin-push": "2.1.3"
 };
 // BOTTOM OF METADATA
 });
