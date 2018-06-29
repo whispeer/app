@@ -23,7 +23,6 @@ fi
 
 set -x
 
-rm -rf platforms plugins www/*
 npm i
 cordova prepare
 npm run businessSass
