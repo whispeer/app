@@ -135,10 +135,6 @@
               "count": 2
             },
             {
-              "xml": "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" />",
-              "count": 1
-            },
-            {
               "xml": "<uses-permission android:name=\"android.permission.CAMERA\" />",
               "count": 1
             },
