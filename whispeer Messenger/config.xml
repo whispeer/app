@@ -90,6 +90,7 @@
     <hook src="scripts/copyPushIcon.js" type="after_prepare" />
     <hook src="scripts/fixPackageFormatting.sh" type="after_prepare" />
     <hook src="scripts/correctIOSSimVersion.sh" type="after_platform_add" />
+    <hook src="scripts/fixAndroidSupportLibrary.sh" type="after_platform_add" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
     <icon height="20" src="resources/ios/icon/Icon-App-20x20@1x.png" width="20" />
