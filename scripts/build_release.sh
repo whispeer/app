@@ -38,6 +38,7 @@ sed -i .bak 's/android-minSdkVersion" value="16"/android-minSdkVersion" value="2
 
 ./scripts/setVersionCode.js 5
 
+read -n 1 -s -r -p "Press any key build android >= 5 release"
 cordova build android --release
 cp ./platforms/android/build/outputs/apk/android-release-unsigned.apk ./release/whispeer-android-unsigned.apk
 
@@ -48,6 +49,7 @@ echo "build for android 4"
 cordova plugin add cordova-plugin-crosswalk-webview
 ./scripts/setVersionCode.js 0
 
+read -n 1 -s -r -p "Press any key build android 4 release"
 cordova build android --release
 cp ./platforms/android/build/outputs/apk/android-release-unsigned.apk ./release/whispeer-android4-unsigned.apk
 
