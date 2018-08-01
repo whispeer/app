@@ -347,6 +347,7 @@ module.exports = [
 module.exports.metadata = 
 // TOP OF METADATA
 {
+  "cordova-plugin-ionic-webview": "1.1.16",
   "ImagePicker": "2.1.8",
   "com-sarriaroman-photoviewer": "1.1.10",
   "cordova-filechooser": "1.0.1",

@@ -132,7 +132,11 @@
           "/manifest": [
             {
               "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
-              "count": 2
+              "count": 1
+            },
+            {
+              "xml": "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" />",
+              "count": 1
             },
             {
               "xml": "<uses-permission android:name=\"android.permission.CAMERA\" />",
@@ -165,10 +169,6 @@
           ],
           "/*": [
             {
-              "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
-              "count": 3
-            },
-            {
               "xml": "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" />",
               "count": 1
             },
@@ -178,6 +178,10 @@
             },
             {
               "xml": "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\" />",
+              "count": 1
+            },
+            {
+              "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
               "count": 1
             },
             {
@@ -196,6 +200,9 @@
     }
   },
   "installed_plugins": {
+    "cordova-plugin-ionic-webview": {
+      "PACKAGE_NAME": "whispeer.app"
+    },
     "ImagePicker": {
       "PACKAGE_NAME": "whispeer.app"
     },
@@ -599,6 +606,7 @@
     }
   ],
   "plugin_metadata": {
+    "cordova-plugin-ionic-webview": "1.1.16",
     "ImagePicker": "2.1.8",
     "com-sarriaroman-photoviewer": "1.1.10",
     "cordova-filechooser": "1.0.1",
