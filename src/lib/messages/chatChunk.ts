@@ -253,7 +253,7 @@ export class Chunk extends Observer {
 		})
 	}
 
-	static loadChunkChain(newChunk, oldChunk) {
+	static loadChunkChain(newChunk: Chunk, oldChunk: Chunk) {
 		if (newChunk.getID() === oldChunk.getID()) {
 			return Bluebird.resolve()
 		}
