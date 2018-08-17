@@ -132,6 +132,10 @@ export class PushService {
 					this.goToReference(additionalData.reference)
 				}
 
+				if (additionalData && additionalData.count) {
+					this.pushInstance.setApplicationIconBadgeNumber(parseInt(additionalData.count, 10));
+				}
+
 				var pushKey = sessionStorage.get("pushKey");
 
 				if (additionalData.encryptedContent && pushKey) {
