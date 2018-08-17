@@ -1,4 +1,4 @@
-console.warn(`Whispeer startup at ${Date.now()}`)
+console.warn(`Whispeer startup at ${Date.now()}. Version: ${CLIENT_INFO.version}-${CLIENT_INFO.commit}-${CLIENT_INFO.date}`)
 console.time("Spinner on Home")
 
 const errorService = require("./error.service").errorServiceInstance;

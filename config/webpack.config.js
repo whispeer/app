@@ -134,6 +134,7 @@ const getConfig = (production) => {
 				"CLIENT_INFO": JSON.stringify({
 					type: "messenger",
 					version: data.version,
+					date: new Date().toUTCString(),
 					commit
 				})
 			}),
