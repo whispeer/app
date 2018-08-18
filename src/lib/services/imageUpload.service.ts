@@ -9,7 +9,7 @@ var imageLib = require("blueimp-load-image/js/load-image");
 
 var canvasToBlob : any = Bluebird.promisify(h.canvasToBlob.bind(h));
 
-var PREVIEWSDISABLED = false;
+var PREVIEWSDISABLED = true;
 
 type previewType = {
 	"0": string,
@@ -92,7 +92,7 @@ if (screenSizeService.mobile) {
 const uploadQueue = new Queue(3);
 uploadQueue.start();
 
-const resizeQueue = new Queue(1);
+const resizeQueue = new Queue(3);
 resizeQueue.start();
 
 const sizeDiff = (a, b) => {
