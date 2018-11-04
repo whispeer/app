@@ -33,7 +33,7 @@ checkVersion npm -v '5.6.0'
 
 # check cordova and ionic
 checkVersion cordova -v '7.1.0'
-checkVersion ionic -v '3.19.0'
+checkVersion ionic --version '3.19.0'
 
 # for completeness, show ionic info
 ionic info

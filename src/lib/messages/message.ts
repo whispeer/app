@@ -195,15 +195,10 @@ export class Message {
 	hasBeenSent = () => this.wasSent
 
 	uploadAttachments = h.cacheResult<Bluebird<any>>((chunkKey) => {
-		return this.prepareAttachments().then(() => {
-			const attachments = [...this.attachments.images, ...this.attachments.files, ...this.attachments.voicemails]
+		const attachments = [...this.attachments.images, ...this.attachments.files, ...this.attachments.voicemails]
 
-			return Bluebird.all(attachments.map((attachment) => {
-				return attachment.upload(chunkKey)
-			}))
-		}).then((imageKeys) => {
-			return h.array.flatten(imageKeys)
-		})
+		return Bluebird.all(attachments.map((attachment) => attachment.upload(chunkKey)))
+			.then((imageKeys) => h.array.flatten(imageKeys))
 	})
 
 	sendContinously = h.cacheResult<any>(() => {
@@ -239,9 +234,11 @@ export class Message {
 
 			this.securedData.setParent(chunk.getSecuredData())
 
-			await Message.setAttachmentsInfo(this.securedData, this.attachments)
-
 			const chunkKey = chunk.getKey()
+
+			const keys = (await this.uploadAttachments(chunkKey)).map(keyStore.upload.getKey)
+
+			await Message.setAttachmentsInfo(this.securedData, this.attachments)
 
 			const sentMessages = messages.filter((m) => m.hasBeenSent())
 
@@ -252,7 +249,6 @@ export class Message {
 			}
 
 			const signAndEncryptPromise = this.securedData.signAndEncrypt(userService.getOwn().getSignKey(), chunkKey)
-			const keys = (await this.uploadAttachments(chunkKey)).map(keyStore.upload.getKey)
 			const request = await signAndEncryptPromise
 
 			if (this.chat.isDraft()) {

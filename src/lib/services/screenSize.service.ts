@@ -1,7 +1,7 @@
 import Observer from "../asset/observer";
 
 class ScreenSizeService extends Observer {
-	mobile: true
+	mobile = true
 }
 
 export default new ScreenSizeService();

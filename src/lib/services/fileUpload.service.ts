@@ -48,32 +48,30 @@ class FileUpload {
 	}
 
 	upload = (encryptionKey) => {
-		if (!this.blob) {
-			throw new Error("usage error: prepare was not called!")
-		}
+		return this.prepare().then(() =>
+			fileTransferQueue.enqueue(1, () => {
+				console.info("Uploading blob")
+				if (this.options.encrypt) {
+					return this.uploadAndEncryptPreparedBlob(encryptionKey, this.blob)
+				}
 
-		return fileTransferQueue.enqueue(1, () => {
-			console.info("Uploading blob")
-			if (this.options.encrypt) {
-				return this.uploadAndEncryptPreparedBlob(encryptionKey, this.blob)
-			}
+				return this.uploadPreparedBlob(this.blob)
+			}).then((keys) => {
+				if (this.file.originalUrl) {
+					const { directory, name } = unpath(this.file.originalUrl)
 
-			return this.uploadPreparedBlob(this.blob)
-		}).then((keys) => {
-			if (this.file.originalUrl) {
-				const { directory, name } = unpath(this.file.originalUrl)
+					const blobID = this.blob.getBlobID()
+					const type = this.blob.getType()
 
-				const blobID = this.blob.getBlobID()
-				const type = this.blob.getType()
+					return blobCache.moveFileToBlob(directory, name, blobID, type).then(() => keys)
+				}
 
-				return blobCache.moveFileToBlob(directory, name, blobID, type).then(() => keys)
-			}
-
-			return keys
-		})
+				return keys
+			})
+		);
 	}
 
-	prepare = h.cacheResult(() => {
+	prepare = h.cacheResult<Bluebird<any>>(() => {
 		return FileUpload.blobToDataSet(this.blob).then((data) => {
 			data.content = {
 				...data.content,

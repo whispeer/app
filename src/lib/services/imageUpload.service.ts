@@ -9,7 +9,7 @@ var imageLib = require("blueimp-load-image/js/load-image");
 
 var canvasToBlob : any = Bluebird.promisify(h.canvasToBlob.bind(h));
 
-var PREVIEWSDISABLED = false;
+var PREVIEWSDISABLED = true;
 
 type previewType = {
 	"0": string,
@@ -92,7 +92,7 @@ if (screenSizeService.mobile) {
 const uploadQueue = new Queue(3);
 uploadQueue.start();
 
-const resizeQueue = new Queue(1);
+const resizeQueue = new Queue(3);
 resizeQueue.start();
 
 const sizeDiff = (a, b) => {
@@ -278,24 +278,22 @@ class ImageUpload extends FileUpload {
 	};
 
 	upload = (encryptionKey?) => {
-		if (!this.blobs) {
-			throw new Error("usage error: prepare was not called!");
-		}
-
 		if (this.options.encrypt && !encryptionKey) {
 			throw new Error("No encryption key given")
 		}
 
-		return uploadQueue.enqueue(1, () => {
-			return Bluebird.resolve(this.blobs).bind(this).map((blobWithMetaData: any) => {
-				console.info("Uploading blob");
-				if (this.options.encrypt) {
-					return this.uploadAndEncryptPreparedBlob(encryptionKey, blobWithMetaData.blob);
-				}
+		return this.prepare().then(() =>
+			uploadQueue.enqueue(1, () => {
+				return Bluebird.resolve(this.blobs).bind(this).map((blobWithMetaData: any) => {
+					console.info("Uploading blob");
+					if (this.options.encrypt) {
+						return this.uploadAndEncryptPreparedBlob(encryptionKey, blobWithMetaData.blob);
+					}
 
-				return this.uploadPreparedBlob(blobWithMetaData.blob);
-			});
-		});
+					return this.uploadPreparedBlob(blobWithMetaData.blob);
+				});
+			})
+		);
 	};
 
 	private _createSizeData = (size: size) => {
