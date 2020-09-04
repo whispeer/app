@@ -95,7 +95,7 @@
     "cordova-plugin-file-opener2": "^2.0.19",
     "cordova-plugin-filepicker": "^1.1.4",
     "cordova-plugin-globalization": "~1.0.5",
-    "cordova-plugin-inappbrowser": "~1.7.1",
+    "cordova-plugin-inappbrowser": "~3.1.0",
     "cordova-plugin-ionic-webview": "1.1.16",
     "cordova-plugin-media": "https://github.com/whispeer/cordova-plugin-media.git#fix/voicemail-recording-crash",
     "cordova-plugin-splashscreen": "https://github.com/whispeer/cordova-plugin-splashscreen.git#adaptedSpinner",
