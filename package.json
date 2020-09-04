@@ -133,7 +133,7 @@
     "fs-extra": "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz",
     "ionic": "^4.0.2",
     "mathsass": "^0.9.5",
-    "node-sass": "^4.5.2",
+    "node-sass": "^4.13.1",
     "raw-loader": "^0.5.1",
     "tslint": "^5.7.0",
     "typescript": "^2.4.2",
