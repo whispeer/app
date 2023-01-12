@@ -101,7 +101,7 @@
     "cordova-plugin-splashscreen": "https://github.com/whispeer/cordova-plugin-splashscreen.git#adaptedSpinner",
     "cordova-plugin-statusbar": "~2.2.1",
     "cordova-plugin-whitelist": "1.3.3",
-    "debug": "^2.6.1",
+    "debug": "^2.6.9",
     "deepmerge": "^1.3.0",
     "idb": "^2.0.3",
     "in-view": "^0.6.1",
